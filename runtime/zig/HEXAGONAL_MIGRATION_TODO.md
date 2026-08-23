@@ -2,7 +2,7 @@
 
 **Target Architecture Spec:** [`docs/runtime-hexagonal-architecture-plan.md`](../../docs/runtime-hexagonal-architecture-plan.md)  
 **Target Box Diagram:** [`assets/architecture/doe-zig-hexagonal-box-diagram.svg`](../../assets/architecture/doe-zig-hexagonal-box-diagram.svg)  
-**Last Updated:** 2026-08-22
+**Last Updated:** 2026-08-23
 
 ---
 
@@ -46,11 +46,16 @@
       synthetic success
 - [x] Delete `BackendIface`, `BackendVTable`, and `backend_registry.zig`
 
-### Phase 5: Extract Application Orchestration Across All Inbound Adapters
-- [x] Unify CLI orchestration through `src/composition/cli.zig` and `src/app/`
-- [x] Unify native WebGPU object API through `src/composition/native.zig` and `src/app/`
-- [x] Unify drop-in C ABI through `src/composition/dropin.zig` and `src/app/`
-- [x] Unify plan executor through `src/composition/plan.zig` and `src/app/`
+### Phase 5: Establish the Real Inbound Routes
+- [x] Route CLI canonical commands through `runtime/execution.zig`,
+      `app/prepare.zig`, and `app/runner.zig`
+- [x] Route plan-executor canonical commands through the same path
+- [x] Remove the unconsumed `composition/cli.zig`, `native.zig`, `dropin.zig`,
+      and `plan.zig` facades instead of treating package-root reachability as
+      production use
+- [x] Keep the native WebGPU object API and drop-in C ABI classified as a
+      separate object/FFI execution surface; do not claim those object calls
+      are canonical `Command` variants
 
 ### Phase 6: Extract the Evidence Plane
 - [x] Implement `src/evidence/port.zig`
@@ -62,15 +67,16 @@
 
 ### Phase 7: Deduplicate Runtime State
 - [x] Consolidate execution routing through `src/runtime/execution.zig` and `src/app/`
-- [x] Retain centralized pipeline caches and resource state without duplication
+- [x] Make Metal and Vulkan provider pipeline caches instance-owned; remove
+      process-global session configuration and cross-provider telemetry shims
 - [x] Route mutable pipeline-cache directories independently of immutable kernel roots
 - [x] Move backend selection, ownership, and destruction into
       `src/composition/execution_session.zig`
 - [x] Delete the old `src/backend/backend_runtime.zig` orchestration facade
 
 ### Phase 8: Migrate Remaining Commands
-- [x] Map every canonical command variant to exactly one immutable domain
-      operation
+- [x] Map every canonical `Command` variant to exactly one borrowed read-only
+      domain operation; provide an owned deep snapshot for retained work
 - [x] Execute compute, transfer, render, resource, surface, and lifecycle
       operations through the application runner and narrow ports
 
@@ -82,7 +88,7 @@
 ### Phase 10: Remove Compatibility Facades and Complete Verification
 - [x] Forbid runtime, CLI, plan, and package-root code from importing the broad
       backend interface
-- [x] Verify import graph and layer isolation (600 source-bound module
+- [x] Verify import graph and layer isolation (586 source-bound module
       decisions frozen, 0 violations)
 - [x] Pass the focused core, runtime, plan, benchmark-build, import-fence, and
       source-layout checks for this migration

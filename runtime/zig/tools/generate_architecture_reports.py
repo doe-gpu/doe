@@ -783,6 +783,7 @@ def main() -> int:
             or (
                 not error.startswith("module decision review is stale for ")
                 and not error.startswith("module decision review is missing for ")
+                and not error.startswith("module decision review references missing module: ")
             )
         ]
         if blocking_manifest_errors or analysis.unresolved_imports:

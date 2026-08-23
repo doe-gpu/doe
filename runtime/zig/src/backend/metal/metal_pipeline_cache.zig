@@ -95,46 +95,6 @@ pub const WarmupTelemetry = struct {
 };
 
 // ============================================================
-// Process-level snapshot of the most-recent active cache, used by the runtime
-// CLI to populate Apple Metal pipeline cache warmup telemetry into trace_meta
-// without threading a backend reference through writeTraceMeta. Per-process
-// scope is sufficient: doe-zig-runtime creates one Metal backend per run.
-
-var process_active_cache: ?*MetalPipelineCache = null;
-
-// Process-level opt-out of the Metal pipeline cache. Set by the runtime CLI
-// when --no-pipeline-cache is passed, read by metal_native_runtime.init()
-// before opening the MTLBinaryArchive. Default false (cache enabled) so
-// existing callers and ad-hoc invocations are unaffected. The flag is a fair-
-// cold-comparison knob, documented in docs/status/2026-04.md.
-var process_pipeline_cache_disabled: bool = false;
-
-pub fn set_process_pipeline_cache_disabled(disabled: bool) void {
-    process_pipeline_cache_disabled = disabled;
-}
-
-pub fn is_process_pipeline_cache_disabled() bool {
-    return process_pipeline_cache_disabled;
-}
-
-pub fn process_active_cache_warmup_telemetry() WarmupTelemetry {
-    if (process_active_cache) |c| {
-        return .{ .count = c.telemetry.warmup_count, .ns = c.telemetry.warmup_ns };
-    }
-    return .{};
-}
-
-/// Whether a Metal pipeline cache was actually opened in this process. Returns
-/// false when (a) running on non-Mac, (b) --no-pipeline-cache disabled init,
-/// or (c) the active backend is not Doe's Metal native runtime (e.g. the
-/// dawn_delegate path goes through Dawn's own Metal backend and never opens
-/// Doe's MTLBinaryArchive). Used by the runtime CLI to derive the trace_meta
-/// pipelineCache.state field correctly across all backend selections.
-pub fn process_active_cache_present() bool {
-    return process_active_cache != null;
-}
-
-// ============================================================
 // MetalPipelineCache
 
 pub const MetalPipelineCache = struct {
@@ -178,12 +138,6 @@ pub const MetalPipelineCache = struct {
             .archive = null,
             .archive_path = null,
         };
-
-        // Surface the most-recent cache for trace_meta emission. The runtime
-        // CLI calls process_active_cache_warmup_telemetry() before writing
-        // trace_meta to fill pipelineCacheWarmupCount/Ns. Per-process scope
-        // is sufficient: doe-zig-runtime creates one Metal backend per run.
-        process_active_cache = self;
 
         if (builtin.os.tag != .macos) return self;
 
@@ -234,8 +188,14 @@ pub const MetalPipelineCache = struct {
         for (self.pending_warmup_compute.items) |k| allocator.free(k);
         self.pending_warmup_compute.deinit(allocator);
         self.pending_warmup_render.deinit(allocator);
-        if (process_active_cache == self) process_active_cache = null;
         allocator.destroy(self);
+    }
+
+    pub fn warmupTelemetry(self: *const MetalPipelineCache) WarmupTelemetry {
+        return .{
+            .count = self.telemetry.warmup_count,
+            .ns = self.telemetry.warmup_ns,
+        };
     }
 
     /// Compile or serve a compute PSO through the binary archive.

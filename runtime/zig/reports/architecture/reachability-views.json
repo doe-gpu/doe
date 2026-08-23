@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
-  "classifiedLineCount": 143885,
-  "classifiedModuleCount": 583,
+  "classifiedLineCount": 143634,
+  "classifiedModuleCount": 565,
   "facadeOnlyFiles": [
     {
       "aggregateProductionRoot": true,
@@ -48,17 +48,23 @@
   ],
   "facadeOnlyLineCount": 368,
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "35136779176f11c470fb8b8118900a6e8a3547a75dc7720b793f12edd4d24d6c",
-  "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
+  "manifestSha256": "a1e24ac3eff2fb0e5c4e91fa3ff9ffce689e9ab81813d1b59e7b2049417f9a94",
+  "reportGeneratorSha256": "4af263e10335e85d6f839348fd011c6d2cc6d1810e1a31ef1744f8751bf9779f",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "40bb7946ecbd9b395e1b3c56823cb6fc1e9d5defefdb8e57fec0b3bf89575c7b",
+  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
   "unclassifiedFiles": [
     {
       "aggregateProductionRoot": false,
       "layer": "compiler",
       "lineCount": 22,
       "path": "src/compiler/wgsl/runtime/runtime_compile.zig"
+    },
+    {
+      "aggregateProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 30,
+      "path": "src/contracts/error.zig"
     },
     {
       "aggregateProductionRoot": false,
@@ -92,9 +98,27 @@
     },
     {
       "aggregateProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 34,
+      "path": "src/contracts/specialization_policy.zig"
+    },
+    {
+      "aggregateProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 34,
+      "path": "src/contracts/workload_profile.zig"
+    },
+    {
+      "aggregateProductionRoot": false,
       "layer": "evidence",
       "lineCount": 63,
       "path": "src/evidence/oracle.zig"
+    },
+    {
+      "aggregateProductionRoot": false,
+      "layer": "evidence",
+      "lineCount": 9,
+      "path": "src/evidence/port.zig"
     },
     {
       "aggregateProductionRoot": false,
@@ -115,7 +139,7 @@
       "path": "src/evidence/trace.zig"
     }
   ],
-  "unclassifiedLineCount": 376,
+  "unclassifiedLineCount": 483,
   "views": [
     {
       "description": "WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets",
@@ -155,7 +179,7 @@
     {
       "description": "Drop-in WebGPU ABI routing and the declared legacy flat compatibility facade",
       "name": "dropin-compatibility",
-      "reachableLineCount": 85604,
+      "reachableLineCount": 85499,
       "reachableModuleCount": 318,
       "rootPatterns": [
         "src/dropin/root.zig",
@@ -171,8 +195,8 @@
     {
       "description": "Module incubation, plan comparison, and repo-only integration executables used for evidence rather than shipped runtime claims",
       "name": "module-incubation-evidence-tools",
-      "reachableLineCount": 78378,
-      "reachableModuleCount": 336,
+      "reachableLineCount": 78135,
+      "reachableModuleCount": 318,
       "rootPatterns": [
         "src/cli/entrypoints/module_runner.zig",
         "src/cli/module_runner_cli.zig",
@@ -202,8 +226,8 @@
     {
       "description": "Implementation roots selected by the shipped runtime CLI and libwebgpu_doe package artifact",
       "name": "shipped-native-package-runtime",
-      "reachableLineCount": 107249,
-      "reachableModuleCount": 442,
+      "reachableLineCount": 106998,
+      "reachableModuleCount": 424,
       "rootPatterns": [
         "src/cli/entrypoints/main.zig",
         "src/cli/runtime_cli.zig",

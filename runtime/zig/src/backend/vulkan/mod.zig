@@ -5,9 +5,11 @@ const model_profile = @import("../../contracts/model/model_profile.zig");
 const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
 const compute_contract = @import("../../contracts/compute.zig");
+const prepared = @import("../../contracts/prepared_operation.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
 const webgpu = @import("../../contracts/runtime_types.zig");
+const runtime_configuration = @import("../../contracts/runtime_configuration.zig");
 const runtime_telemetry = @import("../../contracts/runtime_telemetry.zig");
 const backend_telemetry = @import("../backend_telemetry.zig");
 const port_factory = @import("../ports/factory.zig");
@@ -52,6 +54,8 @@ const UPLOAD_BATCH_LAZY: u32 = std.math.maxInt(u32);
 pub const ZigVulkanBackend = struct {
     allocator: std.mem.Allocator,
     kernel_root_owned: ?[]u8 = null,
+    pipeline_cache_dir_owned: ?[]u8 = null,
+    pipeline_cache_enabled: bool = true,
     runtime: ?native_runtime.NativeVulkanRuntime = null,
 
     upload_path_policy: backend_policy.UploadPathPolicy = .allow_mapped_shortcuts,
@@ -97,10 +101,27 @@ pub const ZigVulkanBackend = struct {
         kernel_root: ?[]const u8,
         selection_policy: backend_policy.SelectionPolicy,
     ) !*ZigVulkanBackend {
+        return init_with_selection_policy_and_cache_configuration(
+            allocator,
+            profile,
+            kernel_root,
+            .{},
+            selection_policy,
+        );
+    }
+
+    pub fn init_with_selection_policy_and_cache_configuration(
+        allocator: std.mem.Allocator,
+        profile: model.DeviceProfile,
+        kernel_root: ?[]const u8,
+        pipeline_cache: runtime_configuration.PipelineCacheConfiguration,
+        selection_policy: backend_policy.SelectionPolicy,
+    ) !*ZigVulkanBackend {
         return init_with_backend_policy(
             allocator,
             profile,
             kernel_root,
+            pipeline_cache,
             selection_policy.upload_path_policy,
             selection_policy.queue_family_policy,
             selection_policy.deferred_submission_sync_policy,
@@ -114,13 +135,14 @@ pub const ZigVulkanBackend = struct {
         kernel_root: ?[]const u8,
         upload_path_policy: backend_policy.UploadPathPolicy,
     ) !*ZigVulkanBackend {
-        return init_with_backend_policy(allocator, profile, kernel_root, upload_path_policy, .prefer_graphics_compute, .prefer_timeline_semaphore, .fixed_32_when_supported);
+        return init_with_backend_policy(allocator, profile, kernel_root, .{}, upload_path_policy, .prefer_graphics_compute, .prefer_timeline_semaphore, .fixed_32_when_supported);
     }
 
     fn init_with_backend_policy(
         allocator: std.mem.Allocator,
         profile: model.DeviceProfile,
         kernel_root: ?[]const u8,
+        pipeline_cache: runtime_configuration.PipelineCacheConfiguration,
         upload_path_policy: backend_policy.UploadPathPolicy,
         queue_family_policy: webgpu.QueueFamilyPolicy,
         deferred_submission_sync_policy: webgpu.DeferredSubmissionSyncPolicy,
@@ -129,6 +151,12 @@ pub const ZigVulkanBackend = struct {
         if (profile.api != .vulkan) return error.UnsupportedFeature;
 
         const owned_kernel_root = if (kernel_root) |root| try allocator.dupe(u8, root) else null;
+        errdefer if (owned_kernel_root) |root| allocator.free(root);
+        const owned_pipeline_cache_dir = if (pipeline_cache.directory.len > 0)
+            try allocator.dupe(u8, pipeline_cache.directory)
+        else
+            null;
+        errdefer if (owned_pipeline_cache_dir) |directory| allocator.free(directory);
 
         const ptr = try allocator.create(ZigVulkanBackend);
         errdefer allocator.destroy(ptr);
@@ -136,6 +164,8 @@ pub const ZigVulkanBackend = struct {
         ptr.* = .{
             .allocator = allocator,
             .kernel_root_owned = owned_kernel_root,
+            .pipeline_cache_dir_owned = owned_pipeline_cache_dir,
+            .pipeline_cache_enabled = pipeline_cache.enabled,
             .runtime = null,
             .upload_path_policy = upload_path_policy,
             .upload_buffer_usage_mode = .copy_dst_copy_src,
@@ -211,9 +241,13 @@ pub const ZigVulkanBackend = struct {
 
     pub fn ensure_runtime_bootstrapped(self: *ZigVulkanBackend) !*native_runtime.NativeVulkanRuntime {
         if (self.runtime == null) {
-            self.runtime = try native_runtime.NativeVulkanRuntime.init_with_backend_policy(
+            self.runtime = try native_runtime.NativeVulkanRuntime.init_with_backend_policy_and_cache(
                 self.allocator,
                 self.kernel_root_owned,
+                .{
+                    .enabled = self.pipeline_cache_enabled,
+                    .directory = self.pipeline_cache_dir_owned orelse "",
+                },
                 self.queue_family_policy,
                 self.deferred_submission_sync_policy,
                 self.vulkan_subgroup_size_policy,
@@ -410,13 +444,15 @@ pub fn queue_family_supports_graphics_from_context(ctx: *anyopaque) ?bool {
 }
 
 pub fn pipeline_cache_active_from_context(ctx: *anyopaque) bool {
-    _ = ctx;
-    return vk_pipeline_cache_persistent.process_active_cache_present();
+    const self = cast(ctx);
+    if (self.runtime) |*runtime| return runtime.pipeline_cache.active();
+    return false;
 }
 
 pub fn pipeline_cache_warmup_telemetry_from_context(ctx: *anyopaque) vk_pipeline_cache_persistent.WarmupTelemetry {
-    _ = ctx;
-    return vk_pipeline_cache_persistent.process_active_cache_warmup_telemetry();
+    const self = cast(ctx);
+    if (self.runtime) |*runtime| return runtime.pipeline_cache.warmupTelemetry();
+    return .{};
 }
 
 pub fn last_submit_count_from_context(ctx: *anyopaque) ?u32 {
@@ -425,14 +461,6 @@ pub fn last_submit_count_from_context(ctx: *anyopaque) ?u32 {
         return runtime.last_submit_count;
     }
     return null;
-}
-
-pub fn set_pipeline_cache_disabled(disabled: bool) void {
-    vk_pipeline_cache_persistent.set_process_pipeline_cache_disabled(disabled);
-}
-
-pub fn set_pipeline_cache_dir(dir: []const u8) void {
-    vk_pipeline_cache_persistent.set_process_pipeline_cache_dir(dir);
 }
 
 fn deinit(ctx: *anyopaque) void {
@@ -447,6 +475,10 @@ fn deinit(ctx: *anyopaque) void {
         allocator.free(kernel_root);
         self.kernel_root_owned = null;
     }
+    if (self.pipeline_cache_dir_owned) |directory| {
+        allocator.free(directory);
+        self.pipeline_cache_dir_owned = null;
+    }
 
     allocator.destroy(self);
 }
@@ -455,6 +487,30 @@ fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.Nati
     const self = cast(ctx);
     self.reset_last_submit_count();
     return backend_execute.execute_command(self, command);
+}
+
+fn execute_prepared_compute(ctx: *anyopaque, operation: prepared.PreparedComputeOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.toCommand());
+}
+
+fn execute_prepared_transfer(ctx: *anyopaque, operation: prepared.PreparedTransferOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand().?);
+}
+
+fn execute_prepared_render(ctx: *anyopaque, operation: prepared.PreparedRenderOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_resource(ctx: *anyopaque, operation: prepared.PreparedResourceOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_surface(ctx: *anyopaque, operation: prepared.PreparedSurfaceOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_lifecycle(ctx: *anyopaque, operation: prepared.PreparedLifecycleOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.toCommand());
 }
 
 fn execute_dispatch(context: compute_contract.ComputeContext, request: compute_contract.DispatchRequest) anyerror!compute_contract.DispatchReport {
@@ -550,7 +606,12 @@ pub fn destroyContext(ctx: *anyopaque) void {
 
 const PortDriver = struct {
     pub const backendId = backend_id;
-    pub const executeCommand = execute_command;
+    pub const executePreparedCompute = execute_prepared_compute;
+    pub const executePreparedTransfer = execute_prepared_transfer;
+    pub const executePreparedRender = execute_prepared_render;
+    pub const executePreparedResource = execute_prepared_resource;
+    pub const executePreparedSurface = execute_prepared_surface;
+    pub const executePreparedLifecycle = execute_prepared_lifecycle;
     pub const executeDispatch = execute_dispatch;
     pub const executeBufferWrite = execute_buffer_write_bytes_iface;
     pub const setUploadBehavior = set_upload_behavior;

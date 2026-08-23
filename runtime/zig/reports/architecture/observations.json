@@ -1,70 +1,127 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "35136779176f11c470fb8b8118900a6e8a3547a75dc7720b793f12edd4d24d6c",
+  "manifestSha256": "a1e24ac3eff2fb0e5c4e91fa3ff9ffce689e9ab81813d1b59e7b2049417f9a94",
   "observations": {
     "baselineComparison": {
-      "moduleCountDelta": 53,
-      "oneConsumerModuleCountDelta": 41,
+      "moduleCountDelta": 39,
+      "oneConsumerModuleCountDelta": 34,
       "reexportOnlyModuleCountDelta": -7,
       "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d",
       "status": "diagnostic-only"
     },
     "buildMeasurements": {
-      "capturedSourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
-      "currentSourceTreeSha256": "40bb7946ecbd9b395e1b3c56823cb6fc1e9d5defefdb8e57fec0b3bf89575c7b",
-      "status": "stale-source-mismatch"
+      "artifacts": [
+        {
+          "path": "$MEASUREMENT_ROOT/prefix/bin/doe-zig-runtime",
+          "sha256": "fe791022438bc990c4aa83c69af896f4f0badf675eedc56d630841795d40896b",
+          "sizeBytes": 1900800
+        }
+      ],
+      "buildStep": "doe-runtime",
+      "captureToolChangedDuringCapture": false,
+      "captureToolSha256": "897fe525b858db9269d5b8bc624d6a42b07e1283f7bfa26cf0d12ef9152a2c66",
+      "cleanCompile": {
+        "elapsedNs": 28362768541,
+        "exitCode": 0,
+        "stderr": "",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout": "",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "/opt/homebrew/Cellar/zig/0.15.2/bin/zig",
+        "build",
+        "doe-runtime",
+        "-Doptimize=ReleaseSafe",
+        "-j1",
+        "--seed",
+        "0",
+        "--summary",
+        "none",
+        "--cache-dir",
+        "$MEASUREMENT_ROOT/cache",
+        "--global-cache-dir",
+        "$MEASUREMENT_ROOT/global-cache",
+        "--prefix",
+        "$MEASUREMENT_ROOT/prefix"
+      ],
+      "host": {
+        "machine": "arm64",
+        "operatingSystem": "Darwin",
+        "release": "25.3.0"
+      },
+      "incrementalCompile": {
+        "elapsedNs": 142427958,
+        "exitCode": 0,
+        "stderr": "",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout": "",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "measurementClass": "diagnostic-only",
+      "optimize": "ReleaseSafe",
+      "schemaVersion": 2,
+      "sourceChangedBeforeIncremental": false,
+      "sourceChangedDuringCapture": false,
+      "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
+      "status": "captured",
+      "toolchain": {
+        "path": "/opt/homebrew/Cellar/zig/0.15.2/bin/zig",
+        "sha256": "78adeedbea88263f19e8aefb31896e092eb265efc570f0a6dfbe9fd01e630ef6",
+        "version": "0.15.2"
+      }
     },
     "coChange": {
-      "commitsConsidered": 167,
+      "commitsConsidered": 168,
       "reportedPairCount": 1000,
       "status": "diagnostic-only"
     },
     "fanInDistribution": {
       "maximum": 97,
-      "mean": 4.113,
+      "mean": 4.128,
       "median": 2.0,
       "minimum": 0,
       "p25": 1.0,
       "p75": 4.0,
-      "populationStdDev": 7.318
+      "populationStdDev": 7.368
     },
     "fanOutDistribution": {
       "maximum": 53,
-      "mean": 4.113,
+      "mean": 4.128,
       "median": 3.0,
       "minimum": 0,
       "p25": 1.0,
       "p75": 5.0,
-      "populationStdDev": 4.941
+      "populationStdDev": 5.006
     },
     "fileSizeDistribution": {
       "maximum": 1063,
-      "mean": 241.048,
-      "median": 145.0,
+      "mean": 246.561,
+      "median": 157.0,
       "minimum": 1,
-      "p25": 51.5,
-      "p75": 343.0,
-      "populationStdDev": 249.11
+      "p25": 56.0,
+      "p75": 354.5,
+      "populationStdDev": 249.832
     },
-    "moduleCount": 600,
-    "oneConsumerModuleCount": 248,
+    "moduleCount": 586,
+    "oneConsumerModuleCount": 241,
     "publicDeclarationsByLayer": {
-      "app": 58,
-      "backend-adapter": 9,
+      "app": 25,
+      "backend-adapter": 6,
       "backend-common": 20,
       "backend-d3d12": 254,
-      "backend-metal": 202,
+      "backend-metal": 197,
       "backend-policy": 11,
       "backend-ports": 60,
-      "backend-services": 123,
-      "backend-vulkan": 1048,
+      "backend-services": 122,
+      "backend-vulkan": 1037,
       "cli": 34,
       "command": 60,
       "compatibility": 12,
       "compiler": 1212,
-      "composition": 26,
-      "contracts": 819,
+      "composition": 12,
+      "contracts": 821,
       "core": 1387,
       "dropin": 158,
       "evidence": 25,
@@ -82,8 +139,8 @@
     "reexportOnlyModuleCount": 42,
     "status": "diagnostic-only"
   },
-  "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
+  "reportGeneratorSha256": "4af263e10335e85d6f839348fd011c6d2cc6d1810e1a31ef1744f8751bf9779f",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "40bb7946ecbd9b395e1b3c56823cb6fc1e9d5defefdb8e57fec0b3bf89575c7b"
+  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93"
 }

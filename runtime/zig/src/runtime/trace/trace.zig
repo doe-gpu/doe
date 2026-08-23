@@ -114,16 +114,11 @@ pub const TraceRunSummary = struct {
     quirk_mode: ?[]const u8 = null,
     determinism: ?trace_determinism.TraceDeterminismSummary = null,
     numeric_stability: ?numeric_stability.trace_meta.TraceNumericStabilitySummary = null,
-    // Apple Metal pipeline cache state and warmup telemetry. `pipeline_cache_
-    // active` is populated by backend_runtime_telemetry.refresh from the active
-    // Metal backend's process-level cache pointer; it is true only when Doe's
-    // Metal native runtime opened an MTLBinaryArchive. `pipeline_cache_disabled`
-    // reflects the --no-pipeline-cache CLI choice. The state/reason pair
-    // emitted into trace_meta is derived from BOTH (see writeTraceMeta below)
-    // so a dawn_delegate Metal run reports state=disabled reason=non-doe-backend
-    // even when the CLI flag is absent. See bench/lib/metal_pipeline_cache_
-    // manifest.py for the reader and CLAUDE.md non-negotiable #7 (hardware-
-    // path asymmetry).
+    // Selected-provider pipeline-cache state and warmup telemetry. Provider
+    // instances own their cache handles and expose snapshots through the
+    // telemetry port; `pipeline_cache_disabled` reflects construction-time
+    // policy such as --no-pipeline-cache. The state/reason pair emitted below
+    // distinguishes an explicit disable from a non-Doe/delegate provider.
     pipeline_cache_active: bool = false,
     pipeline_cache_disabled: bool = false,
     pipeline_cache_warmup_count: u64 = 0,

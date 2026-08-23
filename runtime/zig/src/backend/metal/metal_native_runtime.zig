@@ -70,6 +70,7 @@ pub const NativeMetalRuntime = struct {
 
     kernel_root: ?[]const u8 = null,
     pipeline_cache_dir: []const u8 = "",
+    pipeline_cache_enabled: bool = true,
 
     has_deferred_submissions: bool = false,
 
@@ -137,11 +138,13 @@ pub const NativeMetalRuntime = struct {
         allocator: std.mem.Allocator,
         kernel_root: ?[]const u8,
         pipeline_cache_dir: []const u8,
+        pipeline_cache_enabled: bool,
     ) !NativeMetalRuntime {
         var self = NativeMetalRuntime{
             .allocator = allocator,
             .kernel_root = kernel_root,
             .pipeline_cache_dir = pipeline_cache_dir,
+            .pipeline_cache_enabled = pipeline_cache_enabled,
         };
         errdefer self.deinit();
         try self.bootstrap();
@@ -371,7 +374,7 @@ pub const NativeMetalRuntime = struct {
         self.has_device = true;
         self.timestamp_state.init_resources(self.device);
         if (builtin.os.tag == .macos) {
-            if (HAS_PIPELINE_CACHE and !metal_pipeline_cache.is_process_pipeline_cache_disabled()) {
+            if (HAS_PIPELINE_CACHE and self.pipeline_cache_enabled) {
                 const cache_ptr = metal_pipeline_cache.MetalPipelineCache.init(
                     self.allocator,
                     self.device,
@@ -403,6 +406,15 @@ pub const NativeMetalRuntime = struct {
         if (!HAS_PIPELINE_CACHE) return null;
         const cache = self.pipeline_binary_cache orelse return null;
         return @ptrCast(@alignCast(cache));
+    }
+
+    pub fn pipelineCacheActive(self: *const NativeMetalRuntime) bool {
+        return self.pipeline_binary_cache != null;
+    }
+
+    pub fn pipelineCacheWarmupTelemetry(self: *NativeMetalRuntime) metal_pipeline_cache.WarmupTelemetry {
+        const cache = self.pipelineBinaryCache() orelse return .{};
+        return cache.warmupTelemetry();
     }
 
     pub fn ensure_kernel_pipeline(self: *NativeMetalRuntime, kernel: []const u8, entry_point: ?[]const u8) !?*anyopaque {

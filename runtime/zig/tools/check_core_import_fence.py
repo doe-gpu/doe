@@ -41,6 +41,33 @@ BACKEND_PRIVATE_DIRS = (
 BACKEND_COMPOSITION_ROOTS = {
     (ZIG_SRC / "composition" / "backend_factory.zig").resolve(),
 }
+BACKEND_PROVIDER_INTEGRATION_ROOTS = {
+    (ZIG_SRC / "backend" / path).resolve()
+    for path in (
+        "dropin_capabilities.zig",
+        "dropin_external_texture.zig",
+        "dropin_lifecycle.zig",
+        "dropin_pipeline_cache.zig",
+        "dropin_queue_submit.zig",
+        "dropin_render_state.zig",
+        "dropin_resource_ops.zig",
+        "dropin_surface_ops.zig",
+        "metal_package_pipeline_cache.zig",
+    )
+}
+BACKEND_PROVIDER_OWNERS = BACKEND_COMPOSITION_ROOTS | BACKEND_PROVIDER_INTEGRATION_ROOTS
+PROVIDER_ADAPTER = ZIG_SRC / "backend" / "ports" / "provider_adapter.zig"
+PROVIDER_DRIVER_FILES = (
+    ZIG_SRC / "backend" / "dawn_delegate_backend.zig",
+    ZIG_SRC / "backend" / "metal" / "mod.zig",
+    ZIG_SRC / "backend" / "vulkan" / "mod.zig",
+    ZIG_SRC / "backend" / "d3d12" / "mod.zig",
+)
+PROVIDER_CACHE_FILES = (
+    ZIG_SRC / "backend" / "metal" / "metal_pipeline_cache.zig",
+    ZIG_SRC / "backend" / "vulkan" / "vk_pipeline_cache_persistent.zig",
+)
+PREPARED_OPERATION_OWNER = ZIG_SRC / "app" / "prepare.zig"
 
 
 def is_stub_file(candidate: Path) -> bool:
@@ -59,6 +86,53 @@ def is_within(path: Path, root: Path) -> bool:
         return True
     except ValueError:
         return False
+
+
+def backend_private_owner(path: Path) -> Path | None:
+    """Return the concrete provider subtree that owns *path*, when any."""
+    resolved = path.resolve(strict=False)
+    return next(
+        (root for root in BACKEND_PRIVATE_DIRS if is_within(resolved, root)),
+        None,
+    )
+
+
+def backend_private_import_allowed(source: Path, target: Path) -> bool:
+    """Enforce leaf-provider isolation and the unique composition root.
+
+    Provider-private imports are legal from the unique composition root or
+    from another file in the same provider subtree. Backend-common modules do
+    not receive a blanket exemption: that would allow provider policy to leak
+    back into shared runtime code.
+    """
+    target_owner = backend_private_owner(target)
+    if target_owner is None:
+        return True
+    if source.resolve(strict=False) in BACKEND_PROVIDER_OWNERS:
+        return True
+    return backend_private_owner(source) == target_owner
+
+
+def has_broad_provider_driver_bridge(source: str) -> bool:
+    return "Driver.executeCommand" in source or re.search(
+        r"pub\s+const\s+executeCommand\s*=", source
+    ) is not None
+
+
+def has_direct_prepared_command_construction(source: str) -> bool:
+    return re.search(r"\bprepared(?:_contract)?\.fromCommand\s*\(", source) is not None
+
+
+def has_process_global_provider_cache_state(source: str) -> bool:
+    forbidden_names = (
+        "process_active_cache",
+        "process_cache_handle",
+        "process_cache_state",
+        "process_cache_disabled",
+        "process_pipeline_cache_disabled",
+        "set_process_pipeline_cache",
+    )
+    return any(name in source for name in forbidden_names)
 
 
 def iter_zig_imports(root: Path) -> Iterator[tuple[Path, int, str, Path]]:
@@ -134,12 +208,12 @@ def scan_compat_facade_imports(errors: list[str]) -> None:
 
 
 def scan_backend_private_imports(errors: list[str]) -> None:
-    backend_dir = ZIG_SRC / "backend"
     for path, line_no, import_path, candidate in iter_zig_imports(ZIG_SRC):
-        if is_within(path, backend_dir) or path.resolve() in BACKEND_COMPOSITION_ROOTS:
-            continue
-        if any(is_within(candidate, root) for root in BACKEND_PRIVATE_DIRS):
-            errors.append(f"{path}:{line_no}: non-backend import reaches backend-private module: {import_path}")
+        if not backend_private_import_allowed(path, candidate):
+            errors.append(
+                f"{path}:{line_no}: provider-private import crosses its owner boundary: "
+                f"{import_path}"
+            )
 
 
 def scan_backend_impl_imports(errors: list[str]) -> None:
@@ -155,6 +229,30 @@ def scan_backend_impl_imports(errors: list[str]) -> None:
             errors.append(
                 f"{path}:{line_no}: non-backend file imports backend implementation directly: {import_path}"
             )
+
+
+def scan_provider_driver_escape_hatches(errors: list[str]) -> None:
+    for path in (PROVIDER_ADAPTER, *PROVIDER_DRIVER_FILES):
+        if path.is_file() and has_broad_provider_driver_bridge(path.read_text()):
+            errors.append(
+                f"{path}: provider driver exposes broad executeCommand escape hatch"
+            )
+
+
+def scan_prepared_operation_construction(errors: list[str]) -> None:
+    for path in sorted(ZIG_SRC.rglob("*.zig")):
+        if path == PREPARED_OPERATION_OWNER:
+            continue
+        if has_direct_prepared_command_construction(path.read_text()):
+            errors.append(
+                f"{path}: canonical commands must be prepared by app/prepare.zig"
+            )
+
+
+def scan_provider_cache_ownership(errors: list[str]) -> None:
+    for path in PROVIDER_CACHE_FILES:
+        if path.is_file() and has_process_global_provider_cache_state(path.read_text()):
+            errors.append(f"{path}: provider cache state/configuration must be instance-owned")
 
 
 def scan_forbidden_runtime_state_files(errors: list[str]) -> None:
@@ -174,6 +272,9 @@ def main() -> int:
     scan_compat_facade_imports(errors)
     scan_backend_private_imports(errors)
     scan_backend_impl_imports(errors)
+    scan_provider_driver_escape_hatches(errors)
+    scan_prepared_operation_construction(errors)
+    scan_provider_cache_ownership(errors)
     if not errors:
         return 0
 

@@ -94,6 +94,7 @@ def freeze(manifest_path: Path, report_path: Path, reviewer: str) -> int:
         for error in analysis.manifest_errors
         if not error.startswith("module decision review is stale for ")
         and not error.startswith("module decision review is missing for ")
+        and not error.startswith("module decision review references missing module: ")
     ]
     if blocking_manifest_errors or analysis.unresolved_imports:
         raise RuntimeError("source architecture must be valid before review capture")

@@ -20,3 +20,14 @@ pub const GpuTimestampMode = enum {
     off,
     require,
 };
+
+/// Construction-time policy for a provider-owned mutable pipeline cache.
+///
+/// The directory is borrowed by the contract caller and must be copied by a
+/// provider that retains it. An empty directory preserves provider-specific
+/// environment/default resolution; it never aliases the immutable kernel
+/// root.
+pub const PipelineCacheConfiguration = struct {
+    enabled: bool = true,
+    directory: []const u8 = "",
+};

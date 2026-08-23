@@ -1,9 +1,11 @@
-//! Immutable, pre-validated execution units consumed by backend ports.
+//! Read-only, pre-validated execution units consumed by backend ports.
 //!
 //! Every command enters execution through exactly one domain operation. The
 //! domain split prevents backends from exposing a single catch-all command
-//! interface to application orchestration while preserving the canonical
-//! command payload byte-for-byte.
+//! interface to application orchestration. `PreparedOperation` is a borrowed
+//! view valid for the synchronous execution/callback extent. Code that queues
+//! or retains an operation must first create `OwnedPreparedOperation`, whose
+//! arena freezes every slice reachable from the payload.
 
 const std = @import("std");
 const command_contract = @import("command.zig");
@@ -188,6 +190,86 @@ pub const PreparedOperation = union(enum) {
     }
 };
 
+/// An immutable retained snapshot of a prepared operation.
+///
+/// Opaque handles and callback pointers remain identity values; all slices,
+/// including nested binding/oracle data, are recursively copied into the
+/// snapshot arena. Call `deinit` exactly once after the last borrowed view.
+pub const OwnedPreparedOperation = struct {
+    arena: std.heap.ArenaAllocator,
+    operation: PreparedOperation,
+
+    pub fn init(allocator: std.mem.Allocator, operation: PreparedOperation) !OwnedPreparedOperation {
+        var owned = OwnedPreparedOperation{
+            .arena = std.heap.ArenaAllocator.init(allocator),
+            .operation = undefined,
+        };
+        errdefer owned.arena.deinit();
+        owned.operation = try cloneValue(PreparedOperation, owned.arena.allocator(), operation);
+        return owned;
+    }
+
+    pub fn deinit(self: *OwnedPreparedOperation) void {
+        self.arena.deinit();
+        self.* = undefined;
+    }
+
+    pub fn borrow(self: *const OwnedPreparedOperation) PreparedOperation {
+        return self.operation;
+    }
+};
+
+fn cloneValue(comptime T: type, allocator: std.mem.Allocator, value: T) !T {
+    return switch (@typeInfo(T)) {
+        .optional => |optional| if (value) |present|
+            try cloneValue(optional.child, allocator, present)
+        else
+            null,
+        .array => |array| blk: {
+            var cloned: T = undefined;
+            for (value, 0..) |item, index| {
+                cloned[index] = try cloneValue(array.child, allocator, item);
+            }
+            break :blk cloned;
+        },
+        .pointer => |pointer| switch (pointer.size) {
+            .slice => blk: {
+                const cloned = try allocator.alloc(pointer.child, value.len);
+                for (value, 0..) |item, index| {
+                    cloned[index] = try cloneValue(pointer.child, allocator, item);
+                }
+                break :blk cloned;
+            },
+            .one, .many, .c => value,
+        },
+        .@"struct" => |structure| blk: {
+            var cloned: T = undefined;
+            inline for (structure.fields) |field| {
+                @field(cloned, field.name) = try cloneValue(
+                    field.type,
+                    allocator,
+                    @field(value, field.name),
+                );
+            }
+            break :blk cloned;
+        },
+        .@"union" => |union_info| blk: {
+            const active = std.meta.activeTag(value);
+            inline for (union_info.fields) |field| {
+                if (active == @field(union_info.tag_type.?, field.name)) {
+                    break :blk @unionInit(
+                        T,
+                        field.name,
+                        try cloneValue(field.type, allocator, @field(value, field.name)),
+                    );
+                }
+            }
+            unreachable;
+        },
+        else => value,
+    };
+}
+
 pub fn fromCommand(command: command_contract.Command, operation_id: u64) PreparedOperation {
     return switch (command) {
         .upload => |value| .{ .transfer = .{ .operation_id = operation_id, .operation = .{ .upload = value } } },
@@ -267,4 +349,44 @@ test "kernel preparation binds source and dispatch identity" {
     try std.testing.expect(!prepared.identity.program.isNull());
     try std.testing.expectEqual(@as(u64, 31), prepared.identity.operation_id);
     try std.testing.expect(prepared.toDispatchRequest() != null);
+}
+
+test "owned prepared operation freezes nested borrowed payloads" {
+    var kernel = [_]u8{ 'a', 'b', 'c' };
+    var oracle_kind = [_]u8{ 'u', '3', '2' };
+    var bindings = [_]model_compute.KernelBinding{.{
+        .binding = 2,
+        .resource_kind = .buffer,
+        .resource_handle = 11,
+    }};
+    const borrowed = fromCommand(.{ .kernel_dispatch = .{
+        .kernel = &kernel,
+        .x = 1,
+        .y = 1,
+        .z = 1,
+        .bindings = &bindings,
+        .output_oracle = .{
+            .schema_version = 1,
+            .scope = .isolated_dispatch,
+            .reference_class = .independent,
+            .kind = &oracle_kind,
+            .initialization = "zero",
+            .binding_group = 0,
+            .binding = 2,
+            .dispatch_count = 1,
+            .expected_sha256 = "00",
+            .reference_id = "fixture",
+        },
+    } }, 41);
+    var owned = try OwnedPreparedOperation.init(std.testing.allocator, borrowed);
+    defer owned.deinit();
+
+    kernel[0] = 'z';
+    oracle_kind[0] = 'f';
+    bindings[0].resource_handle = 99;
+
+    const frozen = owned.borrow().compute.operation.kernel_dispatch;
+    try std.testing.expectEqualStrings("abc", frozen.kernel);
+    try std.testing.expectEqualStrings("u32", frozen.output_oracle.?.kind);
+    try std.testing.expectEqual(@as(u64, 11), frozen.bindings.?[0].resource_handle);
 }

@@ -1,7 +1,9 @@
 //! Infallible observer port for prepared operations and execution reports.
 //!
 //! Observer callbacks deliberately return `void`: evidence collection cannot
-//! veto, replace, retry, or otherwise alter an execution decision.
+//! veto, replace, retry, or otherwise alter an execution decision. Operations
+//! are borrowed only for the callback extent. An observer that retains one
+//! must create an `OwnedPreparedOperation` snapshot before returning.
 
 const prepared = @import("prepared_operation.zig");
 const report = @import("execution_report.zig");

@@ -151,8 +151,9 @@ production-shaped roots.
 The 2026-08-22 execution migration also made the central runtime boundary
 physical rather than documentary:
 
-- all canonical commands become one immutable `PreparedOperation` before
-  backend execution;
+- all canonical `Command` values become one read-only borrowed
+  `PreparedOperation` before backend execution, while retained work must own a
+  deep `OwnedPreparedOperation` snapshot;
 - the application runner dispatches compute, transfer, render, resource,
   surface, lifecycle, and spatial domains only through narrow ports;
 - the production CLI, plan executor, output oracle, and Metal correctness
@@ -165,11 +166,23 @@ physical rather than documentary:
   than synthetic success.
 
 Metal, Vulkan, D3D12, and delegate providers now instantiate their narrow port
-vtables directly through a compile-time provider adapter. The runtime catch-all
+vtables directly through a compile-time provider adapter. The provider-driver
+contract has no broad `executeCommand` escape hatch. The runtime catch-all
 `BackendIface`, `BackendVTable`, `BackendRuntime`, and backend registry are
 deleted. `composition/backend_factory.zig` is the sole ordinary module allowed
 to import multiple physical providers, and it owns selection, lifetime, and
-destruction without exposing a semantic execution facade. Structural gates
+destruction without exposing a semantic execution facade. Drop-in FFI
+provider-integration roots are enumerated separately by the import fence rather
+than receiving a blanket `backend/` exemption. Metal and Vulkan pipeline-cache
+configuration, handles, device binding, and telemetry are provider-instance
+state rather than process-global session state.
+
+The 2026-08-23 consumer audit also deleted fourteen package-reexported
+incubation modules: unused application normalization/validation/scheduling
+facades, unused composition inbound facades, their unused runtime factory, and
+the cross-provider telemetry shim. The native WebGPU object API and drop-in C
+ABI remain a separately governed object/FFI execution surface; they are not
+misreported as consumers of the canonical command runner. Structural gates
 still do not substitute for physical AMD/Windows or Fawn-browser
 qualification.
 

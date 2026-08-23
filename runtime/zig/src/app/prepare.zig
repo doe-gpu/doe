@@ -1,4 +1,4 @@
-//! Prepares, validates, and freezes application requests into immutable PreparedOperations.
+//! Prepares requests into read-only PreparedOperations for synchronous execution.
 
 const std = @import("std");
 const request = @import("request.zig");

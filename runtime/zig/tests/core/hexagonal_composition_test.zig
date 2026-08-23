@@ -8,7 +8,6 @@ const backend = struct {
     }
 };
 const evidence = @import("../../src/evidence/mod.zig");
-const composition = @import("../../src/composition/mod.zig");
 const app = @import("../../src/app/mod.zig");
 const execution = @import("../../src/runtime/execution.zig");
 
@@ -57,7 +56,7 @@ test "evidence: oracle comparisons and replay validation" {
     try std.testing.expect(replay_res.matched);
 }
 
-test "composition: runtime composition and CLI/native execution roots" {
+test "production execution context prepares, observes, and routes every domain" {
     // Mock ComputePort
     const MockCompute = struct {
         fn execute(ctx: *anyopaque, compute_op: contracts.preparedOperation().PreparedComputeOperation) anyerror!contracts.executionReport().ExecutionReport {
@@ -259,42 +258,44 @@ test "composition: runtime composition and CLI/native execution roots" {
     var trace_collector = evidence.TraceCollector{};
     const ev_port = trace_collector.asEvidencePort();
 
-    const runtime_comp = composition.RuntimeComposition{
-        .ports = .{
-            .id = .doe_metal,
-            .compute = c_port,
-            .transfer = t_port,
-            .queue = q_port,
-            .readback = r_port,
-            .telemetry = tel_port,
-            .render = ren_port,
-            .resource = resource,
-            .surface = surface,
-            .lifecycle = lifecycle,
-            .spatial = spa_port,
-        },
-        .evidence = ev_port,
+    const ports = backend.ports().PortBundle{
+        .id = .doe_metal,
+        .compute = c_port,
+        .transfer = t_port,
+        .queue = q_port,
+        .readback = r_port,
+        .telemetry = tel_port,
+        .render = ren_port,
+        .resource = resource,
+        .surface = surface,
+        .lifecycle = lifecycle,
+        .spatial = spa_port,
     };
 
-    // Execute via CLI composition
-    const cli_res = try composition.executeComputeCli(runtime_comp, .{
-        .kernel_source = "fn main() {}",
-        .workgroups = .{ .x = 1, .y = 1, .z = 1 },
-    }, 77);
-    try std.testing.expect(cli_res.status.isSuccess());
-    try std.testing.expectEqual(@as(u64, 105), cli_res.timing.totalWallNs());
-    try std.testing.expectEqual(@as(u64, 1), trace_collector.event_count);
-
-    // Execute via Dropin composition
-    const data = [_]u8{ 5, 6, 7, 8 };
-    const dropin_res = try composition.executeDropinWriteBuffer(runtime_comp, 202, 0, data.len, &data, 88);
-    try std.testing.expect(dropin_res.status.isSuccess());
-    try std.testing.expectEqual(@as(u64, 30), dropin_res.timing.totalWallNs());
-    try std.testing.expectEqual(@as(u64, 2), trace_collector.event_count);
-
-    var production_context = execution.ExecutionContext.initNative(.metal_doe_app, runtime_comp.ports);
+    var production_context = execution.ExecutionContext.initNative(.metal_doe_app, ports);
     defer production_context.deinit();
     production_context.setEvidenceObserver(ev_port);
+
+    const compute_result = try production_context.execute(.{ .kernel_dispatch = .{
+        .kernel = "fn main() {}",
+        .x = 1,
+        .y = 1,
+        .z = 1,
+    } });
+    try std.testing.expectEqual(execution.ExecutionStatus.ok, compute_result.status);
+    try std.testing.expectEqual(@as(u64, 1), trace_collector.event_count);
+
+    const data = [_]u8{ 5, 6, 7, 8 };
+    const transfer_result = try production_context.execute_buffer_write_bytes_with_semantic(
+        202,
+        0,
+        data.len,
+        &data,
+        .{},
+    );
+    try std.testing.expectEqual(execution.ExecutionStatus.ok, transfer_result.status);
+    try std.testing.expectEqual(@as(u64, 2), trace_collector.event_count);
+
     const production_result = try production_context.execute(.{ .surface_present = .{ .handle = 303 } });
     try std.testing.expectEqual(execution.ExecutionStatus.ok, production_result.status);
     try std.testing.expectEqual(@as(u64, 3), trace_collector.event_count);
@@ -318,14 +319,15 @@ test "composition: runtime composition and CLI/native execution roots" {
         .prewarm_kernel = MockCompute.prewarm,
         .set_gpu_timestamp_mode = MockCompute.timestampMode,
     };
-    var failing_composition = runtime_comp;
-    failing_composition.ports.compute = .{
+    var failing_ports = ports;
+    failing_ports.compute = .{
         .context = &dummy_ctx,
         .vtable = &failing_compute_vt,
     };
-    try std.testing.expectError(
-        error.ExpectedExecutionFailure,
-        failing_composition.execute(.{ .compute = contracts.preparedOperation().fromCommand(.{ .barrier = .{ .dependency_count = 0 } }, 404).compute }),
-    );
+    var failing_context = execution.ExecutionContext.initNative(.metal_doe_app, failing_ports);
+    defer failing_context.deinit();
+    failing_context.setEvidenceObserver(ev_port);
+    const failure_result = try failing_context.execute(.{ .barrier = .{ .dependency_count = 0 } });
+    try std.testing.expectEqual(execution.ExecutionStatus.@"error", failure_result.status);
     try std.testing.expectEqual(@as(u64, 5), trace_collector.event_count);
 }

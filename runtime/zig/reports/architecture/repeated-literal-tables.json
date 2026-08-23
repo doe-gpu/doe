@@ -25,11 +25,11 @@
       "literalTokenSha256": "0a41164fcad042b7b539901669ef3578f652ca5beea16b038342f14a736e7c63",
       "locations": [
         {
-          "endLine": 103,
+          "endLine": 102,
           "literalCount": 7,
           "name": "wgpu_compare_to_vk",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 92
+          "startLine": 91
         },
         {
           "endLine": 79,
@@ -128,11 +128,11 @@
           "startLine": 315
         },
         {
-          "endLine": 460,
+          "endLine": 459,
           "literalCount": 4,
           "name": "destroy_descriptor_state",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 438
+          "startLine": 437
         },
         {
           "endLine": 105,
@@ -292,18 +292,18 @@
           "startLine": 138
         },
         {
-          "endLine": 454,
+          "endLine": 455,
           "literalCount": 4,
           "name": "flush_pending_uploads_if_required",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 443
+          "startLine": 444
         },
         {
-          "endLine": 524,
+          "endLine": 525,
           "literalCount": 4,
           "name": "execute_native_command",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 456
+          "startLine": 457
         },
         {
           "endLine": 330,
@@ -320,11 +320,11 @@
           "startLine": 11
         },
         {
-          "endLine": 658,
+          "endLine": 618,
           "literalCount": 4,
           "name": "doeNativeMetalPipelineCacheTelemetryExt",
           "path": "src/backend/metal/metal_pipeline_cache.zig",
-          "startLine": 640
+          "startLine": 600
         },
         {
           "endLine": 429,
@@ -334,18 +334,18 @@
           "startLine": 420
         },
         {
-          "endLine": 106,
+          "endLine": 105,
           "literalCount": 4,
           "name": "select_physical_device",
           "path": "src/backend/vulkan/vk_device.zig",
-          "startLine": 88
+          "startLine": 87
         },
         {
-          "endLine": 474,
+          "endLine": 473,
           "literalCount": 4,
           "name": "bind_descriptor_sets",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 462
+          "startLine": 461
         },
         {
           "endLine": 379,
@@ -891,11 +891,11 @@
           "startLine": 84
         },
         {
-          "endLine": 134,
+          "endLine": 133,
           "literalCount": 7,
           "name": "resolve_entry_point_name",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 128
+          "startLine": 127
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1018,11 +1018,11 @@
           "startLine": 54
         },
         {
-          "endLine": 301,
+          "endLine": 300,
           "literalCount": 4,
           "name": "rebuild_compute_shader_spirv",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 297
+          "startLine": 296
         },
         {
           "endLine": 389,
@@ -1643,11 +1643,11 @@
           "startLine": 399
         },
         {
-          "endLine": 226,
+          "endLine": 223,
           "literalCount": 4,
           "name": "find_memory_type_index",
           "path": "src/backend/vulkan/vk_device.zig",
-          "startLine": 216
+          "startLine": 213
         },
         {
           "endLine": 412,
@@ -1864,18 +1864,18 @@
       "literalTokenSha256": "c6ae422b2a11d1f3e58c525624de67e033221296623b8d3a530d17ebd3992c44",
       "locations": [
         {
-          "endLine": 400,
+          "endLine": 397,
           "literalCount": 8,
           "name": "detect_instance_extension",
           "path": "src/backend/vulkan/vk_device.zig",
-          "startLine": 380
+          "startLine": 377
         },
         {
-          "endLine": 423,
+          "endLine": 420,
           "literalCount": 8,
           "name": "detect_device_extension",
           "path": "src/backend/vulkan/vk_device.zig",
-          "startLine": 403
+          "startLine": 400
         },
         {
           "endLine": 213,
@@ -1926,11 +1926,11 @@
           "startLine": 162
         },
         {
-          "endLine": 270,
+          "endLine": 267,
           "literalCount": 6,
           "name": "select_queue_family_for_device",
           "path": "src/backend/vulkan/vk_device.zig",
-          "startLine": 245
+          "startLine": 242
         },
         {
           "endLine": 36,
@@ -2023,11 +2023,11 @@
       "literalTokenSha256": "cf02607498749410127fb5111ef8bab8f05cb0b6f4ad6f4c89566ea32aa7969e",
       "locations": [
         {
-          "endLine": 78,
+          "endLine": 77,
           "literalCount": 8,
           "name": "spirv_has_entry_point",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 62
+          "startLine": 61
         },
         {
           "endLine": 54,
@@ -2164,11 +2164,11 @@
       "literalTokenSha256": "d84953ead5ce15e96a78bc8af113fec861d6c885d116fab23fc1e14cfb0d9dac",
       "locations": [
         {
-          "endLine": 300,
+          "endLine": 301,
           "literalCount": 4,
           "name": "execute_barrier",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 285
+          "startLine": 286
         },
         {
           "endLine": 101,
@@ -2515,11 +2515,11 @@
           "startLine": 424
         },
         {
-          "endLine": 144,
+          "endLine": 143,
           "literalCount": 4,
           "name": "topology_to_vk",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 136
+          "startLine": 135
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2535,7 +2535,7 @@
           "startLine": 23
         },
         {
-          "endLine": 131,
+          "endLine": 126,
           "literalCount": 25,
           "name": "TraceRunSummary",
           "path": "src/runtime/trace/trace.zig",
@@ -2546,10 +2546,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "35136779176f11c470fb8b8118900a6e8a3547a75dc7720b793f12edd4d24d6c",
-  "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
+  "manifestSha256": "a1e24ac3eff2fb0e5c4e91fa3ff9ffce689e9ab81813d1b59e7b2049417f9a94",
+  "reportGeneratorSha256": "4af263e10335e85d6f839348fd011c6d2cc6d1810e1a31ef1744f8751bf9779f",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "40bb7946ecbd9b395e1b3c56823cb6fc1e9d5defefdb8e57fec0b3bf89575c7b",
+  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
   "status": "captured"
 }

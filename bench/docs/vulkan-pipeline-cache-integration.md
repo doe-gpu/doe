@@ -4,9 +4,10 @@ Audience: engineers implementing Doe-side persistent `VkPipelineCache` to close 
 
 ## Status
 
-Scoping-only as of 2026-04-17. Doe's Vulkan backend currently passes `VK_NULL_U64` (VK_NULL_HANDLE) as the `pipelineCache` argument to `vkCreateComputePipelines` (`runtime/zig/src/backend/vulkan/vk_pipeline.zig:385`) and `vkCreateGraphicsPipelines` (`vk_render_pipeline.zig:457`). Dawn's Vulkan backend uses `dawn::native::vulkan::PipelineCacheVk` and threads a real `VkPipelineCache` into every pipeline creation call.
-
-This document scopes the Doe-side implementation without introducing placeholder Zig code (CLAUDE.md non-negotiable #2 forbids runtime-behavior placeholders in the execution path).
+Implemented and refactored to provider-instance ownership as of 2026-08-23.
+Doe passes a real cache handle to compute and graphics pipeline creation when
+the selected Vulkan provider successfully opens its cache. This document
+retains the design rationale and records the landed ownership shape.
 
 See also:
 
@@ -17,9 +18,13 @@ See also:
 ## What Doe has today
 
 - `runtime/zig/src/backend/vulkan/vk_pipeline_cache.zig` is an *in-memory* per-device state cache of descriptor-set / pipeline / layout handles. It is not a persistent `VkPipelineCache` and not disk-backed.
-- Pipeline creation calls pass `VK_NULL_U64` as the cache handle. Every `vkCreateComputePipelines` / `vkCreateGraphicsPipelines` call is therefore a cold compile at the driver level.
-- The `--no-pipeline-cache` CLI flag (`runtime/zig/src/cli/runtime_cli_args.zig:205-206`) exists and is plumbed to Metal (`backend_runtime_telemetry.set_metal_pipeline_cache_disabled`) but is a no-op on the Vulkan path today.
-- `trace_meta.pipelineCache.{state,reason,warmupCount,warmupNs}` fields exist and are populated only on Metal builds.
+- `vk_pipeline_cache_persistent.zig` owns the real per-provider Vulkan cache,
+  including disk persistence and warmup telemetry.
+- Compute and graphics pipeline creation consume that instance handle.
+- `--no-pipeline-cache` and an explicit mutable cache directory flow through
+  `ExecutionSession` construction for both Doe Metal and Doe Vulkan.
+- `trace_meta.pipelineCache.{state,reason,warmupCount,warmupNs}` is populated
+  through provider telemetry.
 
 ## Vulkan API surface required
 
@@ -80,62 +85,53 @@ Add:
 
 Must be used by the new module below; the current Zig convention is that every FFI declaration is referenced somewhere in the backend tree.
 
-### 2. Persistent cache module -- `runtime/zig/src/backend/vulkan/vk_pipeline_cache_persistent.zig` (new)
+### 2. Persistent cache module -- `runtime/zig/src/backend/vulkan/vk_pipeline_cache_persistent.zig`
 
-Mirrors the shape of `runtime/zig/src/backend/metal/metal_pipeline_cache.zig`:
+The landed module is provider-instance owned:
 
 ```zig
 pub const VulkanPipelineCacheState = enum { disabled, enabled, enabled_reloaded };
-
-// Process-level handle (matches Metal's `process_active_cache` pattern).
-var process_cache_handle: c.VkPipelineCache = c.VK_NULL_U64;
-var process_cache_state: VulkanPipelineCacheState = .disabled;
-var process_cache_path: ?[]u8 = null;
-var process_cache_disabled: bool = false;
-
-pub fn set_process_pipeline_cache_disabled(disabled: bool) void;
-pub fn is_process_pipeline_cache_disabled() bool;
-
-pub fn create_process_pipeline_cache(
-    device: c.VkDevice,
-    cache_dir: ?[]const u8,
-) !void;
-
-pub fn destroy_process_pipeline_cache(device: c.VkDevice) void;
-
-pub fn handle_for_pipeline_creation() c.VkPipelineCache;
-
-pub fn process_active_cache_telemetry() struct { state: VulkanPipelineCacheState, warmup_count: u64, warmup_ns: u64 };
+pub const VulkanPipelineCache = struct {
+    pub fn init(configuration: PipelineCacheConfiguration) VulkanPipelineCache;
+    pub fn create(self: *VulkanPipelineCache, device: c.VkDevice) !void;
+    pub fn deinit(self: *VulkanPipelineCache, device: c.VkDevice) void;
+    pub fn flush(self: *VulkanPipelineCache, device: c.VkDevice) void;
+    pub fn handleForPipelineCreation(self: *const VulkanPipelineCache) c.VkPipelineCache;
+    pub fn active(self: *const VulkanPipelineCache) bool;
+    pub fn warmupTelemetry(self: *const VulkanPipelineCache) WarmupTelemetry;
+};
 ```
 
 Key behaviors:
 
-- `create_process_pipeline_cache` reads the existing blob at `<cache_dir>/vulkan-pipeline-cache.blob` if present, validates its `VkPipelineCacheHeaderVersionOne` against the current device's vendorID/deviceID/UUID (reject mismatches -- loading a mismatched blob is UB per spec), creates the cache with or without `pInitialData`, and records `process_cache_state`.
-- `handle_for_pipeline_creation` returns `process_cache_handle` when not disabled, else `VK_NULL_U64`. This is the replacement for the current bare `VK_NULL_U64` argument.
-- `destroy_process_pipeline_cache` serializes via `vkGetPipelineCacheData` and writes atomically (`*.tmp` + `rename`) to the cache path, then destroys the handle.
+- `create` reads the existing blob when configured and lets the Vulkan driver
+  accept or discard incompatible initial data as required by the API.
+- `handleForPipelineCreation` returns the instance handle when active, else
+  `VK_NULL_U64`.
+- `deinit` serializes via `vkGetPipelineCacheData`, writes atomically
+  (`*.tmp` + `rename`), and destroys the cache before its device.
 
 Telemetry mirrors Metal's shape so the existing reader side (`bench/native_compare_modules/run_artifact.py::_pipeline_cache_telemetry`) works without changes.
 
-### 3. Cross-platform wrapper -- `backend_runtime_telemetry.zig` additions
+### 3. Provider-owned configuration and telemetry
 
-Parallel to the Metal flag plumbing:
-
-```zig
-pub fn set_vulkan_pipeline_cache_disabled(disabled: bool) void;  // no-op on non-Vulkan builds
-pub fn vulkan_pipeline_cache_telemetry() ?PipelineCacheTelemetry;
-```
-
-Preserves the `cli/ -> backend/` import fence.
+The process-global wrapper design was superseded on 2026-08-23.
+`ExecutionSession` now passes `PipelineCacheConfiguration` through
+`composition/backend_factory.zig`; `NativeVulkanRuntime` owns the cache handle,
+device binding, persistence path, enablement, and warmup telemetry. This keeps
+the import fence while allowing independent concurrent provider sessions.
 
 ### 4. Pipeline-creation callsite changes
 
-In `runtime/zig/src/backend/vulkan/vk_pipeline.zig:385` and `vk_render_pipeline.zig:457`, replace `VK_NULL_U64` with `vk_pipeline_cache_persistent.handle_for_pipeline_creation()`.
+Compute and render pipeline creation read
+`self.pipeline_cache.handleForPipelineCreation()` from the selected runtime.
 
 This is the one-line runtime change that actually activates the cache. Everything else is infrastructure.
 
 ### 5. CLI + options
 
-`--no-pipeline-cache` is already parsed (`cli/runtime_cli_args.zig:205-206`). Extend its effect in `cli/runtime_cli.zig` to call both the Metal and Vulkan wrappers before `ExecutionContext.init`.
+`--no-pipeline-cache` is parsed by the CLI and becomes construction-time
+provider configuration through `ExecutionSession`.
 
 Optional new flag: `--pipeline-cache-dir <path>` to override the default cache location. Default location is `${XDG_CACHE_HOME:-~/.cache}/doe/pipeline-cache/vulkan/`.
 

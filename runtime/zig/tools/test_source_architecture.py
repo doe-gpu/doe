@@ -11,6 +11,15 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_source_layout import architecture_errors
+from check_core_import_fence import (
+    BACKEND_COMPOSITION_ROOTS,
+    BACKEND_PRIVATE_DIRS,
+    BACKEND_PROVIDER_INTEGRATION_ROOTS,
+    backend_private_import_allowed,
+    has_broad_provider_driver_bridge,
+    has_direct_prepared_command_construction,
+    has_process_global_provider_cache_state,
+)
 from source_architecture import analyze, load_manifest, matches_glob
 
 
@@ -87,6 +96,59 @@ def _write(root: Path, relative_path: str, content: str) -> None:
 
 
 class SourceArchitectureTests(unittest.TestCase):
+    def test_process_global_provider_cache_state_is_rejected(self) -> None:
+        self.assertTrue(has_process_global_provider_cache_state("var process_cache_handle: u64 = 0;"))
+        self.assertTrue(has_process_global_provider_cache_state("pub fn set_process_pipeline_cache_disabled(value: bool) void {}"))
+        self.assertFalse(has_process_global_provider_cache_state("pipeline_cache: VulkanPipelineCache"))
+
+    def test_direct_prepared_command_construction_is_rejected(self) -> None:
+        self.assertTrue(has_direct_prepared_command_construction("return prepared.fromCommand(command, id);"))
+        self.assertTrue(has_direct_prepared_command_construction("return prepared_contract.fromCommand(command, id);"))
+        self.assertFalse(has_direct_prepared_command_construction("return app.prepareCommand(command, id);"))
+
+    def test_broad_provider_driver_bridge_is_rejected(self) -> None:
+        self.assertTrue(has_broad_provider_driver_bridge("return Driver.executeCommand(ctx, command);"))
+        self.assertTrue(has_broad_provider_driver_bridge("pub const executeCommand = execute_command;"))
+        self.assertFalse(has_broad_provider_driver_bridge("pub const executePreparedRender = execute_render;"))
+
+    def test_provider_private_imports_require_explicit_owners(self) -> None:
+        metal_root, vulkan_root, _ = BACKEND_PRIVATE_DIRS
+        composition_root = next(iter(BACKEND_COMPOSITION_ROOTS))
+        integration_root = next(iter(BACKEND_PROVIDER_INTEGRATION_ROOTS))
+        common_module = metal_root.parent / "backend_runtime_telemetry.zig"
+
+        self.assertTrue(
+            backend_private_import_allowed(
+                metal_root / "mod.zig",
+                metal_root / "metal_native_runtime.zig",
+            )
+        )
+        self.assertTrue(
+            backend_private_import_allowed(
+                composition_root,
+                vulkan_root / "mod.zig",
+            )
+        )
+        self.assertTrue(
+            backend_private_import_allowed(
+                integration_root,
+                metal_root / "metal_bridge_decls.zig",
+            )
+        )
+        self.assertFalse(
+            backend_private_import_allowed(
+                metal_root / "mod.zig",
+                vulkan_root / "mod.zig",
+            )
+        )
+        self.assertFalse(
+            backend_private_import_allowed(
+                common_module,
+                metal_root / "mod.zig",
+            )
+        )
+        self.assertNotIn(common_module.resolve(), BACKEND_COMPOSITION_ROOTS)
+
     def test_manifest_loader_rejects_duplicate_json_keys(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             path = Path(temporary_directory) / "source-layout.json"

@@ -426,7 +426,7 @@ contracts.command.Command
     ↓
 application preparation
     ↓
-immutable PreparedOperation
+read-only PreparedOperation
     ↓
 capability-specific backend port
     ↓

@@ -29,10 +29,6 @@ pub fn fromDriver(
     backend_id: backend_contract.BackendId,
 ) factory.PortBundle {
     const Bridge = struct {
-        fn executeCommand(ctx: *anyopaque, command: @import("../../contracts/command.zig").Command) !report.ExecutionReport {
-            return report.ExecutionReport.fromNative(try Driver.executeCommand(ctx, command));
-        }
-
         fn executeCompute(ctx: *anyopaque, operation: prepared.PreparedComputeOperation) anyerror!report.ExecutionReport {
             if (operation.toDispatchRequest()) |request| {
                 const dispatch_report = try Driver.executeDispatch(.{
@@ -41,7 +37,7 @@ pub fn fromDriver(
                 }, request);
                 return report.ExecutionReport.fromNative(dispatch_report.execution);
             }
-            return executeCommand(ctx, operation.toCommand());
+            return report.ExecutionReport.fromNative(try Driver.executePreparedCompute(ctx, operation));
         }
 
         fn prewarmKernel(ctx: *anyopaque, kernel: []const u8, entry_point: ?[]const u8, bindings: ?[]const model_compute.KernelBinding, initialize_buffers_on_create: bool) anyerror!void {
@@ -61,7 +57,7 @@ pub fn fromDriver(
                     write.buffer_size,
                     write.data,
                 )),
-                else => executeCommand(ctx, operation.operation.toCommand().?),
+                else => report.ExecutionReport.fromNative(try Driver.executePreparedTransfer(ctx, operation)),
             };
         }
 
@@ -74,19 +70,19 @@ pub fn fromDriver(
         }
 
         fn executeRender(ctx: *anyopaque, operation: prepared.PreparedRenderOperation) anyerror!report.ExecutionReport {
-            return executeCommand(ctx, operation.operation.toCommand());
+            return report.ExecutionReport.fromNative(try Driver.executePreparedRender(ctx, operation));
         }
 
         fn executeResource(ctx: *anyopaque, operation: prepared.PreparedResourceOperation) anyerror!report.ExecutionReport {
-            return executeCommand(ctx, operation.operation.toCommand());
+            return report.ExecutionReport.fromNative(try Driver.executePreparedResource(ctx, operation));
         }
 
         fn executeSurface(ctx: *anyopaque, operation: prepared.PreparedSurfaceOperation) anyerror!report.ExecutionReport {
-            return executeCommand(ctx, operation.operation.toCommand());
+            return report.ExecutionReport.fromNative(try Driver.executePreparedSurface(ctx, operation));
         }
 
         fn executeLifecycle(ctx: *anyopaque, operation: prepared.PreparedLifecycleOperation) anyerror!report.ExecutionReport {
-            return executeCommand(ctx, operation.toCommand());
+            return report.ExecutionReport.fromNative(try Driver.executePreparedLifecycle(ctx, operation));
         }
 
         fn executeSpatial(ctx: *anyopaque, operation: prepared.PreparedSpatialOperation) anyerror!report.ExecutionReport {

@@ -28,6 +28,10 @@ tests, and receipts when a change touches the corresponding boundary.
 | `INV-REGISTRY-006` | Each command, capability, error class, artifact identity, and timing field has one authoritative registry or contract. | compile-time coverage, schema gates, duplicate-declaration inventory |
 | `INV-CONTEXT-007` | Promoted execution boundaries use explicit context, request, and report types rather than `anytype` dependency hiding. | affected-path compile and parity tests |
 | `INV-ARCH-008` | Every production module has one declared owner, layer, and special role, with zero forbidden dependency edges or cycles. | versioned `source-layout.json`, architecture graph gate |
+| `INV-PROVIDER-009` | Provider selection has one ordinary runtime construction root; FFI provider integrations are explicitly enumerated, and provider configuration/state is instance-owned. | `tools/check_core_import_fence.py`, provider construction and concurrent-session tests |
+| `INV-BORROW-010` | A borrowed prepared operation is valid only for synchronous execution/callback scope; queued or retained work owns a deep immutable snapshot. | `OwnedPreparedOperation` tests, observer and executor lifetime tests |
+| `INV-PORT-011` | Capability ports and provider drivers expose domain-specific operations; no broad command escape hatch survives in the adapter contract. | `tools/check_core_import_fence.py`, provider adapter compilation tests |
+| `INV-LIVE-012` | Re-export reachability is not evidence of use. Incubation modules require a real consumer or are removed from production roots. | architecture reachability reports, consumer search, affected package tests |
 
 No prose-only waiver satisfies an invariant. If the named global gate cannot
 observe a changed behavior, the affected subsystem must add a focused
@@ -62,6 +66,13 @@ those facts.
   rather than importing upward.
 - Backend-specific code must not import sibling backends directly. Cross-backend
   sharing belongs in `backend/common`.
+- `composition/backend_factory.zig` is the ordinary runtime provider
+  construction root. Drop-in FFI modules that must translate provider-native
+  objects are an explicit, source-enforced integration-root set; adding one is
+  an architecture change, not an automatic privilege of living in `backend/`.
+- Provider configuration is passed at construction. Mutable cache paths,
+  enablement flags, handles, telemetry, and device identity belong to the
+  selected provider instance, never a process-global configuration shim.
 - Non-backend implementation files must not import `backend/metal/*`,
   `backend/vulkan/*`, or `backend/d3d12/*` directly. Route those dependencies
   through backend-owned seam modules under `src/backend/`.
@@ -93,6 +104,9 @@ those facts.
 
 - Module roots may re-export contracts, normalize public inputs, delegate to
   feature owners, and translate errors at the public boundary.
+- A package-root re-export does not prove a module has a production consumer.
+  Modules used only by their own characterization tests remain incubation
+  scaffolding and must not be described as a completed production route.
 - Module roots must not own mutable diagnostic state, semantic transforms,
   backend realization, resource state machines, or substantive feature tests.
 - Compatibility facades may contain aliases and delegation required by a
@@ -230,7 +244,13 @@ pub const TIMESTAMP_BUFFER_SIZE: u64 = 16;
 - Resolve policy, bindings, work shape, entry point, specialization, and
   fallback eligibility before selecting an executor.
 - Immediate, recorded, replayed, direct, indirect, and backend-specific paths
-  consume the same immutable prepared-operation contract.
+  consume the same read-only prepared-operation contract.
+- `PreparedOperation` is a borrowed view for one synchronous execution and its
+  observer callbacks. Anything that queues, retries asynchronously, records
+  payloads for later replay, or otherwise retains the operation must own an
+  `OwnedPreparedOperation` snapshot and release it explicitly.
+- Canonical command-to-operation conversion is owned by `app/prepare.zig`.
+  Inbound adapters may not call the lower-level conversion directly.
 - Executor adapters may differ only in submission, resource retention,
   completion, readback scheduling, and evidence capture.
 - An executor must not reinterpret bindings, invent defaults, change dispatch
@@ -281,6 +301,10 @@ the dependencies or output contract of a subsystem or promoted execution path.
 - Place `defer`/`errdefer` immediately after the acquisition they clean up when
   the pairing is not obvious from a tighter local scope.
 - Keep long-lived caches explicit in owning structs.
+- Do not use process-global mutable state to transmit per-session provider
+  configuration or telemetry. A global registry is acceptable only when the
+  process itself is the declared resource owner and concurrency semantics are
+  explicit and tested.
 - Prefer arena allocators only for clearly bounded lifetimes such as one parse,
   one request, or one artifact build; do not use arenas to hide long-lived
   ownership.

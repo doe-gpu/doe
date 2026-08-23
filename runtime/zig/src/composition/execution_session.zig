@@ -6,8 +6,8 @@
 const std = @import("std");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const backend_contract = @import("../contracts/backend.zig");
+const runtime_configuration = @import("../contracts/runtime_configuration.zig");
 const backend_policy = @import("../backend/backend_policy.zig");
-const backend_runtime_telemetry = @import("../backend/backend_runtime_telemetry.zig");
 const execution = @import("../runtime/execution.zig");
 const backend_factory = @import("backend_factory.zig");
 const evidence_observer = @import("../contracts/evidence_observer.zig");
@@ -29,7 +29,7 @@ const OwnedBackend = struct {
         allocator: std.mem.Allocator,
         profile: model_profile.DeviceProfile,
         kernel_root: ?[]const u8,
-        pipeline_cache_dir: []const u8,
+        pipeline_cache: runtime_configuration.PipelineCacheConfiguration,
         lane: backend_policy.BackendLane,
     ) !OwnedBackend {
         const loaded_policy = try backend_policy.load_policy_for_lane(
@@ -44,8 +44,10 @@ const OwnedBackend = struct {
             loaded_policy.policy,
             selection.backend_id,
             profile,
-            kernel_root,
-            pipeline_cache_dir,
+            .{
+                .kernel_root = kernel_root,
+                .pipeline_cache = pipeline_cache,
+            },
             selection.reason,
             selection.fallback_used,
         );
@@ -85,17 +87,16 @@ pub const ExecutionSession = struct {
             };
         }
 
-        backend_runtime_telemetry.set_metal_pipeline_cache_disabled(options.no_pipeline_cache);
-        backend_runtime_telemetry.set_vulkan_pipeline_cache_disabled(options.no_pipeline_cache);
-        backend_runtime_telemetry.set_vulkan_pipeline_cache_dir(options.pipeline_cache_dir);
-
         const owned_backend = try allocator.create(OwnedBackend);
         errdefer allocator.destroy(owned_backend);
         owned_backend.* = try OwnedBackend.init(
             allocator,
             profile,
             kernel_root,
-            options.pipeline_cache_dir,
+            .{
+                .enabled = !options.no_pipeline_cache,
+                .directory = options.pipeline_cache_dir,
+            },
             lane,
         );
         errdefer owned_backend.deinit();

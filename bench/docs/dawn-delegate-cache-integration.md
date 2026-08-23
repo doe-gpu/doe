@@ -140,7 +140,8 @@ This proves Step 1's C++ shim is buildable today on this Linux host against the 
 - `runtime/zig/src/backend/metal/metal_pipeline_cache.zig` opens an `MTLBinaryArchive` at `metal_native_runtime.zig:380-402` when `HAS_PIPELINE_CACHE` (macOS 11+) and the CLI flag `--no-pipeline-cache` is not set
 - the archive is backed by a committed benchmark fixture at `bench/kernels/doe_pipeline_archive.metallib` with manifest at `bench/kernels/doe_pipeline_archive.manifest`
 - `--no-pipeline-cache` (see `runtime/zig/src/cli/runtime_cli_args.zig:205-206`) disables cache init for a given run; the runtime records `trace_meta.pipelineCache.state="disabled" reason="cli-flag"`
-- `set_metal_pipeline_cache_disabled` in `runtime/zig/src/backend/backend_runtime_telemetry.zig` is a cross-platform-safe wrapper that is a no-op on non-Mac, preserving the `cli/ -> backend/metal/` import fence
+- Metal cache enablement and directory are construction-time provider options;
+  `NativeMetalRuntime` owns the cache and exposes telemetry through its port
 
 ## What Dawn needs
 
@@ -206,7 +207,10 @@ pub fn performIdleTasksForAllDevices() void;
 
 Implementation on non-Mac OR non-Dawn builds: returns `false` from `dawnCachingSupported()`, makes `setProcessDawnCacheDir` a no-op, and records that state so `trace_meta.dawnPipelineCache.state="disabled" reason="platform-unsupported"` (or `"dawn-delegate-not-in-build"`) rather than silently succeeding.
 
-This module must respect the existing `cli/ -> backend/` import fence. The shim is called only from `runtime/zig/src/backend/backend_runtime_telemetry.zig` via a new cross-platform wrapper (parallel to `set_metal_pipeline_cache_disabled`), which `cli/runtime_cli.zig` invokes pre-`ExecutionContext.init`.
+This module must respect the existing import fence. If implemented, Dawn cache
+configuration must enter through `ExecutionSession` and
+`composition/backend_factory.zig`, then remain owned by the selected delegate
+provider. A process-global configuration wrapper is not admissible.
 
 ### 3. CLI + options — `runtime/zig/src/cli/runtime_cli_args.zig`
 

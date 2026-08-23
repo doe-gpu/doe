@@ -8,6 +8,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const backend_contract = @import("../contracts/backend.zig");
+const runtime_configuration = @import("../contracts/runtime_configuration.zig");
 const backend_policy = @import("../backend/backend_policy.zig");
 const port_factory = @import("../backend/ports/factory.zig");
 const dawn_delegate_backend = @import("../backend/dawn_delegate_backend.zig");
@@ -16,6 +17,13 @@ const vulkan_backend = if (builtin.os.tag == .linux) @import("../backend/vulkan/
 const d3d12_backend = if (builtin.os.tag == .windows) @import("../backend/d3d12/mod.zig") else struct {};
 
 pub const BackendPortBundle = port_factory.PortBundle;
+
+pub const ProviderConfiguration = struct {
+    /// Immutable shader/kernel source root.
+    kernel_root: ?[]const u8 = null,
+    /// Mutable cache policy and storage, copied by providers that retain it.
+    pipeline_cache: runtime_configuration.PipelineCacheConfiguration = .{},
+};
 
 pub const OwnedProvider = struct {
     context: *anyopaque,
@@ -48,8 +56,7 @@ pub fn initProvider(
     policy: backend_policy.SelectionPolicy,
     backend_id: backend_contract.BackendId,
     profile: model_profile.DeviceProfile,
-    kernel_root: ?[]const u8,
-    pipeline_cache_dir: []const u8,
+    configuration: ProviderConfiguration,
     reason: []const u8,
     fallback_used: bool,
 ) !OwnedProvider {
@@ -58,7 +65,7 @@ pub fn initProvider(
             const backend = try dawn_delegate_backend.DawnDelegateBackend.init_with_id(
                 allocator,
                 profile,
-                kernel_root,
+                configuration.kernel_root,
                 backend_id,
             );
             break :blk own(
@@ -71,11 +78,11 @@ pub fn initProvider(
             );
         },
         .doe_metal => if (comptime builtin.os.tag == .macos) blk: {
-            const backend = try metal_backend.ZigMetalBackend.init_with_selection_policy_and_cache(
+            const backend = try metal_backend.ZigMetalBackend.init_with_selection_policy_and_cache_configuration(
                 allocator,
                 profile,
-                kernel_root,
-                pipeline_cache_dir,
+                configuration.kernel_root,
+                configuration.pipeline_cache,
                 policy,
             );
             break :blk own(
@@ -88,10 +95,11 @@ pub fn initProvider(
             );
         } else error.UnsupportedBackend,
         .doe_vulkan => if (comptime builtin.os.tag == .linux) blk: {
-            const backend = try vulkan_backend.ZigVulkanBackend.init_with_selection_policy(
+            const backend = try vulkan_backend.ZigVulkanBackend.init_with_selection_policy_and_cache_configuration(
                 allocator,
                 profile,
-                kernel_root,
+                configuration.kernel_root,
+                configuration.pipeline_cache,
                 policy,
             );
             break :blk own(
@@ -107,7 +115,7 @@ pub fn initProvider(
             const backend = try d3d12_backend.ZigD3D12Backend.init(
                 allocator,
                 profile,
-                kernel_root,
+                configuration.kernel_root,
             );
             break :blk own(
                 d3d12_backend.ZigD3D12Backend,

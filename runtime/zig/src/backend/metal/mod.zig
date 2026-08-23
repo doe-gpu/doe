@@ -5,11 +5,13 @@ const model_profile = @import("../../contracts/model/model_profile.zig");
 const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
 const compute_contract = @import("../../contracts/compute.zig");
+const prepared = @import("../../contracts/prepared_operation.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const model_surface_control_types = @import("../../contracts/model/model_surface_control_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
 const webgpu = @import("../../contracts/runtime_types.zig");
+const runtime_configuration = @import("../../contracts/runtime_configuration.zig");
 const runtime_telemetry = @import("../../contracts/runtime_telemetry.zig");
 const backend_telemetry = @import("../backend_telemetry.zig");
 const port_factory = @import("../ports/factory.zig");
@@ -132,13 +134,29 @@ pub const ZigMetalBackend = struct {
         pipeline_cache_dir: []const u8,
         selection_policy: backend_policy.SelectionPolicy,
     ) !*ZigMetalBackend {
+        return init_with_selection_policy_and_cache_configuration(
+            allocator,
+            profile,
+            kernel_root,
+            .{ .directory = pipeline_cache_dir },
+            selection_policy,
+        );
+    }
+
+    pub fn init_with_selection_policy_and_cache_configuration(
+        allocator: std.mem.Allocator,
+        profile: model.DeviceProfile,
+        kernel_root: ?[]const u8,
+        pipeline_cache: runtime_configuration.PipelineCacheConfiguration,
+        selection_policy: backend_policy.SelectionPolicy,
+    ) !*ZigMetalBackend {
         if (profile.api != .metal) return common_errors.BackendNativeError.UnsupportedFeature;
         if (builtin.os.tag != .macos) return common_errors.BackendNativeError.UnsupportedFeature;
 
         const owned_root = if (kernel_root) |root| try allocator.dupe(u8, root) else null;
         errdefer if (owned_root) |r| allocator.free(r);
-        const owned_cache_dir = if (pipeline_cache_dir.len > 0)
-            try allocator.dupe(u8, pipeline_cache_dir)
+        const owned_cache_dir = if (pipeline_cache.directory.len > 0)
+            try allocator.dupe(u8, pipeline_cache.directory)
         else
             null;
         errdefer if (owned_cache_dir) |dir| allocator.free(dir);
@@ -150,6 +168,7 @@ pub const ZigMetalBackend = struct {
             allocator,
             owned_root,
             owned_cache_dir orelse "",
+            pipeline_cache.enabled,
         );
         errdefer runtime.deinit();
 
@@ -310,21 +329,19 @@ pub fn manifest_hash_from_context(ctx: *anyopaque) ?[]const u8 {
 }
 
 pub fn pipeline_cache_warmup_telemetry_from_context(ctx: *anyopaque) metal_pipeline_cache.WarmupTelemetry {
-    _ = ctx;
-    return metal_pipeline_cache.process_active_cache_warmup_telemetry();
+    const self = cast(ctx);
+    if (self.runtime) |*runtime| return runtime.pipelineCacheWarmupTelemetry();
+    return .{};
 }
 
 pub fn pipeline_cache_active_from_context(ctx: *anyopaque) bool {
-    _ = ctx;
-    return metal_pipeline_cache.process_active_cache_present();
+    const self = cast(ctx);
+    if (self.runtime) |*runtime| return runtime.pipelineCacheActive();
+    return false;
 }
 
 pub fn last_submit_count_from_context(ctx: *anyopaque) ?u32 {
     return cast(ctx).last_submit_count;
-}
-
-pub fn set_pipeline_cache_disabled(disabled: bool) void {
-    metal_pipeline_cache.set_process_pipeline_cache_disabled(disabled);
 }
 
 fn deinit(ctx: *anyopaque) void {
@@ -347,6 +364,30 @@ fn deinit(ctx: *anyopaque) void {
 
 fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.NativeExecutionResult {
     return backend_execute.execute_command(cast(ctx), command);
+}
+
+fn execute_prepared_compute(ctx: *anyopaque, operation: prepared.PreparedComputeOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.toCommand());
+}
+
+fn execute_prepared_transfer(ctx: *anyopaque, operation: prepared.PreparedTransferOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand().?);
+}
+
+fn execute_prepared_render(ctx: *anyopaque, operation: prepared.PreparedRenderOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_resource(ctx: *anyopaque, operation: prepared.PreparedResourceOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_surface(ctx: *anyopaque, operation: prepared.PreparedSurfaceOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_lifecycle(ctx: *anyopaque, operation: prepared.PreparedLifecycleOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.toCommand());
 }
 
 fn execute_dispatch(context: compute_contract.ComputeContext, request: compute_contract.DispatchRequest) anyerror!compute_contract.DispatchReport {
@@ -430,7 +471,12 @@ pub fn destroyContext(ctx: *anyopaque) void {
 
 const PortDriver = struct {
     pub const backendId = backend_id;
-    pub const executeCommand = execute_command;
+    pub const executePreparedCompute = execute_prepared_compute;
+    pub const executePreparedTransfer = execute_prepared_transfer;
+    pub const executePreparedRender = execute_prepared_render;
+    pub const executePreparedResource = execute_prepared_resource;
+    pub const executePreparedSurface = execute_prepared_surface;
+    pub const executePreparedLifecycle = execute_prepared_lifecycle;
     pub const executeDispatch = execute_dispatch;
     pub const executeBufferWrite = execute_buffer_write_bytes_iface;
     pub const setUploadBehavior = set_upload_behavior;

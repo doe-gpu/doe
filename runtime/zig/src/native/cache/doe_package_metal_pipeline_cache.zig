@@ -14,7 +14,6 @@ var active_device: ?*anyopaque = null;
 pub fn get(dev: *DoeDevice) ?*metal_package_pipeline_cache.MetalPipelineCache {
     if (builtin.os.tag != .macos) return null;
     if (dev.backend != .metal) return null;
-    if (metal_package_pipeline_cache.isProcessPipelineCacheDisabled()) return null;
     const mtl_device = dev.mtl_device orelse return null;
 
     cache_mutex.lock();

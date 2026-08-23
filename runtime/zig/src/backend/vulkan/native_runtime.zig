@@ -5,6 +5,7 @@ const model_compute_types = @import("../../contracts/model/model_compute_types.z
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const backend_contract = @import("../../contracts/backend.zig");
+const runtime_configuration = @import("../../contracts/runtime_configuration.zig");
 const backend_policy = @import("../backend_policy.zig");
 const common_timing = @import("../common/timing.zig");
 const webgpu = @import("../../contracts/runtime_types.zig");
@@ -24,7 +25,6 @@ const vk_dispatch_repeat = @import("vk_dispatch_repeat.zig");
 const vk_metrics = @import("vk_metrics.zig");
 const vk_command_buffers = @import("vk_command_buffers.zig");
 const surface_ops = @import("vk_runtime_surface_ops.zig");
-const render_bundle = @import("../../runtime/render/render_bundle.zig");
 const vk_texture_commands = @import("vk_texture_commands.zig");
 
 const VK_NULL_U64 = c.VK_NULL_U64;
@@ -47,6 +47,8 @@ pub const AdapterIdentity = struct {
 pub const NativeVulkanRuntime = struct {
     allocator: std.mem.Allocator,
     kernel_root: ?[]const u8,
+    pipeline_cache: vk_pipeline_cache_persistent.VulkanPipelineCache =
+        vk_pipeline_cache_persistent.VulkanPipelineCache.init(std.heap.page_allocator, .{}),
 
     instance: c.VkInstance = null,
     physical_device: c.VkPhysicalDevice = null,
@@ -172,36 +174,6 @@ pub const NativeVulkanRuntime = struct {
     /// to validate with spirv-val, then frees the allocation.
     pending_spirv_bytes_owned: ?[]u8 = null,
 
-    pub fn probe_adapter_identity(
-        allocator: std.mem.Allocator,
-        queue_family_policy: webgpu.QueueFamilyPolicy,
-    ) !AdapterIdentity {
-        var probe = NativeVulkanRuntime{
-            .allocator = allocator,
-            .kernel_root = null,
-            .queue_family_policy = queue_family_policy,
-        };
-        try vk_device.create_instance(&probe);
-        defer vk_device.destroy_instance_only(&probe);
-        try vk_device.select_physical_device(&probe);
-
-        var properties2 = std.mem.zeroes(c.VkPhysicalDeviceProperties2);
-        properties2.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-        c.vkGetPhysicalDeviceProperties2(probe.physical_device, &properties2);
-        const properties = properties2.properties;
-        return .{
-            .vendor_id = properties.vendorID,
-            .device_id = properties.deviceID,
-            .driver_version = properties.driverVersion,
-            .device_name = properties.deviceName,
-            .device_name_len = std.mem.indexOfScalar(
-                u8,
-                properties.deviceName[0..],
-                0,
-            ) orelse properties.deviceName.len,
-        };
-    }
-
     pub fn init(allocator: std.mem.Allocator, kernel_root: ?[]const u8) !NativeVulkanRuntime {
         return init_with_backend_policy(allocator, kernel_root, .prefer_graphics_compute, .prefer_timeline_semaphore, .fixed_32_when_supported);
     }
@@ -213,9 +185,28 @@ pub const NativeVulkanRuntime = struct {
         deferred_submission_sync_policy: webgpu.DeferredSubmissionSyncPolicy,
         vulkan_subgroup_size_policy: backend_policy.VulkanSubgroupSizePolicy,
     ) !NativeVulkanRuntime {
+        return init_with_backend_policy_and_cache(
+            allocator,
+            kernel_root,
+            .{},
+            queue_family_policy,
+            deferred_submission_sync_policy,
+            vulkan_subgroup_size_policy,
+        );
+    }
+
+    pub fn init_with_backend_policy_and_cache(
+        allocator: std.mem.Allocator,
+        kernel_root: ?[]const u8,
+        pipeline_cache_configuration: runtime_configuration.PipelineCacheConfiguration,
+        queue_family_policy: webgpu.QueueFamilyPolicy,
+        deferred_submission_sync_policy: webgpu.DeferredSubmissionSyncPolicy,
+        vulkan_subgroup_size_policy: backend_policy.VulkanSubgroupSizePolicy,
+    ) !NativeVulkanRuntime {
         var self = NativeVulkanRuntime{
             .allocator = allocator,
             .kernel_root = kernel_root,
+            .pipeline_cache = vk_pipeline_cache_persistent.VulkanPipelineCache.init(allocator, pipeline_cache_configuration),
             .queue_family_policy = queue_family_policy,
             .deferred_submission_sync_policy = deferred_submission_sync_policy,
             .vulkan_subgroup_size_policy = vulkan_subgroup_size_policy,
@@ -291,7 +282,7 @@ pub const NativeVulkanRuntime = struct {
             self.primary_command_buffer = null;
         }
         if (self.has_device) {
-            vk_pipeline_cache_persistent.destroy_process_pipeline_cache(self.device);
+            self.pipeline_cache.deinit(self.device);
             c.vkDestroyDevice(self.device, null);
             self.has_device = false;
             self.device = null;
@@ -575,16 +566,6 @@ pub const NativeVulkanRuntime = struct {
         };
     }
 
-    pub fn record_prepared_dispatch_replay(
-        self: *NativeVulkanRuntime,
-        x: u32,
-        y: u32,
-        z: u32,
-    ) !void {
-        const command_buffer = try self.begin_prepared_dispatch_replay();
-        try self.record_prepared_dispatch_replay_on(command_buffer, x, y, z);
-    }
-
     pub fn begin_prepared_dispatch_replay(self: *NativeVulkanRuntime) !c.VkCommandBuffer {
         if (!self.recorded_submit_replay_active) return error.InvalidState;
         if (self.replay_recording_active) return self.replay_command_buffer;
@@ -743,17 +724,6 @@ pub const NativeVulkanRuntime = struct {
 
     pub fn run_render_clear(self: *NativeVulkanRuntime, cmd: model_render_types.RenderDrawCommand) !DispatchMetrics {
         return vk_render.execute_render_clear(self, cmd);
-    }
-
-    pub fn run_execute_bundles(
-        self: *NativeVulkanRuntime,
-        bundles: []const *const render_bundle.DoeRenderBundle,
-        target_width: u32,
-        target_height: u32,
-        color_format: u32,
-        sample_count: u32,
-    ) !DispatchMetrics {
-        return vk_render.execute_render_bundles(self, bundles, target_width, target_height, color_format, sample_count);
     }
 
     // --- Queue management ---

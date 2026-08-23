@@ -316,46 +316,16 @@ This is the domain core and should be the most stable directory.
   - migrate each semantic family to its existing narrow owner
   - delete once all declared consumers use namespaced contracts
 
-### 4. New `runtime/zig/src/app/`
+### 4. Minimal `runtime/zig/src/app/`
 
 This becomes the actual center of the hexagonal architecture.
 
 - `request.zig`
   - typed application request independent of CLI, JSON, C ABI, Node, or ONNX
 
-- `normalize.zig`
-  - convert semantically equivalent inputs to one canonical request
-
-- `validate.zig`
-  - capability, shape, ownership, exactness, and lifecycle validation
-
-- `specialize.zig`
-  - apply device profile, explicit policy, and accepted quirk decisions
-  - no hidden fallback
-
-- `compile.zig`
-  - call compiler service and receive immutable `ProgramArtifact`
-
-- `bind.zig`
-  - resolve neutral resource IDs and binding layouts
-  - no backend descriptor allocation
-
-- `schedule.zig`
-  - create synchronization and submission plan
-  - declare, but do not execute, backend queue behavior
-
 - `prepare.zig`
-  - emit the immutable `PreparedOperation`
+  - emit the borrowed read-only `PreparedOperation`
   - compute its identity once
-
-- `execute.zig`
-  - invoke only backend ports
-  - accept an `EvidencePort`
-  - return `ExecutionReport`
-
-- `session.zig`
-  - own application session lifetime and injected ports
-  - no concrete backend construction
 
 - `runner.zig`
   - shared path for immediate, recorded, replayed, direct-plan, and native calls
@@ -363,6 +333,11 @@ This becomes the actual center of the hexagonal architecture.
 
 - `mod.zig`
   - narrow application facade
+
+Normalization, parsing, compilation, and specialization remain with their
+real semantic owners until a shared application use case requires a distinct
+phase. Do not create package-reexported phase modules without production
+consumers merely to make the directory resemble a diagram.
 
 ### 5. `runtime/zig/src/backend/backend_iface.zig`
 
@@ -413,7 +388,7 @@ Each port is separately optional through an explicit capability set. A compute-o
 - policy loading → `backend/policy_loader.zig`
 - provider selection use case → `app/provider_selection.zig`
 - concrete construction → `composition/backend_factory.zig`
-- session lifetime → `app/session.zig`
+- session lifetime → `composition/execution_session.zig`
 - port bundle → `backend/ports/factory.zig`
 - telemetry refresh → concrete adapter or evidence adapter
 
@@ -512,8 +487,9 @@ Split the current spatial lane into three distinct responsibilities:
 
 - `BackendMode`, CLI spellings, and parsing → `cli/runtime_cli_args.zig`
 - backend construction → `composition/backend_factory.zig`
-- application session → `app/session.zig`
-- operation routing → `app/execute.zig`
+- application session → `composition/execution_session.zig`
+- command preparation → `app/prepare.zig`
+- operation routing → `app/runner.zig`
 - prepared operation execution → `runtime/executor.zig`
 - timing and lifecycle report assembly → `contracts/execution_report.zig` plus `evidence/receipt/builder.zig`
 - public facade retained until all callers migrate
@@ -732,7 +708,8 @@ CLI is I/O and composition.
   - render/write result artifacts only
 
 - `runtime_cli.zig`
-  - reduce to command selection and calls into `composition/cli.zig`
+  - reduce to command selection, an `ExecutionSession`, and calls into
+    `runtime/execution.zig`
   - move backend selection, execution, and policy decisions out
 
 - `doe_plan_executor_cli.zig`, `module_runner_cli.zig`
@@ -989,4 +966,11 @@ Additionally require:
 
 ## Final success condition
 
-The migration is complete when every supported entrypoint produces the same immutable `PreparedOperation`, every concrete provider is reachable only through narrow ports and a composition root, shared runtime state has one owner, and trace/receipt/replay code observes the exact operation and result without influencing them.
+The canonical-command migration is complete when every supported command
+entrypoint produces the same borrowed read-only `PreparedOperation`, retained
+work uses an owned deep snapshot, every concrete provider is reachable only
+through narrow ports and an explicit composition/integration root, shared
+runtime state has one owner, and trace/receipt/replay code observes the exact
+operation and result without influencing them. Native WebGPU object calls and
+drop-in FFI calls are a separately declared object surface unless and until
+they are intentionally normalized into the canonical command contract.

@@ -3,6 +3,7 @@ const model_commands = @import("../contracts/command.zig");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const model_transfer_types = @import("../contracts/model/model_compute_types.zig");
 const compute_contract = @import("../contracts/compute.zig");
+const prepared = @import("../contracts/prepared_operation.zig");
 const webgpu = @import("webgpu_backend.zig");
 const backend_ids = @import("../contracts/backend.zig");
 const runtime_telemetry = @import("../contracts/runtime_telemetry.zig");
@@ -67,6 +68,30 @@ fn execute_command_typed(self: *DawnDelegateBackend, command: model.Command) any
 
 fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.NativeExecutionResult {
     return execute_command_typed(cast(ctx), command);
+}
+
+fn execute_prepared_compute(ctx: *anyopaque, operation: prepared.PreparedComputeOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.toCommand());
+}
+
+fn execute_prepared_transfer(ctx: *anyopaque, operation: prepared.PreparedTransferOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand().?);
+}
+
+fn execute_prepared_render(ctx: *anyopaque, operation: prepared.PreparedRenderOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_resource(ctx: *anyopaque, operation: prepared.PreparedResourceOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_surface(ctx: *anyopaque, operation: prepared.PreparedSurfaceOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.operation.toCommand());
+}
+
+fn execute_prepared_lifecycle(ctx: *anyopaque, operation: prepared.PreparedLifecycleOperation) anyerror!webgpu.NativeExecutionResult {
+    return execute_command(ctx, operation.toCommand());
 }
 
 fn execute_dispatch(context: compute_contract.ComputeContext, request: compute_contract.DispatchRequest) anyerror!compute_contract.DispatchReport {
@@ -159,7 +184,12 @@ pub fn destroyContext(ctx: *anyopaque) void {
 
 const PortDriver = struct {
     pub const backendId = backend_id;
-    pub const executeCommand = execute_command;
+    pub const executePreparedCompute = execute_prepared_compute;
+    pub const executePreparedTransfer = execute_prepared_transfer;
+    pub const executePreparedRender = execute_prepared_render;
+    pub const executePreparedResource = execute_prepared_resource;
+    pub const executePreparedSurface = execute_prepared_surface;
+    pub const executePreparedLifecycle = execute_prepared_lifecycle;
     pub const executeDispatch = execute_dispatch;
     pub const executeBufferWrite = execute_buffer_write_bytes;
     pub const setUploadBehavior = set_upload_behavior;

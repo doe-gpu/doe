@@ -7,7 +7,6 @@ const c = @import("vk_constants.zig");
 const vk_formats = @import("vk_formats.zig");
 const vk_pipeline = @import("vk_pipeline.zig");
 const vk_shader_source = @import("vk_shader_source.zig");
-const vk_pipeline_cache_persistent = @import("vk_pipeline_cache_persistent.zig");
 const vk_resources = @import("vk_resources.zig");
 
 // Canonical default render shaders loaded from `bench/kernels/` when a
@@ -493,7 +492,7 @@ pub fn create_graphics_pipeline(
         .basePipelineHandle = VK_NULL_U64,
         .basePipelineIndex = -1,
     };
-    const graphics_cache_handle = vk_pipeline_cache_persistent.handle_for_pipeline_creation();
+    const graphics_cache_handle = self.pipeline_cache.handleForPipelineCreation();
     try c.check_vk(c.vkCreateGraphicsPipelines(
         self.device,
         graphics_cache_handle,

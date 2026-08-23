@@ -2,15 +2,15 @@
   "artifacts": [
     {
       "path": "$MEASUREMENT_ROOT/prefix/bin/doe-zig-runtime",
-      "sha256": "19361a9ad54b304416a280584a088c9464edfcb9ac19d71fdcc65b08c2a2f335",
-      "sizeBytes": 11212840
+      "sha256": "fe791022438bc990c4aa83c69af896f4f0badf675eedc56d630841795d40896b",
+      "sizeBytes": 1900800
     }
   ],
   "buildStep": "doe-runtime",
   "captureToolChangedDuringCapture": false,
   "captureToolSha256": "897fe525b858db9269d5b8bc624d6a42b07e1283f7bfa26cf0d12ef9152a2c66",
   "cleanCompile": {
-    "elapsedNs": 50858865779,
+    "elapsedNs": 28362768541,
     "exitCode": 0,
     "stderr": "",
     "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -18,7 +18,7 @@
     "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "command": [
-    "/home/x/.local/zig/zig-x86_64-linux-0.15.2/zig",
+    "/opt/homebrew/Cellar/zig/0.15.2/bin/zig",
     "build",
     "doe-runtime",
     "-Doptimize=ReleaseSafe",
@@ -35,12 +35,12 @@
     "$MEASUREMENT_ROOT/prefix"
   ],
   "host": {
-    "machine": "x86_64",
-    "operatingSystem": "Linux",
-    "release": "7.0.0-28-generic"
+    "machine": "arm64",
+    "operatingSystem": "Darwin",
+    "release": "25.3.0"
   },
   "incrementalCompile": {
-    "elapsedNs": 51013162,
+    "elapsedNs": 142427958,
     "exitCode": 0,
     "stderr": "",
     "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -52,11 +52,11 @@
   "schemaVersion": 2,
   "sourceChangedBeforeIncremental": false,
   "sourceChangedDuringCapture": false,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
+  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
   "status": "captured",
   "toolchain": {
-    "path": "/home/x/.local/zig/zig-x86_64-linux-0.15.2/zig",
-    "sha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+    "path": "/opt/homebrew/Cellar/zig/0.15.2/bin/zig",
+    "sha256": "78adeedbea88263f19e8aefb31896e092eb265efc570f0a6dfbe9fd01e630ef6",
     "version": "0.15.2"
   }
 }

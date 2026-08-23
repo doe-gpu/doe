@@ -10,25 +10,22 @@ const vk_pipeline_cache_persistent = if (builtin.os.tag == .linux) @import("vulk
 pub const WarmupTelemetry = vk_pipeline_cache_persistent.WarmupTelemetry;
 
 pub fn vulkanPipelineCacheActive(runtime: anytype) bool {
-    _ = runtime;
     if (comptime builtin.os.tag != .linux) return false;
-    return vk_pipeline_cache_persistent.process_active_cache_present();
+    return runtime.pipeline_cache.active();
 }
 
 pub fn vulkanPipelineCacheDisabled(runtime: anytype) bool {
-    _ = runtime;
     if (comptime builtin.os.tag != .linux) return false;
-    return vk_pipeline_cache_persistent.is_process_pipeline_cache_disabled();
+    return !runtime.pipeline_cache.enabled;
 }
 
 pub fn vulkanPipelineCacheWarmupTelemetry(runtime: anytype) WarmupTelemetry {
-    _ = runtime;
     if (comptime builtin.os.tag != .linux) return .{};
-    return vk_pipeline_cache_persistent.process_active_cache_warmup_telemetry();
+    return runtime.pipeline_cache.warmupTelemetry();
 }
 
 pub fn flushVulkanPipelineCache(runtime: anytype) void {
     if (comptime builtin.os.tag != .linux) return;
     if (runtime.device == null) return;
-    vk_pipeline_cache_persistent.flush_process_pipeline_cache(runtime.device);
+    runtime.pipeline_cache.flush(runtime.device);
 }

@@ -88,14 +88,14 @@
   },
   "files": [
     {
-      "path": "abi/libonnxruntime_doe_ep.so.symbols.txt",
-      "sha256": "e237087ac2d50e752bd714bb338719e3e1559b306d056461ebe890b87bf4231b",
-      "sizeBytes": 7988
+      "path": "abi/libonnxruntime_doe_ep.dylib.symbols.txt",
+      "sha256": "9d6fda78daa7522ca16f8efc825ff8c6964db8a81756499e5e2a38fc2dfb7624",
+      "sizeBytes": 3691
     },
     {
-      "path": "abi/libwebgpu_doe.so.symbols.txt",
-      "sha256": "03af98295eb75e953d83e206623d521dfc7fbbda446a7aa14605e85fd0ce1414",
-      "sizeBytes": 24509
+      "path": "abi/libwebgpu_doe.dylib.symbols.txt",
+      "sha256": "d0e9acc41cf394850dfc09daa45d9bdcf3e92c714bd791bfd3f76371cca3779a",
+      "sizeBytes": 26186
     },
     {
       "path": "command-input.json",
@@ -154,14 +154,14 @@
     }
   ],
   "git": {
-    "baseCommit": "WORKTREE:94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
+    "baseCommit": "WORKTREE:2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
     "requestedRef": "WORKTREE",
     "snapshotKind": "live-worktree"
   },
   "host": {
-    "machine": "x86_64",
-    "operatingSystem": "Linux",
-    "release": "7.0.0-28-generic"
+    "machine": "arm64",
+    "operatingSystem": "Darwin",
+    "release": "25.3.0"
   },
   "irDigestInstrumentation": {
     "kind": "native-worktree",
@@ -186,18 +186,18 @@
   "schemaVersion": 1,
   "sharedLibraries": [
     {
-      "path": "libonnxruntime_doe_ep.so",
-      "sha256": "5efa8522bbe9a114895f1f29cc5c80f4a102fa101face5527cf83efecb410e02",
-      "sizeBytes": 6077976,
-      "symbolCount": 100,
-      "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
+      "path": "libonnxruntime_doe_ep.dylib",
+      "sha256": "3a50ffef34387053121f800086505b4857fe80990d3a555e5f5c2aea65e75a8e",
+      "sizeBytes": 749144,
+      "symbolCount": 57,
+      "symbols": "abi/libonnxruntime_doe_ep.dylib.symbols.txt"
     },
     {
-      "path": "libwebgpu_doe.so",
-      "sha256": "e277142fcb4bccbf14b58e55fb58cdddb9fff618b672806c9030699501ae5c84",
-      "sizeBytes": 9720760,
-      "symbolCount": 731,
-      "symbols": "abi/libwebgpu_doe.so.symbols.txt"
+      "path": "libwebgpu_doe.dylib",
+      "sha256": "d6727424255d555c20060f9d581131a8216a08b6e154fc96e240eafad6bdfc3f",
+      "sizeBytes": 2026000,
+      "symbolCount": 758,
+      "symbols": "abi/libwebgpu_doe.dylib.symbols.txt"
     }
   ],
   "status": "captured",
@@ -222,6 +222,6 @@
       "wgsl-output.spv"
     ]
   },
-  "zigExecutableSha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+  "zigExecutableSha256": "78adeedbea88263f19e8aefb31896e092eb265efc570f0a6dfbe9fd01e630ef6",
   "zigVersion": "0.15.2"
 }
