@@ -17,6 +17,9 @@ evidence boundaries are clear.
 - [`thesis.md`](thesis.md): the single Doe-first product strategy; verifiable
   local compute vision, owned tracks, supporting-project roles, Node/Bun wedge,
   downstream portfolio, browser path, and expansion boundaries
+- [`product-strategy-contract.md`](product-strategy-contract.md): validated
+  DoeProof offer, quad roles, comparison law, evidence custody, platform
+  sequence, milestones, and claim boundaries
 - Cross-project documentation authority is maintained in the program registry
   outside this repository; Doe remains canonical for Doe behavior and
   measurements

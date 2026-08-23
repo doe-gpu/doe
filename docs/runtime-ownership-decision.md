@@ -334,10 +334,13 @@ Fawn proceeds from diagnostic integration to product promotion only when:
 - forced Doe identity and prohibited-fallback rejection pass;
 - an unchanged browser application passes its independent oracle and lifecycle
   gates;
-- `D0` demonstrates a durable advantage over pinned Chromium/Dawn plus DoeProof
-  under the same browser evidence contract.
+- matched A/B/C/D evidence isolates the Fawn shell, DoeRuntime, and Direct
+  Protocol contributions under the same browser evidence contract.
 
-Browser launch by itself is integration evidence, not application value.
+Browser launch by itself is integration evidence, not application value. A
+passing B-versus-A decision may promote Fawn while rejecting DoeRuntime browser
+ownership. C-versus-B owns that runtime decision, and D-versus-C separately owns
+the Direct Protocol decision.
 
 ### Lean
 

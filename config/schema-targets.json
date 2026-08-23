@@ -46,6 +46,10 @@
       "data": "config/external-project-promotion-policy.json"
     },
     {
+      "schema": "config/doe-product-strategy.schema.json",
+      "data": "config/doe-product-strategy.json"
+    },
+    {
       "schema": "config/ecosystem-registry.schema.json",
       "data": "config/ecosystem-registry.json"
     },
