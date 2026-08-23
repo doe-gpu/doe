@@ -166,11 +166,14 @@ def parse_args() -> argparse.Namespace:
     suite = commands.add_parser("suite")
     suite.add_argument("--report", action="append", type=Path, required=True)
     suite.add_argument("--out", type=Path, required=True)
+    suite.add_argument("--provenance", type=Path)
+    suite.add_argument("--trust-policy", type=Path)
     aggregate = commands.add_parser("aggregate")
     aggregate.add_argument("--suite-report", action="append", type=Path, required=True)
     aggregate.add_argument("--out", type=Path, required=True)
     passport = commands.add_parser("passport")
     passport.add_argument("--aggregate", type=Path, required=True)
+    passport.add_argument("--trust-policy", type=Path)
     return parser.parse_args()
 
 
@@ -185,6 +188,8 @@ def main() -> int:
         suite = build_platform_suite(
             [load_json(path) for path in args.report],
             config["promotion"]["signingKeyEnvironment"],
+            trust_policy_path=args.trust_policy,
+            execution_provenance=(load_json(args.provenance) if args.provenance else None),
         )
         write_json(args.out, suite)
         print(json.dumps({"reportPath": str(args.out), "decisions": suite["decisions"], "receipt": suite["promotionReceipt"]["signatureStatus"]}, indent=2))
@@ -198,7 +203,7 @@ def main() -> int:
         write_json(args.out, aggregate)
         print(json.dumps({"reportPath": str(args.out), "desktopPlatformStatus": aggregate["desktopPlatformStatus"]}, indent=2))
         return 0
-    validate_passport_candidate(load_json(args.aggregate))
+    validate_passport_candidate(load_json(args.aggregate), args.trust_policy)
     print("PASS: release passport candidate is signed and all product components earned status")
     return 0
 

@@ -6,6 +6,20 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- Fawn matrix physical execution and release signing are now separate trust
+  domains. The self-hosted Apple, AMD Vulkan, or Windows runner checks out the
+  frozen experiment revision, executes with no signing key, emits an unsigned
+  checksum-bound suite, and uploads it as immutable workflow evidence. An
+  optional protected job rehashes the artifact, verifies the approved revision
+  and runner identity, and binds the artifact digest before signing.
+- DoeProof promotion receipts now require an independently configured signer
+  authorization from `config/doe-proof-trusted-signers.json`; accepting the
+  public key embedded in a receipt is no longer sufficient. The registry is
+  intentionally `anchor_required` until the production Ed25519 fingerprint,
+  identity, receipt scope, validity interval, and authorization event are added.
+  Previously generated self-consistent SSHSIG receipts remain diagnostic and
+  must be regenerated before promotion. This is a fail-closed release blocker,
+  not a reason to delay unsigned AMD Vulkan execution.
 - Fawn M4 is now an explicit in-progress published-browser milestone. Linux x64
   joins macOS arm64 as a governed release-candidate platform through
   `config/browser-release-platform-policy.json`; this expands the admissible

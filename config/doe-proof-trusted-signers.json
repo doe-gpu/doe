@@ -1,0 +1,8 @@
+{
+  "$schema": "./doe-proof-trusted-signers.schema.json",
+  "history": [],
+  "policyId": "doe-proof-release-signers-v1",
+  "policyState": "anchor_required",
+  "schemaVersion": 1,
+  "signers": []
+}

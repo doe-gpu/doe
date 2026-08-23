@@ -1,4 +1,4 @@
-# Fawn-Doe Four-Lane Matrix
+# Fawn-Doe four-lane matrix
 
 This benchmark executes `context_snapshot_diff` through four independent lanes:
 
@@ -76,3 +76,25 @@ deterministic hash-chained DoeLab learning manifest. A signed platform suite bec
 a promotion event only after its receipt verifies. The physical-runner workflow
 executes the same three workloads on explicitly labeled self-hosted hardware and
 uploads raw evidence without widening its claim scope.
+
+## Release trust boundary
+
+Embedded-key verification is necessary but not sufficient for release
+admission. `config/doe-proof-trusted-signers.json` separately authorizes
+public-key fingerprints, signer identities, receipt and subject kinds,
+validity intervals, and revocation or replacement history. The registry starts
+fail-closed until the production public fingerprint is deliberately added.
+Receipts created before this trust anchor are cryptographically self-consistent
+diagnostics, not promotable release evidence, and must be regenerated under an
+active policy.
+
+The physical-runner workflow checks out the frozen experiment revision and
+uses fixed self-hosted platform labels plus an exact approved runner name. It
+executes without a signing secret, emits an unsigned suite, records runner and
+workload configuration identity, creates a checksum manifest, and uploads the
+immutable artifact. Optional release signing runs only in the protected
+`doe-proof-production` environment. That job downloads and rehashes the
+artifact, checks the experiment revision and runner identity, binds the
+artifact digest and signer revision, and signs only when the configured public
+fingerprint is trusted. The production private key is never exposed to the
+physical Apple, AMD, or Windows runner.

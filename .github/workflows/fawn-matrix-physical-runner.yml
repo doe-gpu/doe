@@ -8,52 +8,232 @@ on:
         required: true
         type: choice
         options: [apple-metal, amd-vulkan, windows-d3d12]
-      runner_labels:
-        description: JSON runner-label array, for example ["self-hosted","macOS","ARM64"]
+      approved_runner_name:
+        description: Exact approved GitHub self-hosted runner name
         required: true
         type: string
+      experiment_revision:
+        description: Frozen Fawn experiment commit
+        required: true
+        default: ea37481243fa7f177152b85df83fd215ae64b971
+        type: string
+      request_release_signature:
+        description: Revalidate and sign in the protected environment
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
 
 jobs:
   physical-matrix:
-    runs-on: ${{ fromJSON(inputs.runner_labels) }}
-    timeout-minutes: 120
+    environment: fawn-matrix-physical
+    runs-on:
+      - self-hosted
+      - fawn-matrix
+      - ${{ inputs.platform_id }}
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+      artifact-digest: ${{ steps.upload.outputs.artifact-digest }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.experiment_revision }}
+      - name: Bind approved revision and runner
+        env:
+          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
+          EXPERIMENT_REVISION: ${{ inputs.experiment_revision }}
+        run: |
+          test "${RUNNER_NAME}" = "${APPROVED_RUNNER_NAME}"
+          test "$(git rev-parse HEAD)" = "${EXPERIMENT_REVISION}"
       - name: Preflight Fawn and Doe
-        shell: bash
         run: browser/chromium/scripts/preflight.sh
       - name: Run context matrix
-        shell: bash
-        run: python3 -m bench.fawn_matrix.cli run --platform-id "${{ inputs.platform_id }}"
+        run: >-
+          python3 -m bench.fawn_matrix.cli run
+          --platform-id "${{ inputs.platform_id }}"
+          --output-root "${RUNNER_TEMP}/fawn-matrix-output"
       - name: Run GPU preprocessing matrix
-        shell: bash
-        run: python3 -m bench.fawn_matrix.live_cli run --workload webgpu_model_preprocessing --platform-id "${{ inputs.platform_id }}"
+        run: >-
+          python3 -m bench.fawn_matrix.live_cli run
+          --workload webgpu_model_preprocessing
+          --platform-id "${{ inputs.platform_id }}"
+          --output-root "${RUNNER_TEMP}/fawn-matrix-output"
       - name: Run multi-step agent matrix
-        shell: bash
-        run: python3 -m bench.fawn_matrix.live_cli run --workload multi_step_agent_interaction --platform-id "${{ inputs.platform_id }}"
-      - name: Assemble platform suite and promotion receipt
-        shell: bash
+        run: >-
+          python3 -m bench.fawn_matrix.live_cli run
+          --workload multi_step_agent_interaction
+          --platform-id "${{ inputs.platform_id }}"
+          --output-root "${RUNNER_TEMP}/fawn-matrix-output"
+      - name: Assemble unsigned suite and provenance
         env:
-          DOE_PROOF_PRIVATE_KEY: ${{ secrets.DOE_PROOF_SIGNING_KEY }}
+          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
+          EXPERIMENT_REVISION: ${{ inputs.experiment_revision }}
+          PLATFORM_ID: ${{ inputs.platform_id }}
         run: |
-          platform_root="bench/out/fawn-matrix/${{ inputs.platform_id }}"
-          context_report="$(find "${platform_root}" -name context_snapshot_diff.platform-report.json -type f | sort | tail -n 1)"
-          gpu_report="$(find "${platform_root}" -name webgpu_model_preprocessing.platform-report.json -type f | sort | tail -n 1)"
-          agent_report="$(find "${platform_root}" -name multi_step_agent_interaction.platform-report.json -type f | sort | tail -n 1)"
-          if [[ -n "${DOE_PROOF_PRIVATE_KEY}" ]]; then
-            key_path="${RUNNER_TEMP}/doe-proof-signing-key"
-            printf '%s\n' "${DOE_PROOF_PRIVATE_KEY}" > "${key_path}"
-            chmod 600 "${key_path}"
-            export DOE_PROOF_SIGNING_KEY="${key_path}"
-          fi
+          platform_root="${RUNNER_TEMP}/fawn-matrix-output/${PLATFORM_ID}"
+          context_report="$(find "${platform_root}" -name context_snapshot_diff.platform-report.json -type f -print -quit)"
+          gpu_report="$(find "${platform_root}" -name webgpu_model_preprocessing.platform-report.json -type f -print -quit)"
+          agent_report="$(find "${platform_root}" -name multi_step_agent_interaction.platform-report.json -type f -print -quit)"
+          test -n "${context_report}"
+          test -n "${gpu_report}"
+          test -n "${agent_report}"
+          export PLATFORM_ROOT="${platform_root}"
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          configs = [
+              Path("bench/fawn_matrix/config/matrix-workloads.json"),
+              Path("bench/fawn_matrix/config/live-workloads.json"),
+          ]
+          payload = {
+              "schemaVersion": 1,
+              "experimentRevision": os.environ["EXPERIMENT_REVISION"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "workflowRunId": os.environ["GITHUB_RUN_ID"],
+              "workflowRunAttempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "platformId": os.environ["PLATFORM_ID"],
+              "runnerName": os.environ["RUNNER_NAME"],
+              "approvedRunnerName": os.environ["APPROVED_RUNNER_NAME"],
+              "runnerOs": os.environ["RUNNER_OS"],
+              "runnerArch": os.environ["RUNNER_ARCH"],
+              "workloadConfigSha256": {
+                  str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+                  for path in configs
+              },
+          }
+          output = Path(os.environ["PLATFORM_ROOT"]) / "runner-provenance.json"
+          output.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          PY
+          unset DOE_PROOF_SIGNING_KEY
           python3 -m bench.fawn_matrix.live_cli suite \
             --report "${context_report}" \
             --report "${gpu_report}" \
             --report "${agent_report}" \
-            --out "${platform_root}/fawn-doe.platform-suite.json"
-      - name: Upload physical evidence
+            --out "${platform_root}/fawn-doe.platform-suite.unsigned.json"
+          python3 - "${platform_root}/fawn-doe.platform-suite.unsigned.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          suite = json.loads(Path(sys.argv[1]).read_text())
+          if suite["promotionReceipt"]["signatureStatus"] != "unsigned_review_required":
+              raise SystemExit("physical runner unexpectedly signed the suite")
+          PY
+          (
+            cd "${platform_root}"
+            find . -type f ! -name SHA256SUMS -print0 \
+              | sort -z \
+              | xargs -0 sha256sum > SHA256SUMS
+          )
+      - id: upload
+        name: Upload immutable unsigned evidence
         uses: actions/upload-artifact@v4
         with:
-          name: fawn-matrix-${{ inputs.platform_id }}-${{ github.run_id }}
-          path: bench/out/fawn-matrix/${{ inputs.platform_id }}/
+          name: fawn-matrix-unsigned-${{ inputs.platform_id }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/fawn-matrix-output/${{ inputs.platform_id }}/
           if-no-files-found: error
+          retention-days: 90
+
+  protected-signing:
+    if: ${{ inputs.request_release_signature }}
+    needs: physical-matrix
+    environment: doe-proof-production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout signer implementation
+        uses: actions/checkout@v4
+        with:
+          path: signer
+      - name: Checkout frozen experiment
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.experiment_revision }}
+          path: experiment
+      - name: Download unsigned physical evidence
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.physical-matrix.outputs.artifact-id }}
+          path: unsigned-evidence
+      - name: Rehash and verify execution identity
+        env:
+          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
+          ARTIFACT_DIGEST: ${{ needs.physical-matrix.outputs.artifact-digest }}
+          ARTIFACT_ID: ${{ needs.physical-matrix.outputs.artifact-id }}
+          EXPERIMENT_REVISION: ${{ inputs.experiment_revision }}
+        run: |
+          (cd unsigned-evidence && sha256sum -c SHA256SUMS)
+          test "$(git -C experiment rev-parse HEAD)" = "${EXPERIMENT_REVISION}"
+          cmp experiment/bench/fawn_matrix/config/matrix-workloads.json signer/bench/fawn_matrix/config/matrix-workloads.json
+          cmp experiment/bench/fawn_matrix/config/live-workloads.json signer/bench/fawn_matrix/config/live-workloads.json
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          payload = json.loads(Path("unsigned-evidence/runner-provenance.json").read_text())
+          required = {
+              "experimentRevision": os.environ["EXPERIMENT_REVISION"],
+              "runnerName": os.environ["APPROVED_RUNNER_NAME"],
+              "approvedRunnerName": os.environ["APPROVED_RUNNER_NAME"],
+          }
+          for key, expected in required.items():
+              if payload.get(key) != expected:
+                  raise SystemExit(f"runner provenance mismatch for {key}")
+          for relative, expected in payload["workloadConfigSha256"].items():
+              actual = hashlib.sha256((Path("experiment") / relative).read_bytes()).hexdigest()
+              if actual != expected:
+                  raise SystemExit(f"frozen workload config mismatch: {relative}")
+          payload["unsignedArtifact"] = {
+              "artifactId": os.environ["ARTIFACT_ID"],
+              "artifactDigest": os.environ["ARTIFACT_DIGEST"],
+          }
+          payload["signerRevision"] = os.environ["GITHUB_SHA"]
+          Path("release-provenance.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+      - name: Revalidate and sign platform suite
+        env:
+          DOE_PROOF_PRIVATE_KEY: ${{ secrets.DOE_PROOF_SIGNING_KEY }}
+        run: |
+          test -n "${DOE_PROOF_PRIVATE_KEY}"
+          key_path="${RUNNER_TEMP}/doe-proof-signing-key"
+          printf '%s\n' "${DOE_PROOF_PRIVATE_KEY}" > "${key_path}"
+          chmod 600 "${key_path}"
+          export DOE_PROOF_SIGNING_KEY="${key_path}"
+          context_report="$(find unsigned-evidence -name context_snapshot_diff.platform-report.json -type f -print -quit)"
+          gpu_report="$(find unsigned-evidence -name webgpu_model_preprocessing.platform-report.json -type f -print -quit)"
+          agent_report="$(find unsigned-evidence -name multi_step_agent_interaction.platform-report.json -type f -print -quit)"
+          (
+            cd signer
+            PYTHONPATH=. python3 -m bench.fawn_matrix.live_cli suite \
+              --report "${GITHUB_WORKSPACE}/${context_report}" \
+              --report "${GITHUB_WORKSPACE}/${gpu_report}" \
+              --report "${GITHUB_WORKSPACE}/${agent_report}" \
+              --provenance "${GITHUB_WORKSPACE}/release-provenance.json" \
+              --trust-policy config/doe-proof-trusted-signers.json \
+              --out "${GITHUB_WORKSPACE}/fawn-doe.platform-suite.signed.json"
+            PYTHONPATH=. python3 -m pipeline.agent.fawn_matrix_learning_bridge \
+              --suite "${GITHUB_WORKSPACE}/fawn-doe.platform-suite.signed.json" \
+              --out "${GITHUB_WORKSPACE}/fawn-doe.promotion-learning-record.json"
+          )
+          rm -f "${key_path}"
+      - name: Upload signed release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: fawn-matrix-signed-${{ inputs.platform_id }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            fawn-doe.platform-suite.signed.json
+            fawn-doe.promotion-learning-record.json
+            release-provenance.json
+          if-no-files-found: error
+          retention-days: 90

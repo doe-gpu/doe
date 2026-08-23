@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import datetime
 import hashlib
 import json
 import os
@@ -26,6 +27,12 @@ RUNTIMES = {
     Lane.LANE_C.value: "doe",
     Lane.LANE_D.value: "doe",
 }
+DEFAULT_TRUST_POLICY_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "config"
+    / "doe-proof-trusted-signers.json"
+)
+PROMOTION_RECEIPT_KIND = "doe-promotion-receipt-v1"
 
 
 def canonical_hash(value: Any) -> str:
@@ -48,6 +55,59 @@ def file_hash(path: Path) -> str:
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise LiveEvidenceError(message)
+
+
+def _canonical_public_key(public_key: str) -> str:
+    fields = public_key.split()
+    _require(len(fields) >= 2 and fields[0] == "ssh-ed25519", "signing key must be Ed25519")
+    return " ".join(fields[:2])
+
+
+def _parse_utc(value: str, field: str) -> datetime.datetime:
+    _require(value.endswith("Z"), f"{field} must be UTC")
+    try:
+        return datetime.datetime.fromisoformat(value.removesuffix("Z") + "+00:00")
+    except ValueError as error:
+        raise LiveEvidenceError(f"{field} is not an ISO-8601 timestamp") from error
+
+
+def _load_trust_policy(path: Path | None) -> dict[str, Any]:
+    policy_path = path or DEFAULT_TRUST_POLICY_PATH
+    _require(policy_path.is_file(), f"trusted signer policy is missing: {policy_path}")
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    _require(policy.get("schemaVersion") == 1, "unsupported trusted signer policy")
+    _require(policy.get("policyId") == "doe-proof-release-signers-v1", "wrong trusted signer policy")
+    _require(policy.get("policyState") == "active", "trusted signer policy has no production trust anchor")
+    signers = policy.get("signers", [])
+    _require(bool(signers), "trusted signer policy authorizes no signers")
+    _require(len({entry.get("signerId") for entry in signers}) == len(signers), "trusted signer IDs are not unique")
+    _require(len({entry.get("publicKeySha256") for entry in signers}) == len(signers), "trusted signer fingerprints are not unique")
+    return policy
+
+
+def _authorize_signer(
+    public_key_sha256: str,
+    receipt_kind: str,
+    subject_kind: str,
+    signed_at: str,
+    signer_id: str | None,
+    trust_policy_path: Path | None,
+) -> dict[str, Any]:
+    policy = _load_trust_policy(trust_policy_path)
+    matches = [entry for entry in policy["signers"] if entry.get("publicKeySha256") == public_key_sha256]
+    _require(len(matches) == 1, "receipt signer fingerprint is not authorized")
+    signer = matches[0]
+    _require(signer.get("status") == "active", "receipt signer is revoked")
+    if signer_id is not None:
+        _require(signer.get("signerId") == signer_id, "receipt signer identity mismatch")
+    _require(receipt_kind in signer.get("allowedReceiptKinds", []), "signer is not authorized for this receipt kind")
+    _require(subject_kind in signer.get("allowedSubjectKinds", []), "signer is not authorized for this subject kind")
+    instant = _parse_utc(signed_at, "signedAt")
+    _require(
+        _parse_utc(signer["notBefore"], "notBefore") <= instant <= _parse_utc(signer["notAfter"], "notAfter"),
+        "receipt was signed outside the signer's validity interval",
+    )
+    return signer
 
 
 def validate_live_raw(
@@ -209,13 +269,20 @@ def evaluate_live_workload(
     return report
 
 
-def promotion_receipt(subject: dict[str, Any], signing_environment: str) -> dict[str, Any]:
+def promotion_receipt(
+    subject: dict[str, Any],
+    signing_environment: str,
+    trust_policy_path: Path | None = None,
+) -> dict[str, Any]:
     subject_hash = canonical_hash(subject)
+    subject_kind = subject.get("reportKind", "")
+    _require(bool(subject_kind), "signed subject reportKind is missing")
     key_value = os.environ.get(signing_environment)
     if not key_value:
         return {
-            "receiptKind": "doe-promotion-receipt-v1",
+            "receiptKind": PROMOTION_RECEIPT_KIND,
             "subjectSha256": subject_hash,
+            "subjectKind": subject_kind,
             "signatureAlgorithm": None,
             "signature": None,
             "publicKey": None,
@@ -233,6 +300,17 @@ def promotion_receipt(subject: dict[str, Any], signing_environment: str) -> dict
             capture_output=True,
             text=True,
         ).stdout.strip()
+    public_key = _canonical_public_key(public_key)
+    public_key_sha256 = hashlib.sha256(public_key.encode()).hexdigest()
+    signed_at = datetime.datetime.now(datetime.UTC).isoformat().replace("+00:00", "Z")
+    signer = _authorize_signer(
+        public_key_sha256,
+        PROMOTION_RECEIPT_KIND,
+        subject_kind,
+        signed_at,
+        None,
+        trust_policy_path,
+    )
     with tempfile.TemporaryDirectory(prefix="doe-proof-sign-") as directory:
         subject_path = Path(directory) / "subject.txt"
         subject_path.write_text(subject_hash, encoding="utf-8")
@@ -245,12 +323,15 @@ def promotion_receipt(subject: dict[str, Any], signing_environment: str) -> dict
             Path(str(subject_path) + ".sig").read_bytes()
         ).decode("ascii")
     return {
-        "receiptKind": "doe-promotion-receipt-v1",
+        "receiptKind": PROMOTION_RECEIPT_KIND,
         "subjectSha256": subject_hash,
+        "subjectKind": subject_kind,
         "signatureAlgorithm": "sshsig-ed25519",
         "signature": signature,
         "publicKey": public_key,
-        "publicKeySha256": hashlib.sha256(public_key.encode()).hexdigest(),
+        "publicKeySha256": public_key_sha256,
+        "signerId": signer["signerId"],
+        "signedAt": signed_at,
         "signatureStatus": "signed",
     }
 
@@ -258,16 +339,29 @@ def promotion_receipt(subject: dict[str, Any], signing_environment: str) -> dict
 def verify_promotion_receipt(
     subject: dict[str, Any],
     receipt: dict[str, Any],
+    trust_policy_path: Path | None = None,
 ) -> None:
     _require(receipt.get("signatureStatus") == "signed", "receipt is unsigned")
     _require(receipt.get("signatureAlgorithm") == "sshsig-ed25519", "unsupported signature algorithm")
+    _require(receipt.get("receiptKind") == PROMOTION_RECEIPT_KIND, "unsupported receipt kind")
     subject_hash = canonical_hash(subject)
     _require(receipt.get("subjectSha256") == subject_hash, "receipt subject hash mismatch")
-    public_key = receipt.get("publicKey", "")
+    subject_kind = subject.get("reportKind", "")
+    _require(receipt.get("subjectKind") == subject_kind, "receipt subject kind mismatch")
+    public_key = _canonical_public_key(receipt.get("publicKey", ""))
+    public_key_sha256 = hashlib.sha256(public_key.encode()).hexdigest()
     _require(
         receipt.get("publicKeySha256")
-        == hashlib.sha256(public_key.encode()).hexdigest(),
+        == public_key_sha256,
         "receipt public key hash mismatch",
+    )
+    _authorize_signer(
+        public_key_sha256,
+        PROMOTION_RECEIPT_KIND,
+        subject_kind,
+        receipt.get("signedAt", ""),
+        receipt.get("signerId"),
+        trust_policy_path,
     )
     with tempfile.TemporaryDirectory(prefix="doe-proof-verify-") as directory:
         root = Path(directory)
@@ -289,6 +383,8 @@ def verify_promotion_receipt(
 def build_platform_suite(
     reports: list[dict[str, Any]],
     signing_environment: str,
+    trust_policy_path: Path | None = None,
+    execution_provenance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     by_workload = {
         report.get("workloadId") or report.get("workload_id"): report
@@ -315,12 +411,17 @@ def build_platform_suite(
             "verticalStack": by_workload["multi_step_agent_interaction"]["overallThesisStatus"] == "VERTICAL_AGENT_STACK_EVIDENCED",
         },
     }
+    if execution_provenance is not None:
+        _require(execution_provenance.get("schemaVersion") == 1, "execution provenance schemaVersion must be 1")
+        _require(bool(execution_provenance.get("experimentRevision")), "execution provenance must bind the experiment revision")
+        _require(bool(execution_provenance.get("runnerName")), "execution provenance must bind the physical runner")
+        suite["executionProvenance"] = execution_provenance
     suite["earnedComponents"] = sorted(
         component
         for component, earned in suite["decisions"].items()
         if earned
     )
-    suite["promotionReceipt"] = promotion_receipt(suite, signing_environment)
+    suite["promotionReceipt"] = promotion_receipt(suite, signing_environment, trust_policy_path)
     suite["reportHash"] = canonical_hash(suite)
     return suite
 
@@ -348,7 +449,10 @@ def aggregate_platform_suites(
     return aggregate
 
 
-def validate_passport_candidate(aggregate: dict[str, Any]) -> None:
+def validate_passport_candidate(
+    aggregate: dict[str, Any],
+    trust_policy_path: Path | None = None,
+) -> None:
     _require(aggregate.get("reportKind") == "fawn-doe-cross-platform-suite", "wrong aggregate kind")
     _require(aggregate.get("corePlatformStatus") == "pass", "core platform gate failed")
     for platform_id, suite in aggregate.get("platforms", {}).items():
@@ -361,6 +465,7 @@ def validate_passport_candidate(aggregate: dict[str, Any]) -> None:
             verify_promotion_receipt(
                 receipt_subject,
                 suite.get("promotionReceipt", {}),
+                trust_policy_path,
             )
         except LiveEvidenceError as error:
             raise LiveEvidenceError(f"{platform_id} {error}") from error
