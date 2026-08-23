@@ -6,6 +6,12 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- Backend workload catalog schema version 2 owns the generated timestamp in
+  `bench/workloads/metadata/backend-workload-catalog.json`. Generated lane
+  manifests no longer derive provenance from checkout-local filesystem mtime,
+  so `generate_backend_workloads.py --verify` is byte-reproducible across clean
+  checkouts. Version 1 catalogs must add a schema-valid `generatedAt` value and
+  regenerate their lane manifests before verification.
 - Fawn M4 is now an explicit in-progress published-browser milestone. Linux x64
   joins macOS arm64 as a governed release-candidate platform through
   `config/browser-release-platform-policy.json`; this expands the admissible

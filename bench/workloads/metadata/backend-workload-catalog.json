@@ -1,4 +1,5 @@
 {
+  "generatedAt": "2026-08-23T03:35:35Z",
   "laneOutputs": {
     "amd_vulkan": {
       "outputPath": "bench/workloads/workloads.amd.vulkan.json",
@@ -34,7 +35,7 @@
       "sourceLane": "local_d3d12_smoke"
     }
   },
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "workloads": [
     {
       "fieldOrder": [

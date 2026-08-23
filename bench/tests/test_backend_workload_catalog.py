@@ -46,6 +46,10 @@ class BackendWorkloadCatalogTests(unittest.TestCase):
             self.assertFalse(second)
             self.assertEqual(path.read_text(encoding="utf-8"), self.generator.json_text(payload))
 
+    def test_materialization_timestamp_is_catalog_owned(self) -> None:
+        materialized = self.generator.materialize_lane(self.catalog, "amd_vulkan")
+        self.assertEqual(materialized["generatedAt"], self.catalog["generatedAt"])
+
     def test_d3d12_generated_views_match_catalog(self) -> None:
         smoke = self.generator.materialize_lane(self.catalog, "local_d3d12_smoke")
         full = self.generator.materialize_lane(self.catalog, "local_d3d12")

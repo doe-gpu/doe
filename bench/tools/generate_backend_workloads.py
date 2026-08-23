@@ -7,7 +7,6 @@ import argparse
 import json
 import sys
 from collections import OrderedDict
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -539,13 +538,7 @@ def materialize_lane(catalog: dict[str, Any], lane_id: str) -> dict[str, Any]:
                 "bench.tools.generate_backend_workloads:materialize_lane",
             ),
             ("generatorInputHash", file_sha256(CATALOG_PATH)),
-            (
-                "generatedAt",
-                datetime.fromtimestamp(
-                    CATALOG_PATH.stat().st_mtime,
-                    timezone.utc,
-                ).isoformat(),
-            ),
+            ("generatedAt", catalog["generatedAt"]),
             ("workloads", workloads),
         ]
     )
