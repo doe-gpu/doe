@@ -8,26 +8,8 @@
   "classification": "failure",
   "differences": [
     {
-      "baselineSha256": null,
-      "candidateSha256": "9d6fda78daa7522ca16f8efc825ff8c6964db8a81756499e5e2a38fc2dfb7624",
-      "category": "abi-surface",
-      "path": "abi/libonnxruntime_doe_ep.dylib.symbols.txt"
-    },
-    {
-      "baselineSha256": "e237087ac2d50e752bd714bb338719e3e1559b306d056461ebe890b87bf4231b",
-      "candidateSha256": null,
-      "category": "abi-surface",
-      "path": "abi/libonnxruntime_doe_ep.so.symbols.txt"
-    },
-    {
-      "baselineSha256": null,
-      "candidateSha256": "d0e9acc41cf394850dfc09daa45d9bdcf3e92c714bd791bfd3f76371cca3779a",
-      "category": "abi-surface",
-      "path": "abi/libwebgpu_doe.dylib.symbols.txt"
-    },
-    {
       "baselineSha256": "6397dec652765917af9a5fb11ec2002fb5bbb4915d85489ea74fc23076132565",
-      "candidateSha256": null,
+      "candidateSha256": "cc063b38394ed0e1d0d85eec19d5ac79721f771c2d4f64d3a4a1cde434fdc494",
       "category": "abi-surface",
       "path": "abi/libwebgpu_doe.so.symbols.txt"
     }
