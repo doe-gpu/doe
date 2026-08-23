@@ -6,6 +6,14 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- The blocking strict-provider output-equality obligation is now registered in
+  `config/comparability-obligations.json`, matching the report emitter and
+  claim gate. The Lean contract and proof receipt are generated from that same
+  rule, so reports containing `baseline_comparison_result_output_match` no
+  longer fail as unknown while unequal or missing declared outputs remain
+  blocking. Migration: regenerate the Lean comparability contract and proof
+  artifact when adopting this contract hash; do not delete or relabel the
+  output-equality obligation in older diagnostic reports.
 - Backend workload catalog schema version 2 owns the generated timestamp in
   `bench/workloads/metadata/backend-workload-catalog.json`. Generated lane
   manifests no longer derive provenance from checkout-local filesystem mtime,

@@ -4,13 +4,13 @@
   "provenance": {
     "leanToolchainRef": "leanprover/lean4:v4.16.0",
     "extractProgramSha256": "be23888c64ea12e4c483817025ad9bf68344e59e14e9067b25ce8d83fb6ea791",
-    "leanSourceTreeSha256": "5c74f5fb204d47be003e0c297e1076b26e4088161293659149ae714f16bafa8a",
-    "generatedComparabilityContractSha256": "06041825c55a7a57d41d6d4a8f98a2eecf942129bee32e31d39513c5171b8b27",
+    "leanSourceTreeSha256": "fd033d23739cf58940d423d3064c2c7f648ade02177e8a7737748e5586802e45",
+    "generatedComparabilityContractSha256": "d1da49837aae69cbcc87557a15f158166f35ac9ba017af72fe0fe6a9b59eebc7",
     "proofPatternSpecSha256": "0e839bfbcd0f4c5f8087c880434c9741804fb32797fc8650fe8951c00d57529d",
     "theoremMetadataGeneratorSha256": "6c2182cfdc876f63ff6b91c39e3b47275f467c91e718adec0a560e3380256335"
   },
   "contractHashes": {
-    "comparabilityObligationsSha256": "20f2d04f010cac8815c545dd03b5eca9e24be40aa60214a608a96e9103895a9a"
+    "comparabilityObligationsSha256": "122a21b854428b45c6c4dc17780057eda8c0b16d56739b1625a580f8ba0af3db"
   },
   "theorems": [
     {

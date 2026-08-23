@@ -13,7 +13,10 @@ BENCH_ROOT = REPO_ROOT / "bench"
 if str(BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(BENCH_ROOT))
 
-from native_compare_modules.comparability import compare_assessment  # noqa: E402
+from native_compare_modules.comparability import (  # noqa: E402
+    CANONICAL_COMPARABILITY_OBLIGATION_IDS,
+    compare_assessment,
+)
 
 
 def _sample(*, backend: str, command_replay_ns: int) -> dict:
@@ -139,6 +142,15 @@ class CompareAssessmentTests(unittest.TestCase):
         self.assertIn(
             "baseline_comparison_result_output_match",
             result["blockingFailedObligations"],
+        )
+        emitted_ids = [item["id"] for item in result["obligations"]]
+        self.assertEqual(
+            [],
+            [
+                obligation_id
+                for obligation_id in emitted_ids
+                if obligation_id not in CANONICAL_COMPARABILITY_OBLIGATION_IDS
+            ],
         )
 
     def test_submit_scope_mismatch_blocks_strict_package_totals(self) -> None:

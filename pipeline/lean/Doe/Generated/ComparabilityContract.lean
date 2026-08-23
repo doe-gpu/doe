@@ -1,11 +1,12 @@
 import Doe.Core.Model
 
-def comparabilityContractSha256 : String := "20f2d04f010cac8815c545dd03b5eca9e24be40aa60214a608a96e9103895a9a"
+def comparabilityContractSha256 : String := "122a21b854428b45c6c4dc17780057eda8c0b16d56739b1625a580f8ba0af3db"
 
 inductive ComparabilityObligationId where
   | workloadMarkedComparable
   | leftSamplesPresent
   | rightSamplesPresent
+  | baselineComparisonResultOutputMatch
   | leftSingleTimingClass
   | rightSingleTimingClass
   | leftRequiredTimingClass
@@ -66,6 +67,8 @@ structure ComparabilityFacts where
   workloadMarkedComparable : Bool
   leftSamplesPresent : Bool
   rightSamplesPresent : Bool
+  resultOutputMatchApplies : Bool
+  baselineComparisonResultOutputMatch : Bool
   leftSingleTimingClass : Bool
   rightSingleTimingClass : Bool
   requiredTimingClassApplies : Bool
@@ -140,6 +143,10 @@ def obligationsFromFacts (facts : ComparabilityFacts) : List ComparabilityObliga
       blocking := true
       applicable := true
       passes := facts.rightSamplesPresent },
+    { id := .baselineComparisonResultOutputMatch
+      blocking := true
+      applicable := facts.resultOutputMatchApplies
+      passes := facts.baselineComparisonResultOutputMatch },
     { id := .leftSingleTimingClass
       blocking := true
       applicable := true
