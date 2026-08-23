@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from capture_semantic_fixtures import (
     _install_ir_digest_observer,
     _publish_fixture_set,
+    _semantic_build_commands,
 )
 from check_recomposition_reports import _candidate_errors
 from generate_architecture_reports import (
@@ -36,6 +37,30 @@ from verify_semantic_fixtures import load_verified_fixture_set
 
 
 class ArchitectureReportTests(unittest.TestCase):
+    def test_semantic_fixture_build_steps_are_independent_and_ordered(self) -> None:
+        commands = _semantic_build_commands(
+            Path("/opt/zig/zig"),
+            Path("/tmp/cache"),
+            Path("/tmp/prefix"),
+        )
+
+        self.assertEqual(
+            [command[2] for command in commands],
+            [
+                "doe-runtime",
+                "dropin",
+                "emit-ir-digest",
+                "emit-csl",
+                "emit-hlsl",
+                "emit-msl",
+                "emit-spirv",
+                "ort-plugin-ep",
+            ],
+        )
+        self.assertTrue(
+            all(command.count("build") == 1 for command in commands)
+        )
+
     def test_cochange_history_head_ignores_report_only_commits(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             repository = Path(temporary_directory) / "doe"

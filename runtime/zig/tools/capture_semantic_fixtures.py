@@ -34,6 +34,16 @@ WEBGPU_ABI_SOURCE_CONFIG = "config/webgpu-abi-source.json"
 LEGACY_WEBGPU_HEADER_PATH = Path(
     "bench/vendor/dawn/third_party/webgpu-headers/src/webgpu.h"
 )
+SEMANTIC_BUILD_STEPS = (
+    "doe-runtime",
+    "dropin",
+    "emit-ir-digest",
+    "emit-csl",
+    "emit-hlsl",
+    "emit-msl",
+    "emit-spirv",
+    "ort-plugin-ep",
+)
 
 
 def _run(
@@ -48,7 +58,7 @@ def _run(
         if not detail:
             detail = result.stdout.decode("utf-8", errors="replace").strip()
         raise RuntimeError(
-            f"command failed at {' '.join(command[:2])}: {detail[-4096:]}"
+            f"command failed at {' '.join(command[:3])}: {detail[-4096:]}"
         )
     return result
 
@@ -64,6 +74,33 @@ def _find_zig(root: Path) -> Path:
     if not candidates:
         raise RuntimeError("Zig executable not found")
     return candidates[-1].resolve()
+
+
+def _semantic_build_commands(
+    zig: Path,
+    cache: Path,
+    prefix: Path,
+) -> list[list[str]]:
+    """Build semantic tools in fixed, independently diagnosable steps."""
+
+    return [
+        [
+            str(zig),
+            "build",
+            step,
+            "-Doptimize=ReleaseSafe",
+            "-j1",
+            "--seed",
+            "0",
+            "--summary",
+            "none",
+            "--cache-dir",
+            str(cache),
+            "--prefix",
+            str(prefix),
+        ]
+        for step in SEMANTIC_BUILD_STEPS
+    ]
 
 
 def _materialize_runtime(
@@ -306,32 +343,8 @@ def capture(root: Path, git_ref: str, destination: Path) -> dict[str, Any]:
             }
         cache = temporary_root / "cache"
         prefix = temporary_root / "prefix"
-        build_steps = [
-            "doe-runtime",
-            "dropin",
-            "emit-ir-digest",
-            "emit-csl",
-            "emit-hlsl",
-            "emit-msl",
-            "emit-spirv",
-            "ort-plugin-ep",
-        ]
-        build_command = [
-            str(zig),
-            "build",
-            *build_steps,
-            "-Doptimize=ReleaseSafe",
-            "-j1",
-            "--seed",
-            "0",
-            "--summary",
-            "none",
-            "--cache-dir",
-            str(cache),
-            "--prefix",
-            str(prefix),
-        ]
-        _run(build_command, snapshot)
+        for build_command in _semantic_build_commands(zig, cache, prefix):
+            _run(build_command, snapshot)
         binary_root = prefix / "bin"
         runtime = binary_root / "doe-zig-runtime"
         input_path = snapshot / WGSL_FIXTURE
@@ -539,7 +552,8 @@ def capture(root: Path, git_ref: str, destination: Path) -> dict[str, Any]:
         manifest = {
             "build": {
                 "optimize": "ReleaseSafe",
-                "steps": build_steps,
+                "strategy": "ordered-independent-steps",
+                "steps": list(SEMANTIC_BUILD_STEPS),
             },
             "captureToolSha256": capture_tool_sha256,
             "commandNormalization": {
