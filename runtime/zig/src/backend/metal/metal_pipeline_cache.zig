@@ -534,7 +534,7 @@ fn load_warmup_manifest(
 // Cache directory resolution
 
 fn resolve_cache_dir(explicit: []const u8) []const u8 {
-    // Honour explicit path from caller (typically kernel_root).
+    // Honour the composition-owned mutable cache path.
     if (explicit.len > 0) return explicit;
 
     // Check environment override.

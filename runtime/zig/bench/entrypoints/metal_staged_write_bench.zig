@@ -2,8 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const doe = @import("doe");
 const model_profile = doe.contracts.model.profile();
-const backend_runtime = doe.backend.runtime();
-const runtime_types = doe.backend.runtimeTypes();
+const execution = doe.runtime.execution();
 
 const Config = struct {
     iterations: u32 = 8,
@@ -116,16 +115,19 @@ fn writeArtifact(artifact: Artifact) !void {
 fn run(allocator: std.mem.Allocator, config: Config) !u8 {
     if (builtin.os.tag != .macos) return error.UnsupportedPlatform;
 
-    var runtime = try backend_runtime.BackendRuntime.init(
+    var session = try doe.composition.ExecutionSession.init(
         allocator,
+        .native,
         deviceProfile(),
         null,
         .metal_doe_comparable,
+        .{},
     );
-    defer runtime.deinit();
+    defer session.deinit();
+    const runtime = session.contextPtr();
 
-    runtime.set_upload_behavior(.copy_dst, 1);
-    runtime.set_queue_sync_mode(.deferred);
+    runtime.configureUploadBehavior(.copy_dst, 1);
+    runtime.configureQueueSyncMode(.deferred);
 
     var wall_timer = try std.time.Timer.start();
     var write_setup_ns: u64 = 0;
@@ -143,41 +145,43 @@ fn run(allocator: std.mem.Allocator, config: Config) !u8 {
         defer allocator.free(expected);
         fillExpected(expected, iteration);
 
-        const write_result = try runtime.execute_buffer_write_bytes(
+        const write_result = try runtime.execute_buffer_write_bytes_with_semantic(
             handle,
             0,
             config.byte_count,
             expected,
+            .{},
         );
-        if (write_result.status != runtime_types.NativeExecutionStatus.ok) {
+        if (write_result.status != execution.ExecutionStatus.ok) {
             return error.WriteFailed;
         }
         write_setup_ns +|= write_result.setup_ns;
         deferred_submit_wait_ns +|= write_result.submit_wait_ns;
-        const completed_flush_ns = try runtime.flush_queue();
+        const completed_flush_ns = try runtime.flushQueue();
         flush_ns +|= completed_flush_ns;
         every_flush_completed = every_flush_completed and completed_flush_ns > 0;
 
         if (config.inject_corruption and iteration == 0) {
             var corrupt = [_]u8{expected[0] ^ 0xff};
-            const corrupt_result = try runtime.execute_buffer_write_bytes(
+            const corrupt_result = try runtime.execute_buffer_write_bytes_with_semantic(
                 handle,
                 0,
                 config.byte_count,
                 corrupt[0..],
+                .{},
             );
-            if (corrupt_result.status != runtime_types.NativeExecutionStatus.ok) {
+            if (corrupt_result.status != execution.ExecutionStatus.ok) {
                 return error.WriteFailed;
             }
             write_setup_ns +|= corrupt_result.setup_ns;
             deferred_submit_wait_ns +|= corrupt_result.submit_wait_ns;
-            const corrupt_flush_ns = try runtime.flush_queue();
+            const corrupt_flush_ns = try runtime.flushQueue();
             flush_ns +|= corrupt_flush_ns;
             every_flush_completed = every_flush_completed and corrupt_flush_ns > 0;
         }
 
         var capture_timer = try std.time.Timer.start();
-        const actual = try runtime.capture_buffer(allocator, handle, 0, config.byte_count);
+        const actual = try runtime.captureBuffer(allocator, handle, 0, config.byte_count);
         capture_ns +|= capture_timer.read();
         defer allocator.free(actual);
 

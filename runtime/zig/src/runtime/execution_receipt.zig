@@ -1,6 +1,6 @@
 const execution_contract = @import("../contracts/execution.zig");
 const semantic_trace = @import("../contracts/semantic.zig");
-const backend_telemetry = @import("../backend/backend_telemetry.zig");
+const runtime_telemetry = @import("../contracts/runtime_telemetry.zig");
 
 pub const ExecutionStatus = execution_contract.ExecutionStatus;
 
@@ -52,7 +52,7 @@ pub fn missingBackend(identity: Identity) ExecutionResult {
 
 pub fn failure(
     identity: Identity,
-    telemetry: backend_telemetry.BackendTelemetry,
+    telemetry: runtime_telemetry.RuntimeTelemetry,
     duration_ns: u64,
     status_code: []const u8,
 ) ExecutionResult {
@@ -64,7 +64,7 @@ pub fn failure(
 
 pub fn success(
     identity: Identity,
-    telemetry: backend_telemetry.BackendTelemetry,
+    telemetry: runtime_telemetry.RuntimeTelemetry,
     duration_ns: u64,
     native: execution_contract.NativeExecutionResult,
 ) ExecutionResult {
@@ -110,7 +110,7 @@ fn empty(identity: Identity, status: ExecutionStatus, status_code: []const u8) E
     };
 }
 
-fn applyTelemetry(result: *ExecutionResult, telemetry: backend_telemetry.BackendTelemetry) void {
+fn applyTelemetry(result: *ExecutionResult, telemetry: runtime_telemetry.RuntimeTelemetry) void {
     result.submit_count = telemetry.last_submit_count orelse 0;
     result.backend_selection_reason = telemetry.backend_selection_reason;
     result.fallback_used = telemetry.fallback_used;
@@ -131,7 +131,7 @@ fn applyTelemetry(result: *ExecutionResult, telemetry: backend_telemetry.Backend
 
 test "failure preserves backend telemetry and first failure code" {
     const std = @import("std");
-    const telemetry = backend_telemetry.BackendTelemetry{
+    const telemetry = runtime_telemetry.RuntimeTelemetry{
         .backend_id = .doe_vulkan,
         .backend_selection_reason = "profile-api",
         .fallback_used = false,
@@ -166,7 +166,7 @@ test "failure preserves backend telemetry and first failure code" {
 
 test "success maps native measurements without changing timing scope" {
     const std = @import("std");
-    var telemetry = backend_telemetry.default_telemetry();
+    var telemetry = runtime_telemetry.defaultTelemetry();
     telemetry.last_submit_count = 2;
     const result = success(.{
         .backend = "dawn_delegate",

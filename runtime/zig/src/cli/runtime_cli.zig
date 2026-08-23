@@ -1,6 +1,5 @@
 const std = @import("std");
-const backend_runtime_telemetry = @import("../backend/backend_runtime_telemetry.zig");
-const backend_policy = @import("../backend/backend_policy.zig");
+const composition = @import("../composition/mod.zig");
 const execution = @import("../runtime/execution.zig");
 const main_print = @import("../runtime/trace/command_output.zig");
 const model_commands = @import("../contracts/command.zig");
@@ -189,13 +188,14 @@ pub fn runCli() !void {
         return error.OutputOracleRequiresNativeExecution;
     }
     var output_oracle_library_guard: ?std.DynLib = null;
-    if (options.validate_output_oracles and output_oracle.needsLibraryLifetimeGuard(backend_lane)) {
+    if (options.validate_output_oracles and composition.execution_session.needsLibraryLifetimeGuard(backend_lane)) {
         output_oracle_library_guard = try wgpu_loader.openLibrary();
     }
     defer if (output_oracle_library_guard) |*library| library.close();
     if (options.validate_output_oracles) {
         if (!options.execute or options.backend_mode != .native) return error.OutputOracleRequiresNativeExecution;
         output_oracle_evidence = try output_oracle.validate(
+            composition.ExecutionSession,
             allocator,
             commands,
             profile,
@@ -234,23 +234,23 @@ pub fn runCli() !void {
         return;
     }
 
-    var execution_context: ?execution.ExecutionContext = null;
+    var execution_session: ?composition.ExecutionSession = null;
+    var execution_context: ?*execution.ExecutionContext = null;
     if (options.execute) {
-        // Must be set BEFORE backend init so the Metal and Vulkan backends'
-        // cache-init guards see the flag. Both wrappers are cross-platform-safe
-        // no-ops outside their home platform.
-        backend_runtime_telemetry.set_metal_pipeline_cache_disabled(options.no_pipeline_cache);
-        backend_runtime_telemetry.set_vulkan_pipeline_cache_disabled(options.no_pipeline_cache);
-        backend_runtime_telemetry.set_vulkan_pipeline_cache_dir(options.pipeline_cache_dir);
         const executor_init_start_ns = nowNs();
-        execution_context = try execution.ExecutionContext.init(
+        execution_session = try composition.ExecutionSession.init(
             allocator,
             options.backend_mode,
             profile,
             options.kernel_root,
             backend_lane,
+            .{
+                .no_pipeline_cache = options.no_pipeline_cache,
+                .pipeline_cache_dir = options.pipeline_cache_dir,
+            },
         );
-        if (execution_context) |*ctx| {
+        execution_context = execution_session.?.contextPtr();
+        if (execution_context) |ctx| {
             ctx.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
             ctx.configureGpuTimestampMode(options.gpu_timestamp_mode);
             ctx.configureQueueWaitMode(options.queue_wait_mode);
@@ -273,8 +273,8 @@ pub fn runCli() !void {
         }
     }
     defer {
-        if (execution_context) |*ctx| {
-            ctx.deinit();
+        if (execution_session) |*session| {
+            session.deinit();
         }
     }
 
@@ -329,7 +329,7 @@ pub fn runCli() !void {
         options.webgpu_ffi_queue_wait_timeout_ns,
         options.queue_sync_mode,
         options.quirk_mode,
-        if (execution_context) |*ctx| ctx else null,
+        execution_context,
     );
     trace_summary.output_oracle_count = output_oracle_evidence.count;
     trace_summary.output_oracle_matched_count = output_oracle_evidence.matched_count;
@@ -375,7 +375,7 @@ pub fn runCli() !void {
                 (options.trace_meta_path != null) or
                 (load_result.inputs.replay_expectations != null);
 
-            if (execution_context) |*ctx| {
+            if (execution_context) |ctx| {
                 const executed = try ctx.execute_with_semantic(target, metadata.semantic);
                 execute_result = executed;
                 trace_summary.execution_row_count += 1;
@@ -479,7 +479,7 @@ pub fn runCli() !void {
                     try rows.append(allocator, buffered_row);
                 }
                 try artifact_recorder.record(
-                    if (execution_context) |*ctx| ctx else null,
+                    execution_context,
                     .{
                         .source_index = physical_command_index,
                         .command = target,
@@ -499,7 +499,7 @@ pub fn runCli() !void {
                 );
                 if (execute_result) |executed| {
                     if (executed.status == .ok) {
-                        if (execution_context) |*ctx| {
+                        if (execution_context) |ctx| {
                             const numeric_outcome = try numeric_stability_recorder.record(
                                 ctx,
                                 target,
@@ -553,7 +553,7 @@ pub fn runCli() !void {
         host_command_orchestration_total_ns = command_loop_wall_ns - trace_summary.execution_total_ns;
     }
 
-    if (execution_context) |*ctx| {
+    if (execution_context) |ctx| {
         const needs_explicit_drain = options.queue_sync_mode == .deferred or
             options.upload_submit_every > 1 or
             std.mem.eql(u8, trace_summary.execution_backend orelse "", "doe_vulkan");
@@ -599,7 +599,7 @@ pub fn runCli() !void {
         // reason (cli-flag/default/platform-unsupported) are derived inside
         // writeTraceMeta from this bool plus builtin.os.tag.
         trace_summary.pipeline_cache_disabled = options.no_pipeline_cache;
-        if (execution_context) |*ctx_ref| {
+        if (execution_context) |ctx_ref| {
             if (ctx_ref.telemetry()) |snapshot| {
                 trace_summary.pipeline_cache_active = snapshot.pipeline_cache_active;
                 trace_summary.pipeline_cache_warmup_count = snapshot.pipeline_cache_warmup_count;

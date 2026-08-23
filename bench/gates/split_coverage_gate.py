@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Split coverage gate: validates core and full command-coverage ledgers against
-the Zig runtime command partitions and surface schemas.
+the canonical Zig command contract and surface schemas.
 
 Checks:
 1. Schema validation for both ledger files.
-2. Command-kind completeness: every Zig partition enum value has a ledger entry.
-3. Count invariant: ledger commandCount matches the Zig partition enum size.
+2. Command-kind completeness: every scoped Zig command kind has a ledger entry.
+3. Count invariant: ledger counts match the canonical scope metadata.
 4. Superset invariant: full coreCoverage is a strict superset of core coverage.
 5. Domain classification consistency between core and full ledgers.
 6. No overlap: core and full-only command kinds are disjoint.
@@ -23,15 +23,14 @@ import sys
 from pathlib import Path
 
 
-def extract_enum_fields(partition_path: Path) -> list[str]:
-    """Extract enum field names from a Zig command_partition.zig file."""
-    text = partition_path.read_text(encoding="utf-8")
-    # Match lines like "    upload," or "    upload = 0," inside the enum block.
+def extract_kind_fields(contract_path: Path) -> list[str]:
+    """Extract fields from the canonical ``pub const Kind`` Zig enum."""
+    text = contract_path.read_text(encoding="utf-8")
     fields: list[str] = []
     in_enum = False
     for line in text.splitlines():
         stripped = line.strip()
-        if stripped.startswith("pub const CommandKind"):
+        if stripped.startswith("pub const Kind"):
             in_enum = True
             continue
         if in_enum and stripped.startswith("};"):
@@ -44,6 +43,36 @@ def extract_enum_fields(partition_path: Path) -> list[str]:
             if m:
                 fields.append(m.group(1))
     return fields
+
+
+def extract_scoped_kinds(contract_path: Path) -> dict[str, list[str]]:
+    """Read command scopes from the canonical metadata table.
+
+    The command enum owns stable identity and the metadata table owns surface
+    membership. Requiring both prevents a deleted compatibility partition from
+    becoming a second command authority.
+    """
+    text = contract_path.read_text(encoding="utf-8")
+    enum_fields = extract_kind_fields(contract_path)
+    entry_pattern = re.compile(
+        r"\.\{\s*\.scope\s*=\s*\.(core|full)\s*,"
+        r"\s*\.trace_name\s*=\s*\"([a-z_][a-z0-9_]*)\""
+    )
+    scoped = {"core": [], "full": []}
+    seen: set[str] = set()
+    for scope, kind in entry_pattern.findall(text):
+        if kind in seen:
+            raise ValueError(f"duplicate command metadata for {kind}")
+        scoped[scope].append(kind)
+        seen.add(kind)
+    enum_set = set(enum_fields)
+    if seen != enum_set:
+        missing = sorted(enum_set - seen)
+        extra = sorted(seen - enum_set)
+        raise ValueError(
+            f"command metadata does not match Kind enum: missing={missing}, extra={extra}"
+        )
+    return scoped
 
 
 def validate_schema(ledger: dict, schema_path: Path) -> list[str]:
@@ -61,14 +90,18 @@ def validate_schema(ledger: dict, schema_path: Path) -> list[str]:
 def validate_core(
     core_ledger: dict,
     core_schema_path: Path,
-    core_partition_path: Path,
+    command_contract_path: Path,
 ) -> list[str]:
     errors: list[str] = []
     errors.extend(validate_schema(core_ledger, core_schema_path))
 
-    zig_fields = extract_enum_fields(core_partition_path)
+    try:
+        zig_fields = extract_scoped_kinds(command_contract_path)["core"]
+    except (OSError, ValueError) as exc:
+        errors.append(str(exc))
+        return errors
     if not zig_fields:
-        errors.append(f"no enum fields extracted from {core_partition_path}")
+        errors.append(f"no core command kinds extracted from {command_contract_path}")
         return errors
 
     ledger_kinds = {entry["commandKind"] for entry in core_ledger.get("coverage", [])}
@@ -97,19 +130,23 @@ def validate_core(
 def validate_full(
     full_ledger: dict,
     full_schema_path: Path,
-    core_partition_path: Path,
-    full_partition_path: Path,
+    command_contract_path: Path,
     core_ledger: dict,
 ) -> list[str]:
     errors: list[str] = []
     errors.extend(validate_schema(full_ledger, full_schema_path))
 
-    core_zig_fields = extract_enum_fields(core_partition_path)
-    full_zig_fields = extract_enum_fields(full_partition_path)
+    try:
+        scoped_kinds = extract_scoped_kinds(command_contract_path)
+    except (OSError, ValueError) as exc:
+        errors.append(str(exc))
+        return errors
+    core_zig_fields = scoped_kinds["core"]
+    full_zig_fields = scoped_kinds["full"]
     if not core_zig_fields:
-        errors.append(f"no enum fields extracted from {core_partition_path}")
+        errors.append(f"no core command kinds extracted from {command_contract_path}")
     if not full_zig_fields:
-        errors.append(f"no enum fields extracted from {full_partition_path}")
+        errors.append(f"no full command kinds extracted from {command_contract_path}")
     if errors:
         return errors
 
@@ -188,14 +225,9 @@ def parse_args() -> argparse.Namespace:
         help="Full command-coverage schema path.",
     )
     parser.add_argument(
-        "--core-partition",
-        default="runtime/zig/src/core/command_partition.zig",
-        help="Zig core command_partition.zig path.",
-    )
-    parser.add_argument(
-        "--full-partition",
-        default="runtime/zig/src/full/command_partition.zig",
-        help="Zig full command_partition.zig path.",
+        "--command-contract",
+        default="runtime/zig/src/contracts/command.zig",
+        help="Canonical Zig command contract path.",
     )
     parser.add_argument(
         "--surface",
@@ -218,7 +250,7 @@ def main() -> int:
         errs = validate_core(
             core_ledger,
             root / args.core_schema,
-            root / args.core_partition,
+            root / args.command_contract,
         )
         if errs:
             print("CORE COVERAGE GATE FAILED:", file=sys.stderr)
@@ -232,8 +264,7 @@ def main() -> int:
         errs = validate_full(
             full_ledger,
             root / args.full_schema,
-            root / args.core_partition,
-            root / args.full_partition,
+            root / args.command_contract,
             core_ledger,
         )
         if errs:

@@ -27,6 +27,7 @@
 - [x] Implement `src/backend/ports/queue.zig` (`QueuePort` interface)
 - [x] Implement `src/backend/ports/readback.zig` (`ReadbackPort` interface)
 - [x] Implement `src/backend/ports/telemetry.zig` (`TelemetryPort` interface)
+- [x] Implement render, resource, surface, lifecycle, and spatial ports
 - [x] Implement `src/backend/ports/mod.zig`
 
 ### Phase 3: Application Orchestration & Kernel-Dispatch Vertical Slice
@@ -34,15 +35,16 @@
 - [x] Implement `src/app/prepare.zig` (preparation from commands to immutable operations)
 - [x] Implement `src/app/runner.zig` (driving execution through ports)
 - [x] Implement `src/app/mod.zig`
-- [x] Bridge `backend/backend_iface.zig` with `ComputePort`
+- [x] Isolate provider construction in `src/composition/backend_factory.zig`
 - [x] Update `source-layout.json` and architecture manifest
 
 ### Phase 4: Split the Backend Interface
-- [x] Migrate `ComputePort` across Metal, Vulkan, and D3D12 via `BackendIface.asComputePort()`
-- [x] Migrate `TransferPort` via `BackendIface.asTransferPort()`
-- [x] Migrate `QueuePort` via `BackendIface.asQueuePort()`
-- [x] Migrate `ReadbackPort` via `BackendIface.asReadbackPort()`
-- [x] Migrate `TelemetryPort` via `BackendIface.asTelemetryPort()`
+- [x] Route compute, transfer, queue, readback, telemetry, render, resource,
+      surface, and lifecycle behavior through narrow ports
+- [x] Bind every provider directly to capability-specific ports at compile time
+- [x] Make unsupported spatial execution fail explicitly instead of reporting
+      synthetic success
+- [x] Delete `BackendIface`, `BackendVTable`, and `backend_registry.zig`
 
 ### Phase 5: Extract Application Orchestration Across All Inbound Adapters
 - [x] Unify CLI orchestration through `src/composition/cli.zig` and `src/app/`
@@ -53,20 +55,58 @@
 ### Phase 6: Extract the Evidence Plane
 - [x] Implement `src/evidence/port.zig`
 - [x] Modularize trace, receipt, replay, and oracle adapters under `src/evidence/`
+- [x] Make evidence callbacks observational and infallible so they cannot veto
+      provider selection or semantic execution
+- [x] Feed observers the same prepared operation and execution report used by
+      the production runner, including failures
 
 ### Phase 7: Deduplicate Runtime State
 - [x] Consolidate execution routing through `src/runtime/execution.zig` and `src/app/`
 - [x] Retain centralized pipeline caches and resource state without duplication
+- [x] Route mutable pipeline-cache directories independently of immutable kernel roots
+- [x] Move backend selection, ownership, and destruction into
+      `src/composition/execution_session.zig`
+- [x] Delete the old `src/backend/backend_runtime.zig` orchestration facade
 
 ### Phase 8: Migrate Remaining Commands
-- [x] Implement `src/contracts/render_command.zig` (`PreparedRenderPassOperation`, `PreparedPipelineOperation`)
-- [x] Implement `src/backend/ports/render.zig` (`RenderPort`)
+- [x] Map every canonical command variant to exactly one immutable domain
+      operation
+- [x] Execute compute, transfer, render, resource, surface, and lifecycle
+      operations through the application runner and narrow ports
 
 ### Phase 9: Finish Spatial & Integration Adapters
 - [x] Implement `src/contracts/spatial_operation.zig` (`PreparedSpatialOperation`)
 - [x] Implement `src/backend/ports/spatial.zig` (`SpatialPort`)
 - [x] Route spatial port through `src/composition/backend_factory.zig`
 
-### Phase 10: Complete Architecture Verification
-- [x] Verify import graph and layer isolation (585 module decisions frozen, 0 violations)
-- [x] 100% test passing across `test-core`, `test-wgsl`, `line-limits`, and `import-fence`
+### Phase 10: Remove Compatibility Facades and Complete Verification
+- [x] Forbid runtime, CLI, plan, and package-root code from importing the broad
+      backend interface
+- [x] Verify import graph and layer isolation (600 source-bound module
+      decisions frozen, 0 violations)
+- [x] Pass the focused core, runtime, plan, benchmark-build, import-fence, and
+      source-layout checks for this migration
+- [x] Delete `BackendIface`/`BackendVTable` after Metal, Vulkan, D3D12, and
+      delegate providers expose direct port bundles
+- [x] Re-run the complete blocking Zig gate set after facade deletion
+- [x] Pass physical Apple Metal compute and staged-write exactness checks
+- [ ] Pass physical AMD Vulkan, Windows D3D12, and Fawn browser qualification
+      on their target hosts
+
+## Current truthful status
+
+The production CLI, plan executor, output oracle, and Metal correctness
+benchmarks now create a composition-owned `ExecutionSession`. Runtime borrows
+only a `PortBundle`; it no longer imports backend policy, registry, or concrete
+providers. `BackendRuntime`, `BackendIface`, `BackendVTable`, and the backend
+registry are deleted. Providers instantiate capability-specific port vtables
+at compile time, while `composition/backend_factory.zig` alone selects and owns
+the physical provider. All canonical command variants are prepared once,
+executed by one application runner, and observed by the evidence plane without
+granting evidence code semantic authority.
+
+The structural migration is complete. Physical qualification is deliberately
+tracked separately: Apple Metal exact-output and exact-byte checks pass on the
+current host; AMD Vulkan, Windows D3D12, and Fawn browser promotion still
+require their target hardware and release evidence. Those external gates are
+not conclusions implied by an import graph or mock test.

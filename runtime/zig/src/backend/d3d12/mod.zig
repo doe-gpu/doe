@@ -8,8 +8,11 @@ const compute_contract = @import("../../contracts/compute.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
-const webgpu = @import("../runtime_types.zig");
-const backend_iface = @import("../backend_iface.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
+const runtime_telemetry = @import("../../contracts/runtime_telemetry.zig");
+const backend_telemetry = @import("../backend_telemetry.zig");
+const port_factory = @import("../ports/factory.zig");
+const provider_adapter = @import("../ports/provider_adapter.zig");
 const common_errors = @import("../../contracts/execution.zig");
 const common_timing = @import("../common/timing.zig");
 const command_info = @import("../../contracts/command.zig");
@@ -64,6 +67,7 @@ pub const ZigD3D12Backend = struct {
     queue_sync_mode: webgpu.QueueSyncMode = .per_command,
     gpu_timestamp_mode: webgpu.GpuTimestampMode = .auto,
     pending_upload_commands: u32 = 0,
+    telemetry: runtime_telemetry.RuntimeTelemetry = backend_telemetry.default_telemetry(),
 
     capability_set: capabilities.CapabilitySet,
     status_message_storage: [STATUS_MESSAGE_BYTES]u8 = [_]u8{0} ** STATUS_MESSAGE_BYTES,
@@ -109,6 +113,7 @@ pub const ZigD3D12Backend = struct {
             .queue_sync_mode = .per_command,
             .gpu_timestamp_mode = .auto,
             .pending_upload_commands = 0,
+            .telemetry = backend_telemetry.default_telemetry(),
             .capability_set = native_capability_set(),
             .status_message_storage = [_]u8{0} ** STATUS_MESSAGE_BYTES,
             .status_message_len = 0,
@@ -138,31 +143,14 @@ pub const ZigD3D12Backend = struct {
         return ptr;
     }
 
-    pub fn as_iface(
+    pub fn asPorts(
         self: *ZigD3D12Backend,
-        allocator: std.mem.Allocator,
         reason: []const u8,
         policy_hash: []const u8,
-    ) !backend_iface.BackendIface {
-        _ = allocator;
-        return .{
-            .id = .doe_d3d12,
-            .context = self,
-            .vtable = &VTABLE,
-            .telemetry = .{
-                .backend_id = .doe_d3d12,
-                .backend_selection_reason = reason,
-                .fallback_used = false,
-                .selection_policy_hash = policy_hash,
-                .shader_artifact_manifest_path = null,
-                .shader_artifact_manifest_hash = null,
-                .host_plan_artifact_path = null,
-                .host_plan_artifact_hash = null,
-                .adapter_ordinal = null,
-                .queue_family_index = null,
-                .present_capable = null,
-            },
-        };
+        fallback_used: bool,
+    ) port_factory.PortBundle {
+        self.telemetry = backend_telemetry.forSelection(.doe_d3d12, reason, fallback_used, policy_hash);
+        return provider_adapter.fromDriver(PortDriver, self, .doe_d3d12);
     }
 
     fn manifest_path(self: *const ZigD3D12Backend) ?[]const u8 {
@@ -645,18 +633,35 @@ fn capture_buffer(ctx: *anyopaque, allocator: std.mem.Allocator, handle: u64, of
     return error.UnsupportedFeature;
 }
 
-const VTABLE = backend_iface.BackendVTable{
-    .deinit = deinit,
-    .execute_command = execute_command,
-    .execute_dispatch = execute_dispatch,
-    .execute_buffer_write_bytes = execute_buffer_write_bytes,
-    .set_upload_behavior = set_upload_behavior,
-    .set_queue_wait_mode = set_queue_wait_mode,
-    .set_webgpu_ffi_queue_wait_timeout_ns = set_webgpu_ffi_queue_wait_timeout_ns,
-    .set_queue_sync_mode = set_queue_sync_mode,
-    .set_gpu_timestamp_mode = set_gpu_timestamp_mode,
-    .flush_queue = flush_queue,
-    .prewarm_upload_path = prewarm_upload_path,
-    .prewarm_kernel_dispatch = prewarm_kernel_dispatch,
-    .capture_buffer = capture_buffer,
+fn telemetry_snapshot(ctx: *anyopaque) runtime_telemetry.RuntimeTelemetry {
+    const self = cast(ctx);
+    self.telemetry.shader_artifact_manifest_path = manifest_path_from_context(ctx);
+    self.telemetry.shader_artifact_manifest_hash = manifest_hash_from_context(ctx);
+    return self.telemetry;
+}
+
+fn backend_id(ctx: *anyopaque) @import("../../contracts/backend.zig").BackendId {
+    _ = ctx;
+    return .doe_d3d12;
+}
+
+pub fn destroyContext(ctx: *anyopaque) void {
+    deinit(ctx);
+}
+
+const PortDriver = struct {
+    pub const backendId = backend_id;
+    pub const executeCommand = execute_command;
+    pub const executeDispatch = execute_dispatch;
+    pub const executeBufferWrite = execute_buffer_write_bytes;
+    pub const setUploadBehavior = set_upload_behavior;
+    pub const setQueueWaitMode = set_queue_wait_mode;
+    pub const setQueueWaitTimeoutNs = set_webgpu_ffi_queue_wait_timeout_ns;
+    pub const setQueueSyncMode = set_queue_sync_mode;
+    pub const setGpuTimestampMode = set_gpu_timestamp_mode;
+    pub const flush = flush_queue;
+    pub const prewarmUpload = prewarm_upload_path;
+    pub const prewarmKernel = prewarm_kernel_dispatch;
+    pub const capture = capture_buffer;
+    pub const telemetrySnapshot = telemetry_snapshot;
 };

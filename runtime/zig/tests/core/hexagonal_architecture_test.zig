@@ -2,7 +2,11 @@
 
 const std = @import("std");
 const contracts = @import("../../src/contracts/mod.zig");
-const backend = @import("../../src/backend/mod.zig");
+const backend = struct {
+    pub fn ports() type {
+        return @import("../../src/backend/ports/mod.zig");
+    }
+};
 const app = @import("../../src/app/mod.zig");
 
 test "hexagonal contracts: identity, execution report, and exactness" {
@@ -46,8 +50,8 @@ test "hexagonal application layer: prepare and execute compute" {
 
     const op = app.prepareCompute(req, 42);
     try std.testing.expectEqual(@as(u64, 42), op.operation_id);
-    try std.testing.expectEqualStrings("main", op.entry_point.?);
-    try std.testing.expectEqual(@as(u32, 1), op.workgroups.x);
+    try std.testing.expectEqualStrings("main", op.operation.kernel_dispatch.entry_point.?);
+    try std.testing.expectEqual(@as(u32, 1), op.operation.kernel_dispatch.x);
 
     // Mock ComputePort
     const MockCompute = struct {
@@ -60,9 +64,22 @@ test "hexagonal application layer: prepare and execute compute" {
                 .submit_wait_ns = 250,
             }, 1);
         }
+        fn prewarm(ctx: *anyopaque, kernel: []const u8, entry_point: ?[]const u8, bindings: ?[]const contracts.model.computeTypes().KernelBinding, initialize: bool) anyerror!void {
+            _ = ctx;
+            _ = kernel;
+            _ = entry_point;
+            _ = bindings;
+            _ = initialize;
+        }
+        fn timestampMode(ctx: *anyopaque, mode: contracts.runtimeConfiguration().GpuTimestampMode) void {
+            _ = ctx;
+            _ = mode;
+        }
     };
     const vtable = backend.ports().ComputePortVTable{
         .execute_compute = MockCompute.execute,
+        .prewarm_kernel = MockCompute.prewarm,
+        .set_gpu_timestamp_mode = MockCompute.timestampMode,
     };
     var dummy_ctx: u8 = 0;
     const port = backend.ports().ComputePort{
@@ -86,23 +103,34 @@ test "hexagonal application layer: prepare and execute transfer" {
 
     const op = app.prepareTransfer(req, 99);
     try std.testing.expectEqual(@as(u64, 99), op.operation_id);
-    try std.testing.expectEqual(@as(u64, 101), op.buffer_handle);
+    try std.testing.expectEqual(@as(u64, 101), op.operation.direct_buffer_write.handle);
 
     // Mock TransferPort
     const MockTransfer = struct {
         fn execute(ctx: *anyopaque, transfer_op: contracts.preparedOperation().PreparedTransferOperation) anyerror!contracts.executionReport().ExecutionReport {
             _ = ctx;
             try std.testing.expectEqual(@as(u64, 99), transfer_op.operation_id);
-            try std.testing.expectEqual(@as(u64, 4), transfer_op.size_bytes);
+            try std.testing.expectEqual(@as(u64, 4), transfer_op.operation.direct_buffer_write.buffer_size);
             return contracts.executionReport().ExecutionReport.success(.{
                 .setup_ns = 10,
                 .encode_ns = 20,
                 .submit_wait_ns = 30,
             }, 0);
         }
+        fn prewarm(ctx: *anyopaque, max_upload_bytes: u64) anyerror!void {
+            _ = ctx;
+            _ = max_upload_bytes;
+        }
+        fn uploadBehavior(ctx: *anyopaque, mode: contracts.runtimeConfiguration().UploadBufferUsageMode, submit_every: u32) void {
+            _ = ctx;
+            _ = mode;
+            _ = submit_every;
+        }
     };
     const vtable = backend.ports().TransferPortVTable{
         .execute_transfer = MockTransfer.execute,
+        .prewarm_upload = MockTransfer.prewarm,
+        .set_upload_behavior = MockTransfer.uploadBehavior,
     };
     var dummy_ctx: u8 = 0;
     const port = backend.ports().TransferPort{

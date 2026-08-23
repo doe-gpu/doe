@@ -7,7 +7,7 @@ const model_render_types = @import("../../contracts/model/model_render_types.zig
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const model_surface_control_types = @import("../../contracts/model/model_surface_control_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 const async_runtime = @import("metal_async_runtime.zig");
 const cleanup = @import("metal_cleanup.zig");
 const copy_runtime = @import("metal_copy_runtime.zig");
@@ -69,6 +69,7 @@ pub const NativeMetalRuntime = struct {
     has_device: bool = false,
 
     kernel_root: ?[]const u8 = null,
+    pipeline_cache_dir: []const u8 = "",
 
     has_deferred_submissions: bool = false,
 
@@ -132,8 +133,16 @@ pub const NativeMetalRuntime = struct {
     pipeline_binary_cache: ?*anyopaque = null,
     timestamp_state: metal_gpu_timestamps.TimestampState = .{},
 
-    pub fn init(allocator: std.mem.Allocator, kernel_root: ?[]const u8) !NativeMetalRuntime {
-        var self = NativeMetalRuntime{ .allocator = allocator, .kernel_root = kernel_root };
+    pub fn init(
+        allocator: std.mem.Allocator,
+        kernel_root: ?[]const u8,
+        pipeline_cache_dir: []const u8,
+    ) !NativeMetalRuntime {
+        var self = NativeMetalRuntime{
+            .allocator = allocator,
+            .kernel_root = kernel_root,
+            .pipeline_cache_dir = pipeline_cache_dir,
+        };
         errdefer self.deinit();
         try self.bootstrap();
         return self;
@@ -363,11 +372,10 @@ pub const NativeMetalRuntime = struct {
         self.timestamp_state.init_resources(self.device);
         if (builtin.os.tag == .macos) {
             if (HAS_PIPELINE_CACHE and !metal_pipeline_cache.is_process_pipeline_cache_disabled()) {
-                const cache_dir = self.kernel_root orelse "bench/kernels";
                 const cache_ptr = metal_pipeline_cache.MetalPipelineCache.init(
                     self.allocator,
                     self.device,
-                    cache_dir,
+                    self.pipeline_cache_dir,
                 ) catch null;
                 self.pipeline_binary_cache = if (cache_ptr) |c| @ptrCast(c) else null;
                 // Phase 3: run startup warmup to pre-load cached pipeline binaries.

@@ -38,6 +38,9 @@ BACKEND_PRIVATE_DIRS = (
     (ZIG_SRC / "backend" / "vulkan").resolve(),
     (ZIG_SRC / "backend" / "d3d12").resolve(),
 )
+BACKEND_COMPOSITION_ROOTS = {
+    (ZIG_SRC / "composition" / "backend_factory.zig").resolve(),
+}
 
 
 def is_stub_file(candidate: Path) -> bool:
@@ -133,7 +136,7 @@ def scan_compat_facade_imports(errors: list[str]) -> None:
 def scan_backend_private_imports(errors: list[str]) -> None:
     backend_dir = ZIG_SRC / "backend"
     for path, line_no, import_path, candidate in iter_zig_imports(ZIG_SRC):
-        if is_within(path, backend_dir):
+        if is_within(path, backend_dir) or path.resolve() in BACKEND_COMPOSITION_ROOTS:
             continue
         if any(is_within(candidate, root) for root in BACKEND_PRIVATE_DIRS):
             errors.append(f"{path}:{line_no}: non-backend import reaches backend-private module: {import_path}")
@@ -142,7 +145,11 @@ def scan_backend_private_imports(errors: list[str]) -> None:
 def scan_backend_impl_imports(errors: list[str]) -> None:
     for path, line_no, import_path, candidate in iter_zig_imports(ZIG_SRC):
         rel_path = path.relative_to(ZIG_SRC)
-        if rel_path.parts and rel_path.parts[0] == "backend":
+        if (
+            rel_path.parts
+            and rel_path.parts[0] == "backend"
+            or path.resolve() in BACKEND_COMPOSITION_ROOTS
+        ):
             continue
         if any(is_within(candidate, backend_dir) for backend_dir in BACKEND_IMPL_DIRS):
             errors.append(

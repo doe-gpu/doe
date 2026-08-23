@@ -1,5 +1,5 @@
 const std = @import("std");
-const backend_policy = @import("../backend/backend_policy.zig");
+const backend_contract = @import("../contracts/backend.zig");
 const model_commands = @import("../contracts/command.zig");
 const model_compute_types = @import("../contracts/model/model_compute_types.zig");
 const model_profile = @import("../contracts/model/model_profile.zig");
@@ -112,16 +112,18 @@ fn prewarmKernelDispatches(
 }
 
 pub fn validate(
+    comptime Session: type,
     allocator: std.mem.Allocator,
     commands: []const model_commands.Command,
     profile: model_profile.DeviceProfile,
     kernel_root: ?[]const u8,
-    backend_lane: backend_policy.BackendLane,
+    backend_lane: backend_contract.BackendLane,
     options: ValidationOptions,
 ) !Evidence {
     var evidence = Evidence{};
-    var command_graph_context: ?execution.ExecutionContext = null;
-    defer if (command_graph_context) |*context| context.deinit();
+    var command_graph_session: ?Session = null;
+    var command_graph_context: ?*execution.ExecutionContext = null;
+    defer if (command_graph_session) |*session| session.deinit();
 
     const has_command_graph_oracle = for (commands) |command| {
         switch (command) {
@@ -134,14 +136,16 @@ pub fn validate(
         }
     } else false;
     if (has_command_graph_oracle) {
-        command_graph_context = try execution.ExecutionContext.init(
+        command_graph_session = try Session.init(
             allocator,
             .native,
             profile,
             kernel_root,
             backend_lane,
+            .{},
         );
-        const context = &command_graph_context.?;
+        command_graph_context = command_graph_session.?.contextPtr();
+        const context = command_graph_context.?;
         context.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
         context.configureGpuTimestampMode(.off);
         context.configureQueueWaitMode(options.queue_wait_mode);
@@ -154,7 +158,7 @@ pub fn validate(
         const original = switch (command) {
             .kernel_dispatch => |dispatch| dispatch,
             else => {
-                if (command_graph_context) |*context| {
+                if (command_graph_context) |context| {
                     const result = try context.execute(command);
                     if (result.status != .ok) return error.OutputOracleExecutionFailed;
                 }
@@ -162,7 +166,7 @@ pub fn validate(
             },
         };
         const oracle = original.output_oracle orelse {
-            if (command_graph_context) |*context| {
+            if (command_graph_context) |context| {
                 const result = try context.execute(command);
                 if (result.status != .ok) return error.OutputOracleExecutionFailed;
             }
@@ -196,18 +200,19 @@ pub fn validate(
             return error.OutputOracleBufferSizeInvalid;
         }
 
-        var isolated_context: ?execution.ExecutionContext = null;
-        defer if (isolated_context) |*context| context.deinit();
+        var isolated_session: ?Session = null;
+        defer if (isolated_session) |*session| session.deinit();
         const oracle_context = switch (oracle.scope) {
             .isolated_dispatch => blk: {
-                isolated_context = try execution.ExecutionContext.init(
+                isolated_session = try Session.init(
                     allocator,
                     .native,
                     profile,
                     kernel_root,
                     backend_lane,
+                    .{},
                 );
-                const context = &isolated_context.?;
+                const context = isolated_session.?.contextPtr();
                 context.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
                 context.configureGpuTimestampMode(.off);
                 context.configureQueueWaitMode(options.queue_wait_mode);
@@ -221,7 +226,7 @@ pub fn validate(
                 );
                 break :blk context;
             },
-            .command_graph => &command_graph_context.?,
+            .command_graph => command_graph_context.?,
         };
 
         var oracle_dispatch = original;
@@ -281,20 +286,13 @@ pub fn validate(
             evidence.failed_count += 1;
         }
         if (oracle.scope == .isolated_dispatch) {
-            if (command_graph_context) |*context| {
+            if (command_graph_context) |context| {
                 const graph_result = try context.execute(command);
                 if (graph_result.status != .ok) return error.OutputOracleExecutionFailed;
             }
         }
     }
     return evidence;
-}
-
-pub fn needsLibraryLifetimeGuard(backend_lane: backend_policy.BackendLane) bool {
-    return switch (backend_policy.default_policy_for_lane(backend_lane).default_backend) {
-        .dawn_delegate, .webkit_delegate => true,
-        else => false,
-    };
 }
 
 test "float32 reference comparison accepts values inside mixed tolerance" {
@@ -314,10 +312,4 @@ test "float32 reference comparison rejects non-finite and out-of-range values" {
     const actual = std.mem.sliceAsBytes(actual_values[0..]);
     const result = try compareFloat32Reference(actual, reference, 0.000001, 0.00001);
     try std.testing.expectEqual(@as(u64, 2), result.mismatch_count);
-}
-
-test "library lifetime guard applies only to delegate lanes" {
-    try std.testing.expect(needsLibraryLifetimeGuard(.vulkan_dawn_release));
-    try std.testing.expect(needsLibraryLifetimeGuard(.metal_webkit_release));
-    try std.testing.expect(!needsLibraryLifetimeGuard(.vulkan_doe_comparable));
 }

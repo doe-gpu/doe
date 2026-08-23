@@ -1,18 +1,12 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
-  "classifiedLineCount": 143455,
-  "classifiedModuleCount": 569,
+  "classifiedLineCount": 143885,
+  "classifiedModuleCount": 583,
   "facadeOnlyFiles": [
     {
       "aggregateProductionRoot": true,
-      "layer": "backend-interface",
-      "lineCount": 19,
-      "path": "src/backend/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
       "layer": "backend-ports",
-      "lineCount": 38,
+      "lineCount": 48,
       "path": "src/backend/ports/mod.zig"
     },
     {
@@ -23,14 +17,8 @@
     },
     {
       "aggregateProductionRoot": true,
-      "layer": "composition",
-      "lineCount": 18,
-      "path": "src/composition/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
       "layer": "contracts",
-      "lineCount": 123,
+      "lineCount": 139,
       "path": "src/contracts/mod.zig"
     },
     {
@@ -42,7 +30,7 @@
     {
       "aggregateProductionRoot": true,
       "layer": "package-root",
-      "lineCount": 34,
+      "lineCount": 38,
       "path": "src/mod.zig"
     },
     {
@@ -58,67 +46,19 @@
       "path": "src/runtime/mod.zig"
     }
   ],
-  "facadeOnlyLineCount": 375,
+  "facadeOnlyLineCount": 368,
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "6457eb3053f2450387d3b1b8117df60c33128936ed59c58bdcc3a44f1934dae0",
+  "manifestSha256": "35136779176f11c470fb8b8118900a6e8a3547a75dc7720b793f12edd4d24d6c",
   "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "0acb47d7dbcff3b9473a72cc3ce955f1d2a3f29f1674b718c633c535c9a3738d",
+  "sourceTreeSha256": "40bb7946ecbd9b395e1b3c56823cb6fc1e9d5defefdb8e57fec0b3bf89575c7b",
   "unclassifiedFiles": [
-    {
-      "aggregateProductionRoot": false,
-      "layer": "backend-ports",
-      "lineCount": 21,
-      "path": "src/backend/ports/capture.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "backend-ports",
-      "lineCount": 24,
-      "path": "src/backend/ports/factory.zig"
-    },
     {
       "aggregateProductionRoot": false,
       "layer": "compiler",
       "lineCount": 22,
       "path": "src/compiler/wgsl/runtime/runtime_compile.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "composition",
-      "lineCount": 39,
-      "path": "src/composition/backend_factory.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "composition",
-      "lineCount": 12,
-      "path": "src/composition/cli.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "composition",
-      "lineCount": 16,
-      "path": "src/composition/dropin.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "composition",
-      "lineCount": 12,
-      "path": "src/composition/native.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "composition",
-      "lineCount": 11,
-      "path": "src/composition/plan.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "composition",
-      "lineCount": 35,
-      "path": "src/composition/runtime_factory.zig"
     },
     {
       "aggregateProductionRoot": false,
@@ -146,6 +86,12 @@
     },
     {
       "aggregateProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 34,
+      "path": "src/contracts/render_command.zig"
+    },
+    {
+      "aggregateProductionRoot": false,
       "layer": "evidence",
       "lineCount": 63,
       "path": "src/evidence/oracle.zig"
@@ -153,13 +99,7 @@
     {
       "aggregateProductionRoot": false,
       "layer": "evidence",
-      "lineCount": 27,
-      "path": "src/evidence/port.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "evidence",
-      "lineCount": 34,
+      "lineCount": 32,
       "path": "src/evidence/receipt.zig"
     },
     {
@@ -171,11 +111,11 @@
     {
       "aggregateProductionRoot": false,
       "layer": "evidence",
-      "lineCount": 71,
+      "lineCount": 68,
       "path": "src/evidence/trace.zig"
     }
   ],
-  "unclassifiedLineCount": 544,
+  "unclassifiedLineCount": 376,
   "views": [
     {
       "description": "WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets",
@@ -215,8 +155,8 @@
     {
       "description": "Drop-in WebGPU ABI routing and the declared legacy flat compatibility facade",
       "name": "dropin-compatibility",
-      "reachableLineCount": 85597,
-      "reachableModuleCount": 317,
+      "reachableLineCount": 85604,
+      "reachableModuleCount": 318,
       "rootPatterns": [
         "src/dropin/root.zig",
         "src/dropin/wgpu_dropin_lib.zig",
@@ -231,8 +171,8 @@
     {
       "description": "Module incubation, plan comparison, and repo-only integration executables used for evidence rather than shipped runtime claims",
       "name": "module-incubation-evidence-tools",
-      "reachableLineCount": 77939,
-      "reachableModuleCount": 322,
+      "reachableLineCount": 78378,
+      "reachableModuleCount": 336,
       "rootPatterns": [
         "src/cli/entrypoints/module_runner.zig",
         "src/cli/module_runner_cli.zig",
@@ -262,8 +202,8 @@
     {
       "description": "Implementation roots selected by the shipped runtime CLI and libwebgpu_doe package artifact",
       "name": "shipped-native-package-runtime",
-      "reachableLineCount": 106822,
-      "reachableModuleCount": 428,
+      "reachableLineCount": 107249,
+      "reachableModuleCount": 442,
       "rootPatterns": [
         "src/cli/entrypoints/main.zig",
         "src/cli/runtime_cli.zig",
@@ -280,8 +220,8 @@
     {
       "description": "Legacy aggregate type facades and surface contracts exercised by Zig tests but absent from shipped and repository-tool build roots",
       "name": "test-only-compatibility",
-      "reachableLineCount": 13847,
-      "reachableModuleCount": 78,
+      "reachableLineCount": 13349,
+      "reachableModuleCount": 74,
       "rootPatterns": [
         "src/contracts/model/model_gpu_types.zig",
         "src/core/abi/wgpu_runtime_abi.zig",

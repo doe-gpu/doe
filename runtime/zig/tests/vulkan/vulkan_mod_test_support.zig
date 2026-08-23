@@ -5,6 +5,7 @@ const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const common_errors = @import("../../src/contracts/execution.zig");
 const command_info = @import("../../src/contracts/command.zig");
 const vulkan_mod = @import("../../src/backend/vulkan/mod.zig");
+const provider_harness = @import("../support/provider_harness.zig");
 
 const STATUS_MESSAGE_RING_SLOTS: usize = 32;
 const STATUS_MESSAGE_SLOT_BYTES: usize = 256;
@@ -58,9 +59,11 @@ pub fn run_contract_path(command: model.Command, queue_sync_mode: webgpu.QueueSy
     const backend = vulkan_mod.ZigVulkanBackend.init(std.testing.allocator, test_profile(), null) catch |err| {
         return unsupportedResult(command, err);
     };
-    var iface = vulkan_mod.ZigVulkanBackend.as_iface(backend, std.testing.allocator, "vulkan_contract_test", "vulkan_contract_test_policy") catch |err| {
-        return unsupportedResult(command, err);
-    };
+    var iface = provider_harness.ProviderHarness.init(
+        backend.asPorts("vulkan_contract_test", "vulkan_contract_test_policy", false),
+        backend,
+        vulkan_mod.destroyContext,
+    );
     defer iface.deinit();
     iface.set_queue_sync_mode(queue_sync_mode);
     return persistResult(try iface.execute_command(command));

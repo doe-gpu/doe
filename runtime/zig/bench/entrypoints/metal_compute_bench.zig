@@ -4,8 +4,7 @@ const doe = @import("doe");
 const model_profile = doe.contracts.model.profile();
 const model_commands = doe.contracts.model.commands();
 const model_compute_types = doe.contracts.model.computeTypes();
-const backend_runtime = doe.backend.runtime();
-const runtime_types = doe.backend.runtimeTypes();
+const execution = doe.runtime.execution();
 
 const KERNEL_ROOT = "../../bench/kernels";
 const KERNEL_NAME = "concurrent_execution_runsingle_u32";
@@ -130,16 +129,19 @@ fn writeArtifact(artifact: Artifact) !void {
 fn run(allocator: std.mem.Allocator, config: Config) !u8 {
     if (builtin.os.tag != .macos) return error.UnsupportedPlatform;
 
-    var runtime = try backend_runtime.BackendRuntime.init(
+    var session = try doe.composition.ExecutionSession.init(
         allocator,
+        .native,
         deviceProfile(),
         KERNEL_ROOT,
         .metal_doe_comparable,
+        .{},
     );
-    defer runtime.deinit();
+    defer session.deinit();
+    const runtime = session.contextPtr();
 
-    runtime.set_upload_behavior(.copy_dst, 1);
-    runtime.set_queue_sync_mode(.per_command);
+    runtime.configureUploadBehavior(.copy_dst, 1);
+    runtime.configureQueueSyncMode(.per_command);
 
     var wall_timer = try std.time.Timer.start();
     var write_setup_ns: u64 = 0;
@@ -162,13 +164,14 @@ fn run(allocator: std.mem.Allocator, config: Config) !u8 {
         const input_bytes = std.mem.sliceAsBytes(input[0..]);
         const expected_bytes = std.mem.sliceAsBytes(expected[0..]);
 
-        const write_result = try runtime.execute_buffer_write_bytes(
+        const write_result = try runtime.execute_buffer_write_bytes_with_semantic(
             handle,
             0,
             BUFFER_BYTES,
             input_bytes,
+            .{},
         );
-        if (write_result.status != runtime_types.NativeExecutionStatus.ok) {
+        if (write_result.status != execution.ExecutionStatus.ok) {
             return error.WriteFailed;
         }
         write_setup_ns +|= write_result.setup_ns;
@@ -181,14 +184,14 @@ fn run(allocator: std.mem.Allocator, config: Config) !u8 {
             .resource_handle = handle,
             .buffer_size = BUFFER_BYTES,
         }};
-        const dispatch_result = try runtime.execute_command(model_commands.Command{ .kernel_dispatch = .{
+        const dispatch_result = try runtime.execute(model_commands.Command{ .kernel_dispatch = .{
             .kernel = KERNEL_NAME,
             .x = 1,
             .y = 1,
             .z = 1,
             .bindings = bindings[0..],
         } });
-        if (dispatch_result.status != runtime_types.NativeExecutionStatus.ok) {
+        if (dispatch_result.status != execution.ExecutionStatus.ok) {
             return error.DispatchFailed;
         }
         dispatch_setup_ns +|= dispatch_result.setup_ns;
@@ -202,13 +205,14 @@ fn run(allocator: std.mem.Allocator, config: Config) !u8 {
 
         if (config.inject_corruption and iteration == 0) {
             var corrupt = [_]u8{expected_bytes[@sizeOf(u32)] ^ 0xff};
-            const corrupt_result = try runtime.execute_buffer_write_bytes(
+            const corrupt_result = try runtime.execute_buffer_write_bytes_with_semantic(
                 handle,
                 @sizeOf(u32),
                 BUFFER_BYTES,
                 corrupt[0..],
+                .{},
             );
-            if (corrupt_result.status != runtime_types.NativeExecutionStatus.ok) {
+            if (corrupt_result.status != execution.ExecutionStatus.ok) {
                 return error.WriteFailed;
             }
             write_setup_ns +|= corrupt_result.setup_ns;
@@ -217,7 +221,7 @@ fn run(allocator: std.mem.Allocator, config: Config) !u8 {
         }
 
         var capture_timer = try std.time.Timer.start();
-        const actual = try runtime.capture_buffer(allocator, handle, 0, BUFFER_BYTES);
+        const actual = try runtime.captureBuffer(allocator, handle, 0, BUFFER_BYTES);
         capture_ns +|= capture_timer.read();
         defer allocator.free(actual);
 

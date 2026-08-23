@@ -9,8 +9,11 @@ const model_render_types = @import("../../contracts/model/model_render_types.zig
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const model_surface_control_types = @import("../../contracts/model/model_surface_control_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
-const webgpu = @import("../runtime_types.zig");
-const backend_iface = @import("../backend_iface.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
+const runtime_telemetry = @import("../../contracts/runtime_telemetry.zig");
+const backend_telemetry = @import("../backend_telemetry.zig");
+const port_factory = @import("../ports/factory.zig");
+const provider_adapter = @import("../ports/provider_adapter.zig");
 const common_errors = @import("../../contracts/execution.zig");
 const capabilities = @import("../../contracts/capability.zig");
 const artifact_meta = @import("../../contracts/artifact.zig");
@@ -61,6 +64,7 @@ pub const ZigMetalBackend = struct {
     allocator: std.mem.Allocator,
     runtime: ?native_runtime.NativeMetalRuntime = null,
     kernel_root_owned: ?[]u8 = null,
+    pipeline_cache_dir_owned: ?[]u8 = null,
     upload_path_policy: backend_policy.UploadPathPolicy = .allow_mapped_shortcuts,
 
     upload_buffer_usage_mode: webgpu.UploadBufferUsageMode = .copy_dst_copy_src,
@@ -70,6 +74,7 @@ pub const ZigMetalBackend = struct {
     gpu_timestamp_mode: webgpu.GpuTimestampMode = .auto,
     pending_upload_commands: u32 = 0,
     last_submit_count: ?u32 = null,
+    telemetry: runtime_telemetry.RuntimeTelemetry = backend_telemetry.default_telemetry(),
 
     capability_set: capabilities.CapabilitySet,
     status_message_storage: [STATUS_MESSAGE_BYTES]u8 = [_]u8{0} ** STATUS_MESSAGE_BYTES,
@@ -96,10 +101,11 @@ pub const ZigMetalBackend = struct {
         profile: model.DeviceProfile,
         kernel_root: ?[]const u8,
     ) !*ZigMetalBackend {
-        return init_with_selection_policy(
+        return init_with_selection_policy_and_cache(
             allocator,
             profile,
             kernel_root,
+            "",
             backend_policy.default_policy_for_lane(.metal_doe_app),
         );
     }
@@ -110,22 +116,48 @@ pub const ZigMetalBackend = struct {
         kernel_root: ?[]const u8,
         selection_policy: backend_policy.SelectionPolicy,
     ) !*ZigMetalBackend {
+        return init_with_selection_policy_and_cache(
+            allocator,
+            profile,
+            kernel_root,
+            "",
+            selection_policy,
+        );
+    }
+
+    pub fn init_with_selection_policy_and_cache(
+        allocator: std.mem.Allocator,
+        profile: model.DeviceProfile,
+        kernel_root: ?[]const u8,
+        pipeline_cache_dir: []const u8,
+        selection_policy: backend_policy.SelectionPolicy,
+    ) !*ZigMetalBackend {
         if (profile.api != .metal) return common_errors.BackendNativeError.UnsupportedFeature;
         if (builtin.os.tag != .macos) return common_errors.BackendNativeError.UnsupportedFeature;
 
         const owned_root = if (kernel_root) |root| try allocator.dupe(u8, root) else null;
         errdefer if (owned_root) |r| allocator.free(r);
+        const owned_cache_dir = if (pipeline_cache_dir.len > 0)
+            try allocator.dupe(u8, pipeline_cache_dir)
+        else
+            null;
+        errdefer if (owned_cache_dir) |dir| allocator.free(dir);
 
         const ptr = try allocator.create(ZigMetalBackend);
         errdefer allocator.destroy(ptr);
 
-        var runtime = try native_runtime.NativeMetalRuntime.init(allocator, owned_root);
+        var runtime = try native_runtime.NativeMetalRuntime.init(
+            allocator,
+            owned_root,
+            owned_cache_dir orelse "",
+        );
         errdefer runtime.deinit();
 
         ptr.* = .{
             .allocator = allocator,
             .runtime = runtime,
             .kernel_root_owned = owned_root,
+            .pipeline_cache_dir_owned = owned_cache_dir,
             .upload_path_policy = selection_policy.upload_path_policy,
             .upload_buffer_usage_mode = .copy_dst_copy_src,
             .upload_submit_every = 1,
@@ -134,6 +166,7 @@ pub const ZigMetalBackend = struct {
             .gpu_timestamp_mode = .auto,
             .pending_upload_commands = 0,
             .last_submit_count = null,
+            .telemetry = backend_telemetry.default_telemetry(),
             .capability_set = native_capability_set(),
             .status_message_storage = [_]u8{0} ** STATUS_MESSAGE_BYTES,
             .status_message_len = 0,
@@ -163,31 +196,14 @@ pub const ZigMetalBackend = struct {
         return ptr;
     }
 
-    pub fn as_iface(
+    pub fn asPorts(
         self: *ZigMetalBackend,
-        allocator: std.mem.Allocator,
         reason: []const u8,
         policy_hash: []const u8,
-    ) !backend_iface.BackendIface {
-        _ = allocator;
-        return .{
-            .id = .doe_metal,
-            .context = self,
-            .vtable = &VTABLE,
-            .telemetry = .{
-                .backend_id = .doe_metal,
-                .backend_selection_reason = reason,
-                .fallback_used = false,
-                .selection_policy_hash = policy_hash,
-                .shader_artifact_manifest_path = null,
-                .shader_artifact_manifest_hash = null,
-                .host_plan_artifact_path = null,
-                .host_plan_artifact_hash = null,
-                .adapter_ordinal = null,
-                .queue_family_index = null,
-                .present_capable = null,
-            },
-        };
+        fallback_used: bool,
+    ) port_factory.PortBundle {
+        self.telemetry = backend_telemetry.forSelection(.doe_metal, reason, fallback_used, policy_hash);
+        return provider_adapter.fromDriver(PortDriver, self, .doe_metal);
     }
 
     fn manifest_path(self: *const ZigMetalBackend) ?[]const u8 {
@@ -322,6 +338,10 @@ fn deinit(ctx: *anyopaque) void {
         allocator.free(r);
         self.kernel_root_owned = null;
     }
+    if (self.pipeline_cache_dir_owned) |dir| {
+        allocator.free(dir);
+        self.pipeline_cache_dir_owned = null;
+    }
     allocator.destroy(self);
 }
 
@@ -387,18 +407,40 @@ fn capture_buffer(ctx: *anyopaque, allocator: std.mem.Allocator, handle: u64, of
     return backend_execute.capture_buffer(cast(ctx), allocator, handle, offset, size);
 }
 
-const VTABLE = backend_iface.BackendVTable{
-    .deinit = deinit,
-    .execute_command = execute_command,
-    .execute_dispatch = execute_dispatch,
-    .execute_buffer_write_bytes = execute_buffer_write_bytes_iface,
-    .set_upload_behavior = set_upload_behavior,
-    .set_queue_wait_mode = set_queue_wait_mode,
-    .set_webgpu_ffi_queue_wait_timeout_ns = set_webgpu_ffi_queue_wait_timeout_ns,
-    .set_queue_sync_mode = set_queue_sync_mode,
-    .set_gpu_timestamp_mode = set_gpu_timestamp_mode,
-    .flush_queue = flush_queue,
-    .prewarm_upload_path = prewarm_upload_path,
-    .prewarm_kernel_dispatch = prewarm_kernel_dispatch,
-    .capture_buffer = capture_buffer,
+fn telemetry_snapshot(ctx: *anyopaque) runtime_telemetry.RuntimeTelemetry {
+    const self = cast(ctx);
+    self.telemetry.shader_artifact_manifest_path = manifest_path_from_context(ctx);
+    self.telemetry.shader_artifact_manifest_hash = manifest_hash_from_context(ctx);
+    const cache = pipeline_cache_warmup_telemetry_from_context(ctx);
+    self.telemetry.pipeline_cache_warmup_count = cache.count;
+    self.telemetry.pipeline_cache_warmup_ns = cache.ns;
+    self.telemetry.pipeline_cache_active = pipeline_cache_active_from_context(ctx);
+    self.telemetry.last_submit_count = last_submit_count_from_context(ctx);
+    return self.telemetry;
+}
+
+fn backend_id(ctx: *anyopaque) @import("../../contracts/backend.zig").BackendId {
+    _ = ctx;
+    return .doe_metal;
+}
+
+pub fn destroyContext(ctx: *anyopaque) void {
+    deinit(ctx);
+}
+
+const PortDriver = struct {
+    pub const backendId = backend_id;
+    pub const executeCommand = execute_command;
+    pub const executeDispatch = execute_dispatch;
+    pub const executeBufferWrite = execute_buffer_write_bytes_iface;
+    pub const setUploadBehavior = set_upload_behavior;
+    pub const setQueueWaitMode = set_queue_wait_mode;
+    pub const setQueueWaitTimeoutNs = set_webgpu_ffi_queue_wait_timeout_ns;
+    pub const setQueueSyncMode = set_queue_sync_mode;
+    pub const setGpuTimestampMode = set_gpu_timestamp_mode;
+    pub const flush = flush_queue;
+    pub const prewarmUpload = prewarm_upload_path;
+    pub const prewarmKernel = prewarm_kernel_dispatch;
+    pub const capture = capture_buffer;
+    pub const telemetrySnapshot = telemetry_snapshot;
 };

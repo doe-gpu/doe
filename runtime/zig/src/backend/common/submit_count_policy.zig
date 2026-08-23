@@ -1,6 +1,6 @@
 const std = @import("std");
 const model_commands = @import("../../contracts/command.zig");
-const runtime_types = @import("../runtime_types.zig");
+const runtime_types = @import("../../contracts/runtime_types.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;

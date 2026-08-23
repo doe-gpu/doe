@@ -15,13 +15,11 @@ pub const ExecutionReceipt = struct {
 };
 
 pub fn createExecutionReceipt(op: prepared.PreparedOperation, rep: report.ExecutionReport) ExecutionReceipt {
-    const op_id: u64 = switch (op) {
-        .compute => |c| c.operation_id,
-        .transfer => |t| t.operation_id,
-    };
+    const op_id = op.operationId();
     const src_sha: identity.Sha256Digest = switch (op) {
         .compute => |c| c.identity.program.source_sha256,
-        .transfer => [_]u8{0} ** 32,
+        .spatial => |s| s.program_identity.source_sha256,
+        else => [_]u8{0} ** 32,
     };
 
     return .{

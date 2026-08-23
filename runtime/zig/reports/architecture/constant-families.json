@@ -406,32 +406,32 @@
         {
           "name": "BOOTSTRAP_MANIFEST_MODULE",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 53
+          "startLine": 56
         },
         {
           "name": "BOOTSTRAP_MANIFEST_STATUS_CODE",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 54
+          "startLine": 57
         },
         {
           "name": "BOOTSTRAP_MANIFEST_MODULE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 30
+          "startLine": 33
         },
         {
           "name": "BOOTSTRAP_MANIFEST_STATUS_CODE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 31
+          "startLine": 34
         },
         {
           "name": "BOOTSTRAP_MANIFEST_MODULE",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 30
+          "startLine": 33
         },
         {
           "name": "BOOTSTRAP_MANIFEST_STATUS_CODE",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 31
+          "startLine": 34
         }
       ],
       "prefix": "BOOTSTRAP",
@@ -1162,17 +1162,17 @@
         {
           "name": "DEFAULT_MODULE_NAME",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 31
+          "startLine": 32
         },
         {
           "name": "DEFAULT_EXECUTION_BACKEND",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 32
+          "startLine": 33
         },
         {
           "name": "DEFAULT_SEMANTIC_STAGE",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 33
+          "startLine": 34
         },
         {
           "name": "DEFAULT_CACHE_DIR_SUFFIX",
@@ -1252,7 +1252,7 @@
         {
           "name": "DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS",
           "path": "src/runtime/execution.zig",
-          "startLine": 95
+          "startLine": 66
         },
         {
           "name": "DEFAULT_POLICY_PATH",
@@ -2958,17 +2958,17 @@
         {
           "name": "HASH_HEX_SIZE",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 30
+          "startLine": 33
         },
         {
           "name": "HASH_HEX_SIZE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 26
+          "startLine": 29
         },
         {
           "name": "HASH_HEX_SIZE",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 25
+          "startLine": 28
         },
         {
           "name": "HASH_SEED",
@@ -3429,17 +3429,17 @@
         {
           "name": "MANIFEST_PATH_CAPACITY",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 24
+          "startLine": 27
         },
         {
           "name": "MANIFEST_MODULE_CAPACITY",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 31
+          "startLine": 34
         },
         {
           "name": "MANIFEST_STATUS_CODE_CAPACITY",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 51
+          "startLine": 54
         },
         {
           "name": "MANIFEST_FILENAME",
@@ -3459,32 +3459,32 @@
         {
           "name": "MANIFEST_PATH_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 25
+          "startLine": 28
         },
         {
           "name": "MANIFEST_MODULE_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 27
+          "startLine": 30
         },
         {
           "name": "MANIFEST_STATUS_CODE_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 28
+          "startLine": 31
         },
         {
           "name": "MANIFEST_PATH_CAPACITY",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 24
+          "startLine": 27
         },
         {
           "name": "MANIFEST_MODULE_CAPACITY",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 26
+          "startLine": 29
         },
         {
           "name": "MANIFEST_STATUS_CODE_CAPACITY",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 27
+          "startLine": 30
         },
         {
           "name": "MANIFEST_PATH_SUFFIX",
@@ -3671,7 +3671,7 @@
         {
           "name": "MAX_SHADER_SOURCE_BYTES",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 29
+          "startLine": 32
         },
         {
           "name": "MAX_TRACKED_COMPUTE_BINDINGS",
@@ -6110,17 +6110,17 @@
         {
           "name": "STATUS_MESSAGE_BYTES",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 52
+          "startLine": 55
         },
         {
           "name": "STATUS_MESSAGE_BYTES",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 29
+          "startLine": 32
         },
         {
           "name": "STATUS_MESSAGE_BYTES",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 28
+          "startLine": 31
         }
       ],
       "prefix": "STATUS",
@@ -15564,17 +15564,17 @@
         {
           "name": "artifact_meta",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 18
+          "startLine": 21
         },
         {
           "name": "artifact_policy",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 19
+          "startLine": 22
         },
         {
           "name": "artifact_emit",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 21
+          "startLine": 24
         },
         {
           "name": "artifact_meta",
@@ -15594,12 +15594,12 @@
         {
           "name": "artifact_meta",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 16
+          "startLine": 19
         },
         {
           "name": "artifact_emit",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 18
+          "startLine": 21
         },
         {
           "name": "artifact_meta",
@@ -15619,17 +15619,17 @@
         {
           "name": "artifact_meta",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 16
+          "startLine": 19
         },
         {
           "name": "artifact_policy",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 17
+          "startLine": 20
         },
         {
           "name": "artifact_emit",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 19
+          "startLine": 22
         }
       ],
       "prefix": "artifact",
@@ -15792,16 +15792,6 @@
       "members": [
         {
           "name": "backend_ids",
-          "path": "src/backend/backend_iface.zig",
-          "startLine": 6
-        },
-        {
-          "name": "backend_telemetry",
-          "path": "src/backend/backend_iface.zig",
-          "startLine": 7
-        },
-        {
-          "name": "backend_ids",
           "path": "src/backend/backend_policy.zig",
           "startLine": 2
         },
@@ -15811,64 +15801,14 @@
           "startLine": 3
         },
         {
-          "name": "backend_ids",
-          "path": "src/backend/backend_registry.zig",
-          "startLine": 4
-        },
-        {
-          "name": "backend_iface",
-          "path": "src/backend/backend_registry.zig",
-          "startLine": 5
-        },
-        {
-          "name": "backend_policy",
-          "path": "src/backend/backend_registry.zig",
-          "startLine": 6
-        },
-        {
-          "name": "backend_iface",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 6
-        },
-        {
-          "name": "backend_policy",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 7
-        },
-        {
-          "name": "backend_registry",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 8
-        },
-        {
-          "name": "backend_runtime_telemetry",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 9
-        },
-        {
-          "name": "backend_selection",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 10
-        },
-        {
-          "name": "backend_telemetry",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 11
-        },
-        {
-          "name": "backend_iface",
-          "path": "src/backend/backend_runtime_telemetry.zig",
-          "startLine": 3
-        },
-        {
-          "name": "backend_ids",
+          "name": "backend_contract",
           "path": "src/backend/backend_telemetry.zig",
-          "startLine": 1
+          "startLine": 2
         },
         {
-          "name": "backend_iface",
+          "name": "backend_telemetry",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 12
+          "startLine": 13
         },
         {
           "name": "backend_ids",
@@ -15876,29 +15816,24 @@
           "startLine": 7
         },
         {
-          "name": "backend_iface",
-          "path": "src/backend/dawn_delegate_backend.zig",
-          "startLine": 8
-        },
-        {
           "name": "backend_telemetry",
           "path": "src/backend/dawn_delegate_backend.zig",
           "startLine": 9
         },
         {
-          "name": "backend_iface",
+          "name": "backend_telemetry",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 13
+          "startLine": 14
         },
         {
           "name": "backend_execute",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 19
+          "startLine": 22
         },
         {
           "name": "backend_policy",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 22
+          "startLine": 25
         },
         {
           "name": "backend_contract",
@@ -15907,23 +15842,23 @@
         },
         {
           "name": "backend_contract",
-          "path": "src/backend/runtime_types.zig",
-          "startLine": 2
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 13
         },
         {
-          "name": "backend_iface",
-          "path": "src/backend/vulkan/mod.zig",
-          "startLine": 11
-        },
-        {
-          "name": "backend_policy",
+          "name": "backend_telemetry",
           "path": "src/backend/vulkan/mod.zig",
           "startLine": 12
         },
         {
+          "name": "backend_policy",
+          "path": "src/backend/vulkan/mod.zig",
+          "startLine": 15
+        },
+        {
           "name": "backend_execute",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 20
+          "startLine": 23
         },
         {
           "name": "backend_contract",
@@ -15966,34 +15901,19 @@
           "startLine": 9
         },
         {
-          "name": "backend_runtime_telemetry",
-          "path": "src/cli/runtime_cli.zig",
-          "startLine": 2
-        },
-        {
-          "name": "backend_policy",
-          "path": "src/cli/runtime_cli.zig",
-          "startLine": 3
-        },
-        {
           "name": "backend_ids",
           "path": "src/cli/runtime_cli_artifacts.zig",
           "startLine": 2
         },
         {
-          "name": "backend_policy",
-          "path": "src/cli/runtime_cli_artifacts.zig",
-          "startLine": 3
-        },
-        {
           "name": "backend_contract",
           "path": "src/composition/backend_factory.zig",
-          "startLine": 7
+          "startLine": 10
         },
         {
-          "name": "backend_iface",
+          "name": "backend_policy",
           "path": "src/composition/backend_factory.zig",
-          "startLine": 15
+          "startLine": 11
         },
         {
           "name": "backend_factory",
@@ -16001,14 +15921,29 @@
           "startLine": 5
         },
         {
-          "name": "backend_factory",
-          "path": "src/composition/mod.zig",
-          "startLine": 5
+          "name": "backend_contract",
+          "path": "src/composition/execution_session.zig",
+          "startLine": 8
+        },
+        {
+          "name": "backend_policy",
+          "path": "src/composition/execution_session.zig",
+          "startLine": 9
+        },
+        {
+          "name": "backend_runtime_telemetry",
+          "path": "src/composition/execution_session.zig",
+          "startLine": 10
         },
         {
           "name": "backend_factory",
-          "path": "src/composition/runtime_factory.zig",
-          "startLine": 4
+          "path": "src/composition/execution_session.zig",
+          "startLine": 12
+        },
+        {
+          "name": "backend_factory",
+          "path": "src/composition/mod.zig",
+          "startLine": 5
         },
         {
           "name": "backend_id_name",
@@ -16021,7 +15956,12 @@
           "startLine": 3
         },
         {
-          "name": "backend_policy",
+          "name": "backend_contract",
+          "path": "src/contracts/runtime_telemetry.zig",
+          "startLine": 3
+        },
+        {
+          "name": "backend_contract",
           "path": "src/dropin/dropin_runtime_config.zig",
           "startLine": 3
         },
@@ -16091,37 +16031,17 @@
           "startLine": 5
         },
         {
-          "name": "backend_policy",
+          "name": "backend_contract",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 9
-        },
-        {
-          "name": "backend_runtime",
-          "path": "src/runtime/execution.zig",
-          "startLine": 7
+          "startLine": 10
         },
         {
           "name": "backend_ids",
           "path": "src/runtime/execution.zig",
-          "startLine": 8
+          "startLine": 6
         },
         {
-          "name": "backend_policy",
-          "path": "src/runtime/execution.zig",
-          "startLine": 9
-        },
-        {
-          "name": "backend_telemetry",
-          "path": "src/runtime/execution.zig",
-          "startLine": 10
-        },
-        {
-          "name": "backend_telemetry",
-          "path": "src/runtime/execution_receipt.zig",
-          "startLine": 3
-        },
-        {
-          "name": "backend_policy",
+          "name": "backend_contract",
           "path": "src/runtime/output_oracle.zig",
           "startLine": 2
         },
@@ -16354,14 +16274,19 @@
     {
       "members": [
         {
+          "name": "command_contract",
+          "path": "src/app/prepare.zig",
+          "startLine": 5
+        },
+        {
           "name": "command_info",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 15
+          "startLine": 18
         },
         {
           "name": "command_requirements",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 16
+          "startLine": 19
         },
         {
           "name": "command_info",
@@ -16386,7 +16311,7 @@
         {
           "name": "command_info",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 14
+          "startLine": 17
         },
         {
           "name": "command_stream",
@@ -16477,6 +16402,11 @@
           "name": "command_kind_name",
           "path": "src/contracts/command.zig",
           "startLine": 232
+        },
+        {
+          "name": "command_contract",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 9
         },
         {
           "name": "command_dispatch",
@@ -16572,12 +16502,12 @@
         {
           "name": "common_errors",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 13
+          "startLine": 16
         },
         {
           "name": "common_timing",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 14
+          "startLine": 17
         },
         {
           "name": "common_timing",
@@ -16662,7 +16592,7 @@
         {
           "name": "common_errors",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 14
+          "startLine": 17
         },
         {
           "name": "common_errors",
@@ -16682,7 +16612,7 @@
         {
           "name": "common_errors",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 13
+          "startLine": 16
         },
         {
           "name": "common_timing",
@@ -16835,22 +16765,12 @@
         {
           "name": "compute_port",
           "path": "src/app/runner.zig",
-          "startLine": 6
+          "startLine": 7
         },
         {
           "name": "compute_port",
           "path": "src/app/session.zig",
           "startLine": 7
-        },
-        {
-          "name": "compute_contract",
-          "path": "src/backend/backend_iface.zig",
-          "startLine": 4
-        },
-        {
-          "name": "compute_contract",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 5
         },
         {
           "name": "compute_contract",
@@ -16876,6 +16796,11 @@
           "name": "compute_port",
           "path": "src/backend/ports/factory.zig",
           "startLine": 5
+        },
+        {
+          "name": "compute_port",
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 14
         },
         {
           "name": "compute_contract",
@@ -16933,14 +16858,9 @@
           "startLine": 11
         },
         {
-          "name": "compute_port",
-          "path": "src/composition/backend_factory.zig",
-          "startLine": 8
-        },
-        {
           "name": "compute_contract",
           "path": "src/contracts/prepared_operation.zig",
-          "startLine": 7
+          "startLine": 10
         },
         {
           "name": "compute_commands",
@@ -16991,11 +16911,6 @@
           "name": "compute_bindings",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
           "startLine": 26
-        },
-        {
-          "name": "compute_contract",
-          "path": "src/runtime/execution.zig",
-          "startLine": 6
         }
       ],
       "prefix": "compute",
@@ -17086,16 +17001,6 @@
     },
     {
       "members": [
-        {
-          "name": "d3d12_backend",
-          "path": "src/backend/backend_registry.zig",
-          "startLine": 10
-        },
-        {
-          "name": "d3d12_backend",
-          "path": "src/backend/backend_runtime_telemetry.zig",
-          "startLine": 7
-        },
         {
           "name": "d3d12_descriptors",
           "path": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
@@ -17272,6 +17177,11 @@
           "startLine": 12
         },
         {
+          "name": "d3d12_backend",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 16
+        },
+        {
           "name": "d3d12_device_caps",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 34
@@ -17314,18 +17224,13 @@
       "members": [
         {
           "name": "dawn_delegate_backend",
-          "path": "src/backend/backend_registry.zig",
-          "startLine": 7
-        },
-        {
-          "name": "dawn_delegate_backend",
-          "path": "src/backend/backend_runtime_telemetry.zig",
-          "startLine": 4
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 13
         },
         {
           "name": "dawn_plan_types",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 15
+          "startLine": 16
         },
         {
           "name": "dawn_plan_types",
@@ -18068,6 +17973,27 @@
     {
       "members": [
         {
+          "name": "evidence_observer",
+          "path": "src/composition/execution_session.zig",
+          "startLine": 13
+        },
+        {
+          "name": "evidence_port",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 5
+        },
+        {
+          "name": "evidence_observer",
+          "path": "src/runtime/execution.zig",
+          "startLine": 9
+        }
+      ],
+      "prefix": "evidence",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "execution_contract",
           "path": "src/backend/d3d12/commands/d3d12_dispatch.zig",
           "startLine": 3
@@ -18088,14 +18014,14 @@
           "startLine": 2
         },
         {
-          "name": "execution_types",
-          "path": "src/backend/runtime_types.zig",
-          "startLine": 1
-        },
-        {
           "name": "execution_contract",
           "path": "src/backend/vulkan/vk_metrics.zig",
           "startLine": 1
+        },
+        {
+          "name": "execution_session",
+          "path": "src/composition/mod.zig",
+          "startLine": 7
         },
         {
           "name": "execution_contract",
@@ -18106,6 +18032,11 @@
           "name": "execution_report",
           "path": "src/contracts/error.zig",
           "startLine": 4
+        },
+        {
+          "name": "execution_contract",
+          "path": "src/contracts/execution_report.zig",
+          "startLine": 6
         },
         {
           "name": "execution_types",
@@ -18119,13 +18050,28 @@
         },
         {
           "name": "execution_contract",
+          "path": "src/core/command_dispatch.zig",
+          "startLine": 2
+        },
+        {
+          "name": "execution_contract",
+          "path": "src/full/command/wgpu_commands.zig",
+          "startLine": 2
+        },
+        {
+          "name": "execution_contract",
+          "path": "src/full/command_dispatch.zig",
+          "startLine": 2
+        },
+        {
+          "name": "execution_contract",
           "path": "src/runtime/execution.zig",
           "startLine": 2
         },
         {
           "name": "execution_receipt",
           "path": "src/runtime/execution.zig",
-          "startLine": 14
+          "startLine": 13
         },
         {
           "name": "execution_contract",
@@ -18439,17 +18385,17 @@
         {
           "name": "hash_utils",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 20
+          "startLine": 23
         },
         {
           "name": "hash_utils",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 17
+          "startLine": 20
         },
         {
           "name": "hash_utils",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 18
+          "startLine": 21
         },
         {
           "name": "hash_contract",
@@ -18887,7 +18833,7 @@
         {
           "name": "main_print",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 5
+          "startLine": 4
         },
         {
           "name": "main_usage",
@@ -18897,7 +18843,7 @@
         {
           "name": "main_print",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 10
+          "startLine": 11
         },
         {
           "name": "main_print",
@@ -18980,13 +18926,8 @@
       "members": [
         {
           "name": "metal_backend",
-          "path": "src/backend/backend_registry.zig",
-          "startLine": 8
-        },
-        {
-          "name": "metal_backend",
           "path": "src/backend/backend_runtime_telemetry.zig",
-          "startLine": 6
+          "startLine": 4
         },
         {
           "name": "metal_bridge_mod",
@@ -19521,12 +19462,17 @@
         {
           "name": "metal_pipeline_cache",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 21
+          "startLine": 24
         },
         {
           "name": "metal_pipeline_cache",
           "path": "src/backend/metal_package_pipeline_cache.zig",
           "startLine": 2
+        },
+        {
+          "name": "metal_backend",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 14
         },
         {
           "name": "metal_bridge_configure_surface_host",
@@ -19757,37 +19703,12 @@
         {
           "name": "model_compute",
           "path": "src/app/prepare.zig",
-          "startLine": 6
+          "startLine": 7
         },
         {
           "name": "model_compute",
           "path": "src/app/request.zig",
           "startLine": 7
-        },
-        {
-          "name": "model_commands",
-          "path": "src/backend/backend_iface.zig",
-          "startLine": 2
-        },
-        {
-          "name": "model_transfer_types",
-          "path": "src/backend/backend_iface.zig",
-          "startLine": 3
-        },
-        {
-          "name": "model_commands",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 2
-        },
-        {
-          "name": "model_profile",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 3
-        },
-        {
-          "name": "model_transfer_types",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 4
         },
         {
           "name": "model_commands",
@@ -20115,6 +20036,16 @@
           "startLine": 11
         },
         {
+          "name": "model_compute",
+          "path": "src/backend/ports/compute.zig",
+          "startLine": 10
+        },
+        {
+          "name": "model_compute",
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 12
+        },
+        {
           "name": "model_commands",
           "path": "src/backend/vulkan/backend_execute.zig",
           "startLine": 2
@@ -20352,22 +20283,22 @@
         {
           "name": "model_commands",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 6
+          "startLine": 5
         },
         {
           "name": "model_policy",
+          "path": "src/cli/runtime_cli.zig",
+          "startLine": 6
+        },
+        {
+          "name": "model_profile",
           "path": "src/cli/runtime_cli.zig",
           "startLine": 7
         },
         {
           "name": "model_profile",
-          "path": "src/cli/runtime_cli.zig",
-          "startLine": 8
-        },
-        {
-          "name": "model_profile",
           "path": "src/cli/runtime_cli_artifacts.zig",
-          "startLine": 5
+          "startLine": 4
         },
         {
           "name": "model_commands",
@@ -20495,6 +20426,16 @@
           "startLine": 3
         },
         {
+          "name": "model_profile",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 9
+        },
+        {
+          "name": "model_profile",
+          "path": "src/composition/execution_session.zig",
+          "startLine": 7
+        },
+        {
           "name": "model_compute",
           "path": "src/composition/native.zig",
           "startLine": 6
@@ -20505,9 +20446,34 @@
           "startLine": 5
         },
         {
+          "name": "model_async",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 12
+        },
+        {
           "name": "model_compute",
           "path": "src/contracts/prepared_operation.zig",
-          "startLine": 9
+          "startLine": 13
+        },
+        {
+          "name": "model_render",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 14
+        },
+        {
+          "name": "model_resource",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 15
+        },
+        {
+          "name": "model_surface",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 16
+        },
+        {
+          "name": "model_texture",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 17
         },
         {
           "name": "model_gpu_types",
@@ -20949,7 +20915,7 @@
         {
           "name": "native_runtime",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 22
+          "startLine": 25
         },
         {
           "name": "native_types",
@@ -20964,7 +20930,7 @@
         {
           "name": "native_runtime",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 20
+          "startLine": 23
         },
         {
           "name": "native_runtime",
@@ -20974,7 +20940,7 @@
         {
           "name": "native_runtime",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 21
+          "startLine": 24
         },
         {
           "name": "native_runtime",
@@ -21665,12 +21631,12 @@
         {
           "name": "numeric_stability",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 9
+          "startLine": 8
         },
         {
           "name": "numeric_stability",
           "path": "src/cli/runtime_cli_artifacts.zig",
-          "startLine": 6
+          "startLine": 5
         },
         {
           "name": "numeric_stability_annotation",
@@ -21792,12 +21758,12 @@
         {
           "name": "operator_artifacts",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 10
+          "startLine": 9
         },
         {
           "name": "operator_artifacts",
           "path": "src/cli/runtime_cli_artifacts.zig",
-          "startLine": 7
+          "startLine": 6
         },
         {
           "name": "operator_text",
@@ -22196,7 +22162,7 @@
         {
           "name": "plan_validation",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 16
+          "startLine": 17
         },
         {
           "name": "plan_config",
@@ -22220,6 +22186,52 @@
         }
       ],
       "prefix": "plan",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "port_factory",
+          "path": "src/app/runner.zig",
+          "startLine": 6
+        },
+        {
+          "name": "port_factory",
+          "path": "src/backend/d3d12/mod.zig",
+          "startLine": 14
+        },
+        {
+          "name": "port_factory",
+          "path": "src/backend/dawn_delegate_backend.zig",
+          "startLine": 10
+        },
+        {
+          "name": "port_factory",
+          "path": "src/backend/metal/mod.zig",
+          "startLine": 15
+        },
+        {
+          "name": "port_factory",
+          "path": "src/backend/vulkan/mod.zig",
+          "startLine": 13
+        },
+        {
+          "name": "port_factory",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 12
+        },
+        {
+          "name": "port_factory",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 4
+        },
+        {
+          "name": "port_factory",
+          "path": "src/runtime/execution.zig",
+          "startLine": 10
+        }
+      ],
+      "prefix": "port",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -22398,6 +22410,37 @@
     {
       "members": [
         {
+          "name": "provider_adapter",
+          "path": "src/backend/d3d12/mod.zig",
+          "startLine": 15
+        },
+        {
+          "name": "provider_adapter",
+          "path": "src/backend/dawn_delegate_backend.zig",
+          "startLine": 11
+        },
+        {
+          "name": "provider_adapter",
+          "path": "src/backend/metal/mod.zig",
+          "startLine": 16
+        },
+        {
+          "name": "provider_adapter",
+          "path": "src/backend/ports/mod.zig",
+          "startLine": 14
+        },
+        {
+          "name": "provider_adapter",
+          "path": "src/backend/vulkan/mod.zig",
+          "startLine": 14
+        }
+      ],
+      "prefix": "provider",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "query_native",
           "path": "src/dropin/wgpu_dropin_ext_a_core.zig",
           "startLine": 41
@@ -22444,6 +22487,11 @@
           "startLine": 7
         },
         {
+          "name": "queue_port",
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 16
+        },
+        {
           "name": "queue_sync",
           "path": "src/backend/webgpu_backend_ops.zig",
           "startLine": 6
@@ -22452,11 +22500,6 @@
           "name": "queue_capture",
           "path": "src/backend/webgpu_backend_ops.zig",
           "startLine": 7
-        },
-        {
-          "name": "queue_port",
-          "path": "src/composition/backend_factory.zig",
-          "startLine": 10
         },
         {
           "name": "queue_flush_breakdown",
@@ -22588,7 +22631,7 @@
         {
           "name": "release_ref",
           "path": "src/backend/metal/metal_native_runtime.zig",
-          "startLine": 443
+          "startLine": 451
         },
         {
           "name": "release_cached_compute_states",
@@ -22627,9 +22670,9 @@
           "startLine": 10
         },
         {
-          "name": "render_contract",
-          "path": "src/backend/ports/render.zig",
-          "startLine": 4
+          "name": "render_port",
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 19
         },
         {
           "name": "render_bundle",
@@ -22640,11 +22683,6 @@
           "name": "render_bundle",
           "path": "src/backend/vulkan/vk_render.zig",
           "startLine": 15
-        },
-        {
-          "name": "render_port",
-          "path": "src/composition/backend_factory.zig",
-          "startLine": 13
         },
         {
           "name": "render_pipeline_request_key",
@@ -22944,6 +22982,16 @@
           "startLine": 24
         },
         {
+          "name": "resource_port",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 14
+        },
+        {
+          "name": "resource_port",
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 21
+        },
+        {
           "name": "resource_scheduler",
           "path": "src/cli/module_runner_cli.zig",
           "startLine": 6
@@ -23021,18 +23069,13 @@
       "members": [
         {
           "name": "runtime_types",
-          "path": "src/backend/backend_iface.zig",
-          "startLine": 5
-        },
-        {
-          "name": "runtime_types",
           "path": "src/backend/backend_policy.zig",
           "startLine": 4
         },
         {
-          "name": "runtime_types",
-          "path": "src/backend/backend_runtime.zig",
-          "startLine": 12
+          "name": "runtime_telemetry",
+          "path": "src/backend/backend_telemetry.zig",
+          "startLine": 1
         },
         {
           "name": "runtime_types",
@@ -23043,6 +23086,31 @@
           "name": "runtime_types",
           "path": "src/backend/common/submit_count_policy.zig",
           "startLine": 3
+        },
+        {
+          "name": "runtime_telemetry",
+          "path": "src/backend/d3d12/mod.zig",
+          "startLine": 12
+        },
+        {
+          "name": "runtime_telemetry",
+          "path": "src/backend/dawn_delegate_backend.zig",
+          "startLine": 8
+        },
+        {
+          "name": "runtime_telemetry",
+          "path": "src/backend/metal/mod.zig",
+          "startLine": 13
+        },
+        {
+          "name": "runtime_telemetry",
+          "path": "src/backend/ports/telemetry.zig",
+          "startLine": 4
+        },
+        {
+          "name": "runtime_telemetry",
+          "path": "src/backend/vulkan/mod.zig",
+          "startLine": 11
         },
         {
           "name": "runtime_types",
@@ -23077,17 +23145,17 @@
         {
           "name": "runtime_cli_args",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 16
+          "startLine": 15
         },
         {
           "name": "runtime_cli_artifacts",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 17
+          "startLine": 16
         },
         {
           "name": "runtime_cli_inputs",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 18
+          "startLine": 17
         },
         {
           "name": "runtime_cli_args",
@@ -23140,11 +23208,6 @@
           "startLine": 4
         },
         {
-          "name": "runtime_types",
-          "path": "src/core/command_dispatch.zig",
-          "startLine": 2
-        },
-        {
           "name": "runtime_state",
           "path": "src/core/compute/wgpu_commands_compute.zig",
           "startLine": 10
@@ -23158,16 +23221,6 @@
           "name": "runtime_state",
           "path": "src/core/queue/wgpu_ffi_sync.zig",
           "startLine": 6
-        },
-        {
-          "name": "runtime_types",
-          "path": "src/full/command/wgpu_commands.zig",
-          "startLine": 2
-        },
-        {
-          "name": "runtime_types",
-          "path": "src/full/command_dispatch.zig",
-          "startLine": 2
         },
         {
           "name": "runtime_helpers",
@@ -23200,9 +23253,19 @@
           "startLine": 6
         },
         {
-          "name": "runtime_types",
+          "name": "runtime_configuration",
           "path": "src/runtime/execution.zig",
-          "startLine": 11
+          "startLine": 7
+        },
+        {
+          "name": "runtime_telemetry",
+          "path": "src/runtime/execution.zig",
+          "startLine": 8
+        },
+        {
+          "name": "runtime_telemetry",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 3
         },
         {
           "name": "runtime_decode",
@@ -23374,12 +23437,12 @@
         {
           "name": "semantic_trace",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 12
+          "startLine": 13
         },
         {
           "name": "semantic_trace",
           "path": "src/runtime/execution.zig",
-          "startLine": 13
+          "startLine": 12
         },
         {
           "name": "semantic_trace",
@@ -23495,14 +23558,14 @@
           "startLine": 11
         },
         {
-          "name": "spatial_contract",
-          "path": "src/backend/ports/spatial.zig",
-          "startLine": 4
+          "name": "spatial_port",
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 20
         },
         {
-          "name": "spatial_port",
-          "path": "src/composition/backend_factory.zig",
-          "startLine": 14
+          "name": "spatial_contract",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 18
         }
       ],
       "prefix": "spatial",
@@ -23612,6 +23675,16 @@
           "name": "surface_runtime",
           "path": "src/backend/metal/metal_native_runtime.zig",
           "startLine": 25
+        },
+        {
+          "name": "surface_port",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 15
+        },
+        {
+          "name": "surface_port",
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 22
         },
         {
           "name": "surface_ops",
@@ -23932,7 +24005,7 @@
         {
           "name": "tooling_io_context",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 14
+          "startLine": 13
         },
         {
           "name": "tooling_io_context",
@@ -23953,12 +24026,12 @@
         {
           "name": "trace_jsonl_emit",
           "path": "src/cli/runtime_cli_artifacts.zig",
-          "startLine": 10
+          "startLine": 9
         },
         {
           "name": "trace_jsonl_emit",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 14
+          "startLine": 15
         },
         {
           "name": "trace_meta",
@@ -24014,7 +24087,7 @@
         {
           "name": "transfer_port",
           "path": "src/app/runner.zig",
-          "startLine": 7
+          "startLine": 8
         },
         {
           "name": "transfer_port",
@@ -24023,8 +24096,8 @@
         },
         {
           "name": "transfer_port",
-          "path": "src/composition/backend_factory.zig",
-          "startLine": 9
+          "path": "src/backend/ports/provider_adapter.zig",
+          "startLine": 15
         }
       ],
       "prefix": "transfer",
@@ -24184,7 +24257,7 @@
         {
           "name": "vk_pipeline_cache_persistent",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 22
+          "startLine": 25
         },
         {
           "name": "vk_device",
@@ -24619,13 +24692,8 @@
       "members": [
         {
           "name": "vulkan_backend",
-          "path": "src/backend/backend_registry.zig",
-          "startLine": 9
-        },
-        {
-          "name": "vulkan_backend",
           "path": "src/backend/backend_runtime_telemetry.zig",
-          "startLine": 5
+          "startLine": 3
         },
         {
           "name": "vulkan_upload",
@@ -24661,6 +24729,11 @@
           "name": "vulkan_compute_runtime_robustness_config",
           "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
           "startLine": 12
+        },
+        {
+          "name": "vulkan_backend",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 15
         },
         {
           "name": "vulkan_compute",
@@ -24890,10 +24963,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "6457eb3053f2450387d3b1b8117df60c33128936ed59c58bdcc3a44f1934dae0",
+  "manifestSha256": "35136779176f11c470fb8b8118900a6e8a3547a75dc7720b793f12edd4d24d6c",
   "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "0acb47d7dbcff3b9473a72cc3ce955f1d2a3f29f1674b718c633c535c9a3738d",
+  "sourceTreeSha256": "40bb7946ecbd9b395e1b3c56823cb6fc1e9d5defefdb8e57fec0b3bf89575c7b",
   "status": "captured"
 }

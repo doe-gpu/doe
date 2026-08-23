@@ -6,7 +6,8 @@ const model_profile = @import("../contracts/model/model_profile.zig");
 const model_compute_types = @import("../contracts/model/model_compute_types.zig");
 const model_gpu_types = @import("../contracts/model/model_binding_value_types.zig");
 const execution = @import("../runtime/execution.zig");
-const backend_policy = @import("../backend/backend_policy.zig");
+const composition = @import("../composition/mod.zig");
+const backend_contract = @import("../contracts/backend.zig");
 const main_print = @import("../runtime/trace/command_output.zig");
 const quirk = @import("../quirk/mod.zig");
 const semantic_trace = @import("../contracts/semantic.zig");
@@ -197,7 +198,7 @@ fn loadKernelRoot(allocator: Allocator, ir_path: []const u8, override_root: ?[]c
     return allocator.dupe(u8, "bench/inference-pipeline/kernels");
 }
 
-fn makeDryRunExecutionResult(dispatch_count: u32, backend_lane: backend_policy.BackendLane, plan_path: []const u8, plan_hash: []const u8) execution.ExecutionResult {
+fn makeDryRunExecutionResult(dispatch_count: u32, backend_lane: backend_contract.BackendLane, plan_path: []const u8, plan_hash: []const u8) execution.ExecutionResult {
     return .{
         .backend = DEFAULT_EXECUTION_BACKEND,
         .status = .ok,
@@ -363,12 +364,14 @@ pub fn runPlan(allocator: Allocator, options: RunOptions) !void {
 
     var host_executor_init_total_ns: u64 = 0;
     var execute_wall_ns: u64 = 0;
-    var execution_context: ?execution.ExecutionContext = null;
+    var execution_session: ?composition.ExecutionSession = null;
+    var execution_context: ?*execution.ExecutionContext = null;
     if (!options.dry_run) {
         const executor_init_start_ns = nowNs();
-        execution_context = try execution.ExecutionContext.init(allocator, .native, profile, kernel_root, backend_lane);
+        execution_session = try composition.ExecutionSession.init(allocator, .native, profile, kernel_root, backend_lane, .{});
+        execution_context = execution_session.?.contextPtr();
         host_executor_init_total_ns = elapsedSince(executor_init_start_ns);
-        if (execution_context) |*ctx| {
+        if (execution_context) |ctx| {
             ctx.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
             ctx.configureGpuTimestampMode(options.gpu_timestamp_mode);
             ctx.configureQueueWaitMode(options.queue_wait_mode);
@@ -389,7 +392,7 @@ pub fn runPlan(allocator: Allocator, options: RunOptions) !void {
             }
         }
     }
-    defer if (execution_context) |*ctx| ctx.deinit();
+    defer if (execution_session) |*session| session.deinit();
     trace_summary.host_executor_init_total_ns = host_executor_init_total_ns;
 
     const execute_start_ns = nowNs();
@@ -406,7 +409,7 @@ pub fn runPlan(allocator: Allocator, options: RunOptions) !void {
             .buffer_load => null,
         };
         const timestamp_ns = nowNs();
-        const execution_result = if (execution_context) |*ctx| switch (item.payload) {
+        const execution_result = if (execution_context) |ctx| switch (item.payload) {
             .runtime => |command| try ctx.execute_with_semantic(command, semantic),
             .buffer_load => |command| try executeBufferLoadWithSemantic(allocator, ctx, command, semantic),
         } else switch (item.payload) {
@@ -501,7 +504,7 @@ pub fn runPlan(allocator: Allocator, options: RunOptions) !void {
         trace_summary.host_command_orchestration_total_ns = execute_wall_ns - trace_summary.execution_total_ns;
     }
 
-    if (execution_context) |*ctx| {
+    if (execution_context) |ctx| {
         const flush_start_ns = nowNs();
         const flush_ns = try ctx.flushQueue();
         const flush_elapsed_ns = elapsedSince(flush_start_ns);

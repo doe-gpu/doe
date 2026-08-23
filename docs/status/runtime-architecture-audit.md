@@ -148,6 +148,31 @@ known legacy contract paths, broad layer permissions, platform-specific
 parallel implementations, and diagnostic/future modules living under
 production-shaped roots.
 
+The 2026-08-22 execution migration also made the central runtime boundary
+physical rather than documentary:
+
+- all canonical commands become one immutable `PreparedOperation` before
+  backend execution;
+- the application runner dispatches compute, transfer, render, resource,
+  surface, lifecycle, and spatial domains only through narrow ports;
+- the production CLI, plan executor, output oracle, and Metal correctness
+  benches construct `ExecutionSession` in composition and pass a borrowed
+  `PortBundle` into runtime;
+- the former `backend/backend_runtime.zig` owner is deleted;
+- evidence observers receive the same prepared operation and result as the
+  runner and cannot return an error or select a provider;
+- unsupported spatial execution returns an explicit unsupported report rather
+  than synthetic success.
+
+Metal, Vulkan, D3D12, and delegate providers now instantiate their narrow port
+vtables directly through a compile-time provider adapter. The runtime catch-all
+`BackendIface`, `BackendVTable`, `BackendRuntime`, and backend registry are
+deleted. `composition/backend_factory.zig` is the sole ordinary module allowed
+to import multiple physical providers, and it owns selection, lifetime, and
+destruction without exposing a semantic execution facade. Structural gates
+still do not substitute for physical AMD/Windows or Fawn-browser
+qualification.
+
 ## Classification
 
 | Surface | Classification | Boundary decision |
@@ -157,6 +182,9 @@ production-shaped roots.
 | `src/compiler/tsir/` | Diagnostic/canonical research path | Doe-owned portability path with real contracts, but broad target execution is not yet promoted. |
 | `src/backend/common/` | Canonical shared implementation | The current helpers import canonical contracts and are reused by backend paths; no merge is justified from this audit. |
 | `src/backend/metal/`, `vulkan/`, `d3d12/` | Canonical platform components | Keep separate because the native APIs, synchronization, memory, and failure models differ. Reuse policy, contracts, tracing, and common helpers. |
+| `src/backend/ports/provider_adapter.zig` | Canonical compile-time leaf adapter | Binds provider functions directly into capability-specific ports; it creates no catch-all runtime execution interface. |
+| `src/backend/ports/` | Canonical outbound contracts | Application and runtime execution depend on these narrow capability ports, never concrete providers. Unsupported capability paths must fail explicitly. |
+| `src/composition/execution_session.zig` | Canonical composition root | Owns policy, provider selection, concrete provider lifetime, port assembly, and destruction. |
 | `src/native/` | Canonical runtime | Doe-native WebGPU objects, resource ownership, commands, and lifecycle. Backend mechanics should remain below shared runtime contracts. |
 | `src/runtime/` | Canonical shared services | Queues, cache, device, lifecycle, diagnostics, execution policy, and trace services shared by runtime paths. |
 | `src/core/` | Canonical compute core | Narrower WebGPU/compute ABI and shared core behavior. It must not become a second full-runtime implementation. |

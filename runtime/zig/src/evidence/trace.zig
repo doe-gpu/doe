@@ -20,10 +20,7 @@ pub const TraceCollector = struct {
     event_count: u64 = 0,
 
     pub fn record(self: *TraceCollector, op: prepared.PreparedOperation, rep: report.ExecutionReport, timestamp_ns: u64) TraceEvent {
-        const op_id: u64 = switch (op) {
-            .compute => |c| c.operation_id,
-            .transfer => |t| t.operation_id,
-        };
+        const op_id = op.operationId();
 
         var hasher = std.crypto.hash.sha2.Sha256.init(.{});
         hasher.update(&self.last_hash);
@@ -48,11 +45,11 @@ pub const TraceCollector = struct {
 
     pub fn asEvidencePort(self: *TraceCollector) port.EvidencePort {
         const Bridge = struct {
-            fn onPrepared(ctx: *anyopaque, op: prepared.PreparedOperation) anyerror!void {
+            fn onPrepared(ctx: *anyopaque, op: prepared.PreparedOperation) void {
                 _ = ctx;
                 _ = op;
             }
-            fn onCompleted(ctx: *anyopaque, op: prepared.PreparedOperation, rep: report.ExecutionReport) anyerror!void {
+            fn onCompleted(ctx: *anyopaque, op: prepared.PreparedOperation, rep: report.ExecutionReport) void {
                 const collector: *TraceCollector = @ptrCast(@alignCast(ctx));
                 _ = collector.record(op, rep, 0);
             }

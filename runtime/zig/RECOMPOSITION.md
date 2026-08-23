@@ -424,9 +424,11 @@ command JSON
     ↓
 contracts.command.Command
     ↓
-runtime execution/router
+application preparation
     ↓
-BackendIface
+immutable PreparedOperation
+    ↓
+capability-specific backend port
     ↓
 Metal / Vulkan / D3D12 compute implementation
     ↓
@@ -707,7 +709,7 @@ universal ideals.
 - [x] Delete every facade with no declared external consumer.
 - [x] Define explicit neutral `ComputeContext`, `DispatchRequest`, and `DispatchReport` contracts for the promoted kernel-dispatch path.
 - [x] Replace boundary-hiding `anytype` parameters in the promoted dispatch path with the explicit context/request/report contracts.
-- [x] Route command JSON through the canonical command, runtime router, `BackendIface`, concrete compute implementation, neutral result, trace, and receipt path.
+- [x] Route command JSON through the canonical command, immutable prepared operation, narrow compute port, concrete implementation, neutral result, trace, and receipt path.
 - [x] Share validation, command/capability contracts, workgroup normalization, artifact identity, timing semantics, error taxonomy, and pure layout calculations across backends.
 - [x] Keep resource transitions, encoder creation, descriptor allocation, fences/semaphores, native lifetimes, driver workarounds, and submission batching backend-local.
 - [x] Prove exact normalized-output, error, trace-identity, receipt, and artifact-digest equality between the old and new kernel-dispatch paths in `runtime/zig/reports/recomposition/kernel-dispatch-equivalence.json`.
@@ -722,6 +724,7 @@ universal ideals.
 - [x] Apply the proven execution-contract pattern to buffer upload and writes.
 - [x] Apply the proven execution-contract pattern to copy commands.
 - [x] Apply the proven execution-contract pattern to pipeline creation and caches.
+- [x] Keep immutable kernel-source roots separate from mutable provider pipeline-cache storage.
 - [x] Apply the proven execution-contract pattern to render commands.
 - [x] Apply the proven execution-contract pattern to surface and presentation lifecycle.
 - [x] Apply the proven execution-contract pattern to async diagnostics and queries.

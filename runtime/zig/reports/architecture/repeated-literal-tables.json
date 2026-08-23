@@ -292,18 +292,18 @@
           "startLine": 138
         },
         {
-          "endLine": 466,
+          "endLine": 454,
           "literalCount": 4,
           "name": "flush_pending_uploads_if_required",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 455
+          "startLine": 443
         },
         {
-          "endLine": 536,
+          "endLine": 524,
           "literalCount": 4,
           "name": "execute_native_command",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 468
+          "startLine": 456
         },
         {
           "endLine": 330,
@@ -362,11 +362,11 @@
           "startLine": 344
         },
         {
-          "endLine": 28,
+          "endLine": 27,
           "literalCount": 4,
           "name": "ArtifactFinalizeTotals",
           "path": "src/cli/runtime_cli_artifacts.zig",
-          "startLine": 23
+          "startLine": 22
         },
         {
           "endLine": 431,
@@ -390,11 +390,11 @@
           "startLine": 82
         },
         {
-          "endLine": 27,
+          "endLine": 28,
           "literalCount": 4,
           "name": "TimingBreakdownNs",
           "path": "src/contracts/execution_report.zig",
-          "startLine": 18
+          "startLine": 19
         },
         {
           "endLine": 107,
@@ -1318,11 +1318,11 @@
       "literalTokenSha256": "971571cb58f761fce53e553a043a34e7a3bb67068bf6cd3638261573ec6b7c85",
       "locations": [
         {
-          "endLine": 107,
+          "endLine": 106,
           "literalCount": 5,
           "name": "applyDeferredFlushToTraceRows",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 87
+          "startLine": 86
         },
         {
           "endLine": 114,
@@ -1954,11 +1954,11 @@
           "startLine": 588
         },
         {
-          "endLine": 21,
+          "endLine": 20,
           "literalCount": 6,
           "name": "HostTimingTotals",
           "path": "src/cli/runtime_cli_artifacts.zig",
-          "startLine": 14
+          "startLine": 13
         },
         {
           "endLine": 40,
@@ -2164,11 +2164,11 @@
       "literalTokenSha256": "d84953ead5ce15e96a78bc8af113fec861d6c885d116fab23fc1e14cfb0d9dac",
       "locations": [
         {
-          "endLine": 312,
+          "endLine": 300,
           "literalCount": 4,
           "name": "execute_barrier",
           "path": "src/backend/d3d12/mod.zig",
-          "startLine": 297
+          "startLine": 285
         },
         {
           "endLine": 101,
@@ -2546,10 +2546,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "6457eb3053f2450387d3b1b8117df60c33128936ed59c58bdcc3a44f1934dae0",
+  "manifestSha256": "35136779176f11c470fb8b8118900a6e8a3547a75dc7720b793f12edd4d24d6c",
   "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "0acb47d7dbcff3b9473a72cc3ce955f1d2a3f29f1674b718c633c535c9a3738d",
+  "sourceTreeSha256": "40bb7946ecbd9b395e1b3c56823cb6fc1e9d5defefdb8e57fec0b3bf89575c7b",
   "status": "captured"
 }

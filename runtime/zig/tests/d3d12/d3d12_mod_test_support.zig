@@ -6,6 +6,7 @@ const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const common_errors = @import("../../src/contracts/execution.zig");
 const command_info = @import("../../src/contracts/command.zig");
 const d3d12_mod = @import("../../src/backend/d3d12/mod.zig");
+const provider_harness = @import("../support/provider_harness.zig");
 
 const STATUS_MESSAGE_RING_SLOTS: usize = 32;
 const STATUS_MESSAGE_SLOT_BYTES: usize = 256;
@@ -63,9 +64,11 @@ pub fn run_contract_path(command: model.Command, queue_sync_mode: webgpu.QueueSy
     const backend = d3d12_mod.ZigD3D12Backend.init(std.testing.allocator, test_profile(), null) catch |err| {
         return unsupportedResult(command, common_errors.error_code(err), err);
     };
-    var iface = d3d12_mod.ZigD3D12Backend.as_iface(backend, std.testing.allocator, "d3d12_contract_test", "d3d12_contract_test_policy") catch |err| {
-        return unsupportedResult(command, common_errors.error_code(err), err);
-    };
+    var iface = provider_harness.ProviderHarness.init(
+        backend.asPorts("d3d12_contract_test", "d3d12_contract_test_policy", false),
+        backend,
+        d3d12_mod.destroyContext,
+    );
     defer iface.deinit();
     iface.set_queue_sync_mode(queue_sync_mode);
     return persistResult(try iface.execute_command(command));

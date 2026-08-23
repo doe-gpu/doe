@@ -1,4 +1,4 @@
-const runtime_types = @import("../backend/runtime_types.zig");
+const runtime_types = @import("../contracts/runtime_types.zig");
 const backend = @import("../backend/webgpu_backend.zig");
 
 pub const NativeExecutionStatus = runtime_types.NativeExecutionStatus;

@@ -2,10 +2,15 @@
 
 const std = @import("std");
 const contracts = @import("../../src/contracts/mod.zig");
-const backend = @import("../../src/backend/mod.zig");
+const backend = struct {
+    pub fn ports() type {
+        return @import("../../src/backend/ports/mod.zig");
+    }
+};
 const evidence = @import("../../src/evidence/mod.zig");
 const composition = @import("../../src/composition/mod.zig");
 const app = @import("../../src/app/mod.zig");
+const execution = @import("../../src/runtime/execution.zig");
 
 test "evidence: trace collector and hash chaining" {
     var collector = evidence.TraceCollector{};
@@ -15,11 +20,12 @@ test "evidence: trace collector and hash chaining" {
         .submit_wait_ns = 30,
     }, 1);
 
-    const compute_op = contracts.preparedOperation().PreparedComputeOperation{
-        .operation_id = 100,
-        .kernel_source = "fn main() {}",
-        .workgroups = .{ .x = 1, .y = 1, .z = 1 },
-    };
+    const compute_op = contracts.preparedOperation().fromCommand(.{ .kernel_dispatch = .{
+        .kernel = "fn main() {}",
+        .x = 1,
+        .y = 1,
+        .z = 1,
+    } }, 100).compute;
 
     const ev1 = collector.record(.{ .compute = compute_op }, rep, 1000);
     try std.testing.expectEqual(@as(u64, 0), ev1.seq);
@@ -63,9 +69,22 @@ test "composition: runtime composition and CLI/native execution roots" {
                 .submit_wait_ns = 55,
             }, 1);
         }
+        fn prewarm(ctx: *anyopaque, kernel: []const u8, entry_point: ?[]const u8, bindings: ?[]const contracts.model.computeTypes().KernelBinding, initialize: bool) anyerror!void {
+            _ = ctx;
+            _ = kernel;
+            _ = entry_point;
+            _ = bindings;
+            _ = initialize;
+        }
+        fn timestampMode(ctx: *anyopaque, mode: contracts.runtimeConfiguration().GpuTimestampMode) void {
+            _ = ctx;
+            _ = mode;
+        }
     };
     const compute_vt = backend.ports().ComputePortVTable{
         .execute_compute = MockCompute.execute,
+        .prewarm_kernel = MockCompute.prewarm,
+        .set_gpu_timestamp_mode = MockCompute.timestampMode,
     };
     var dummy_ctx: u8 = 0;
     const c_port = backend.ports().ComputePort{
@@ -84,9 +103,20 @@ test "composition: runtime composition and CLI/native execution roots" {
                 .submit_wait_ns = 15,
             }, 0);
         }
+        fn prewarm(ctx: *anyopaque, max_upload_bytes: u64) anyerror!void {
+            _ = ctx;
+            _ = max_upload_bytes;
+        }
+        fn uploadBehavior(ctx: *anyopaque, mode: contracts.runtimeConfiguration().UploadBufferUsageMode, submit_every: u32) void {
+            _ = ctx;
+            _ = mode;
+            _ = submit_every;
+        }
     };
     const transfer_vt = backend.ports().TransferPortVTable{
         .execute_transfer = MockTransfer.execute,
+        .prewarm_upload = MockTransfer.prewarm,
+        .set_upload_behavior = MockTransfer.uploadBehavior,
     };
     const t_port = backend.ports().TransferPort{
         .context = &dummy_ctx,
@@ -102,10 +132,25 @@ test "composition: runtime composition and CLI/native execution roots" {
         fn sync(ctx: *anyopaque) anyerror!void {
             _ = ctx;
         }
+        fn waitMode(ctx: *anyopaque, mode: contracts.runtimeConfiguration().QueueWaitMode) void {
+            _ = ctx;
+            _ = mode;
+        }
+        fn waitTimeout(ctx: *anyopaque, timeout_ns: u64) void {
+            _ = ctx;
+            _ = timeout_ns;
+        }
+        fn syncMode(ctx: *anyopaque, mode: contracts.runtimeConfiguration().QueueSyncMode) void {
+            _ = ctx;
+            _ = mode;
+        }
     };
     const queue_vt = backend.ports().QueuePortVTable{
         .flush = MockQueue.flush,
         .sync = MockQueue.sync,
+        .set_wait_mode = MockQueue.waitMode,
+        .set_wait_timeout_ns = MockQueue.waitTimeout,
+        .set_sync_mode = MockQueue.syncMode,
     };
     const q_port = backend.ports().QueuePort{
         .context = &dummy_ctx,
@@ -135,9 +180,14 @@ test "composition: runtime composition and CLI/native execution roots" {
             _ = ctx;
             return 123456789;
         }
+        fn snapshot(ctx: *anyopaque) contracts.runtimeTelemetry().RuntimeTelemetry {
+            _ = ctx;
+            return contracts.runtimeTelemetry().defaultTelemetry();
+        }
     };
     const telemetry_vt = backend.ports().TelemetryPortVTable{
         .get_gpu_timestamp_ns = MockTelemetry.getTimestamp,
+        .snapshot = MockTelemetry.snapshot,
     };
     const tel_port = backend.ports().TelemetryPort{
         .context = &dummy_ctx,
@@ -146,20 +196,14 @@ test "composition: runtime composition and CLI/native execution roots" {
 
     // Mock RenderPort
     const MockRender = struct {
-        fn executePass(ctx: *anyopaque, op: contracts.renderCommand().PreparedRenderPassOperation) anyerror!contracts.executionReport().ExecutionReport {
-            _ = ctx;
-            _ = op;
-            return contracts.executionReport().ExecutionReport.success(.{}, 0);
-        }
-        fn createPipe(ctx: *anyopaque, op: contracts.renderCommand().PreparedPipelineOperation) anyerror!contracts.executionReport().ExecutionReport {
+        fn execute(ctx: *anyopaque, op: contracts.preparedOperation().PreparedRenderOperation) anyerror!contracts.executionReport().ExecutionReport {
             _ = ctx;
             _ = op;
             return contracts.executionReport().ExecutionReport.success(.{}, 0);
         }
     };
     const render_vt = backend.ports().RenderPortVTable{
-        .execute_render_pass = MockRender.executePass,
-        .create_pipeline = MockRender.createPipe,
+        .execute_render = MockRender.execute,
     };
     const ren_port = backend.ports().RenderPort{
         .context = &dummy_ctx,
@@ -182,6 +226,36 @@ test "composition: runtime composition and CLI/native execution roots" {
         .vtable = &spatial_vt,
     };
 
+    const MockResource = struct {
+        fn execute(ctx: *anyopaque, op: contracts.preparedOperation().PreparedResourceOperation) anyerror!contracts.executionReport().ExecutionReport {
+            _ = ctx;
+            _ = op;
+            return contracts.executionReport().ExecutionReport.success(.{}, 0);
+        }
+    };
+    const resource_vt = backend.ports().ResourcePortVTable{ .execute_resource = MockResource.execute };
+    const resource = backend.ports().ResourcePort{ .context = &dummy_ctx, .vtable = &resource_vt };
+
+    const MockSurface = struct {
+        fn execute(ctx: *anyopaque, op: contracts.preparedOperation().PreparedSurfaceOperation) anyerror!contracts.executionReport().ExecutionReport {
+            _ = ctx;
+            _ = op;
+            return contracts.executionReport().ExecutionReport.success(.{}, 0);
+        }
+    };
+    const surface_vt = backend.ports().SurfacePortVTable{ .execute_surface = MockSurface.execute };
+    const surface = backend.ports().SurfacePort{ .context = &dummy_ctx, .vtable = &surface_vt };
+
+    const MockLifecycle = struct {
+        fn execute(ctx: *anyopaque, op: contracts.preparedOperation().PreparedLifecycleOperation) anyerror!contracts.executionReport().ExecutionReport {
+            _ = ctx;
+            _ = op;
+            return contracts.executionReport().ExecutionReport.success(.{}, 0);
+        }
+    };
+    const lifecycle_vt = backend.ports().LifecyclePortVTable{ .execute_lifecycle = MockLifecycle.execute };
+    const lifecycle = backend.ports().LifecyclePort{ .context = &dummy_ctx, .vtable = &lifecycle_vt };
+
     var trace_collector = evidence.TraceCollector{};
     const ev_port = trace_collector.asEvidencePort();
 
@@ -194,6 +268,9 @@ test "composition: runtime composition and CLI/native execution roots" {
             .readback = r_port,
             .telemetry = tel_port,
             .render = ren_port,
+            .resource = resource,
+            .surface = surface,
+            .lifecycle = lifecycle,
             .spatial = spa_port,
         },
         .evidence = ev_port,
@@ -214,4 +291,41 @@ test "composition: runtime composition and CLI/native execution roots" {
     try std.testing.expect(dropin_res.status.isSuccess());
     try std.testing.expectEqual(@as(u64, 30), dropin_res.timing.totalWallNs());
     try std.testing.expectEqual(@as(u64, 2), trace_collector.event_count);
+
+    var production_context = execution.ExecutionContext.initNative(.metal_doe_app, runtime_comp.ports);
+    defer production_context.deinit();
+    production_context.setEvidenceObserver(ev_port);
+    const production_result = try production_context.execute(.{ .surface_present = .{ .handle = 303 } });
+    try std.testing.expectEqual(execution.ExecutionStatus.ok, production_result.status);
+    try std.testing.expectEqual(@as(u64, 3), trace_collector.event_count);
+
+    var trace_context = execution.ExecutionContext.initTrace(.metal_doe_app);
+    defer trace_context.deinit();
+    trace_context.setEvidenceObserver(ev_port);
+    const trace_result = try trace_context.execute(.{ .barrier = .{ .dependency_count = 1 } });
+    try std.testing.expectEqual(execution.ExecutionStatus.skipped, trace_result.status);
+    try std.testing.expectEqual(@as(u64, 4), trace_collector.event_count);
+
+    const FailingCompute = struct {
+        fn execute(ctx: *anyopaque, op: contracts.preparedOperation().PreparedComputeOperation) anyerror!contracts.executionReport().ExecutionReport {
+            _ = ctx;
+            _ = op;
+            return error.ExpectedExecutionFailure;
+        }
+    };
+    const failing_compute_vt = backend.ports().ComputePortVTable{
+        .execute_compute = FailingCompute.execute,
+        .prewarm_kernel = MockCompute.prewarm,
+        .set_gpu_timestamp_mode = MockCompute.timestampMode,
+    };
+    var failing_composition = runtime_comp;
+    failing_composition.ports.compute = .{
+        .context = &dummy_ctx,
+        .vtable = &failing_compute_vt,
+    };
+    try std.testing.expectError(
+        error.ExpectedExecutionFailure,
+        failing_composition.execute(.{ .compute = contracts.preparedOperation().fromCommand(.{ .barrier = .{ .dependency_count = 0 } }, 404).compute }),
+    );
+    try std.testing.expectEqual(@as(u64, 5), trace_collector.event_count);
 }
