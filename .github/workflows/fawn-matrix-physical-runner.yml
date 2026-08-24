@@ -12,10 +12,21 @@ on:
         description: Exact approved GitHub self-hosted runner name
         required: true
         type: string
-      experiment_revision:
+      exact_revision:
         description: Frozen Fawn experiment commit
         required: true
-        default: ea37481243fa7f177152b85df83fd215ae64b971
+        type: string
+      stock_chrome:
+        description: Optional explicit stock Chromium executable
+        required: false
+        type: string
+      fawn_chrome:
+        description: Optional explicit Fawn executable
+        required: false
+        type: string
+      doe_lib:
+        description: Optional explicit Doe runtime library
+        required: false
         type: string
       request_release_signature:
         description: Revalidate and sign in the protected environment
@@ -33,52 +44,144 @@ jobs:
       - self-hosted
       - fawn-matrix
       - ${{ inputs.platform_id }}
+    defaults:
+      run:
+        shell: bash
     outputs:
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
       artifact-digest: ${{ steps.upload.outputs.artifact-digest }}
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.experiment_revision }}
+          ref: ${{ inputs.exact_revision }}
+          clean: true
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
       - name: Bind approved revision and runner
         env:
           APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
-          EXPERIMENT_REVISION: ${{ inputs.experiment_revision }}
+          EXACT_REVISION: ${{ inputs.exact_revision }}
         run: |
+          set -euo pipefail
+          [[ "${EXACT_REVISION}" =~ ^[0-9a-f]{40}$ ]]
           test "${RUNNER_NAME}" = "${APPROVED_RUNNER_NAME}"
-          test "$(git rev-parse HEAD)" = "${EXPERIMENT_REVISION}"
-      - name: Preflight Fawn and Doe
-        run: browser/chromium/scripts/preflight.sh
-      - name: Run context matrix
-        run: >-
-          python3 -m bench.fawn_matrix.cli run
-          --platform-id "${{ inputs.platform_id }}"
-          --output-root "${RUNNER_TEMP}/fawn-matrix-output"
-      - name: Run GPU preprocessing matrix
-        run: >-
-          python3 -m bench.fawn_matrix.live_cli run
-          --workload webgpu_model_preprocessing
-          --platform-id "${{ inputs.platform_id }}"
-          --output-root "${RUNNER_TEMP}/fawn-matrix-output"
-      - name: Run multi-step agent matrix
-        run: >-
-          python3 -m bench.fawn_matrix.live_cli run
-          --workload multi_step_agent_interaction
-          --platform-id "${{ inputs.platform_id }}"
-          --output-root "${RUNNER_TEMP}/fawn-matrix-output"
-      - name: Assemble unsigned suite and provenance
+          test "$(git rev-parse HEAD)" = "${EXACT_REVISION}"
+          test -z "$(git status --short)"
+          output_root="${RUNNER_TEMP}/fawn-matrix-output"
+          echo "OUTPUT_ROOT=${output_root}" >> "${GITHUB_ENV}"
+      - name: Build and preflight Fawn and Doe
         env:
-          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
-          EXPERIMENT_REVISION: ${{ inputs.experiment_revision }}
           PLATFORM_ID: ${{ inputs.platform_id }}
         run: |
-          platform_root="${RUNNER_TEMP}/fawn-matrix-output/${PLATFORM_ID}"
+          set -euo pipefail
+          browser/chromium/scripts/preflight.sh --mode build
+          if [[ "${PLATFORM_ID}" == "amd-vulkan" ]]; then
+            browser/chromium/scripts/bringup-linux.sh --mode release
+          fi
+          (
+            cd runtime/zig
+            zig build dropin-full -Doptimize=ReleaseFast
+          )
+          npm ci --prefix browser/chromium
+          browser/chromium/scripts/preflight.sh --mode bench
+          git status --short | tee "${RUNNER_TEMP}/git-status-after-fawn-preflight.txt"
+          test ! -s "${RUNNER_TEMP}/git-status-after-fawn-preflight.txt"
+      - id: context
+        name: Run context matrix
+        continue-on-error: true
+        env:
+          STOCK_CHROME: ${{ inputs.stock_chrome }}
+          FAWN_CHROME: ${{ inputs.fawn_chrome }}
+          DOE_LIB: ${{ inputs.doe_lib }}
+        run: |
+          path_args=()
+          [[ -z "${STOCK_CHROME}" ]] || path_args+=(--stock-chrome "${STOCK_CHROME}")
+          [[ -z "${FAWN_CHROME}" ]] || path_args+=(--fawn-chrome "${FAWN_CHROME}")
+          [[ -z "${DOE_LIB}" ]] || path_args+=(--doe-lib "${DOE_LIB}")
+          python3 -m bench.fawn_matrix.cli run \
+            --platform-id "${{ inputs.platform_id }}" \
+            --output-root "${OUTPUT_ROOT}" \
+            "${path_args[@]}"
+      - id: gpu
+        name: Run GPU preprocessing matrix
+        continue-on-error: true
+        env:
+          STOCK_CHROME: ${{ inputs.stock_chrome }}
+          FAWN_CHROME: ${{ inputs.fawn_chrome }}
+          DOE_LIB: ${{ inputs.doe_lib }}
+        run: |
+          path_args=()
+          [[ -z "${STOCK_CHROME}" ]] || path_args+=(--stock-chrome "${STOCK_CHROME}")
+          [[ -z "${FAWN_CHROME}" ]] || path_args+=(--fawn-chrome "${FAWN_CHROME}")
+          [[ -z "${DOE_LIB}" ]] || path_args+=(--doe-lib "${DOE_LIB}")
+          python3 -m bench.fawn_matrix.live_cli run \
+            --workload webgpu_model_preprocessing \
+            --platform-id "${{ inputs.platform_id }}" \
+            --output-root "${OUTPUT_ROOT}" \
+            "${path_args[@]}"
+      - id: agent
+        name: Run multi-step agent matrix
+        continue-on-error: true
+        env:
+          STOCK_CHROME: ${{ inputs.stock_chrome }}
+          FAWN_CHROME: ${{ inputs.fawn_chrome }}
+          DOE_LIB: ${{ inputs.doe_lib }}
+        run: |
+          path_args=()
+          [[ -z "${STOCK_CHROME}" ]] || path_args+=(--stock-chrome "${STOCK_CHROME}")
+          [[ -z "${FAWN_CHROME}" ]] || path_args+=(--fawn-chrome "${FAWN_CHROME}")
+          [[ -z "${DOE_LIB}" ]] || path_args+=(--doe-lib "${DOE_LIB}")
+          python3 -m bench.fawn_matrix.live_cli run \
+            --workload multi_step_agent_interaction \
+            --platform-id "${{ inputs.platform_id }}" \
+            --output-root "${OUTPUT_ROOT}" \
+            "${path_args[@]}"
+      - id: assemble
+        name: Assemble unsigned suite
+        if: steps.context.outcome == 'success' && steps.gpu.outcome == 'success' && steps.agent.outcome == 'success'
+        env:
+          PLATFORM_ID: ${{ inputs.platform_id }}
+        run: |
+          platform_root="${OUTPUT_ROOT}/${PLATFORM_ID}"
           context_report="$(find "${platform_root}" -name context_snapshot_diff.platform-report.json -type f -print -quit)"
           gpu_report="$(find "${platform_root}" -name webgpu_model_preprocessing.platform-report.json -type f -print -quit)"
           agent_report="$(find "${platform_root}" -name multi_step_agent_interaction.platform-report.json -type f -print -quit)"
           test -n "${context_report}"
           test -n "${gpu_report}"
           test -n "${agent_report}"
+          unset DOE_PROOF_SIGNING_KEY
+          python3 -m bench.fawn_matrix.live_cli suite \
+            --report "${context_report}" \
+            --report "${gpu_report}" \
+            --report "${agent_report}" \
+            --out "${platform_root}/fawn-doe.platform-suite.unsigned.json"
+          python3 - "${platform_root}/fawn-doe.platform-suite.unsigned.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          suite = json.loads(Path(sys.argv[1]).read_text())
+          if suite["promotionReceipt"]["signatureStatus"] != "unsigned_review_required":
+              raise SystemExit("physical runner unexpectedly signed the suite")
+          PY
+      - name: Generate failure learning and seal evidence
+        if: always()
+        env:
+          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
+          EXACT_REVISION: ${{ inputs.exact_revision }}
+          PLATFORM_ID: ${{ inputs.platform_id }}
+        run: |
+          set -euo pipefail
+          platform_root="${OUTPUT_ROOT}/${PLATFORM_ID}"
+          mkdir -p "${platform_root}"
+          learning_failed=0
+          while IFS= read -r -d '' raw_path; do
+            learning_path="${raw_path%.raw.json}.doe-lab-learning.json"
+            python3 -m pipeline.agent.fawn_matrix_learning_bridge \
+              --raw "${raw_path}" \
+              --out "${learning_path}" || learning_failed=1
+          done < <(find "${platform_root}" -name '*.raw.json' -type f -print0)
           export PLATFORM_ROOT="${platform_root}"
           python3 - <<'PY'
           import hashlib
@@ -92,7 +195,7 @@ jobs:
           ]
           payload = {
               "schemaVersion": 1,
-              "experimentRevision": os.environ["EXPERIMENT_REVISION"],
+              "experimentRevision": os.environ["EXACT_REVISION"],
               "repository": os.environ["GITHUB_REPOSITORY"],
               "workflowRunId": os.environ["GITHUB_RUN_ID"],
               "workflowRunAttempt": os.environ["GITHUB_RUN_ATTEMPT"],
@@ -109,35 +212,28 @@ jobs:
           output = Path(os.environ["PLATFORM_ROOT"]) / "runner-provenance.json"
           output.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
           PY
-          unset DOE_PROOF_SIGNING_KEY
-          python3 -m bench.fawn_matrix.live_cli suite \
-            --report "${context_report}" \
-            --report "${gpu_report}" \
-            --report "${agent_report}" \
-            --out "${platform_root}/fawn-doe.platform-suite.unsigned.json"
-          python3 - "${platform_root}/fawn-doe.platform-suite.unsigned.json" <<'PY'
-          import json
-          import sys
-          from pathlib import Path
-
-          suite = json.loads(Path(sys.argv[1]).read_text())
-          if suite["promotionReceipt"]["signatureStatus"] != "unsigned_review_required":
-              raise SystemExit("physical runner unexpectedly signed the suite")
-          PY
+          git status --short > "${platform_root}/final-git-status.txt"
+          manifest_tmp="${RUNNER_TEMP}/fawn-matrix.SHA256SUMS"
           (
             cd "${platform_root}"
             find . -type f ! -name SHA256SUMS -print0 \
               | sort -z \
-              | xargs -0 sha256sum > SHA256SUMS
+              | xargs -0 sha256sum > "${manifest_tmp}"
           )
+          mv "${manifest_tmp}" "${platform_root}/SHA256SUMS"
+          test "${learning_failed}" -eq 0
       - id: upload
         name: Upload immutable unsigned evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: fawn-matrix-unsigned-${{ inputs.platform_id }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/fawn-matrix-output/${{ inputs.platform_id }}/
           if-no-files-found: error
           retention-days: 90
+      - name: Fail after preserving incomplete physical evidence
+        if: ${{ always() && (steps.context.outcome != 'success' || steps.gpu.outcome != 'success' || steps.agent.outcome != 'success' || steps.assemble.outcome != 'success') }}
+        run: exit 1
 
   protected-signing:
     if: ${{ inputs.request_release_signature }}
@@ -155,7 +251,7 @@ jobs:
       - name: Checkout frozen experiment
         uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.experiment_revision }}
+          ref: ${{ inputs.exact_revision }}
           path: experiment
       - name: Download unsigned physical evidence
         uses: actions/download-artifact@v8
@@ -167,10 +263,10 @@ jobs:
           APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
           ARTIFACT_DIGEST: ${{ needs.physical-matrix.outputs.artifact-digest }}
           ARTIFACT_ID: ${{ needs.physical-matrix.outputs.artifact-id }}
-          EXPERIMENT_REVISION: ${{ inputs.experiment_revision }}
+          EXACT_REVISION: ${{ inputs.exact_revision }}
         run: |
           (cd unsigned-evidence && sha256sum -c SHA256SUMS)
-          test "$(git -C experiment rev-parse HEAD)" = "${EXPERIMENT_REVISION}"
+          test "$(git -C experiment rev-parse HEAD)" = "${EXACT_REVISION}"
           cmp experiment/bench/fawn_matrix/config/matrix-workloads.json signer/bench/fawn_matrix/config/matrix-workloads.json
           cmp experiment/bench/fawn_matrix/config/live-workloads.json signer/bench/fawn_matrix/config/live-workloads.json
           python3 - <<'PY'
@@ -181,7 +277,7 @@ jobs:
 
           payload = json.loads(Path("unsigned-evidence/runner-provenance.json").read_text())
           required = {
-              "experimentRevision": os.environ["EXPERIMENT_REVISION"],
+              "experimentRevision": os.environ["EXACT_REVISION"],
               "runnerName": os.environ["APPROVED_RUNNER_NAME"],
               "approvedRunnerName": os.environ["APPROVED_RUNNER_NAME"],
           }

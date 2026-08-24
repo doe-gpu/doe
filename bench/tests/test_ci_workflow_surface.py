@@ -28,6 +28,7 @@ MANUAL_WORKFLOWS = {
     "macos-browser-refresh.yml",
     "release-claim-trends.yml",
     "release-gates.yml",
+    "windows-d3d12-qualification.yml",
 }
 
 REUSABLE_WORKFLOWS = {
@@ -54,6 +55,7 @@ WORKFLOW_ENTRYPOINTS = {
     "bench/runners/run_blocking_gates.py",
     "bench/runners/run_release_claim_windows.py",
     "bench/runners/run_release_pipeline.py",
+    "bench/runners/run_local_d3d12_lane.py",
     "bench/tools/bootstrap_dawn.py",
     "bench/tools/bootstrap_zig.py",
     "bench/tools/build_test_inventory_dashboard.py",
@@ -148,6 +150,64 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
     def test_amd_smoke_declares_its_nonstandard_lane(self) -> None:
         text = workflow_text("amd-vulkan-smoke.yml")
         self.assertIn("--local-vulkan-lane vulkan_doe_comparable", text)
+
+    def test_physical_workflows_bind_revision_runner_and_failed_evidence(self) -> None:
+        for name in (
+            "amd-vulkan-smoke.yml",
+            "fawn-matrix-physical-runner.yml",
+            "release-gates.yml",
+            "windows-d3d12-qualification.yml",
+        ):
+            text = workflow_text(name)
+            with self.subTest(workflow=name):
+                self.assertIn("exact_revision:", text)
+                self.assertIn("approved_runner_name:", text)
+                self.assertIn("ref: ${{ inputs.exact_revision }}", text)
+                self.assertIn("RUNNER_NAME", text)
+                self.assertIn("^[0-9a-f]{40}$", text)
+                self.assertRegex(
+                    text,
+                    r"(?s)if: always\(\).*?uses: actions/upload-artifact@v7",
+                )
+                self.assertIn("SHA256SUMS", text)
+
+    def test_amd_release_runs_the_frozen_native_sequence(self) -> None:
+        text = workflow_text("release-gates.yml")
+        required_fragments = (
+            "zig build dropin-full -Doptimize=ReleaseFast",
+            "zig build test test-core test-full test-d3d12 test-wgsl import-fence",
+            "--verify-smoke-require-comparable",
+            "zig build dropin -Doptimize=ReleaseFast",
+            "--with-dropin-gate",
+            "--with-claim-gate",
+            "python3 -m bench.runners.probe_vulkan_host_profile",
+        )
+        for fragment in required_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
+    def test_fawn_physical_runner_preserves_failures_unsigned(self) -> None:
+        text = workflow_text("fawn-matrix-physical-runner.yml")
+        required_fragments = (
+            "preflight.sh --mode build",
+            "bringup-linux.sh --mode release",
+            "zig build dropin-full -Doptimize=ReleaseFast",
+            "npm ci --prefix browser/chromium",
+            "preflight.sh --mode bench",
+            "continue-on-error: true",
+            "pipeline.agent.fawn_matrix_learning_bridge",
+            "unsigned_review_required",
+            "unset DOE_PROOF_SIGNING_KEY",
+        )
+        for fragment in required_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
+    def test_windows_d3d12_workflow_runs_governed_lane(self) -> None:
+        text = workflow_text("windows-d3d12-qualification.yml")
+        self.assertIn("python bench/runners/preflight_d3d12_host.py --json", text)
+        self.assertIn("zig build dropin-full -Doptimize=ReleaseFast", text)
+        self.assertIn("python bench/runners/run_local_d3d12_lane.py", text)
 
     def test_workflows_only_reference_current_repo_layout(self) -> None:
         for path in WORKFLOW_ROOT.glob("*.yml"):

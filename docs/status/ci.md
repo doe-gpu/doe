@@ -5,6 +5,17 @@ compiler, proof, package, and source-contract surfaces. Hardware-dependent AMD
 Vulkan, drop-in, macOS browser, release, and claim-trend lanes remain explicit
 manual workflows.
 
+The AMD Vulkan smoke and release, Fawn matrix, and Windows D3D12 qualification
+workflows require an exact full Git revision and an approved self-hosted runner
+name. AMD Vulkan workflows run the migrated Zig build and gate sequence before
+strict physical comparison. The Fawn matrix retains each workload attempt,
+emits DoeLab learning records from raw evidence, keeps hardware-host suites
+unsigned, and uploads evidence even when a lane fails. Windows D3D12 has a
+separate manual workflow around the governed local D3D12 runner. These
+qualification workflows seal collected files with SHA-256 and upload failures
+as well as successful results; protected signing remains a separate
+environment-owned step.
+
 The machine-owned workflow inventory and trigger policy are checked by
 `bench/tests/test_ci_workflow_surface.py`. Workflow files under
 `.github/workflows/` are the source of truth.

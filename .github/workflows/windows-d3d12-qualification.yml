@@ -1,0 +1,140 @@
+name: windows-d3d12-qualification
+
+on:
+  workflow_dispatch:
+    inputs:
+      exact_revision:
+        description: Exact 40-character Doe commit to qualify
+        required: true
+        type: string
+      approved_runner_name:
+        description: Exact approved GitHub self-hosted runner name
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  physical-d3d12:
+    runs-on:
+      - self-hosted
+      - windows
+      - d3d12
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.exact_revision }}
+          clean: true
+      - name: Bind exact revision and approved runner
+        shell: pwsh
+        env:
+          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
+          EXACT_REVISION: ${{ inputs.exact_revision }}
+        run: |
+          if ($env:EXACT_REVISION -notmatch '^[0-9a-f]{40}$') {
+            throw 'exact_revision must be a full lowercase Git commit'
+          }
+          if ($env:RUNNER_NAME -ne $env:APPROVED_RUNNER_NAME) {
+            throw 'approved runner identity mismatch'
+          }
+          if ((git rev-parse HEAD).Trim() -ne $env:EXACT_REVISION) {
+            throw 'checked-out revision mismatch'
+          }
+          if (git status --short) {
+            throw 'qualification checkout is not clean'
+          }
+          $evidenceRoot = Join-Path $env:RUNNER_TEMP "doe-windows-d3d12-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          New-Item -ItemType Directory -Force "$evidenceRoot\logs" | Out-Null
+          "EVIDENCE_ROOT=$evidenceRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          git rev-parse HEAD | Set-Content "$evidenceRoot\commit.txt"
+      - name: Capture and admit Windows D3D12 host
+        shell: pwsh
+        run: |
+          Get-ComputerInfo | Out-File "$env:EVIDENCE_ROOT\logs\computer-info.log"
+          Get-CimInstance Win32_VideoController |
+            ConvertTo-Json -Depth 5 |
+            Out-File "$env:EVIDENCE_ROOT\logs\video-controller.json"
+          zig version | Out-File "$env:EVIDENCE_ROOT\logs\zig-version.log"
+          node --version | Out-File "$env:EVIDENCE_ROOT\logs\node-version.log"
+          python bench/runners/preflight_d3d12_host.py --json 2>&1 |
+            Tee-Object -FilePath "$env:EVIDENCE_ROOT\logs\d3d12-preflight.log"
+          if ($LASTEXITCODE -ne 0) {
+            throw 'D3D12 preflight failed'
+          }
+          $status = git status --short
+          $status | Set-Content "$env:EVIDENCE_ROOT\logs\git-status-after-preflight.txt"
+          if ($status) {
+            throw 'preflight changed tracked repository files'
+          }
+      - name: Build full Doe runtime
+        shell: pwsh
+        run: |
+          Push-Location runtime/zig
+          zig build dropin-full -Doptimize=ReleaseFast 2>&1 |
+            Tee-Object -FilePath "$env:EVIDENCE_ROOT\logs\zig-dropin-full.log"
+          $buildExit = $LASTEXITCODE
+          Pop-Location
+          if ($buildExit -ne 0) {
+            throw 'dropin-full build failed'
+          }
+          $status = git status --short
+          $status | Set-Content "$env:EVIDENCE_ROOT\logs\git-status-after-dropin-full.txt"
+          if ($status) {
+            throw 'dropin-full changed tracked repository files'
+          }
+      - name: Run complete migrated-surface gates
+        shell: pwsh
+        run: |
+          Push-Location runtime/zig
+          zig build test test-core test-full test-d3d12 test-wgsl import-fence source-layout line-limits webgpu-abi test-inventory bridge-manifest coverage-gate doe-runtime doe-plan-executor 2>&1 |
+            Tee-Object -FilePath "$env:EVIDENCE_ROOT\logs\zig-complete-gates.log"
+          $gateExit = $LASTEXITCODE
+          Pop-Location
+          if ($gateExit -ne 0) {
+            throw 'migrated-surface gates failed'
+          }
+          $status = git status --short
+          $status | Set-Content "$env:EVIDENCE_ROOT\logs\git-status-after-zig-gates.txt"
+          if ($status) {
+            throw 'Zig gates changed tracked repository files'
+          }
+      - name: Run governed physical D3D12 lane
+        shell: pwsh
+        run: |
+          python bench/runners/run_local_d3d12_lane.py 2>&1 |
+            Tee-Object -FilePath "$env:EVIDENCE_ROOT\logs\d3d12-qualification.log"
+          if ($LASTEXITCODE -ne 0) {
+            throw 'governed D3D12 lane failed'
+          }
+          $status = git status --short
+          $status | Set-Content "$env:EVIDENCE_ROOT\logs\git-status-after-d3d12.txt"
+          if ($status) {
+            throw 'D3D12 qualification changed tracked repository files'
+          }
+      - name: Seal all D3D12 evidence
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:EVIDENCE_ROOT\artifacts" | Out-Null
+          if (Test-Path bench/out) {
+            Copy-Item -Recurse -Force bench/out "$env:EVIDENCE_ROOT\artifacts\bench-out"
+          }
+          git status --short | Set-Content "$env:EVIDENCE_ROOT\final-git-status.txt"
+          $root = (Resolve-Path $env:EVIDENCE_ROOT).Path
+          Get-ChildItem -File -Recurse $root |
+            Where-Object { $_.Name -ne 'SHA256SUMS' } |
+            Sort-Object FullName |
+            ForEach-Object {
+              $relative = [IO.Path]::GetRelativePath($root, $_.FullName).Replace('\', '/')
+              $hash = (Get-FileHash -Algorithm SHA256 $_.FullName).Hash.ToLowerInvariant()
+              "$hash  $relative"
+            } | Set-Content -Encoding ascii "$env:EVIDENCE_ROOT\SHA256SUMS"
+      - name: Upload immutable D3D12 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-d3d12-${{ inputs.exact_revision }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/doe-windows-d3d12-${{ github.run_id }}-${{ github.run_attempt }}/
+          if-no-files-found: error
+          retention-days: 90

@@ -2,6 +2,15 @@ name: fawn-release-gates
 
 on:
   workflow_dispatch:
+    inputs:
+      exact_revision:
+        description: Exact 40-character Doe commit to qualify
+        required: true
+        type: string
+      approved_runner_name:
+        description: Exact approved GitHub self-hosted runner name
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -13,31 +22,121 @@ jobs:
       - linux
       - amd-vulkan
     env:
-      CONFIG_PATH: bench/native-compare/compare.config.amd.vulkan.release.json
+      SMOKE_CONFIG: bench/native-compare/compare.config.amd.vulkan.smoke.gpu.json
+      SMOKE_REPORT: bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.compute.json
+      RELEASE_CONFIG: bench/native-compare/compare.config.amd.vulkan.release.json
       DROPIN_ARTIFACT: runtime/zig/zig-out/lib/libwebgpu_doe.so
     steps:
       - uses: actions/checkout@v7
-      - name: Build Doe drop-in artifact
+        with:
+          ref: ${{ inputs.exact_revision }}
+          clean: true
+      - name: Bind exact revision and approved runner
+        env:
+          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
+          EXACT_REVISION: ${{ inputs.exact_revision }}
+        run: |
+          set -euo pipefail
+          [[ "${EXACT_REVISION}" =~ ^[0-9a-f]{40}$ ]]
+          test "${RUNNER_NAME}" = "${APPROVED_RUNNER_NAME}"
+          test "$(git rev-parse HEAD)" = "${EXACT_REVISION}"
+          test -z "$(git status --short)"
+          evidence_root="${RUNNER_TEMP}/doe-amd-vulkan-release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          mkdir -p "${evidence_root}/logs"
+          echo "EVIDENCE_ROOT=${evidence_root}" >> "${GITHUB_ENV}"
+          git rev-parse HEAD | tee "${evidence_root}/commit.txt"
+      - name: Capture and admit AMD Vulkan host
+        run: |
+          set -euo pipefail
+          {
+            uname -a
+            zig version
+            node --version
+            chromium --version || true
+            google-chrome --version || true
+          } 2>&1 | tee "${EVIDENCE_ROOT}/logs/environment.log"
+          vulkaninfo --summary 2>&1 | tee "${EVIDENCE_ROOT}/logs/vulkaninfo-summary.log"
+          rocm-smi 2>&1 | tee "${EVIDENCE_ROOT}/logs/rocm-smi.log"
+          python3 -m bench.runners.probe_vulkan_host_profile \
+            --profile linux_amd_vulkan \
+            2>&1 | tee "${EVIDENCE_ROOT}/vulkan-host-profile.json"
+          git status --short | tee "${EVIDENCE_ROOT}/logs/git-status-after-preflight.txt"
+          test ! -s "${EVIDENCE_ROOT}/logs/git-status-after-preflight.txt"
+      - name: Build and test migrated Zig surface
         working-directory: runtime/zig
         run: |
-          zig build dropin -Doptimize=ReleaseFast
-          test -f zig-out/lib/libwebgpu_doe.so
-      - name: Run canonical release pipeline
+          set -o pipefail
+          zig build dropin-full -Doptimize=ReleaseFast \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/zig-dropin-full.log"
+          cd ../..
+          git status --short | tee "${EVIDENCE_ROOT}/logs/git-status-after-dropin-full.txt"
+          test ! -s "${EVIDENCE_ROOT}/logs/git-status-after-dropin-full.txt"
+          cd runtime/zig
+          zig build test test-core test-full test-d3d12 test-wgsl import-fence \
+            source-layout line-limits webgpu-abi test-inventory bridge-manifest \
+            coverage-gate doe-runtime doe-plan-executor \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/zig-complete-gates.log"
+          cd ../..
+          git status --short | tee "${EVIDENCE_ROOT}/logs/git-status-after-zig-gates.txt"
+          test ! -s "${EVIDENCE_ROOT}/logs/git-status-after-zig-gates.txt"
+      - name: Run focused strict AMD Vulkan smoke
         run: |
-          python3 bench/runners/run_release_pipeline.py --config "$CONFIG_PATH" --strict-amd-vulkan --trace-semantic-parity-mode auto --with-dropin-gate --dropin-artifact "$DROPIN_ARTIFACT" --with-claim-gate
-      - name: Upload release artifacts
+          set -o pipefail
+          python3 bench/runners/run_release_pipeline.py \
+            --config "${SMOKE_CONFIG}" \
+            --report "${SMOKE_REPORT}" \
+            --strict-amd-vulkan \
+            --local-vulkan-lane vulkan_doe_comparable \
+            --verify-smoke-report "${SMOKE_REPORT}" \
+            --verify-smoke-require-comparable \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/strict-smoke.log"
+          git status --short | tee "${EVIDENCE_ROOT}/logs/git-status-after-smoke.txt"
+          test ! -s "${EVIDENCE_ROOT}/logs/git-status-after-smoke.txt"
+      - name: Build release drop-in artifact
+        working-directory: runtime/zig
+        run: |
+          set -o pipefail
+          zig build dropin -Doptimize=ReleaseFast \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/zig-dropin-release.log"
+          test -f zig-out/lib/libwebgpu_doe.so
+          cd ../..
+          git status --short | tee "${EVIDENCE_ROOT}/logs/git-status-after-release-build.txt"
+          test ! -s "${EVIDENCE_ROOT}/logs/git-status-after-release-build.txt"
+      - name: Run canonical native release and claim gates
+        run: |
+          set -o pipefail
+          python3 bench/runners/run_release_pipeline.py \
+            --config "${RELEASE_CONFIG}" \
+            --strict-amd-vulkan \
+            --trace-semantic-parity-mode auto \
+            --with-dropin-gate \
+            --dropin-artifact "${DROPIN_ARTIFACT}" \
+            --with-claim-gate \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/native-release-gates.log"
+          git status --short | tee "${EVIDENCE_ROOT}/logs/git-status-after-release.txt"
+          test ! -s "${EVIDENCE_ROOT}/logs/git-status-after-release.txt"
+      - name: Seal all native release evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "${EVIDENCE_ROOT}/artifacts"
+          if [[ -d bench/out ]]; then
+            cp -a bench/out "${EVIDENCE_ROOT}/artifacts/bench-out"
+          fi
+          git status --short > "${EVIDENCE_ROOT}/final-git-status.txt"
+          manifest_tmp="${RUNNER_TEMP}/doe-amd-vulkan-release.SHA256SUMS"
+          (
+            cd "${EVIDENCE_ROOT}"
+            find . -type f ! -name SHA256SUMS -print0 \
+              | sort -z \
+              | xargs -0 sha256sum > "${manifest_tmp}"
+          )
+          mv "${manifest_tmp}" "${EVIDENCE_ROOT}/SHA256SUMS"
+      - name: Upload immutable native release evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: fawn-release-gates-report
-          path: |
-            bench/out/dawn-vs-doe.amd.vulkan.release*.json
-            bench/out/**/dawn-vs-doe.amd.vulkan.release*.json
-            bench/out/dawn-vs-doe.amd.vulkan.release*.html
-            bench/out/**/dawn-vs-doe.amd.vulkan.release*.html
-            bench/out/runtime-comparisons.amd.vulkan.release*
-            bench/out/**/runtime-comparisons.amd.vulkan.release*
-            bench/out/**/run_manifest.json
-            bench/out/dropin_*.json
-            bench/out/**/dropin_*.json
-            bench/out/dropin_*.html
-            bench/out/**/dropin_*.html
+          name: amd-vulkan-release-${{ inputs.exact_revision }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.EVIDENCE_ROOT }}/
+          if-no-files-found: error
+          retention-days: 90
