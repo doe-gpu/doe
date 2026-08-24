@@ -203,7 +203,7 @@ test "analyzeToIrWithConfig records affine gid stride preconditions" {
     try std.testing.expect(!elided_has_min);
 }
 
-test "compute runtime translation drops _doe_sizes for proof-covered affine bounds only" {
+test "compute runtime translation retains _doe_sizes for affine bounds until robust fallback exists" {
     const affine_source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -231,11 +231,8 @@ test "compute runtime translation drops _doe_sizes for proof-covered affine boun
     );
     defer affine_translation.info.deinit(std.testing.allocator);
 
-    if (lean_proof.boundsProven(.gid_1d_storage_buffer_offset)) {
-        try std.testing.expect(!affine_translation.info.needs_sizes_buf);
-    } else {
-        try std.testing.expect(affine_translation.info.needs_sizes_buf);
-    }
+    try std.testing.expect(affine_translation.info.needs_sizes_buf);
+    try std.testing.expectEqual(@as(usize, 0), affine_translation.info.dispatch_preconditions.len);
 
     var direct_out: [MAX_OUTPUT]u8 = undefined;
     var direct_translation = try runtime_compile.translateToMslForComputeRuntime(

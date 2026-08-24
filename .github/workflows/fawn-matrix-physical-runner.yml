@@ -37,7 +37,7 @@ jobs:
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
       artifact-digest: ${{ steps.upload.outputs.artifact-digest }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.experiment_revision }}
       - name: Bind approved revision and runner
@@ -132,7 +132,7 @@ jobs:
           )
       - id: upload
         name: Upload immutable unsigned evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fawn-matrix-unsigned-${{ inputs.platform_id }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/fawn-matrix-output/${{ inputs.platform_id }}/
@@ -149,16 +149,16 @@ jobs:
       id-token: write
     steps:
       - name: Checkout signer implementation
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: signer
       - name: Checkout frozen experiment
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.experiment_revision }}
           path: experiment
       - name: Download unsigned physical evidence
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           artifact-ids: ${{ needs.physical-matrix.outputs.artifact-id }}
           path: unsigned-evidence
@@ -228,7 +228,7 @@ jobs:
           )
           rm -f "${key_path}"
       - name: Upload signed release evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fawn-matrix-signed-${{ inputs.platform_id }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |

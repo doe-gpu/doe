@@ -24,9 +24,14 @@ AUTOMATIC_WORKFLOWS = {
 MANUAL_WORKFLOWS = {
     "amd-vulkan-smoke.yml",
     "dropin-compat.yml",
+    "fawn-matrix-physical-runner.yml",
     "macos-browser-refresh.yml",
     "release-claim-trends.yml",
     "release-gates.yml",
+}
+
+REUSABLE_WORKFLOWS = {
+    "fawn-matrix-release-passport.yml": {"workflow_call", "workflow_dispatch"},
 }
 
 STALE_PATH_PATTERNS = {
@@ -87,7 +92,7 @@ def workflow_triggers(text: str) -> set[str]:
 class CiWorkflowSurfaceTests(unittest.TestCase):
     def test_workflow_inventory_is_intentional(self) -> None:
         actual = {path.name for path in WORKFLOW_ROOT.glob("*.yml")}
-        expected = set(AUTOMATIC_WORKFLOWS) | MANUAL_WORKFLOWS
+        expected = set(AUTOMATIC_WORKFLOWS) | MANUAL_WORKFLOWS | set(REUSABLE_WORKFLOWS)
         self.assertEqual(actual, expected)
 
     def test_automatic_workflow_triggers_are_explicit(self) -> None:
@@ -99,6 +104,11 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
         for name in MANUAL_WORKFLOWS:
             with self.subTest(workflow=name):
                 self.assertEqual(workflow_triggers(workflow_text(name)), {"workflow_dispatch"})
+
+    def test_reusable_workflow_triggers_are_explicit(self) -> None:
+        for name, expected in REUSABLE_WORKFLOWS.items():
+            with self.subTest(workflow=name):
+                self.assertEqual(workflow_triggers(workflow_text(name)), expected)
 
     def test_automatic_self_hosted_job_is_manual_only(self) -> None:
         text = workflow_text("doe-gpu-native-freshness.yml")

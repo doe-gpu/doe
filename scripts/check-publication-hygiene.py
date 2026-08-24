@@ -38,6 +38,26 @@ PRIVATE_HOME_PATTERNS = (
     ),
 )
 
+# These exact files are byte-bound evidence. Rewriting embedded machine paths
+# would invalidate their recorded identities; neighboring and future evidence
+# remains in the scan.
+IMMUTABLE_RAW_EVIDENCE_FILES = frozenset(
+    {
+        "bench/out/browser-promotion/20260724T204526Z/browser_gate.json",
+        (
+            "browser/chromium/artifacts/20260724T204526Z/"
+            "dawn-vs-doe.browser-layered.superset.diagnostic.json"
+        ),
+        (
+            "browser/chromium/artifacts/20260724T204526Z/"
+            "dawn-vs-doe.browser-layered.superset.summary.json"
+        ),
+        (
+            "browser/chromium/artifacts/20260724T204526Z/"
+            "dawn-vs-doe.browser.playwright-smoke.diagnostic.json"
+        ),
+    }
+)
 PUBLIC_CORPUS_PREFIXES = ("dawn-research/data/",)
 
 
@@ -60,7 +80,10 @@ def list_tracked_files() -> list[Path]:
     return [
         path
         for path in paths
-        if not any(path.as_posix().startswith(prefix) for prefix in PUBLIC_CORPUS_PREFIXES)
+        if path.as_posix() not in IMMUTABLE_RAW_EVIDENCE_FILES
+        and not any(
+            path.as_posix().startswith(prefix) for prefix in PUBLIC_CORPUS_PREFIXES
+        )
     ]
 
 

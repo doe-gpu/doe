@@ -50,7 +50,7 @@ test "analyzeToIrWithConfig records tiled gid preconditions" {
     try std.testing.expect(!has_call_named(&elided_ir.functions.items[0], "min"));
 }
 
-test "compute runtime translation drops _doe_sizes for proof-covered tiled bounds only" {
+test "compute runtime translation retains _doe_sizes for tiled bounds until robust fallback exists" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -70,9 +70,6 @@ test "compute runtime translation drops _doe_sizes for proof-covered tiled bound
     );
     defer translation.info.deinit(std.testing.allocator);
 
-    if (lean_proof.boundsProven(.gid_1d_storage_buffer_tiled)) {
-        try std.testing.expect(!translation.info.needs_sizes_buf);
-    } else {
-        try std.testing.expect(translation.info.needs_sizes_buf);
-    }
+    try std.testing.expect(translation.info.needs_sizes_buf);
+    try std.testing.expectEqual(@as(usize, 0), translation.info.dispatch_preconditions.len);
 }
