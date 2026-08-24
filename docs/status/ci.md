@@ -33,9 +33,12 @@ renderer, and earns no browser evidence.
 The normal package pull-request workflow runs the complete package contract,
 smoke, and integration suite, checks the public tool surface, and inspects the
 packed contents. It also verifies that the reviewed HoloScript Electron
-diagnostic remains hash-bound to its current plan, runner, application seam,
-native library, incumbent, and zero-credit decision. This hosted check replays
-no GPU work and grants no new evidence; the manual self-hosted workflow owns
-runtime-specific execution. Hosted execution may skip native checks when staged
-platform artifacts or physical GPUs are absent. Repository-wide performance
-remains advisory rather than a promoted JavaScript-runtime release requirement.
+diagnostic remains hash-bound to every tracked input and retains exact hashes
+for its declared external capture inputs, native library, incumbent, and
+zero-credit decision. The hosted checkout does not contain those external raw
+bytes, so this deterministic contract check does not claim to revalidate them.
+It replays no GPU work and grants no new evidence; the manual self-hosted
+workflow owns runtime-specific execution. Hosted execution may skip native
+checks when staged platform artifacts or physical GPUs are absent.
+Repository-wide performance remains advisory rather than a promoted
+JavaScript-runtime release requirement.

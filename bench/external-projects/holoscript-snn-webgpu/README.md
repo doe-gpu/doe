@@ -66,3 +66,9 @@ The other plans in this directory cover the public DoeProof loader, CLI,
 declared-file boundary, and Linux workspace-sealing surfaces. None grants
 application adoption, performance, renderer, Chromium, browser, or release
 credit.
+
+The reviewed
+[`public process-observer admission`](../../../reports/ecosystem/holoscript-snn-webgpu/holoscript-doeproof-process-observer-amd-vulkan-2026-08-16-diagnostic.json)
+binds the immutable tropical-SpMV oracle to the package observer's public
+command and mapped-readback evidence. It grants no runtime-ownership,
+performance, promotion, or release credit.

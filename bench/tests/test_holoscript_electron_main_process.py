@@ -18,6 +18,17 @@ REVIEWED_REPORT = (
     / "reports/ecosystem/holoscript-snn-webgpu"
     / "holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json"
 )
+EXTERNAL_CAPTURE_ROOT = "bench/out/external-projects/holoscript-snn-webgpu/upstream"
+DECLARED_EXTERNAL_CAPTURE_INPUTS = frozenset(
+    {
+        f"{EXTERNAL_CAPTURE_ROOT}/packages/snn-webgpu/dist/index.js",
+        f"{EXTERNAL_CAPTURE_ROOT}/packages/snn-webgpu/src/shaders/tropical-graph.wgsl",
+        f"{EXTERNAL_CAPTURE_ROOT}/packages/core/dist/math/tropical-spmv.js",
+        f"{EXTERNAL_CAPTURE_ROOT}/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/index.js",
+        f"{EXTERNAL_CAPTURE_ROOT}/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/dist/linux-x64.dawn.node",
+        "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+    }
+)
 
 
 def sha256(path: Path) -> str:
@@ -89,18 +100,29 @@ class HoloScriptElectronMainProcessTests(unittest.TestCase):
         ):
             self.assertFalse(self.plan["acceptance"][credit])
 
-    def test_reviewed_report_is_hash_bound_to_current_inputs(self) -> None:
+    def test_reviewed_report_binds_tracked_and_external_inputs(self) -> None:
         self.assertEqual(self.report["status"], "passed")
         self.assertEqual(self.report["candidateId"], self.plan["candidateId"])
         self.assertEqual(
             self.report["plan"]["sha256"],
             sha256(ROOT / self.report["plan"]["path"]),
         )
+        external_references = set()
         for reference in self.report["immutableInputs"]:
             path = Path(reference["path"])
             if not path.is_absolute():
                 path = ROOT / path
+            if reference["path"] in DECLARED_EXTERNAL_CAPTURE_INPUTS:
+                external_references.add(reference["path"])
+                self.assertRegex(reference["sha256"], r"\A[0-9a-f]{64}\Z")
+                if path.is_file():
+                    self.assertEqual(
+                        reference["sha256"], sha256(path), reference["path"]
+                    )
+                continue
+            self.assertTrue(path.is_file(), reference["path"])
             self.assertEqual(reference["sha256"], sha256(path), reference["path"])
+        self.assertEqual(external_references, DECLARED_EXTERNAL_CAPTURE_INPUTS)
 
     def test_incumbent_failure_and_doe_exactness_are_preserved(self) -> None:
         for lane_id in ("I0", "I1", "W0"):
