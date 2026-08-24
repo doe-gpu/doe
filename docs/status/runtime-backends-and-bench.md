@@ -6,6 +6,12 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- The schema-backed browser product comparison policy now preserves A/B/C/D as
+  internal causal lanes and records Cloudflare Browser Run plus Kitesurf as the
+  separate K0 external product comparator. It freezes shared and
+  differentiation suites, evidence freshness, independence tests, fork
+  authorities, and stop conditions. No K0 execution artifact or Fawn product
+  result exists yet, so the policy changes no current claim or milestone state.
 - Browser layered-report schema version 6 makes source-kernel measurement an
   exact-operation contract. Each timed sample executes one declared source
   command, uses that command's `dispatchRepeat` without multiplying it by the
@@ -79,6 +85,11 @@ file only names the promoted boundary and open admission gates.
   joins macOS arm64 as a governed release-candidate platform through
   `config/browser-release-platform-policy.json`; this expands the admissible
   lane without promoting any browser claim.
+- M4 no longer treats the ignored historical compact-archive manifest path as
+  locally retained evidence. The exact artifact has no Git history and is
+  absent from this checkout; the milestone records that absence as a blocker
+  instead of letting a nonexistent diagnostic fail the repository checker or
+  imply evidence custody.
 - A clean extraction of the retained compact Linux diagnostic archive aborts
   before WebGPU because Chromium runtime support files are absent. The governed
   failure is retained at

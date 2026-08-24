@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.local/schemas/browser-product-comparison-policy.schema.json",
+  "title": "Browser product comparison policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "policyId",
+    "authority",
+    "noRegretTrunk",
+    "internalCausalLanes",
+    "externalComparators",
+    "suites",
+    "independenceTests",
+    "forkAuthorities",
+    "stopConditions",
+    "evidenceReferences",
+    "claimBoundary"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "browser-product-comparison-policy.schema.json" },
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "policyId": { "type": "string", "const": "fawn-external-product-comparison-v1" },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategyPath", "browserLanePath", "milestonePath", "claimStatePath"],
+      "properties": {
+        "strategyPath": { "$ref": "#/$defs/path" },
+        "browserLanePath": { "$ref": "#/$defs/path" },
+        "milestonePath": { "$ref": "#/$defs/path" },
+        "claimStatePath": { "$ref": "#/$defs/path" }
+      }
+    },
+    "noRegretTrunk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["definition", "workItems"],
+      "properties": {
+        "definition": { "$ref": "#/$defs/text" },
+        "workItems": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/workItem" }
+        }
+      }
+    },
+    "internalCausalLanes": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/internalLane" }
+    },
+    "externalComparators": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": { "$ref": "#/$defs/externalComparator" }
+    },
+    "suites": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/suite" }
+    },
+    "independenceTests": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/independenceTest" }
+    },
+    "forkAuthorities": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/forkAuthority" }
+    },
+    "stopConditions": { "$ref": "#/$defs/stringList" },
+    "evidenceReferences": { "$ref": "#/$defs/pathList" },
+    "claimBoundary": { "$ref": "#/$defs/text" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "text": { "type": "string", "minLength": 1 },
+    "path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "stringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/text" }
+    },
+    "pathList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/path" }
+    },
+    "workItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "requiredOutcome", "authorityPath"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "doeproof-incumbent-qualification"
+        },
+        "requiredOutcome": { "$ref": "#/$defs/text" },
+        "authorityPath": { "$ref": "#/$defs/path" }
+      }
+    },
+    "internalLane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["laneId", "browser", "runtime", "isolates"],
+      "properties": {
+        "laneId": { "type": "string", "enum": ["A", "B", "C", "D"] },
+        "browser": { "$ref": "#/$defs/text" },
+        "runtime": { "$ref": "#/$defs/text" },
+        "isolates": { "$ref": "#/$defs/text" }
+      }
+    },
+    "externalComparator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "comparatorId",
+        "product",
+        "owner",
+        "componentSubstitution",
+        "currentState",
+        "lastVerifiedAt",
+        "freshnessRule",
+        "officialSources",
+        "claimBoundary"
+      ],
+      "properties": {
+        "comparatorId": { "type": "string", "const": "K0" },
+        "product": { "type": "string", "const": "Cloudflare Browser Run plus Kitesurf" },
+        "owner": { "type": "string", "const": "Cloudflare" },
+        "componentSubstitution": { "type": "boolean", "const": false },
+        "currentState": { "type": "string", "const": "external-beta" },
+        "lastVerifiedAt": { "type": "string", "format": "date-time" },
+        "freshnessRule": { "$ref": "#/$defs/text" },
+        "officialSources": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uri", "pattern": "^https://" }
+        },
+        "claimBoundary": { "$ref": "#/$defs/text" }
+      }
+    },
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["suiteId", "purpose", "tasks", "requiredObservations"],
+      "properties": {
+        "suiteId": {
+          "type": "string",
+          "enum": ["shared-agent-browser-tasks", "fawn-differentiation-tasks"]
+        },
+        "purpose": { "$ref": "#/$defs/text" },
+        "tasks": { "$ref": "#/$defs/stringList" },
+        "requiredObservations": { "$ref": "#/$defs/stringList" }
+      }
+    },
+    "independenceTest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "comparison", "requiredInterpretation", "forbiddenInference"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "doeproof-incumbent-value",
+            "fawn-shell-value",
+            "doeruntime-browser-value",
+            "direct-protocol-value",
+            "external-comparator-separation"
+          ]
+        },
+        "comparison": { "$ref": "#/$defs/text" },
+        "requiredInterpretation": { "$ref": "#/$defs/text" },
+        "forbiddenInference": { "$ref": "#/$defs/text" }
+      }
+    },
+    "forkAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["forkId", "decisionAuthorityPath", "fundWhen", "stopWhen"],
+      "properties": {
+        "forkId": {
+          "type": "string",
+          "enum": [
+            "doeproof-commercial",
+            "fawn-product",
+            "doeruntime-browser",
+            "fawn-direct-protocol"
+          ]
+        },
+        "decisionAuthorityPath": { "$ref": "#/$defs/path" },
+        "fundWhen": { "$ref": "#/$defs/text" },
+        "stopWhen": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

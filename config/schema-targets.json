@@ -50,6 +50,10 @@
       "data": "config/doe-product-strategy.json"
     },
     {
+      "schema": "config/browser-product-comparison-policy.schema.json",
+      "data": "config/browser-product-comparison-policy.json"
+    },
+    {
       "schema": "config/ecosystem-registry.schema.json",
       "data": "config/ecosystem-registry.json"
     },

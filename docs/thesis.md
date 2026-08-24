@@ -57,6 +57,30 @@ while an incumbent keeps execution. Fawn may create browser-shell value while
 DoeRuntime remains unearned. DoeRuntime is promoted only for the capabilities
 whose frozen `D0` comparison proves a material application advantage.
 
+## No-regret trunks and evidence-gated forks
+
+“No-regret trunk” means work required under every plausible strategy. It does
+not imply assured commercial success. Doe's no-regret trunk is an independently
+purchased `I1` to `W0` DoeProof episode around the customer's incumbent,
+production signer authorization, an independent oracle, replay, lifecycle and
+failure evidence, a blocking decision, and a paid repeat requalification.
+
+Fawn is an evidence-gated fork. Its evaluation begins with a clean-install
+candidate, frozen task suites, explicit provider identity, retained failures,
+and replayable receipts before any product outcome is claimed. The funded
+forks remain separate:
+
+- Fawn shell authority comes only from `B` versus `A`.
+- DoeRuntime browser authority comes only from `C` versus `B`, and remains
+  bounded by the application-level `D0` versus `W0` and authorized `P0` law.
+- Direct Protocol authority comes only from `D` versus `C`.
+- External product substitution is tested by `K0` beside A/B/C/D; it never
+  changes their causal meaning.
+
+Doe may accept a Doppler workload, but DoeProof must remain purchasable and
+useful without Doppler. Doppler use does not establish Doe demand, and a Doe
+receipt does not establish Doppler adoption.
+
 ## Objective
 
 Doe should become the receipt-backed local compute plane for autonomous
@@ -402,6 +426,25 @@ Fawn plus Dawn, Fawn plus Doe, and Fawn Direct Protocol plus Doe. Fawn shell
 promotion depends on B versus A. DoeRuntime browser ownership depends on C
 versus B. Direct Protocol promotion depends on D versus C. Failure of one layer
 does not erase a proven result in another.
+
+Cloudflare Browser Run plus Kitesurf is `K0`, a separate external product
+comparator rather than a fifth component-substitution lane. Official scope and
+freshness are recorded in
+[`browser-product-comparison-policy.json`](../config/browser-product-comparison-policy.json).
+Vendor documentation defines comparator scope only; it does not become Doe or
+Fawn evidence.
+
+The shared suite freezes HTML extraction, screenshots, navigation, automation
+success, wall time, tokens, memory, cost, failures, unsupported behavior,
+retries, recovery, and total task outcomes. The differentiation suite freezes
+persistent authentication, restart recovery, offline local operation, WebGL,
+WebGPU, private state, and long-running sessions under the same no-cherry-pick
+law.
+
+If K0 wins the shared suite and customers do not value differentiation, stop
+treating Fawn as a product. If B does not beat A, do not grant Fawn shell value.
+If C does not beat B, DoeRuntime has not earned browser execution. If D does
+not beat C on the declared total task outcome, stop funding Direct Protocol.
 
 Controlled GPU worker fleets are another later surface: a worker can advertise
 its runtime, backend, adapter, driver, limits, and policy capabilities, while a

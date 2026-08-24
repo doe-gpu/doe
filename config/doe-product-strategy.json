@@ -1,7 +1,7 @@
 {
   "$schema": "doe-product-strategy.schema.json",
   "schemaVersion": 1,
-  "strategyVersion": "1.0.0",
+  "strategyVersion": "1.1.0",
   "artifactKind": "doe-product-strategy",
   "authority": {
     "goals": "GOALS.md",
@@ -38,8 +38,8 @@
       "portfolioRole": "product-vector",
       "marketRole": "breakout-distribution",
       "job": "Distribute agent-native browser state, semantic interaction, recovery, and qualified local compute through a real Chromium artifact.",
-      "promotionGate": "A hash-bound Fawn release wins its admitted A/B/C/D comparison on a complete unchanged agent workflow.",
-      "authorityPaths": ["docs/browser-lane.md", "browser/chromium/bench/workflows/browser-milestones.json"]
+      "promotionGate": "A hash-bound Fawn release wins B versus A, remains valuable against the separately measured K0 external product comparator, and uses C versus B and D versus C only for their narrower fork decisions.",
+      "authorityPaths": ["docs/browser-lane.md", "config/browser-product-comparison-policy.json", "browser/chromium/bench/workflows/browser-milestones.json"]
     },
     {
       "id": "doelab",
@@ -156,8 +156,8 @@
     {
       "order": 3,
       "id": "fawn-agent-compute-v1",
-      "outcome": "A downloadable hash-bound Fawn archive proves its browser shell, runtime, and direct protocol independently on one complete unchanged agent workflow.",
-      "requiredEvidence": ["stock Chromium plus Dawn control", "Fawn plus Dawn", "Fawn plus Doe", "Fawn Direct Protocol plus Doe", "task oracle", "lifecycle and recovery", "matched p50 p95 p99 when performance is claimed"],
+      "outcome": "A downloadable hash-bound Fawn archive proves its browser shell, runtime, and direct protocol independently while K0 separately tests whether the external product is substitutable for the customer workflow.",
+      "requiredEvidence": ["stock Chromium plus Dawn control", "Fawn plus Dawn", "Fawn plus Doe", "Fawn Direct Protocol plus Doe", "Cloudflare Browser Run plus Kitesurf external comparator", "shared task suite", "differentiation task suite", "task oracle", "lifecycle and recovery", "matched p50 p95 p99 when performance is claimed"],
       "currentAssessment": "diagnostic",
       "stateAuthorityPaths": ["bench/fawn_matrix/config/matrix-workloads.json", "browser/chromium/bench/workflows/browser-milestones.json"]
     }
@@ -166,6 +166,8 @@
     "forbiddenInferences": [
       "DoeProof value does not imply DoeRuntime ownership.",
       "Fawn shell value does not imply DoeRuntime or Direct Protocol value.",
+      "K0 is an external product comparator and never identifies the value of an internal Fawn or DoeRuntime component.",
+      "Cloudflare documentation and vendor measurements define comparator scope but do not constitute Doe or Fawn execution evidence.",
       "A component timing win does not imply an application win.",
       "Node, native, Apple, AMD, browser, and Windows evidence never inherit promotion from one another.",
       "A first qualification does not establish recurring commercial demand."

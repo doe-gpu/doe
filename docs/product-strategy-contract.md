@@ -6,6 +6,13 @@ authority. This contract makes the commercial offer, internal product roles,
 comparison law, evidence custody, platform sequence, and milestone claim
 boundaries testable instead of leaving them scattered across prose.
 
+The separately schema-backed
+[`browser-product-comparison-policy.json`](../config/browser-product-comparison-policy.json)
+owns A/B/C/D causal semantics, K0 external-comparator scope and freshness, the
+shared and differentiation suites, independence tests, fork authorities, and
+literal stop conditions. K0 is not a Doe strategy object or an internal runtime
+lane.
+
 ## Product roles
 
 | Surface | Portfolio role | Market job |
@@ -51,6 +58,11 @@ claims remain in `reports/claim-index.json`; browser promotion remains in the
 Fawn milestone artifacts. The three named milestones intentionally remain
 `unestablished`, `unestablished`, and `diagnostic` until their external or
 physical evidence exists.
+
+Implementation readiness, internal qualification, external evidence, paid use,
+repeat use, revenue, and product authority are separate states. A passing
+schema, harness, internal fixture, or diagnostic receipt advances only its
+named state and never establishes the others.
 
 Validate the contract with:
 

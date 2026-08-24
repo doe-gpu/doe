@@ -1,0 +1,181 @@
+{
+  "$schema": "browser-product-comparison-policy.schema.json",
+  "schemaVersion": 1,
+  "policyId": "fawn-external-product-comparison-v1",
+  "authority": {
+    "strategyPath": "docs/thesis.md",
+    "browserLanePath": "docs/browser-lane.md",
+    "milestonePath": "browser/chromium/bench/workflows/browser-milestones.json",
+    "claimStatePath": "reports/claim-index.json"
+  },
+  "noRegretTrunk": {
+    "definition": "Work required under every plausible strategy; it is not an assurance of commercial success.",
+    "workItems": [
+      {
+        "id": "doeproof-incumbent-qualification",
+        "requiredOutcome": "An independently purchased I1-to-W0 episode qualifies the customer's incumbent before any runtime replacement proposal.",
+        "authorityPath": "docs/product-strategy-contract.md"
+      }
+    ]
+  },
+  "internalCausalLanes": [
+    {
+      "laneId": "A",
+      "browser": "stock Chromium with Playwright",
+      "runtime": "Dawn",
+      "isolates": "incumbent browser and runtime control"
+    },
+    {
+      "laneId": "B",
+      "browser": "Fawn with Playwright",
+      "runtime": "Dawn",
+      "isolates": "Fawn shell and agent-facing browser behavior"
+    },
+    {
+      "laneId": "C",
+      "browser": "Fawn with Playwright",
+      "runtime": "DoeRuntime",
+      "isolates": "DoeRuntime beneath the same Fawn surface"
+    },
+    {
+      "laneId": "D",
+      "browser": "Fawn Direct Protocol",
+      "runtime": "DoeRuntime",
+      "isolates": "Direct Protocol beyond the Fawn plus DoeRuntime control"
+    }
+  ],
+  "externalComparators": [
+    {
+      "comparatorId": "K0",
+      "product": "Cloudflare Browser Run plus Kitesurf",
+      "owner": "Cloudflare",
+      "componentSubstitution": false,
+      "currentState": "external-beta",
+      "lastVerifiedAt": "2026-08-24T00:00:00Z",
+      "freshnessRule": "Reverify both official sources before every funded fork decision or published comparison.",
+      "officialSources": [
+        "https://blog.cloudflare.com/kitesurf/",
+        "https://developers.cloudflare.com/browser-run/kitesurf/"
+      ],
+      "claimBoundary": "Cloudflare product documentation establishes comparator scope only; it is not Doe or Fawn execution evidence."
+    }
+  ],
+  "suites": [
+    {
+      "suiteId": "shared-agent-browser-tasks",
+      "purpose": "Compare substitutable product outcomes without treating K0 as an internal component lane.",
+      "tasks": [
+        "HTML extraction",
+        "screenshots",
+        "navigation",
+        "automation success"
+      ],
+      "requiredObservations": [
+        "task oracle",
+        "wall time",
+        "tokens",
+        "memory",
+        "cost",
+        "compatibility failures",
+        "unsupported features",
+        "retries",
+        "recovery behavior",
+        "total task outcome"
+      ]
+    },
+    {
+      "suiteId": "fawn-differentiation-tasks",
+      "purpose": "Test whether persistent local browser operation creates customer value outside Kitesurf's documented fit.",
+      "tasks": [
+        "persistent authentication",
+        "restart recovery",
+        "offline local operation",
+        "WebGL",
+        "WebGPU",
+        "private state",
+        "long-running sessions"
+      ],
+      "requiredObservations": [
+        "task oracle",
+        "state continuity",
+        "privacy boundary",
+        "compatibility failures",
+        "unsupported features",
+        "retries",
+        "recovery behavior",
+        "total task outcome"
+      ]
+    }
+  ],
+  "independenceTests": [
+    {
+      "id": "doeproof-incumbent-value",
+      "comparison": "I1 to W0",
+      "requiredInterpretation": "DoeProof can produce a paid blocking qualification while the incumbent retains execution.",
+      "forbiddenInference": "DoeProof value grants DoeRuntime ownership."
+    },
+    {
+      "id": "fawn-shell-value",
+      "comparison": "B to A",
+      "requiredInterpretation": "Only a B-over-A application outcome grants Fawn shell value.",
+      "forbiddenInference": "Fawn shell value grants DoeRuntime or Direct Protocol value."
+    },
+    {
+      "id": "doeruntime-browser-value",
+      "comparison": "C to B",
+      "requiredInterpretation": "Only a C-over-B application outcome grants DoeRuntime browser value for the measured tuple.",
+      "forbiddenInference": "A DoeRuntime result generalizes across applications, hardware, operating systems, drivers, or providers."
+    },
+    {
+      "id": "direct-protocol-value",
+      "comparison": "D to C",
+      "requiredInterpretation": "Only a D-over-C total task outcome funds the Direct Protocol for the measured workload.",
+      "forbiddenInference": "Lower token count alone grants Direct Protocol value."
+    },
+    {
+      "id": "external-comparator-separation",
+      "comparison": "K0 beside A/B/C/D",
+      "requiredInterpretation": "K0 compares external product outcomes and never changes the causal meaning of A/B/C/D.",
+      "forbiddenInference": "A K0 result identifies the value of a Fawn or DoeRuntime component."
+    }
+  ],
+  "forkAuthorities": [
+    {
+      "forkId": "doeproof-commercial",
+      "decisionAuthorityPath": "config/doe-product-strategy.json",
+      "fundWhen": "An external customer independently purchases W0 and later pays for or depends on repeat requalification.",
+      "stopWhen": "The evidence cannot block a real release decision or customers do not repeat qualification."
+    },
+    {
+      "forkId": "fawn-product",
+      "decisionAuthorityPath": "docs/browser-lane.md",
+      "fundWhen": "A clean-install candidate and frozen suites support measurement, B beats A, and the customer values differentiation after K0 is measured on the shared suite.",
+      "stopWhen": "K0 wins shared tasks and customers do not value the differentiation suite, or B does not beat A."
+    },
+    {
+      "forkId": "doeruntime-browser",
+      "decisionAuthorityPath": "docs/runtime-ownership-decision.md",
+      "fundWhen": "C beats B materially and the exact D0 tuple also beats W0 and every authorized P0.",
+      "stopWhen": "C does not beat B or a governed incumbent meets the application outcome at lower durable cost."
+    },
+    {
+      "forkId": "fawn-direct-protocol",
+      "decisionAuthorityPath": "docs/browser-lane.md",
+      "fundWhen": "D beats C on the complete task outcome under the same oracle and lifecycle scope.",
+      "stopWhen": "D does not beat C or reduces tokens while worsening the customer's declared total task outcome."
+    }
+  ],
+  "stopConditions": [
+    "Do not treat Fawn as a product when K0 wins shared tasks and customers do not value differentiation.",
+    "Do not grant Fawn shell value unless B beats A.",
+    "Do not grant DoeRuntime browser ownership unless C beats B for the exact measured tuple.",
+    "Do not continue Direct Protocol funding unless D beats C on the declared total task outcome."
+  ],
+  "evidenceReferences": [
+    "browser/chromium/bench/workflows/browser-milestones.json",
+    "bench/fawn_matrix/config/matrix-workloads.json",
+    "reports/claim-index.json",
+    "docs/status/runtime-backends-and-bench.md"
+  ],
+  "claimBoundary": "This policy defines experiments and decisions. Until schema-valid physical receipts exist, K0 and A/B/C/D have no promoted comparative product outcome."
+}

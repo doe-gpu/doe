@@ -383,9 +383,9 @@
           "id": "retained_diagnostic_archive_manifest",
           "kind": "artifact",
           "path": "bench/out/public-browser-release/20260703T233418Z/Fawn-Doe-linux-x64-gui-diagnostic.manifest.json",
-          "description": "Retained compact diagnostic archive manifest; not an installable release candidate.",
+          "description": "Historical compact diagnostic archive manifest path; the ignored artifact is not retained locally and grants no evidence.",
           "required": false,
-          "mustExist": true
+          "mustExist": false
         },
         {
           "id": "retained_clean_install_gate_failure",
@@ -403,6 +403,7 @@
         "Any promoted advantage uses matched browser builds, work, timing scope, and release percentiles."
       ],
       "blockers": [
+        "The historical compact diagnostic archive manifest is not retained in the repository and cannot be used as evidence.",
         "The retained Linux archive is a compact diagnostic archive and omits required Chromium runtime support files.",
         "The original Chromium checkout and complete build output are not present on this machine.",
         "No unchanged exact-oracle application is yet bound to a clean-install release candidate.",
