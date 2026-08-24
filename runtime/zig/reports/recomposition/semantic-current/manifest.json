@@ -155,9 +155,9 @@
     }
   ],
   "git": {
-    "baseCommit": "WORKTREE:b5f519ef1d01132295f3dee27a7b18f8050e8a1217b205b2ca4f1dc1f6b47039",
-    "requestedRef": "WORKTREE",
-    "snapshotKind": "live-worktree"
+    "baseCommit": "763008bec853885de9e2fcd7050f483aecf20799",
+    "requestedRef": "763008bec853885de9e2fcd7050f483aecf20799",
+    "snapshotKind": "git-archive"
   },
   "host": {
     "machine": "arm64",
@@ -165,7 +165,7 @@
     "release": "25.3.0"
   },
   "irDigestInstrumentation": {
-    "kind": "native-worktree",
+    "kind": "native-snapshot",
     "observers": [
       {
         "path": "src/cli/entrypoints/main_emit_ir_digest.zig",
@@ -188,15 +188,15 @@
   "sharedLibraries": [
     {
       "path": "libonnxruntime_doe_ep.dylib",
-      "sha256": "d0e5974912812556b879765632cea102044e31c60a8e31d81bb2f94adf25f58a",
-      "sizeBytes": 749144,
+      "sha256": "b1b3e96db0078817b32a84244a26f9bc295361d685da42724dddcac67de5a959",
+      "sizeBytes": 749608,
       "symbolCount": 57,
       "symbols": "abi/libonnxruntime_doe_ep.dylib.symbols.txt"
     },
     {
       "path": "libwebgpu_doe.dylib",
-      "sha256": "bde38a3846857c5040bb850e80042f0318b9d50a49d75e20d823ee5d4a40a18d",
-      "sizeBytes": 2043168,
+      "sha256": "8345ba3115e40b6bb6fbb2ba5969dd464463d816ac44edd8a5499948efa7f13a",
+      "sizeBytes": 2043920,
       "symbolCount": 758,
       "symbols": "abi/libwebgpu_doe.dylib.symbols.txt"
     }

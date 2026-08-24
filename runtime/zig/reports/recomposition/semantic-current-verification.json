@@ -30,7 +30,7 @@
     "reason": "Approve the WebGPU-spec robustness correction for runtime-sized array stores: out-of-bounds writes are discarded while reads remain clamped, with MSL/HLSL translation regressions and a physical Metal overdispatch oracle."
   },
   "baselineCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
-  "candidateCommit": "WORKTREE:b5f519ef1d01132295f3dee27a7b18f8050e8a1217b205b2ca4f1dc1f6b47039",
+  "candidateCommit": "763008bec853885de9e2fcd7050f483aecf20799",
   "classification": "failure",
   "differences": [
     {
