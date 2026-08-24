@@ -1,12 +1,8 @@
 #!/usr/bin/env node
 
-import { setupGlobals } from '../../src/index.js';
+import { requestNativeDeviceOrSkip } from './native-device-test-helper.js';
 
-setupGlobals();
-
-const adapter = await navigator.gpu.requestAdapter();
-if (!adapter) throw new Error('no adapter');
-const device = await adapter.requestDevice();
+const device = await requestNativeDeviceOrSkip('texture copy then compute');
 
 const sourceTexture = device.createTexture({
   size: [1, 1, 1],

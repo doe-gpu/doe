@@ -19,6 +19,7 @@ const contracts = [
   './unit/plan-contracts.test.js',
   './unit/plan-refactor-receipt.test.js',
   './unit/transparent-webgpu-observer.test.js',
+  './unit/native-device-test-helper.test.js',
 ];
 
 for (const contract of contracts) {

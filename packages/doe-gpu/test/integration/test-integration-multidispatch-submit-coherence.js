@@ -1,12 +1,8 @@
 #!/usr/bin/env node
 
-import { setupGlobals } from '../../src/index.js';
+import { requestNativeDeviceOrSkip } from './native-device-test-helper.js';
 
-setupGlobals();
-
-const adapter = await navigator.gpu.requestAdapter();
-if (!adapter) throw new Error('no adapter');
-const device = await adapter.requestDevice();
+const device = await requestNativeDeviceOrSkip('multidispatch submit coherence');
 
 const buffers = Array.from({ length: 9 }, (_, index) => device.createBuffer({
   label: `multidispatch-chain-${index}`,

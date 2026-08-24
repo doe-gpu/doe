@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-import { setupGlobals } from '../../src/index.js';
-
-setupGlobals();
+import { requestNativeDeviceOrSkip } from './native-device-test-helper.js';
 
 const COPY_BYTES_PER_ROW = 256;
 const TEXTURE_SIZE = Object.freeze({
@@ -11,9 +9,7 @@ const TEXTURE_SIZE = Object.freeze({
   depthOrArrayLayers: 1,
 });
 
-const adapter = await navigator.gpu.requestAdapter();
-if (!adapter) throw new Error('no adapter');
-const device = await adapter.requestDevice();
+const device = await requestNativeDeviceOrSkip('native texture commands');
 
 async function readTexture(texture) {
   const readback = device.createBuffer({
