@@ -7,7 +7,6 @@
     "backends",
     "claimable",
     "evidenceMaturity",
-    "host",
     "policy",
     "schemaVersion",
     "status"
@@ -28,16 +27,6 @@
       "type": "string",
       "enum": ["diagnostic", "comparable"]
     },
-    "host": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["machine", "operatingSystem", "release"],
-      "properties": {
-        "machine": { "type": "string", "minLength": 1 },
-        "operatingSystem": { "type": "string", "minLength": 1 },
-        "release": { "type": "string", "minLength": 1 }
-      }
-    },
     "policy": {
       "type": "object",
       "additionalProperties": false,
@@ -47,7 +36,7 @@
         "softwareFallbackProhibited": { "type": "boolean", "const": true }
       }
     },
-    "schemaVersion": { "type": "integer", "const": 3 },
+    "schemaVersion": { "type": "integer", "const": 4 },
     "status": {
       "type": "string",
       "enum": ["captured", "hardware-evidence-incomplete"]

@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -16,6 +17,7 @@ from capture_backend_evidence import (
     _metal_device_from_payload,
     _preserve_captured_backends,
     _representative_output_evidence,
+    capture,
 )
 
 
@@ -204,6 +206,46 @@ class RepresentativeOutputEvidenceTests(unittest.TestCase):
         self.assertEqual(backends["vulkan"]["representativeOutput"], "captured")
         self.assertEqual(
             backends["vulkan"]["evidenceHost"]["operatingSystem"],
+            "Linux",
+        )
+
+    def test_aggregate_has_no_last_writer_host_identity(self) -> None:
+        unavailable = {
+            "physicalGpuEligible": False,
+            "representativeOutput": "not-captured",
+        }
+        with patch(
+            "capture_backend_evidence._os_backend",
+            side_effect=[dict(unavailable), dict(unavailable)],
+        ), patch(
+            "capture_backend_evidence._vulkan",
+            return_value=dict(unavailable),
+        ):
+            payload = capture(
+                existing={
+                    "backends": {
+                        "d3d12": {"representativeOutput": "not-captured"},
+                        "metal": {"representativeOutput": "not-captured"},
+                        "vulkan": {
+                            "evidenceHost": {
+                                "machine": "x86_64",
+                                "operatingSystem": "Linux",
+                                "release": "test",
+                            },
+                            "representativeOutput": "captured",
+                        },
+                    },
+                    "host": {
+                        "machine": "arm64",
+                        "operatingSystem": "Darwin",
+                        "release": "legacy-last-writer",
+                    },
+                }
+            )
+        self.assertEqual(payload["schemaVersion"], 4)
+        self.assertNotIn("host", payload)
+        self.assertEqual(
+            payload["backends"]["vulkan"]["evidenceHost"]["operatingSystem"],
             "Linux",
         )
 

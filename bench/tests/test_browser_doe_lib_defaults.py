@@ -19,6 +19,9 @@ PATCH_CHROMIUM_APP_DOE = REPO_ROOT / "browser/chromium/scripts/patch-chromium-ap
 RUN_CONSUMER_BENCH = REPO_ROOT / "browser/chromium/scripts/run-consumer-bench.sh"
 RUN_FAWN_RUNTIME_BENCH = REPO_ROOT / "browser/chromium/scripts/run-fawn-runtime-bench.sh"
 RUN_WITH_LANE_DEFAULTS = REPO_ROOT / "browser/chromium/scripts/run-with-lane-defaults.sh"
+PROJECTION_MANIFEST_GENERATOR = (
+    REPO_ROOT / "browser/chromium/scripts/generate-browser-projection-manifest.py"
+)
 SYNC_RELEASE_ARTIFACTS_LOCAL = (
     REPO_ROOT / "browser/chromium/scripts/sync-release-artifacts-local.sh"
 )
@@ -88,6 +91,113 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
             self.module.REPO_ROOT
             / "browser/chromium/bench/generated/browser_projection_manifest.json",
         )
+
+    def test_projection_manifest_generation_is_stable_and_verifiable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out = Path(tmpdir) / "projection.json"
+            command = [
+                sys.executable,
+                str(PROJECTION_MANIFEST_GENERATOR),
+                "--workloads",
+                str(
+                    REPO_ROOT
+                    / "bench/workloads/specialized/workloads.apple.metal.superset.json"
+                ),
+                "--rules",
+                str(REPO_ROOT / "browser/chromium/bench/projection-rules.json"),
+                "--out",
+                str(out),
+            ]
+            first = subprocess.run(
+                command,
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            first_bytes = out.read_bytes()
+            second = subprocess.run(
+                command,
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            second_bytes = out.read_bytes()
+            verify = subprocess.run(
+                [*command, "--verify"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            payload = json.loads(out.read_text(encoding="utf-8"))
+            payload["projectionContractHash"] = "0" * 64
+            out.write_text(f"{json.dumps(payload, indent=2)}\n", encoding="utf-8")
+            stale_bytes = out.read_bytes()
+            stale = subprocess.run(
+                [*command, "--verify"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+        self.assertEqual(first.returncode, 0, first.stderr)
+        self.assertEqual(second.returncode, 0, second.stderr)
+        self.assertEqual(verify.returncode, 0, verify.stderr)
+        self.assertEqual(first_bytes, second_bytes)
+        self.assertIn("unchanged", second.stdout)
+        self.assertIn("verify ok", verify.stdout)
+        self.assertEqual(stale.returncode, 1)
+        self.assertIn("output is stale", stale.stdout)
+        self.assertNotEqual(stale_bytes, first_bytes)
+
+    def test_layered_runner_bounds_every_scenario_with_a_typed_timeout(self) -> None:
+        text = (
+            REPO_ROOT / "browser/chromium/scripts/webgpu-playwright-layered-bench.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('statusCode: "scenario_controller_timeout"', text)
+        self.assertIn("scenarioControllerDeadlineMs", text)
+        self.assertNotIn('if (template !== "fawn_visual_resource")', text)
+
+    def test_shell_wrapper_routes_default_pipeline_cache_to_ignored_lane_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            lane = root / "lane"
+            fake_bin = root / "bin"
+            lane.mkdir()
+            fake_bin.mkdir()
+            fake_python = fake_bin / "python3"
+            fake_python.write_text(
+                '#!/usr/bin/env bash\nprintf "%s\\n" "${DOE_PIPELINE_CACHE_DIR}"\n',
+                encoding="utf-8",
+            )
+            fake_python.chmod(0o755)
+            env = os.environ.copy()
+            env["PATH"] = f"{fake_bin}:{env['PATH']}"
+            env["FAWN_CHROMIUM_LANE_DIR"] = str(lane)
+            env.pop("DOE_PIPELINE_CACHE_DIR", None)
+            completed = subprocess.run(
+                [
+                    "bash",
+                    str(RUN_WITH_LANE_DEFAULTS),
+                    "bench",
+                    "--skip-run",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            expected = lane / "out/cache/doe/pipeline_cache"
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertEqual(completed.stdout.strip(), str(expected))
+            self.assertTrue(expected.is_dir())
 
     def test_build_release_external_uses_end_user_optimized_gn_profile(self) -> None:
         text = BUILD_RELEASE_EXTERNAL.read_text(encoding="utf-8")

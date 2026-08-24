@@ -151,6 +151,11 @@ if [[ -z "${FAWN_BACKEND_LANE:-}" ]]; then
   esac
 fi
 
+if [[ -z "${DOE_PIPELINE_CACHE_DIR:-}" ]]; then
+  export DOE_PIPELINE_CACHE_DIR="${FAWN_CHROMIUM_LANE_DIR}/out/cache/doe/pipeline_cache"
+fi
+mkdir -p "${DOE_PIPELINE_CACHE_DIR}"
+
 if [[ "${runner}" == "smoke" ]]; then
   exec node "${SCRIPT_DIR}/webgpu-playwright-smoke.mjs" \
     --chrome "${chrome_bin}" \

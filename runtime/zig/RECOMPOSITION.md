@@ -641,9 +641,11 @@ universal ideals.
 - [x] Capture WGSL-to-IR and WGSL-to-MSL/SPIR-V/HLSL/CSL semantic and output digests as immutable fixtures.
 - [x] Capture trace rows, terminal trace hashes, replay results, receipt identities, and first failure boundaries for the promoted paths.
 - [ ] Capture backend capability reports and representative Metal, Vulkan, and D3D12 compute outputs with explicit hardware/runtime identity.
-  - Vulkan is captured and receipt-bound in `runtime/zig/reports/recomposition/backend-evidence.json`; Metal and D3D12 remain separate host obligations.
-  - Schema version 3 preserves already captured backends while a Darwin or
-    Windows operator adds a comparable, hash-bound native report. Run the
+  - Metal and Vulkan are captured and receipt-bound in `runtime/zig/reports/recomposition/backend-evidence.json`; D3D12 remains a separate Windows-host obligation.
+  - Schema version 4 preserves already captured backends while another host
+    adds a comparable, hash-bound native report. Each captured backend owns its
+    own `evidenceHost`; the cumulative receipt has no ambiguous last-writer
+    host identity. Run the
     matching command from the repository root:
 
     ```bash

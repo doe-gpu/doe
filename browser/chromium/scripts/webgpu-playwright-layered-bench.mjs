@@ -184,6 +184,7 @@ const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICES = 1;
 const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICE_MIN_DISPATCH_REPEAT = 1;
 const DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY = "iteration-batch-v1";
 const DEFAULT_MODE_SCHEDULE_REPETITIONS = 1;
+const DEFAULT_SCENARIO_CONTROLLER_DEADLINE_MS = 120000;
 const VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS = 15000;
 const SOURCE_KERNEL_SUBMIT_POLICIES = new Set([
   "iteration-batch-v1",
@@ -255,6 +256,9 @@ Options:
                             Apply schedule slicing only when source dispatchRepeat is at least N (default: 1)
   --source-kernel-submit-policy ${[...SOURCE_KERNEL_SUBMIT_POLICIES].join("|")}
                             Source-kernel queue submit cadence (default: ${DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY})
+  --scenario-controller-deadline-ms N
+                            Fail a scenario that does not settle before this controller deadline
+                            (default: ${DEFAULT_SCENARIO_CONTROLLER_DEADLINE_MS})
   --focus-category CATEGORY Run only rows in this diagnostic category (repeatable or comma-separated)
   --strict                  Exit non-zero when required rows fail
   --help                    Show this message
@@ -504,6 +508,7 @@ function parseArgs(argv) {
     sourceKernelScheduleSliceMinDispatchRepeat:
       DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICE_MIN_DISPATCH_REPEAT,
     sourceKernelSubmitPolicy: DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY,
+    scenarioControllerDeadlineMs: DEFAULT_SCENARIO_CONTROLLER_DEADLINE_MS,
   };
 
   for (let i = 2; i < argv.length; i += 1) {
@@ -651,6 +656,12 @@ function parseArgs(argv) {
     } else if (token === "--source-kernel-submit-policy") {
       args.sourceKernelSubmitPolicy = parseSourceKernelSubmitPolicy(
         readOptionValue(argv, i, "--source-kernel-submit-policy"),
+      );
+      i += 1;
+    } else if (token === "--scenario-controller-deadline-ms") {
+      args.scenarioControllerDeadlineMs = parsePositiveInt(
+        readOptionValue(argv, i, "--scenario-controller-deadline-ms"),
+        "--scenario-controller-deadline-ms",
       );
       i += 1;
     } else {
@@ -1689,6 +1700,7 @@ async function runScenario(
   sourceKernelSamples = DEFAULT_SOURCE_KERNEL_SAMPLES,
   sourceKernelWarmupSamples = DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES,
   sourceKernelSubmitPolicy = DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY,
+  scenarioControllerDeadlineMs = DEFAULT_SCENARIO_CONTROLLER_DEADLINE_MS,
 ) {
   const evaluation = page.evaluate(
     async ({
@@ -3250,10 +3262,9 @@ async function runScenario(
       sourceKernelSubmitPolicy,
     },
   );
-  if (template !== "fawn_visual_resource") {
-    return evaluation;
-  }
-
+  const controllerDeadlineMs = template === "fawn_visual_resource"
+    ? Math.min(scenarioControllerDeadlineMs, VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS)
+    : scenarioControllerDeadlineMs;
   let controllerTimeout;
   try {
     return await Promise.race([
@@ -3263,13 +3274,14 @@ async function runScenario(
           resolve({
             apiSurface: browserSurfaceArgs.apiSurface,
             status: "fail",
-            statusCode: "scenario_runtime_error",
-            error: "fawn visual scenario exceeded the controller deadline",
+            statusCode: "scenario_controller_timeout",
+            error: `scenario ${template} exceeded the controller deadline`,
             metrics: {
-              controllerDeadlineMs: VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS,
+              scenarioTemplate: template,
+              controllerDeadlineMs,
             },
           });
-        }, VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS);
+        }, controllerDeadlineMs);
       }),
     ]);
   } finally {
@@ -3610,6 +3622,7 @@ async function runMode(
         scheduledSourceKernelSamples,
         args.sourceKernelWarmupSamples,
         args.sourceKernelSubmitPolicy,
+        args.scenarioControllerDeadlineMs,
       );
       rowResultsById.set(
         row.sourceWorkloadId,
@@ -3647,6 +3660,7 @@ async function runMode(
         scheduledSourceKernelSamples,
         args.sourceKernelWarmupSamples,
         args.sourceKernelSubmitPolicy,
+        args.scenarioControllerDeadlineMs,
       );
       workflowResultsById.set(
         workflow.id,
@@ -4347,6 +4361,7 @@ async function main() {
       sourceKernelScheduleSliceMinDispatchRepeat:
         args.sourceKernelScheduleSliceMinDispatchRepeat,
       sourceKernelSubmitPolicy: args.sourceKernelSubmitPolicy,
+      scenarioControllerDeadlineMs: args.scenarioControllerDeadlineMs,
       nativeMetalTrace: {
         requested: args.nativeMetalTrace,
         configPath: args.nativeMetalTraceConfigPath,
@@ -4381,11 +4396,17 @@ async function main() {
           "scenario_template_unknown",
           "webgpu_unavailable",
         ],
-        fail: ["browser_launch_failed", "mode_setup_failed", "mode_execution_failed", "scenario_runtime_error"],
+        fail: [
+          "browser_launch_failed",
+          "mode_setup_failed",
+          "mode_execution_failed",
+          "scenario_controller_timeout",
+          "scenario_runtime_error",
+        ],
         l0_only: ["l0_only"],
       },
       notes: [
-        "Nursery layered browser harness output is diagnostic and not a strict L0 claim artifact.",
+        "The layered browser harness output is diagnostic and not a strict L0 claim artifact.",
         "Comparability and claim scope are carried from projection/workflow contracts and must not be widened.",
       ],
     },

@@ -6,6 +6,12 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- Recomposition backend-evidence schema version 4 makes cumulative multi-host
+  identity backend-local. Every captured backend carries its own
+  `evidenceHost`; the aggregate no longer records whichever operator happened
+  to write it last. Version 3 receipts must be regenerated or migrated through
+  `capture_backend_evidence.py`, which preserves captured backend records and
+  their legacy host identity while emitting the version 4 shape.
 - The blocking strict-provider output-equality obligation is now registered in
   `config/comparability-obligations.json`, matching the report emitter and
   claim gate. The Lean contract and proof receipt are generated from that same

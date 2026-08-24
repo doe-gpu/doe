@@ -445,6 +445,12 @@ def parse_args() -> argparse.Namespace:
         help="Source-kernel queue submit cadence passed to the layered runner.",
     )
     parser.add_argument(
+        "--scenario-controller-deadline-ms",
+        type=positive_int,
+        default=None,
+        help="Fail a browser scenario that does not settle before this controller deadline.",
+    )
+    parser.add_argument(
         "--out",
         default="",
         help=(
@@ -682,6 +688,7 @@ def extend_iteration_args(command: list[str], args: argparse.Namespace) -> None:
             args.source_kernel_schedule_slice_min_dispatch_repeat,
         ),
         ("--source-kernel-submit-policy", args.source_kernel_submit_policy),
+        ("--scenario-controller-deadline-ms", args.scenario_controller_deadline_ms),
     ]
     for flag, value in iteration_args:
         if value is not None:
@@ -882,6 +889,7 @@ def main() -> int:
         str(rules),
         "--out",
         str(manifest_out),
+        "--verify",
     ]
     run_step("generate", generate_command, dry_run=args.dry_run)
 

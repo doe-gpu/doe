@@ -22,6 +22,7 @@ OUTPUT_PATH = ROOT / "reports" / "recomposition" / "backend-evidence.json"
 DEFAULT_VULKAN_OUTPUT_WORKLOAD_ID = "compute_workgroup_atomic_1024"
 DEFAULT_METAL_OUTPUT_WORKLOAD_ID = DEFAULT_VULKAN_OUTPUT_WORKLOAD_ID
 DEFAULT_D3D12_OUTPUT_WORKLOAD_ID = DEFAULT_VULKAN_OUTPUT_WORKLOAD_ID
+SCHEMA_VERSION = 4
 
 
 def _field(content: str, name: str) -> str | None:
@@ -516,12 +517,11 @@ def capture(
         "backends": backends,
         "claimable": outputs_captured,
         "evidenceMaturity": "comparable" if outputs_captured else "diagnostic",
-        "host": _host_identity(),
         "policy": {
             "physicalHardwareRequired": True,
             "softwareFallbackProhibited": True,
         },
-        "schemaVersion": 3,
+        "schemaVersion": SCHEMA_VERSION,
         "status": "captured" if outputs_captured else "hardware-evidence-incomplete",
     }
 

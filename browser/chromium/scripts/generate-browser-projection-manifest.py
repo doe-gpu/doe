@@ -67,7 +67,15 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Validate inputs and print summary without writing output.",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="Fail when the existing output differs from the generated manifest.",
+    )
+    args = parser.parse_args()
+    if args.check_only and args.verify:
+        parser.error("--check-only and --verify are mutually exclusive")
+    return args
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -615,6 +623,7 @@ def build_manifest(
     rules_path: str,
     workloads_sha256: str,
     rules_sha256: str,
+    generated_at: str,
 ) -> dict[str, Any]:
     workloads_raw = workloads_payload.get("workloads")
     if not isinstance(workloads_raw, list) or not workloads_raw:
@@ -710,7 +719,7 @@ def build_manifest(
 
     return {
         "schemaVersion": PROJECTION_MANIFEST_SCHEMA_VERSION,
-        "generatedAt": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "generatedAt": generated_at,
         "sourceWorkloadsPath": workloads_path,
         "sourceWorkloadsSha256": workloads_sha256,
         "rulesPath": rules_path,
@@ -719,6 +728,24 @@ def build_manifest(
         "sourceWorkloadCount": len(rows),
         "rows": rows,
     }
+
+
+def generated_at_now() -> str:
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
+
+
+def existing_generated_at(out_path: Path) -> str | None:
+    if not out_path.is_file():
+        return None
+    payload = load_json(out_path)
+    value = payload.get("generatedAt")
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"existing manifest has invalid generatedAt: {out_path}")
+    return value
+
+
+def render_manifest(manifest: dict[str, Any]) -> str:
+    return f"{json.dumps(manifest, indent=2)}\n"
 
 
 def summarize(manifest: dict[str, Any]) -> str:
@@ -748,6 +775,7 @@ def main() -> int:
     workloads_sha256 = file_sha256(workloads_path)
     rules_sha256 = file_sha256(rules_path)
 
+    prior_generated_at = existing_generated_at(out_path)
     manifest = build_manifest(
         workloads_payload,
         rules_payload,
@@ -755,6 +783,7 @@ def main() -> int:
         display_path(rules_path, repo_root),
         workloads_sha256,
         rules_sha256,
+        prior_generated_at or generated_at_now(),
     )
     summary = summarize(manifest)
 
@@ -762,9 +791,25 @@ def main() -> int:
         print(f"[projection-manifest] check-only ok: {summary}")
         return 0
 
+
+    rendered = render_manifest(manifest)
+    if args.verify:
+        if not out_path.is_file():
+            print(f"[projection-manifest] verify failed: output missing: {out_path}")
+            return 1
+        if out_path.read_text(encoding="utf-8") != rendered:
+            print(f"[projection-manifest] verify failed: output is stale: {out_path}")
+            return 1
+        print(f"[projection-manifest] verify ok: {summary}")
+        return 0
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(f"{json.dumps(manifest, indent=2)}\n", encoding="utf-8")
-    print(f"[projection-manifest] wrote {out_path}")
+    if out_path.is_file() and out_path.read_text(encoding="utf-8") == rendered:
+        print(f"[projection-manifest] unchanged {out_path}")
+    else:
+        manifest["generatedAt"] = generated_at_now()
+        out_path.write_text(render_manifest(manifest), encoding="utf-8")
+        print(f"[projection-manifest] wrote {out_path}")
     print(f"[projection-manifest] {summary}")
     return 0
 
