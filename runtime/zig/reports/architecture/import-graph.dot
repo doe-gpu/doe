@@ -1680,6 +1680,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/dxil/emit_dxil_native.zig" -> "src/compiler/wgsl/emit/dxil/dxil_serialize.zig";
   "src/compiler/wgsl/emit/dxil/emit_dxil_native.zig" -> "src/compiler/wgsl/emit/dxil/dxil_container.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig" -> "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig" -> "src/contracts/shader_abi/dispatch_info.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig" -> "src/compiler/wgsl/emit/hlsl/emit_hlsl_builtins.zig";
@@ -1709,6 +1710,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/msl/emit_msl_ir.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_ir.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_workgroup_zero.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_ir.zig" -> "src/compiler/wgsl/ir/layout_utils.zig";
+  "src/compiler/wgsl/emit/msl/emit_msl_ir.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_maps.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_texture.zig";
@@ -1717,6 +1719,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/msl/emit_msl_maps.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_maps.zig" -> "src/compiler/wgsl/emit/operator_text.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_shared.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/msl/emit_msl_shared.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_shared.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_maps.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_stage.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_stage.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
@@ -2498,6 +2501,7 @@ digraph doe_zig_architecture {
   "src/native/command/doe_immediates_external_native.zig" -> "src/runtime/render/render_bundle.zig";
   "src/native/compute/doe_compute_bind_groups.zig" -> "src/native/support/doe_native_shared_types.zig";
   "src/native/compute/doe_compute_bind_groups.zig" -> "src/native/support/doe_native_object_types.zig";
+  "src/native/compute/doe_compute_bind_groups.zig" -> "src/native/support/doe_native_object_helpers.zig";
   "src/native/compute/doe_compute_ext_native.zig" -> "src/native/support/doe_native_object_types.zig";
   "src/native/compute/doe_compute_ext_native.zig" -> "src/native/support/doe_native_shared_types.zig";
   "src/native/compute/doe_compute_ext_native.zig" -> "src/native/support/doe_native_command_types.zig";
@@ -2592,7 +2596,7 @@ digraph doe_zig_architecture {
   "src/native/queue/doe_queue_lifecycle.zig" -> "src/native/support/doe_native_exports.zig";
   "src/native/queue/doe_queue_lifecycle.zig" -> "src/native/queue/doe_queue_flush_breakdown.zig";
   "src/native/queue/doe_queue_lifecycle.zig" -> "src/native/queue/doe_queue_submit_shared.zig";
-  "src/native/queue/doe_queue_lifecycle.zig" -> "src/runtime/process_roots.zig";
+  "src/native/queue/doe_queue_lifecycle.zig" -> "src/runtime/callback_dispatch.zig";
   "src/native/queue/doe_queue_submit_d3d12.zig" -> "src/backend/dropin_queue_submit.zig";
   "src/native/queue/doe_queue_submit_d3d12.zig" -> "src/native/support/doe_native_object_types.zig";
   "src/native/queue/doe_queue_submit_d3d12.zig" -> "src/native/support/doe_native_object_helpers.zig";
@@ -2603,6 +2607,7 @@ digraph doe_zig_architecture {
   "src/native/queue/doe_queue_submit_metal.zig" -> "src/native/support/doe_native_shared_types.zig";
   "src/native/queue/doe_queue_submit_metal.zig" -> "src/native/support/doe_native_object_helpers.zig";
   "src/native/queue/doe_queue_submit_metal.zig" -> "src/native/support/doe_native_command_types.zig";
+  "src/native/queue/doe_queue_submit_metal.zig" -> "src/native/compute/doe_compute_bind_groups.zig";
   "src/native/queue/doe_queue_submit_metal.zig" -> "src/native/queue/doe_queue_flush_breakdown.zig";
   "src/native/queue/doe_queue_submit_metal.zig" -> "src/native/diagnostics/doe_metal_browser_trace.zig";
   "src/native/queue/doe_queue_submit_metal.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_ir.zig";

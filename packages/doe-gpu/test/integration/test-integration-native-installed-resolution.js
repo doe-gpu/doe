@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, realpathSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -27,7 +27,8 @@ if (!existsSync(resolve(platformPackageRoot, 'bin', platformLibraryName))) {
   process.exit(0);
 }
 
-const scratch = await mkdtemp(join(tmpdir(), 'doe-gpu-installed-resolution-'));
+const scratchAlias = await mkdtemp(join(tmpdir(), 'doe-gpu-installed-resolution-'));
+const scratch = realpathSync.native(scratchAlias);
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 function execute(command, args, cwd = scratch) {
@@ -100,5 +101,5 @@ try {
   }
   console.log(`installed native resolution: ok ${process.platform}-${process.arch}`);
 } finally {
-  await rm(scratch, { recursive: true, force: true });
+  await rm(scratchAlias, { recursive: true, force: true });
 }

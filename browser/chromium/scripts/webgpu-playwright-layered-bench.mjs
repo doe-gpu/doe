@@ -186,6 +186,7 @@ const DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY = "iteration-batch-v1";
 const DEFAULT_MODE_SCHEDULE_REPETITIONS = 1;
 const DEFAULT_SCENARIO_CONTROLLER_DEADLINE_MS = 120000;
 const VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS = 15000;
+const SCENARIO_STAGE_PREFIX = "__DOE_BENCH_SCENARIO_STAGE__";
 const SOURCE_KERNEL_SUBMIT_POLICIES = new Set([
   "iteration-batch-v1",
   "sample-batch-v1",
@@ -1702,6 +1703,14 @@ async function runScenario(
   sourceKernelSubmitPolicy = DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY,
   scenarioControllerDeadlineMs = DEFAULT_SCENARIO_CONTROLLER_DEADLINE_MS,
 ) {
+  let latestScenarioStage = "evaluation_started";
+  const onScenarioConsole = (message) => {
+    const text = message.text();
+    if (!text.startsWith(SCENARIO_STAGE_PREFIX)) return;
+    latestScenarioStage = text.slice(SCENARIO_STAGE_PREFIX.length);
+    console.log(`[scenario-stage] ${latestScenarioStage}`);
+  };
+  page.on("console", onScenarioConsole);
   const evaluation = page.evaluate(
     async ({
       scenarioTemplate,
@@ -1713,6 +1722,7 @@ async function runScenario(
       sourceKernelSamples,
       sourceKernelWarmupSamples,
       sourceKernelSubmitPolicy,
+      scenarioStagePrefix,
     }) => {
       const result = {
         apiSurface,
@@ -1732,6 +1742,11 @@ async function runScenario(
         indirectDispatchArgumentWords * Uint32Array.BYTES_PER_ELEMENT;
 
       const nowMs = () => performance.now();
+      const reportScenarioStage = (stage) => {
+        console.debug(
+          `${scenarioStagePrefix}${scenarioConfig?.sourceWorkloadId ?? scenarioTemplate}:${stage}`,
+        );
+      };
       async function sha256Hex(bytes) {
         if (!globalThis.crypto?.subtle) {
           throw new Error("Web Crypto SHA-256 unavailable for browser output oracle");
@@ -1750,6 +1765,7 @@ async function runScenario(
         browserRuntime ? browserRuntime.createCanvasContext(canvas) : canvas.getContext("webgpu");
 
       async function initDevice() {
+        reportScenarioStage("adapter_request_started");
         if (typeof gpu === "undefined") {
           throw new Error("WebGPU surface unavailable");
         }
@@ -1761,9 +1777,12 @@ async function runScenario(
         if (!adapter) {
           throw new Error("requestAdapter returned null");
         }
+        reportScenarioStage("adapter_request_completed");
         const deviceStart = nowMs();
+        reportScenarioStage("device_request_started");
         const device = await adapter.requestDevice();
         const deviceEnd = nowMs();
+        reportScenarioStage("device_request_completed");
         return {
           adapter,
           device,
@@ -1862,6 +1881,7 @@ async function runScenario(
           computeProjectionSourceKernel,
           computeProjectionSourceKernelOracle,
         ].includes(computeConfig.computeProjection)) {
+          reportScenarioStage("source_kernel_started");
           const kernelSource = scenarioConfig?.kernelSource;
           if (typeof kernelSource !== "string" || kernelSource.length === 0) {
             throw new Error(`${computeProjectionSourceKernel} missing kernelSource`);
@@ -1884,7 +1904,9 @@ async function runScenario(
             device.queue.writeBuffer(buffer, 0, new Uint8Array(binding.bufferSize));
             return { ...binding, buffer };
           });
+          reportScenarioStage("buffer_initialization_submitted");
           await device.queue.onSubmittedWorkDone();
+          reportScenarioStage("buffer_initialization_completed");
           result.metrics.bufferInitMs = nowMs() - t0;
 
           t0 = nowMs();
@@ -1943,6 +1965,7 @@ async function runScenario(
             layout: pipelineLayout,
             compute: { module: shader, entryPoint: "main" },
           });
+          reportScenarioStage("pipeline_created");
           result.metrics.computePipelineMs = nowMs() - t0;
 
           t0 = nowMs();
@@ -1976,37 +1999,111 @@ async function runScenario(
           }
 
           const warmupDispatchCount = computeConfig.warmupDispatchCount ?? 0;
-          const dispatchesPerSample = dispatchIters * computeConfig.dispatchRepeat;
-          const submitsPerSample = sourceKernelSubmitPolicy === "sample-batch-v1"
-            ? 1
-            : dispatchIters;
+          const sourceOperationIterations = 1;
+          const dispatchesPerSample = computeConfig.dispatchRepeat;
+          const submitsPerSample = 1;
           function encodeSampleDispatches() {
-            if (sourceKernelSubmitPolicy === "sample-batch-v1") {
-              encodeDispatches(dispatchesPerSample);
-              return;
+            encodeDispatches(dispatchesPerSample);
+          }
+
+          async function resetStorageBuffers(stage) {
+            const resetStartMs = nowMs();
+            for (const binding of buffers) {
+              device.queue.writeBuffer(binding.buffer, 0, new Uint8Array(binding.bufferSize));
             }
-            for (let i = 0; i < dispatchIters; i += 1) {
-              encodeDispatches(computeConfig.dispatchRepeat);
-            }
+            await device.queue.onSubmittedWorkDone();
+            reportScenarioStage(stage);
+            return nowMs() - resetStartMs;
           }
 
           if (warmupDispatchCount > 0) {
             encodeDispatches(warmupDispatchCount);
+            reportScenarioStage("warmup_submitted");
             await device.queue.onSubmittedWorkDone();
+            reportScenarioStage("warmup_completed");
           }
 
           for (let sampleIndex = 0; sampleIndex < sourceKernelWarmupSamples; sampleIndex += 1) {
             encodeSampleDispatches();
             await device.queue.onSubmittedWorkDone();
           }
+
+          const outputOracle = computeConfig.outputOracle;
+          if (outputOracle) {
+            const oracleBinding = buffers.find(
+              (candidate) => candidate.group === outputOracle.bindingGroup
+                && candidate.binding === outputOracle.binding,
+            );
+            if (!oracleBinding || oracleBinding.bufferBindingType !== "storage") {
+              throw new Error(`${computeProjectionSourceKernel} output oracle binding unavailable`);
+            }
+            result.metrics.outputOracleResetMs = await resetStorageBuffers(
+              "oracle_reset_completed",
+            );
+
+            t0 = nowMs();
+            encodeDispatches(outputOracle.dispatchCount);
+            reportScenarioStage("oracle_dispatch_submitted");
+            await device.queue.onSubmittedWorkDone();
+            reportScenarioStage("oracle_dispatch_completed");
+            result.metrics.outputOracleDispatchMs = nowMs() - t0;
+
+            const oracleReadback = device.createBuffer({
+              size: oracleBinding.bufferSize,
+              usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+            });
+            t0 = nowMs();
+            const oracleEncoder = device.createCommandEncoder();
+            oracleEncoder.copyBufferToBuffer(
+              oracleBinding.buffer,
+              0,
+              oracleReadback,
+              0,
+              oracleBinding.bufferSize,
+            );
+            device.queue.submit([oracleEncoder.finish()]);
+            await device.queue.onSubmittedWorkDone();
+            await oracleReadback.mapAsync(GPUMapMode.READ);
+            reportScenarioStage("oracle_readback_mapped");
+            const oracleData = new Uint8Array(oracleReadback.getMappedRange());
+            const oracleActualSha256 = await sha256Hex(oracleData);
+            const oracleSampleBytes = Array.from(
+              oracleData.slice(0, Math.min(readbackSampleByteCount, oracleData.length)),
+            );
+            oracleReadback.unmap();
+            oracleReadback.destroy();
+            result.metrics.outputOracleReadbackMs = nowMs() - t0;
+            result.metrics.outputOracleSchemaVersion = outputOracle.schemaVersion;
+            result.metrics.outputOracleKind = outputOracle.kind;
+            result.metrics.outputOracleInitialization = outputOracle.initialization;
+            result.metrics.outputOracleBindingGroup = outputOracle.bindingGroup;
+            result.metrics.outputOracleBinding = outputOracle.binding;
+            result.metrics.outputOracleDispatchCount = outputOracle.dispatchCount;
+            result.metrics.outputOracleExpectedSha256 = outputOracle.expectedSha256;
+            result.metrics.outputOracleActualSha256 = oracleActualSha256;
+            result.metrics.outputOracleReferenceId = outputOracle.referenceId;
+            result.metrics.outputOracleSampleBytes = oracleSampleBytes;
+            result.metrics.outputOracleMatched = oracleActualSha256 === outputOracle.expectedSha256;
+            if (!result.metrics.outputOracleMatched) {
+              throw new Error(
+                `${computeProjectionSourceKernel} output oracle mismatch: `
+                  + `expected ${outputOracle.expectedSha256}, got ${oracleActualSha256}`,
+              );
+            }
+          }
+
           const dispatchSamples = [];
+          const sampleResetMs = [];
           for (let sampleIndex = 0; sampleIndex < sourceKernelSamples; sampleIndex += 1) {
+            sampleResetMs.push(await resetStorageBuffers(`sample_${sampleIndex + 1}_reset`));
             const sampleStartMs = nowMs();
             const encodeSubmitStartMs = nowMs();
             encodeSampleDispatches();
+            reportScenarioStage(`sample_${sampleIndex + 1}_submitted`);
             const encodeSubmitMs = nowMs() - encodeSubmitStartMs;
             const waitStartMs = nowMs();
             await device.queue.onSubmittedWorkDone();
+            reportScenarioStage(`sample_${sampleIndex + 1}_completed`);
             const waitMs = nowMs() - waitStartMs;
             const elapsedMs = nowMs() - sampleStartMs;
             dispatchSamples.push({
@@ -2040,11 +2137,13 @@ async function runScenario(
             readbackBinding.bufferSize,
           );
           device.queue.submit([readbackEncoder.finish()]);
+          reportScenarioStage("readback_submitted");
           result.metrics.submitReadbackMs = nowMs() - t0;
 
           t0 = nowMs();
           await device.queue.onSubmittedWorkDone();
           await readback.mapAsync(GPUMapMode.READ);
+          reportScenarioStage("readback_mapped");
           const readbackData = new Uint8Array(readback.getMappedRange());
           let readbackChecksum = 0;
           for (let index = 0; index < readbackData.length; index += 1) {
@@ -2057,69 +2156,6 @@ async function runScenario(
           readback.unmap();
           result.metrics.mapReadMs = nowMs() - t0;
 
-          const outputOracle = computeConfig.outputOracle;
-          if (outputOracle) {
-            const oracleBinding = buffers.find(
-              (candidate) => candidate.group === outputOracle.bindingGroup
-                && candidate.binding === outputOracle.binding,
-            );
-            if (!oracleBinding || oracleBinding.bufferBindingType !== "storage") {
-              throw new Error(`${computeProjectionSourceKernel} output oracle binding unavailable`);
-            }
-            t0 = nowMs();
-            for (const binding of buffers) {
-              device.queue.writeBuffer(binding.buffer, 0, new Uint8Array(binding.bufferSize));
-            }
-            await device.queue.onSubmittedWorkDone();
-            result.metrics.outputOracleResetMs = nowMs() - t0;
-
-            t0 = nowMs();
-            encodeDispatches(outputOracle.dispatchCount);
-            await device.queue.onSubmittedWorkDone();
-            result.metrics.outputOracleDispatchMs = nowMs() - t0;
-
-            const oracleReadback = device.createBuffer({
-              size: oracleBinding.bufferSize,
-              usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-            });
-            t0 = nowMs();
-            const oracleEncoder = device.createCommandEncoder();
-            oracleEncoder.copyBufferToBuffer(
-              oracleBinding.buffer,
-              0,
-              oracleReadback,
-              0,
-              oracleBinding.bufferSize,
-            );
-            device.queue.submit([oracleEncoder.finish()]);
-            await device.queue.onSubmittedWorkDone();
-            await oracleReadback.mapAsync(GPUMapMode.READ);
-            const oracleData = new Uint8Array(oracleReadback.getMappedRange());
-            const oracleActualSha256 = await sha256Hex(oracleData);
-            const oracleSampleBytes = Array.from(
-              oracleData.slice(0, Math.min(readbackSampleByteCount, oracleData.length)),
-            );
-            oracleReadback.unmap();
-            oracleReadback.destroy();
-            result.metrics.outputOracleReadbackMs = nowMs() - t0;
-            result.metrics.outputOracleSchemaVersion = outputOracle.schemaVersion;
-            result.metrics.outputOracleKind = outputOracle.kind;
-            result.metrics.outputOracleInitialization = outputOracle.initialization;
-            result.metrics.outputOracleBindingGroup = outputOracle.bindingGroup;
-            result.metrics.outputOracleBinding = outputOracle.binding;
-            result.metrics.outputOracleDispatchCount = outputOracle.dispatchCount;
-            result.metrics.outputOracleExpectedSha256 = outputOracle.expectedSha256;
-            result.metrics.outputOracleActualSha256 = oracleActualSha256;
-            result.metrics.outputOracleReferenceId = outputOracle.referenceId;
-            result.metrics.outputOracleSampleBytes = oracleSampleBytes;
-            result.metrics.outputOracleMatched = oracleActualSha256 === outputOracle.expectedSha256;
-            if (!result.metrics.outputOracleMatched) {
-              throw new Error(
-                `${computeProjectionSourceKernel} output oracle mismatch: `
-                  + `expected ${outputOracle.expectedSha256}, got ${oracleActualSha256}`,
-              );
-            }
-          }
           const bindGroupLayoutEntries = storageBindings
             .map((binding) => ({
               group: binding.group,
@@ -2129,7 +2165,12 @@ async function runScenario(
             }))
             .sort((left, right) => left.group - right.group || left.binding - right.binding);
 
-          result.metrics.iterations = dispatchIters;
+          result.metrics.iterations = sourceOperationIterations;
+          result.metrics.requestedIterations = dispatchIters;
+          result.metrics.sourceOperationIterations = sourceOperationIterations;
+          result.metrics.sourceOperationPolicy = "declared-command-once-v1";
+          result.metrics.sourceKernelSampleResetPolicy = "zero-fill-before-each-sample-v1";
+          result.metrics.sourceKernelSampleResetMsSamples = sampleResetMs;
           result.metrics.sourceKernelSampleCount = dispatchSamples.length;
           result.metrics.sourceKernelWarmupSampleCount = sourceKernelWarmupSamples;
           result.metrics.sourceKernelWarmupDispatches = dispatchesPerSample * sourceKernelWarmupSamples;
@@ -2351,6 +2392,7 @@ async function runScenario(
           layout: "auto",
           compute: { module: shader, entryPoint: "main" },
         });
+        reportScenarioStage("generic_pipeline_created");
         for (let i = 0; i < genericComputeWarmupSubmits; i += 1) {
           const encoder = device.createCommandEncoder();
           const pass = encoder.beginComputePass();
@@ -2359,7 +2401,9 @@ async function runScenario(
           pass.end();
           device.queue.submit([encoder.finish()]);
         }
+        reportScenarioStage("generic_warmup_submitted");
         await device.queue.onSubmittedWorkDone();
+        reportScenarioStage("generic_warmup_completed");
         const t0 = nowMs();
         const encodeSubmitStart = nowMs();
         for (let i = 0; i < dispatchIters; i += 1) {
@@ -2370,9 +2414,11 @@ async function runScenario(
           pass.end();
           device.queue.submit([encoder.finish()]);
         }
+        reportScenarioStage("generic_sample_submitted");
         const encodeSubmitMs = nowMs() - encodeSubmitStart;
         const waitStart = nowMs();
         await device.queue.onSubmittedWorkDone();
+        reportScenarioStage("generic_sample_completed");
         const waitMs = nowMs() - waitStart;
         const t1 = nowMs();
         const dispatchElapsedMs = t1 - t0;
@@ -3260,6 +3306,7 @@ async function runScenario(
       sourceKernelSamples,
       sourceKernelWarmupSamples,
       sourceKernelSubmitPolicy,
+      scenarioStagePrefix: SCENARIO_STAGE_PREFIX,
     },
   );
   const controllerDeadlineMs = template === "fawn_visual_resource"
@@ -3279,6 +3326,7 @@ async function runScenario(
             metrics: {
               scenarioTemplate: template,
               controllerDeadlineMs,
+              latestScenarioStage,
             },
           });
         }, controllerDeadlineMs);
@@ -3286,6 +3334,7 @@ async function runScenario(
     ]);
   } finally {
     clearTimeout(controllerTimeout);
+    page.off("console", onScenarioConsole);
   }
 }
 
@@ -3584,7 +3633,13 @@ async function runMode(
 
   try {
     const context = await browser.newContext();
-    const page = await context.newPage();
+    let page = await context.newPage();
+    async function recycleTimedOutPage(scenarioResult, scenarioLabel) {
+      if (scenarioResult.statusCode !== "scenario_controller_timeout") return;
+      console.log(`[mode=${mode} scenario=${scenarioLabel}] recycling timed-out page`);
+      await page.close({ runBeforeUnload: false });
+      page = await context.newPage();
+    }
     await page.goto(pageTarget.url, { waitUntil: "domcontentloaded", timeout: 120000 });
     const browserSurfaceArgs = {
       apiSurface: args.apiSurface,
@@ -3613,6 +3668,9 @@ async function runMode(
         continue;
       }
       await page.goto(pageTarget.url, { waitUntil: "load", timeout: 120000 });
+      console.log(
+        `[mode=${mode} l1=${row.sourceWorkloadId}] started template=${row.scenarioTemplate}`,
+      );
       const scenarioResult = await runScenario(
         page,
         row.scenarioTemplate,
@@ -3624,6 +3682,9 @@ async function runMode(
         args.sourceKernelSubmitPolicy,
         args.scenarioControllerDeadlineMs,
       );
+      console.log(
+        `[mode=${mode} l1=${row.sourceWorkloadId}] completed status=${scenarioResult.status} code=${scenarioResult.statusCode}`,
+      );
       rowResultsById.set(
         row.sourceWorkloadId,
         makeModeRowResult(
@@ -3633,6 +3694,7 @@ async function runMode(
           scenarioResult.metrics,
         ),
       );
+      await recycleTimedOutPage(scenarioResult, `l1:${row.sourceWorkloadId}`);
     }
 
     for (const workflow of l2Rows) {
@@ -3651,6 +3713,9 @@ async function runMode(
         ? resourceUrl(pageTarget.url, workflow.resourcePath)
         : pageTarget.url;
       await page.goto(workflowUrl, { waitUntil: "load", timeout: 120000 });
+      console.log(
+        `[mode=${mode} l2=${workflow.id}] started template=${workflow.scenarioTemplate}`,
+      );
       const scenarioResult = await runScenario(
         page,
         workflow.scenarioTemplate,
@@ -3662,6 +3727,9 @@ async function runMode(
         args.sourceKernelSubmitPolicy,
         args.scenarioControllerDeadlineMs,
       );
+      console.log(
+        `[mode=${mode} l2=${workflow.id}] completed status=${scenarioResult.status} code=${scenarioResult.statusCode}`,
+      );
       workflowResultsById.set(
         workflow.id,
         makeModeRowResult(
@@ -3671,6 +3739,7 @@ async function runMode(
           scenarioResult.metrics,
         ),
       );
+      await recycleTimedOutPage(scenarioResult, `l2:${workflow.id}`);
     }
 
     return {
@@ -3914,6 +3983,7 @@ const MERGED_SUM_METRICS = new Set([
 const MERGED_CONCAT_METRICS = new Set([
   "dispatchElapsedMsSamples",
   "encodeSubmitMsSamples",
+  "sourceKernelSampleResetMsSamples",
   "waitMsSamples",
   "usPerOpSamples",
 ]);
@@ -4299,7 +4369,7 @@ async function main() {
   );
 
   const report = {
-    schemaVersion: 5,
+    schemaVersion: 6,
     reportKind: "browser-layered-diagnostic",
     benchmarkClass: "directional",
     comparisonStatus: "diagnostic",

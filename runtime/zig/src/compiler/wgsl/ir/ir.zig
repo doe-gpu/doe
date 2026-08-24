@@ -404,6 +404,9 @@ pub const Expr = union(enum) {
         name: []const u8,
         kind: CallKind,
         args: Range,
+        /// Marks a compiler-inserted robustness operation so backend emitters
+        /// can distinguish it from an identical user-authored builtin call.
+        robustness_generated: bool = false,
     },
     construct: struct {
         ty: TypeId,

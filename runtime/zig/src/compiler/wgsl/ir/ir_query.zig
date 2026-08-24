@@ -79,6 +79,67 @@ pub fn matchesIntLiteral(function: *const ir.Function, expr_id: ir.ExprId, expec
     return matchIntLiteral(function, expr_id) == expected;
 }
 
+pub const RuntimeArrayWriteGuard = struct {
+    unclamped_index: ir.ExprId,
+    array_length: ir.ExprId,
+};
+
+/// Recognize the compiler-generated runtime-array clamp on an assignment
+/// target. Reads retain the in-bounds clamp, while writes need an outer guard
+/// so an out-of-bounds store is discarded instead of aliasing the last element.
+pub fn runtimeArrayWriteGuard(
+    function: *const ir.Function,
+    lhs_expr_id: ir.ExprId,
+) ?RuntimeArrayWriteGuard {
+    var current = lhs_expr_id;
+    while (true) {
+        const expression = function.exprs.items[current];
+        const index = switch (expression.data) {
+            .index => |value| value,
+            .member => |member| {
+                current = member.base;
+                continue;
+            },
+            else => return null,
+        };
+        const clamp = function.exprs.items[index.index];
+        const call = switch (clamp.data) {
+            .call => |value| value,
+            else => return null,
+        };
+        if (!call.robustness_generated or
+            call.kind != .builtin or
+            !std.mem.eql(u8, call.name, "min") or
+            call.args.len != 2)
+        {
+            current = index.base;
+            continue;
+        }
+        const unclamped_index = function.expr_args.items[call.args.start];
+        const maximum = function.exprs.items[function.expr_args.items[call.args.start + 1]];
+        const subtraction = switch (maximum.data) {
+            .binary => |value| value,
+            else => return null,
+        };
+        if (subtraction.op != .sub or !matchesIntLiteral(function, subtraction.rhs, 1)) return null;
+        const array_length = function.exprs.items[subtraction.lhs];
+        const length_call = switch (array_length.data) {
+            .call => |value| value,
+            else => return null,
+        };
+        if (length_call.kind != .builtin or
+            !std.mem.eql(u8, length_call.name, "arrayLength") or
+            length_call.args.len != 1)
+        {
+            return null;
+        }
+        return .{
+            .unclamped_index = unclamped_index,
+            .array_length = subtraction.lhs,
+        };
+    }
+}
+
 pub fn typeHasIoStructField(module: *const ir.Module, ty: ir.TypeId) bool {
     return switch (module.types.get(ty)) {
         .struct_ => |struct_id| {

@@ -57,6 +57,8 @@
         "metal_bridge_encode_compute_dispatch_batch",
         "metal_bridge_cmd_buf_encode_compute_dispatch",
         "metal_bridge_compute_encoder_encode_dispatch",
+        "metal_bridge_compute_encoder_encode_dispatch_indirect",
+        "metal_bridge_compute_encoder_bind_resources",
         "metal_bridge_compute_encoder_encode_dispatch_batch",
         "metal_bridge_compute_encoder_encode_dispatch_batch_repeated",
         "metal_bridge_cmd_buf_encode_compute_dispatch_indirect",

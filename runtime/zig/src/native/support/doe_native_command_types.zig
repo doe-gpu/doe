@@ -77,6 +77,7 @@ pub const RecordedCmd = union(CmdTag) {
         buf_sizes: [shared.MAX_FLAT_BIND]u64,
         buf_count: u32,
         vulkan_binding_state: RecordedVulkanBindingState = .{},
+        bind_groups: [shared.MAX_COMPUTE_BIND_GROUPS]?*anyopaque = [_]?*anyopaque{null} ** shared.MAX_COMPUTE_BIND_GROUPS,
         indirect_buf: ?*anyopaque,
         offset: u64,
         wg_x: u32 = 0,
@@ -233,6 +234,7 @@ pub fn dispatchesCanMerge(left: *const RecordedDispatch, right: *const RecordedD
     if (left.buf_count != right.buf_count) return false;
     if (left.x != right.x or left.y != right.y or left.z != right.z) return false;
     if (left.wg_x != right.wg_x or left.wg_y != right.wg_y or left.wg_z != right.wg_z) return false;
+    if (!std.mem.eql(?*anyopaque, &left.bind_groups, &right.bind_groups)) return false;
 
     const count: usize = @intCast(left.buf_count);
     return std.mem.eql(?*anyopaque, left.bufs[0..count], right.bufs[0..count]) and

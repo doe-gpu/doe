@@ -154,7 +154,7 @@ test "robustness: guarded local stride workgroup index elides sized-array clamp"
     try std.testing.expect(std.mem.indexOf(u8, msl, "min((lane + stride)") == null);
 }
 
-test "robustness: runtime-sized array index emits arrayLength in MSL output" {
+test "robustness: runtime-sized array write is guarded in MSL output" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> buf: array<u32>;
         \\@compute @workgroup_size(64)
@@ -169,6 +169,23 @@ test "robustness: runtime-sized array index emits arrayLength in MSL output" {
     const expect_elided = lean_proof.boundsProven(.gid_1d_storage_buffer);
     try std.testing.expectEqual(!expect_elided, std.mem.indexOf(u8, msl, "min(") != null);
     try std.testing.expectEqual(!expect_elided, std.mem.indexOf(u8, msl, "_doe_sizes") != null);
+    try std.testing.expectEqual(!expect_elided, std.mem.indexOf(u8, msl, "if (idx < ") != null);
+}
+
+test "robustness: runtime-sized array write is guarded in HLSL output" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> buf: array<u32>;
+        \\@compute @workgroup_size(64)
+        \\fn main(@builtin(global_invocation_id) gid: vec3u) {
+        \\    let idx = gid.x;
+        \\    buf[idx] = 42u;
+        \\}
+    ;
+    var out: [MAX_HLSL_OUTPUT]u8 = undefined;
+    const len = try translateToHlsl(std.testing.allocator, source, &out);
+    const hlsl = out[0..len];
+    try std.testing.expect(std.mem.indexOf(u8, hlsl, "if (idx < ") != null);
+    try std.testing.expect(std.mem.indexOf(u8, hlsl, "doe_arrayLength_buf()") != null);
 }
 
 test "arrayLength(&buf) in comparison compiles" {

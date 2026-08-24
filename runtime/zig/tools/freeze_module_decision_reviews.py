@@ -41,6 +41,7 @@ REVIEWED_SIGNALS: dict[str, str] = {
     "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig": "Keep: independently meaningful uniform-bounds proof algorithm.",
     "src/dropin/dropin_browser_shared_memory.zig": "Keep: browser shared-memory ABI and lifetime capsule; native ownership must remain isolated.",
     "src/native/compute/doe_compute_fast.zig": "Keep: promoted native fast-compute API and execution boundary; Vulkan bindings and backend implementation have separate owners.",
+    "src/native/queue/doe_queue_submit_metal.zig": "Keep: authoritative Metal recorded-command submission, encoder lifetime, synchronization, and backend resource-binding boundary.",
     "src/native/resource/doe_texture_sampler_native.zig": "Keep: cohesive native texture, texture-view, and sampler ABI ownership; the upstream chained swizzle descriptor belongs to texture-view normalization and does not justify a size-only split.",
     "src/native/shader/doe_shader_native.zig": "Keep: native shader-module creation, translation, cache, diagnostics, and object-lifetime boundary.",
     "src/native/vulkan/vulkan_compute_native.zig": "Keep: native WebGPU-to-Vulkan compute command orchestration and lifetime boundary.",

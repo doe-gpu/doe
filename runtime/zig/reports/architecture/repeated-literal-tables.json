@@ -258,11 +258,11 @@
           "startLine": 635
         },
         {
-          "endLine": 72,
+          "endLine": 89,
           "literalCount": 4,
           "name": "try_execute_copy_only_deferred",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 45
+          "startLine": 62
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -432,6 +432,13 @@
           "startLine": 54
         },
         {
+          "endLine": 21,
+          "literalCount": 4,
+          "name": "FlatResources",
+          "path": "src/native/compute/doe_compute_bind_groups.zig",
+          "startLine": 12
+        },
+        {
           "endLine": 47,
           "literalCount": 4,
           "name": "executeDeferredCopies",
@@ -535,11 +542,18 @@
           "startLine": 164
         },
         {
-          "endLine": 276,
+          "endLine": 84,
+          "literalCount": 4,
+          "name": "collectFlatResources",
+          "path": "src/native/compute/doe_compute_bind_groups.zig",
+          "startLine": 64
+        },
+        {
+          "endLine": 278,
           "literalCount": 4,
           "name": "renderDrawsCanMerge",
           "path": "src/native/support/doe_native_command_types.zig",
-          "startLine": 262
+          "startLine": 264
         },
         {
           "endLine": 334,
@@ -1616,11 +1630,11 @@
           "startLine": 189
         },
         {
-          "endLine": 50,
+          "endLine": 62,
           "literalCount": 6,
           "name": "populateFlatBindings",
           "path": "src/native/compute/doe_compute_bind_groups.zig",
-          "startLine": 27
+          "startLine": 39
         },
         {
           "endLine": 51,
@@ -1650,11 +1664,11 @@
           "startLine": 213
         },
         {
-          "endLine": 412,
+          "endLine": 414,
           "literalCount": 4,
           "name": "texture_pattern_is_identity",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 404
+          "startLine": 406
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2003,11 +2017,11 @@
           "startLine": 568
         },
         {
-          "endLine": 241,
+          "endLine": 243,
           "literalCount": 6,
           "name": "dispatchesCanMerge",
           "path": "src/native/support/doe_native_command_types.zig",
-          "startLine": 229
+          "startLine": 230
         },
         {
           "endLine": 98,
@@ -2546,10 +2560,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "a1e24ac3eff2fb0e5c4e91fa3ff9ffce689e9ab81813d1b59e7b2049417f9a94",
+  "manifestSha256": "7d8ecdc587bc8b679e1e8d0073a37dc9f60f4c6dc404b6b73a0f8d41b835b47a",
   "reportGeneratorSha256": "4af263e10335e85d6f839348fd011c6d2cc6d1810e1a31ef1744f8751bf9779f",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
+  "sourceTreeSha256": "b5f519ef1d01132295f3dee27a7b18f8050e8a1217b205b2ca4f1dc1f6b47039",
   "status": "captured"
 }

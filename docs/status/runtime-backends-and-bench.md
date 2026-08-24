@@ -6,6 +6,39 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- Browser layered-report schema version 6 makes source-kernel measurement an
+  exact-operation contract. Each timed sample executes one declared source
+  command, uses that command's `dispatchRepeat` without multiplying it by the
+  generic dispatch-iteration knob, starts from a zero-filled buffer state, and
+  records the effective operation and reset policies. The checker rejects the
+  former multiplied shape. Version 5 source-kernel reports remain historical
+  diagnostics and must be regenerated before comparison or promotion; their
+  timing samples must not be relabeled as version 6 evidence.
+- Metal `onSubmittedWorkDone` now finalizes the retained command buffer and all
+  deferred queue state before dispatching a spontaneous callback through the
+  canonical callback dispatcher. This prevents JavaScript from reusing buffers
+  after a shared-event notification but before Doe has made the queue state
+  reusable.
+- Metal compute recording now retains bind-group identity and binds texture and
+  sampler index spaces for direct and indirect dispatch. Indirect dispatch no
+  longer snapshots counts on the CPU before preceding GPU commands execute;
+  the regression writes its dispatch counts on the GPU and consumes a sampled
+  texture in the following indirect dispatch.
+- WGSL runtime-array robustness now distinguishes reads from writes. Reads keep
+  the generated clamp, while MSL and HLSL discard out-of-bounds stores instead
+  of redirecting them to the last element. Translation fixtures and the native
+  overdispatch oracle exercise the correction.
+- Node read-only execution canonicalizes physical filesystem paths while
+  retaining declared aliases when both are required by the host permission
+  model. Clean-installed DoeProof and native platform-package resolution now
+  pass from macOS temporary roots where `/var` resolves through `/private/var`.
+- Schema-current physical browser evidence and its balanced control are
+  retained under `browser/chromium/artifacts/20260824T031600Z/`. All required
+  rows pass with forced Dawn and forced Doe and no fallback. The diagnostic
+  score is unfavorable to Doe (`38.37` versus Dawn `61.63`, aggregate delta
+  `-60.65%`; category-balanced delta `-52.81%`), so it grants no performance
+  win. The evidence remains diagnostic until bound to a frozen commit and an
+  admissible release browser.
 - Recomposition backend-evidence schema version 4 makes cumulative multi-host
   identity backend-local. Every captured backend carries its own
   `evidenceHost`; the aggregate no longer records whichever operator happened
@@ -593,9 +626,16 @@ file only names the promoted boundary and open admission gates.
   before it supports public conformance language. The AMD Vulkan raw run,
   physical adapter identity, subset receipt, and backend pass ledger are now
   hash-bound published diagnostic evidence.
-- Chromium Track A needs a locally built Fawn-patched browser artifact before a
-  forced-Doe run can prove Doe is active. Stock Chrome is only a negative
-  runtime-selection control.
+- A local Apple Fawn build now proves forced Dawn and forced Doe execution in
+  the browser smoke and balanced superset diagnostics. This does not satisfy
+  the physical AMD four-lane obligation, establish an official release-class
+  browser archive, or grant public Fawn promotion.
+- The current worktree semantic receipt remains red at the ABI boundary. A
+  macOS `.dylib` symbol inventory cannot replace the frozen Linux `.so`
+  inventory, and the existing PCI-identity approval is bound to an earlier
+  reviewed source digest. The robustness lowering is explicitly approved as a
+  WebGPU correctness correction; ABI revalidation still requires the frozen
+  candidate on its matching Linux host and independent review.
 - End-to-end application latency, memory, concurrency, crash, hang, and leak
   evidence must become release-blocking for the promoted developer wedge.
 - Installation must pass from clean npm environments on every supported

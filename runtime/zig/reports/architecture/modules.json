@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "a1e24ac3eff2fb0e5c4e91fa3ff9ffce689e9ab81813d1b59e7b2049417f9a94",
+  "manifestSha256": "7d8ecdc587bc8b679e1e8d0073a37dc9f60f4c6dc404b6b73a0f8d41b835b47a",
   "modules": [
     {
       "containsCImport": false,
@@ -3787,7 +3787,7 @@
       "imports": [],
       "isProductionRoot": false,
       "layer": "backend-metal",
-      "lineCount": 211,
+      "lineCount": 213,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/metal/metal_bridge_decls.zig",
@@ -3800,12 +3800,12 @@
         },
         {
           "kind": "const",
-          "line": 200,
+          "line": 202,
           "name": "MetalVertexBufferLayout"
         },
         {
           "kind": "const",
-          "line": 206,
+          "line": 208,
           "name": "MetalVertexAttributeDesc"
         }
       ],
@@ -3847,9 +3847,9 @@
       "roles": [
         "ffi-boundary"
       ],
-      "sha256": "29ea5b80249daed3776e7fe0d5bb11834abb2be6009dd27409e888d59d992051",
+      "sha256": "c21eafbcf392bd8525f63bd88fc3ca62cdd3904ed63d237dcfab075bda29e5a6",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 132
+      "topLevelDeclarationCount": 134
     },
     {
       "containsCImport": false,
@@ -21376,19 +21376,20 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 4,
-      "fanOut": 7,
+      "fanOut": 8,
       "imports": [
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_builtins.zig",
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig",
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig",
         "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/ir/layout_utils.zig",
         "src/contracts/shader_abi/dispatch_info.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 753,
+      "lineCount": 769,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
@@ -21396,17 +21397,17 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 10,
+          "line": 11,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 16,
+          "line": 17,
           "name": "MAX_OUTPUT"
         },
         {
           "kind": "fn",
-          "line": 18,
+          "line": 19,
           "name": "emit"
         }
       ],
@@ -21425,9 +21426,9 @@
         "src/compiler/wgsl/pipeline/translate_hlsl.zig"
       ],
       "roles": [],
-      "sha256": "f97768329ddcc9d86e13eab123efee4f8004255feab4d8103da33e4355dd9e9f",
+      "sha256": "554705f74a90c6415d10a9c438179f0fccb2943c5c5f258fbe22110af8405a61",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 13
+      "topLevelDeclarationCount": 14
     },
     {
       "containsCImport": false,
@@ -21574,7 +21575,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 436,
+      "lineCount": 451,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig",
@@ -21598,7 +21599,7 @@
         "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig"
       ],
       "roles": [],
-      "sha256": "4e277fe572fd89cb4f1dd7d3fa795c7e7bf70f3ae0be98adf5955dde90a65117",
+      "sha256": "013fa6a3a57a0a127cc3bcde07f0e2032009e8fa9e5c6037442211e6e88ae366",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 16
     },
@@ -21758,7 +21759,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 7,
+      "fanOut": 8,
       "imports": [
         "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
@@ -21766,11 +21767,12 @@
         "src/compiler/wgsl/emit/msl/emit_msl_subgroups.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_workgroup_zero.zig",
         "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/ir/layout_utils.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 957,
+      "lineCount": 973,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
@@ -21778,27 +21780,27 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 10,
+          "line": 11,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 15,
+          "line": 16,
           "name": "MAX_OUTPUT"
         },
         {
           "kind": "const",
-          "line": 19,
+          "line": 20,
           "name": "MSL_SIZES_SLOT"
         },
         {
           "kind": "fn",
-          "line": 21,
+          "line": 22,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 27,
+          "line": 28,
           "name": "moduleNeedsSizesParam"
         }
       ],
@@ -21816,9 +21818,9 @@
         "src/native/queue/doe_queue_submit_metal.zig"
       ],
       "roles": [],
-      "sha256": "24e09d092bd3e92d7af669e88d0b6eb14280d16d85c29224fc5145e47d1374d1",
+      "sha256": "3b3139b0f71cb314c5ef5d26ede6e6e4758047f114571a3fa388a691a2370ea4",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 15
+      "topLevelDeclarationCount": 16
     },
     {
       "containsCImport": false,
@@ -21954,14 +21956,15 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 4,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
-        "src/compiler/wgsl/ir/ir.zig"
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 633,
+      "lineCount": 649,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
@@ -21969,52 +21972,52 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 16,
+          "line": 17,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 25,
+          "line": 26,
           "name": "vertex_function_name"
         },
         {
           "kind": "fn",
-          "line": 31,
+          "line": 32,
           "name": "fragment_function_name"
         },
         {
           "kind": "fn",
-          "line": 40,
+          "line": 41,
           "name": "write_type"
         },
         {
           "kind": "fn",
-          "line": 158,
+          "line": 159,
           "name": "write_bound_global_param"
         },
         {
           "kind": "fn",
-          "line": 229,
+          "line": 230,
           "name": "write_stmt"
         },
         {
           "kind": "fn",
-          "line": 366,
+          "line": 382,
           "name": "write_expr"
         },
         {
           "kind": "fn",
-          "line": 602,
+          "line": 618,
           "name": "write_str"
         },
         {
           "kind": "fn",
-          "line": 608,
+          "line": 624,
           "name": "write_indent"
         },
         {
           "kind": "fn",
-          "line": 613,
+          "line": 629,
           "name": "write_u32"
         }
       ],
@@ -22033,9 +22036,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "4175e54423674fc0bdf8b3a994e8e659e0544d5544783f450acab38de1f50a18",
+      "sha256": "185a0e9d40c114c3794e299d9376f367c7c2b6b771fd13a2dc568e4ac92d98a7",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 26
+      "topLevelDeclarationCount": 27
     },
     {
       "containsCImport": false,
@@ -24335,7 +24338,7 @@
       "imports": [],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 676,
+      "lineCount": 679,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir.zig",
@@ -24508,77 +24511,77 @@
         },
         {
           "kind": "const",
-          "line": 423,
+          "line": 426,
           "name": "ExprNode"
         },
         {
           "kind": "const",
-          "line": 437,
+          "line": 440,
           "name": "LoopKind"
         },
         {
           "kind": "const",
-          "line": 443,
+          "line": 446,
           "name": "SwitchCase"
         },
         {
           "kind": "const",
-          "line": 453,
+          "line": 456,
           "name": "Stmt"
         },
         {
           "kind": "const",
-          "line": 488,
+          "line": 491,
           "name": "Function"
         },
         {
           "kind": "const",
-          "line": 543,
+          "line": 546,
           "name": "EntryPoint"
         },
         {
           "kind": "const",
-          "line": 551,
+          "line": 554,
           "name": "OverrideEntry"
         },
         {
           "kind": "const",
-          "line": 558,
+          "line": 561,
           "name": "DispatchPreconditionKind"
         },
         {
           "kind": "const",
-          "line": 576,
+          "line": 579,
           "name": "DispatchPrecondition"
         },
         {
           "kind": "const",
-          "line": 601,
+          "line": 604,
           "name": "TextureDispatchPreconditionKind"
         },
         {
           "kind": "const",
-          "line": 607,
+          "line": 610,
           "name": "TextureDispatchCoordMode"
         },
         {
           "kind": "const",
-          "line": 612,
+          "line": 615,
           "name": "TextureDispatchPrecondition"
         },
         {
           "kind": "const",
-          "line": 630,
+          "line": 633,
           "name": "Module"
         },
         {
           "kind": "fn",
-          "line": 666,
+          "line": 669,
           "name": "dup_string"
         },
         {
           "kind": "fn",
-          "line": 670,
+          "line": 673,
           "name": "is_scalar"
         }
       ],
@@ -24690,7 +24693,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "bdba3b4b9c4aa38a572802523470c87cbfef1df6642b64f6ab886ed28c5463e2",
+      "sha256": "af17ee39fe189b629ed621621ccd5fce42e60e22cc42cec4cb0bebfc738d1613",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 50
     },
@@ -24926,7 +24929,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 12,
+      "fanIn": 15,
       "fanOut": 2,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
@@ -24934,11 +24937,11 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 317,
+      "lineCount": 378,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_query.zig",
-      "publicDeclarationCount": 14,
+      "publicDeclarationCount": 16,
       "publicDeclarations": [
         {
           "kind": "fn",
@@ -24971,43 +24974,53 @@
           "name": "matchesIntLiteral"
         },
         {
-          "kind": "fn",
+          "kind": "const",
           "line": 82,
+          "name": "RuntimeArrayWriteGuard"
+        },
+        {
+          "kind": "fn",
+          "line": 90,
+          "name": "runtimeArrayWriteGuard"
+        },
+        {
+          "kind": "fn",
+          "line": 143,
           "name": "typeHasIoStructField"
         },
         {
           "kind": "fn",
-          "line": 94,
+          "line": 155,
           "name": "exprIsTexture1D"
         },
         {
           "kind": "fn",
-          "line": 101,
+          "line": 162,
           "name": "resolveRuntimeArrayElementStride"
         },
         {
           "kind": "fn",
-          "line": 117,
+          "line": 178,
           "name": "findGlobalBase"
         },
         {
           "kind": "fn",
-          "line": 131,
+          "line": 192,
           "name": "isLocalRef"
         },
         {
           "kind": "fn",
-          "line": 139,
+          "line": 200,
           "name": "stmtWritesLocal"
         },
         {
           "kind": "fn",
-          "line": 167,
+          "line": 228,
           "name": "stmtContainsExpr"
         },
         {
           "kind": "fn",
-          "line": 208,
+          "line": 269,
           "name": "exprContainsExpr"
         }
       ],
@@ -25023,8 +25036,11 @@
         "src/compiler/tsir/family_hint.zig",
         "src/compiler/tsir/frontend.zig",
         "src/compiler/tsir/frontend_expr.zig",
+        "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig",
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig",
+        "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
+        "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_stage.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_texture.zig",
         "src/compiler/wgsl/ir/ir_transform_robustness.zig",
@@ -25034,9 +25050,9 @@
         "src/compiler/wgsl/proof/robustness_static_bounds.zig"
       ],
       "roles": [],
-      "sha256": "bbb3cb844b112a9104dbd32102150a538f6af4a91d60848a96c7118e90232c05",
+      "sha256": "9a3922c918ca3e4ce59e9b5a14b2eaf6d5d8475e286c1085c8bc6d5745bbbd43",
       "testBlockCount": 1,
-      "topLevelDeclarationCount": 18
+      "topLevelDeclarationCount": 20
     },
     {
       "containsCImport": false,
@@ -25053,7 +25069,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 973,
+      "lineCount": 975,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
@@ -25091,7 +25107,7 @@
         "src/compiler/wgsl/runtime/shader_info.zig"
       ],
       "roles": [],
-      "sha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6",
+      "sha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 46
     },
@@ -47567,49 +47583,65 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
-      "fanOut": 2,
+      "fanIn": 3,
+      "fanOut": 3,
       "imports": [
+        "src/native/support/doe_native_object_helpers.zig",
         "src/native/support/doe_native_object_types.zig",
         "src/native/support/doe_native_shared_types.zig"
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 56,
+      "lineCount": 114,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/compute/doe_compute_bind_groups.zig",
-      "publicDeclarationCount": 6,
+      "publicDeclarationCount": 9,
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 5,
+          "line": 6,
           "name": "MAX_BIND"
         },
         {
           "kind": "const",
-          "line": 6,
+          "line": 7,
           "name": "MAX_COMPUTE_BIND_GROUPS"
         },
         {
           "kind": "const",
-          "line": 7,
+          "line": 8,
           "name": "MAX_FLAT_BIND"
         },
         {
           "kind": "const",
-          "line": 9,
+          "line": 10,
           "name": "DoeBindGroup"
         },
         {
+          "kind": "const",
+          "line": 12,
+          "name": "FlatResources"
+        },
+        {
           "kind": "fn",
-          "line": 21,
+          "line": 33,
           "name": "bindingCount"
         },
         {
           "kind": "fn",
-          "line": 27,
+          "line": 39,
           "name": "populateFlatBindings"
+        },
+        {
+          "kind": "fn",
+          "line": 64,
+          "name": "collectFlatResources"
+        },
+        {
+          "kind": "fn",
+          "line": 86,
+          "name": "collectFlatResourcesFromRaw"
         }
       ],
       "reachabilityViewRoots": [],
@@ -47620,12 +47652,13 @@
       "reachable": true,
       "reverseImports": [
         "src/native/compute/doe_compute_ext_native.zig",
-        "src/native/compute/doe_compute_fast.zig"
+        "src/native/compute/doe_compute_fast.zig",
+        "src/native/queue/doe_queue_submit_metal.zig"
       ],
       "roles": [],
-      "sha256": "c5e4ace6a28fc811aa6e15d515912f49b0ba00c2bd2ebe0e696ef4cf54768ce9",
-      "testBlockCount": 1,
-      "topLevelDeclarationCount": 10
+      "sha256": "f2c00ad26a88dbbf8ab6e96aa36ac0fc8bdc2c3ef84da3c1483d346e6b83b4a0",
+      "testBlockCount": 2,
+      "topLevelDeclarationCount": 15
     },
     {
       "containsCImport": false,
@@ -47647,7 +47680,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 381,
+      "lineCount": 384,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/compute/doe_compute_ext_native.zig",
@@ -47663,7 +47696,7 @@
         "src/native/api/doe_native_api_core_exports.zig"
       ],
       "roles": [],
-      "sha256": "0e086cad3bb6015733a28a73712cf3ddfb9a00b053874957731d0e809f8caa43",
+      "sha256": "b534be51c7a4cae755664ecef3269ad24a2d587766d8df53cba60852dd4dd12b",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 58
     },
@@ -47685,7 +47718,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 999,
+      "lineCount": 1062,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/compute/doe_compute_fast.zig",
@@ -47693,12 +47726,12 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 481,
+          "line": 519,
           "name": "computeDispatchFlushDirect"
         },
         {
           "kind": "fn",
-          "line": 953,
+          "line": 1016,
           "name": "prewarmDispatchBindingsForQueue"
         }
       ],
@@ -47713,9 +47746,9 @@
         "src/native/mod.zig"
       ],
       "roles": [],
-      "sha256": "c4a615bdfe79cb6e0a6f3e98417452b9b212fe47379f0047732de1864f07deb7",
+      "sha256": "973582cf216aff09424d61edf21cdd878564822151feb5ce4d6041e5d11df659",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 73
+      "topLevelDeclarationCount": 76
     },
     {
       "containsCImport": false,
@@ -49509,11 +49542,11 @@
         "src/native/support/doe_native_object_types.zig",
         "src/native/support/doe_native_runtime_helpers.zig",
         "src/native/support/doe_native_shared_types.zig",
-        "src/runtime/process_roots.zig"
+        "src/runtime/callback_dispatch.zig"
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 408,
+      "lineCount": 391,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/queue/doe_queue_lifecycle.zig",
@@ -49601,12 +49634,12 @@
         },
         {
           "kind": "fn",
-          "line": 354,
+          "line": 317,
           "name": "drain_global_work_done"
         },
         {
           "kind": "fn",
-          "line": 364,
+          "line": 327,
           "name": "doeNativeQueueOnSubmittedWorkDone"
         }
       ],
@@ -49620,9 +49653,9 @@
         "src/native/queue/doe_queue_submit_native.zig"
       ],
       "roles": [],
-      "sha256": "7283575acf37a104aaeef7a15168bbed5a92d2a4e8b93fd1c908373317310ec8",
+      "sha256": "56e26697e29b4fbda7b20d15c585a6b05386348d63290415a831bf9c5f43612b",
       "testBlockCount": 2,
-      "topLevelDeclarationCount": 69
+      "topLevelDeclarationCount": 67
     },
     {
       "containsCImport": false,
@@ -49668,10 +49701,11 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 10,
+      "fanOut": 11,
       "imports": [
         "src/backend/dropin_queue_submit.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
+        "src/native/compute/doe_compute_bind_groups.zig",
         "src/native/diagnostics/doe_metal_browser_trace.zig",
         "src/native/queue/doe_queue_flush_breakdown.zig",
         "src/native/queue/doe_queue_submit_shared.zig",
@@ -49683,7 +49717,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 792,
+      "lineCount": 824,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/queue/doe_queue_submit_metal.zig",
@@ -49691,7 +49725,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 341,
+          "line": 359,
           "name": "submit_metal_commands"
         }
       ],
@@ -49705,9 +49739,9 @@
         "src/native/queue/doe_queue_submit_native.zig"
       ],
       "roles": [],
-      "sha256": "83e1438cdc3a5b425961a078c5cf879fc61b8678df456477149aa72027c7497b",
+      "sha256": "ef1b0f92e39941fca90844bc85ae08e7c30330a2cb2c2413a1f3f23417d5671a",
       "testBlockCount": 1,
-      "topLevelDeclarationCount": 35
+      "topLevelDeclarationCount": 38
     },
     {
       "containsCImport": false,
@@ -51107,7 +51141,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 383,
+      "lineCount": 385,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_native_command_types.zig",
@@ -51160,32 +51194,32 @@
         },
         {
           "kind": "const",
-          "line": 226,
+          "line": 227,
           "name": "RecordedDispatch"
         },
         {
           "kind": "const",
-          "line": 227,
+          "line": 228,
           "name": "RecordedRender"
         },
         {
           "kind": "fn",
-          "line": 229,
+          "line": 230,
           "name": "dispatchesCanMerge"
         },
         {
           "kind": "fn",
-          "line": 243,
+          "line": 245,
           "name": "tryMergeDispatchIntoLast"
         },
         {
           "kind": "fn",
-          "line": 262,
+          "line": 264,
           "name": "renderDrawsCanMerge"
         },
         {
           "kind": "fn",
-          "line": 278,
+          "line": 280,
           "name": "tryMergeRenderDrawIntoLast"
         }
       ],
@@ -51212,7 +51246,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "a831137094c6f433cc29f42bf4d9d33ee02003e92edb6a33804462259fc14954",
+      "sha256": "d6ce3477af9d1767961861a0d9393920bf550b2569f70653b34cec253a0d7006",
       "testBlockCount": 3,
       "topLevelDeclarationCount": 21
     },
@@ -51253,7 +51287,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 40,
+      "fanIn": 41,
       "fanOut": 2,
       "imports": [
         "src/native/diagnostics/doe_program_identity_trace.zig",
@@ -51316,6 +51350,7 @@
         "src/native/cache/doe_package_metal_pipeline_cache.zig",
         "src/native/command/doe_encoder_native.zig",
         "src/native/command/doe_immediates_external_native.zig",
+        "src/native/compute/doe_compute_bind_groups.zig",
         "src/native/compute/doe_compute_ext_native.zig",
         "src/native/compute/doe_compute_fast.zig",
         "src/native/compute/doe_compute_fast_vulkan.zig",
@@ -54056,7 +54091,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
+      "fanIn": 2,
       "fanOut": 4,
       "imports": [
         "src/core/abi/wgpu_callback_descriptor_types.zig",
@@ -54100,6 +54135,7 @@
       ],
       "reachable": true,
       "reverseImports": [
+        "src/native/queue/doe_queue_lifecycle.zig",
         "src/runtime/queue/gpu_timeline.zig"
       ],
       "roles": [],
@@ -56002,7 +56038,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
+      "fanIn": 6,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -56050,7 +56086,6 @@
         "src/backend/metal/metal_pipeline_cache.zig",
         "src/dropin/wgpu_dropin_ext_a_exports.zig",
         "src/dropin/wgpu_dropin_ext_a_pipeline.zig",
-        "src/native/queue/doe_queue_lifecycle.zig",
         "src/runtime/callback_dispatch.zig",
         "src/runtime/device/multi_adapter.zig",
         "src/runtime/queue/multi_queue.zig"
@@ -57463,5 +57498,5 @@
   "reportGeneratorSha256": "4af263e10335e85d6f839348fd011c6d2cc6d1810e1a31ef1744f8751bf9779f",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93"
+  "sourceTreeSha256": "b5f519ef1d01132295f3dee27a7b18f8050e8a1217b205b2ca4f1dc1f6b47039"
 }

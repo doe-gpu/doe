@@ -2,6 +2,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#if defined(__GNUC__)
+#define DOE_METAL_BRIDGE_INTERNAL __attribute__((visibility("hidden")))
+#else
+#define DOE_METAL_BRIDGE_INTERNAL
+#endif
+
 // Opaque handle: every returned handle is +1 retained; caller owns it.
 // Call metal_bridge_release() to decrement when done.
 typedef void* MetalHandle;
@@ -318,6 +324,29 @@ void metal_bridge_compute_encoder_encode_dispatch(
     uint32_t     wg_x,
     uint32_t     wg_y,
     uint32_t     wg_z);
+
+// Encode an indirect dispatch on an already-open compute encoder. Resource
+// index spaces are bound separately through the encoder before this call.
+DOE_METAL_BRIDGE_INTERNAL void metal_bridge_compute_encoder_encode_dispatch_indirect(
+    MetalHandle  encoder,
+    MetalHandle  pipeline,
+    MetalHandle* buffers,
+    uint32_t     buffer_count,
+    MetalHandle  indirect_buffer,
+    uint64_t     indirect_offset,
+    uint32_t     wg_x,
+    uint32_t     wg_y,
+    uint32_t     wg_z);
+
+// Bind the non-buffer resources for a compute dispatch. Metal keeps buffer,
+// texture, and sampler index spaces separate, so each array uses the same
+// flattened WebGPU group/binding slot law as the MSL emitter.
+DOE_METAL_BRIDGE_INTERNAL void metal_bridge_compute_encoder_bind_resources(
+    MetalHandle  encoder,
+    MetalHandle* textures,
+    uint32_t     texture_count,
+    MetalHandle* samplers,
+    uint32_t     sampler_count);
 
 // Encode multiple compute dispatches on an already-open compute encoder.
 void metal_bridge_compute_encoder_encode_dispatch_batch(

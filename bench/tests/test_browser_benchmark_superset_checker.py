@@ -152,7 +152,7 @@ def _mode_detail(mode: str, selected_runtime: str | None = None) -> dict[str, An
 
 def _report() -> dict[str, Any]:
     return {
-        "schemaVersion": 5,
+        "schemaVersion": 6,
         "reportKind": "browser-layered-diagnostic",
         "comparisonStatus": "diagnostic",
         "claimStatus": "diagnostic",
@@ -341,25 +341,30 @@ def _source_kernel_manifest_row() -> dict[str, Any]:
 
 def _source_kernel_metrics() -> dict[str, Any]:
     metrics: dict[str, Any] = {
-        "iterations": 2,
+        "iterations": 1,
+        "requestedIterations": 2,
+        "sourceOperationIterations": 1,
+        "sourceOperationPolicy": "declared-command-once-v1",
+        "sourceKernelSampleResetPolicy": "zero-fill-before-each-sample-v1",
+        "sourceKernelSampleResetMsSamples": [1.0, 1.0],
         "sourceKernelSampleCount": 2,
         "orderBalancedSampleCount": 2,
         "sourceKernelWarmupSampleCount": 0,
         "sourceKernelWarmupDispatches": 0,
         "sourceKernelWarmupSubmits": 0,
         "sourceKernelSubmitPolicy": "iteration-batch-v1",
-        "submitsPerSample": 2,
+        "submitsPerSample": 1,
         "warmupSubmitCount": 1,
         "totalWarmupDispatches": 2,
         "totalWarmupSubmits": 2,
-        "totalSubmits": 4,
-        "dispatchesPerSample": 200,
+        "totalSubmits": 2,
+        "dispatchesPerSample": 100,
         "dispatchWorkgroupsX": 1024,
         "dispatchWorkgroupsY": 1,
         "dispatchWorkgroupsZ": 1,
         "dispatchRepeat": 100,
         "warmupDispatchCount": 1,
-        "totalDispatches": 400,
+        "totalDispatches": 200,
         "dispatchElapsedMsSamples": [10.0, 12.0],
         "encodeSubmitMsSamples": [2.0, 4.0],
         "waitMsSamples": [8.0, 8.0],
@@ -500,6 +505,22 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
             "compute_workgroup_atomic_1024: output oracle did not match for mode 'doe'",
             errors,
         )
+
+    def test_source_kernel_runtime_evidence_rejects_generic_iteration_multiplication(self) -> None:
+        row = _source_kernel_manifest_row()
+        metrics = _source_kernel_metrics()
+        metrics["iterations"] = 2
+        metrics["dispatchesPerSample"] = 200
+
+        errors = self.module.check_source_kernel_runtime_evidence(
+            {"status": "ok", "statusCode": "ok", "metrics": metrics},
+            row,
+            "compute_workgroup_atomic_1024",
+            "doe",
+        )
+
+        self.assertTrue(any("exactly one declared source operation" in error for error in errors))
+        self.assertTrue(any("metrics.dispatchesPerSample drift" in error for error in errors))
 
     def test_source_kernel_cross_runtime_parity_rejects_hash_drift(self) -> None:
         report_row = {
@@ -895,7 +916,7 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
             ["dawn", "doe"],
         )
 
-        self.assertIn("report schemaVersion must be 5", errors)
+        self.assertIn("report schemaVersion must be 6", errors)
 
     def test_report_coverage_rejects_missing_dawn_runtime_hash(self) -> None:
         report = _report()

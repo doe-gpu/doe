@@ -1,7 +1,7 @@
 // Public DoeProof CLI/CI contract over the governed unchanged-process API.
 
 import { createHash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, realpath, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -308,6 +308,9 @@ export async function loadDoeProofProcessContract(contractFile, options = {}) {
       `runtime file "${runtimeFile.id}"`,
     ),
   })));
+  const governedProviderPath = document.process.filesystem.mode === 'node-permission-read-only'
+    ? await realpath(providerPath)
+    : providerPath;
   const dependencies = {
     provider: await verifiedFile(providerPath, document.provider.sha256, 'provider entrypoint'),
     input: await verifiedFile(inputPath, document.workload.input.sha256, 'workload input'),
@@ -360,7 +363,7 @@ export async function loadDoeProofProcessContract(contractFile, options = {}) {
       timeoutMs: document.process.timeoutMs,
       maxOutputBytes: document.process.maxOutputBytes,
     },
-    provider: { id: document.provider.id, module: providerPath },
+    provider: { id: document.provider.id, module: governedProviderPath },
   };
 }
 

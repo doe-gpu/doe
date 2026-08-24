@@ -1,5 +1,6 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const ir_query = @import("../../ir/ir_query.zig");
 const maps = @import("emit_hlsl_maps.zig");
 const dispatch_contract = @import("../../../../contracts/shader_abi/dispatch_info.zig");
 const builtins = @import("emit_hlsl_builtins.zig");
@@ -400,6 +401,16 @@ const Emitter = struct {
                 try self.write(";\n");
             },
             .assign => |assign| {
+                const write_guard = ir_query.runtimeArrayWriteGuard(&function, assign.lhs);
+                if (write_guard) |guard| {
+                    try self.write_indent();
+                    try self.write("if (");
+                    try self.emit_expr(function, guard.unclamped_index);
+                    try self.write(" < ");
+                    try self.emit_expr(function, guard.array_length);
+                    try self.write(") {\n");
+                    self.indent += 4;
+                }
                 try self.write_indent();
                 try self.emit_expr(function, assign.lhs);
                 try self.write(" ");
@@ -407,6 +418,11 @@ const Emitter = struct {
                 try self.write(" ");
                 try self.emit_expr(function, assign.rhs);
                 try self.write(";\n");
+                if (write_guard != null) {
+                    self.indent -= 4;
+                    try self.write_indent();
+                    try self.write("}\n");
+                }
             },
             .return_ => |value| {
                 try self.write_indent();

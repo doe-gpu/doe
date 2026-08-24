@@ -68,5 +68,7 @@ void main(uint3 gid : SV_DispatchThreadID) {
         return;
     }
     const float x = input[min(idx, (doe_arrayLength_input() - 1))];
-    output[min(idx, (doe_arrayLength_output() - 1))] = gelu(x);
+    if (idx < doe_arrayLength_output()) {
+        output[min(idx, (doe_arrayLength_output() - 1))] = gelu(x);
+    }
 }

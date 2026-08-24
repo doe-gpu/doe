@@ -161,6 +161,16 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
 
         self.assertIn('statusCode: "scenario_controller_timeout"', text)
         self.assertIn("scenarioControllerDeadlineMs", text)
+        self.assertIn("latestScenarioStage", text)
+        self.assertIn("sample_${sampleIndex + 1}_submitted", text)
+        self.assertIn("recycleTimedOutPage", text)
+        self.assertIn("page.close({ runBeforeUnload: false })", text)
+        self.assertIn("const sourceOperationIterations = 1", text)
+        self.assertIn("const dispatchesPerSample = computeConfig.dispatchRepeat", text)
+        self.assertNotIn(
+            "const dispatchesPerSample = dispatchIters * computeConfig.dispatchRepeat",
+            text,
+        )
         self.assertNotIn('if (template !== "fawn_visual_resource")', text)
 
     def test_shell_wrapper_routes_default_pipeline_cache_to_ignored_lane_output(self) -> None:

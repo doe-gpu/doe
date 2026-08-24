@@ -1451,7 +1451,7 @@
           "symbols": [
             "msl_binding_slot"
           ],
-          "sourceSha256": "24e09d092bd3e92d7af669e88d0b6eb14280d16d85c29224fc5145e47d1374d1"
+          "sourceSha256": "3b3139b0f71cb314c5ef5d26ede6e6e4758047f114571a3fa388a691a2370ea4"
         },
         {
           "path": "runtime/zig/src/native/compute/doe_compute_bind_groups.zig",
@@ -1459,7 +1459,7 @@
             "flatBindSlot",
             "populateFlatBindings"
           ],
-          "sourceSha256": "c5e4ace6a28fc811aa6e15d515912f49b0ba00c2bd2ebe0e696ef4cf54768ce9"
+          "sourceSha256": "f2c00ad26a88dbbf8ab6e96aa36ac0fc8bdc2c3ef84da3c1483d346e6b83b4a0"
         }
       ]
     },
@@ -1477,7 +1477,7 @@
             "flatBindSlot",
             "populateFlatBindings"
           ],
-          "sourceSha256": "c5e4ace6a28fc811aa6e15d515912f49b0ba00c2bd2ebe0e696ef4cf54768ce9"
+          "sourceSha256": "f2c00ad26a88dbbf8ab6e96aa36ac0fc8bdc2c3ef84da3c1483d346e6b83b4a0"
         }
       ]
     },
@@ -2031,7 +2031,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2066,7 +2066,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2083,7 +2083,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2136,7 +2136,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2153,7 +2153,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2188,7 +2188,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2205,7 +2205,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2276,7 +2276,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2293,7 +2293,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2310,7 +2310,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2327,7 +2327,7 @@
           "symbols": [
             "clamp_runtime_sized"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2416,7 +2416,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2433,7 +2433,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2450,7 +2450,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2467,7 +2467,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2484,7 +2484,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2501,7 +2501,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2518,7 +2518,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2535,7 +2535,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2552,7 +2552,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2569,7 +2569,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     },
@@ -2595,7 +2595,7 @@
           "symbols": [
             "clamp_texture_coords"
           ],
-          "sourceSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6"
+          "sourceSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880"
         }
       ]
     }

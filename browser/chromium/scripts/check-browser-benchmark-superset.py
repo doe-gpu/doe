@@ -1293,6 +1293,23 @@ def check_source_kernel_runtime_evidence(
     iterations = metrics.get("iterations")
     if not isinstance(iterations, int) or iterations <= 0:
         errors.append(f"{row_label}: metrics.iterations must be positive for mode '{mode}'")
+    elif iterations != 1:
+        errors.append(
+            f"{row_label}: metrics.iterations must be exactly one declared source operation "
+            f"for mode '{mode}' (report={iterations!r})"
+        )
+    if metrics.get("sourceOperationIterations") != 1:
+        errors.append(
+            f"{row_label}: metrics.sourceOperationIterations must be 1 for mode '{mode}'"
+        )
+    if metrics.get("sourceOperationPolicy") != "declared-command-once-v1":
+        errors.append(
+            f"{row_label}: metrics.sourceOperationPolicy drift for mode '{mode}'"
+        )
+    if metrics.get("sourceKernelSampleResetPolicy") != "zero-fill-before-each-sample-v1":
+        errors.append(
+            f"{row_label}: metrics.sourceKernelSampleResetPolicy drift for mode '{mode}'"
+        )
     source_kernel_submit_policy = metrics.get("sourceKernelSubmitPolicy")
     if source_kernel_submit_policy not in VALID_SOURCE_KERNEL_SUBMIT_POLICIES:
         errors.append(
@@ -1312,10 +1329,8 @@ def check_source_kernel_runtime_evidence(
         )
         source_kernel_warmup_sample_count = 0
     if isinstance(iterations, int) and iterations > 0:
-        expected_dispatches_per_sample = iterations * int(browser_workload["dispatchRepeat"])
-        expected_submits_per_sample = (
-            1 if source_kernel_submit_policy == "sample-batch-v1" else iterations
-        )
+        expected_dispatches_per_sample = int(browser_workload["dispatchRepeat"])
+        expected_submits_per_sample = 1
         if metrics.get("dispatchesPerSample") != expected_dispatches_per_sample:
             errors.append(
                 f"{row_label}: metrics.dispatchesPerSample drift for mode '{mode}' "
@@ -1407,6 +1422,7 @@ def check_source_kernel_runtime_evidence(
     for metric_key in (
         "dispatchElapsedMsSamples",
         "encodeSubmitMsSamples",
+        "sourceKernelSampleResetMsSamples",
         "waitMsSamples",
         "usPerOpSamples",
     ):
@@ -2464,8 +2480,8 @@ def check_report_coverage(
 ) -> list[str]:
     errors: list[str] = []
 
-    if report_payload.get("schemaVersion") != 5:
-        errors.append("report schemaVersion must be 5")
+    if report_payload.get("schemaVersion") != 6:
+        errors.append("report schemaVersion must be 6")
     report_kind = report_payload.get("reportKind")
     if report_kind != "browser-layered-diagnostic":
         errors.append(f"reportKind must be browser-layered-diagnostic (found {report_kind})")

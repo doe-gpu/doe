@@ -5,6 +5,7 @@ import {
   existsSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -216,6 +217,10 @@ try {
   );
   assert.ok(permissionPass.receipt.process.declaration.filesystem.readPaths.includes(
     runtimeFilePath,
+  ));
+  const physicalRuntimeFilePath = realpathSync.native(runtimeFilePath);
+  assert.ok(permissionPass.receipt.process.declaration.filesystem.readPaths.includes(
+    physicalRuntimeFilePath,
   ));
   assert.equal(permissionPass.receipt.process.environment.keys.includes('NODE_OPTIONS'), false);
   assert.equal(validateGovernedNodeWebGPUProcessReceipt(permissionPass.receipt).valid, true);

@@ -4,6 +4,7 @@ const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const native_cmds = @import("../support/doe_native_command_types.zig");
+const compute_bind_groups = @import("../compute/doe_compute_bind_groups.zig");
 const queue_flush_breakdown = @import("doe_queue_flush_breakdown.zig");
 const metal_browser_trace = @import("../diagnostics/doe_metal_browser_trace.zig");
 const emit_msl = @import("../../compiler/wgsl/emit/msl/emit_msl_ir.zig");
@@ -23,23 +24,39 @@ const MSL_SIZES_SLOT: u32 = emit_msl.MSL_SIZES_SLOT;
 const SIZES_BUF_BYTES: usize = (MSL_SIZES_SLOT + 1) * @sizeOf(u32);
 const bridge = queue_submit_ops.metal_bridge;
 
+fn recordedDispatchResources(bind_groups: [native_shared.MAX_COMPUTE_BIND_GROUPS]?*anyopaque) compute_bind_groups.FlatResources {
+    return compute_bind_groups.collectFlatResourcesFromRaw(
+        @as([*]const ?*anyopaque, @ptrCast(&bind_groups)),
+        native_shared.MAX_COMPUTE_BIND_GROUPS,
+    );
+}
+
+fn recordedDispatchHasNonBufferResources(bind_groups: [native_shared.MAX_COMPUTE_BIND_GROUPS]?*anyopaque) bool {
+    const resources = recordedDispatchResources(bind_groups);
+    return resources.hasNonBufferResources();
+}
+
+fn bindRecordedDispatchResources(
+    encoder: ?*anyopaque,
+    bind_groups: [native_shared.MAX_COMPUTE_BIND_GROUPS]?*anyopaque,
+) void {
+    var resources = recordedDispatchResources(bind_groups);
+    if (!resources.hasNonBufferResources()) return;
+    bridge.metal_bridge_compute_encoder_bind_resources(
+        encoder,
+        @as(?[*]?*anyopaque, &resources.textures),
+        resources.texture_count,
+        @as(?[*]?*anyopaque, &resources.samplers),
+        resources.sampler_count,
+    );
+}
+
 fn submittedBuffersHaveRecordedCommands(count: usize, cmd_bufs: [*]const ?*anyopaque) bool {
     for (cmd_bufs[0..count]) |raw| {
         const cb = cast(DoeCommandBuffer, raw) orelse continue;
         if (cb.cmds.items.len != 0) return true;
     }
     return false;
-}
-
-fn read_indirect_dispatch_counts(buffer_raw: ?*anyopaque, offset: u64) ?struct { x: u32, y: u32, z: u32 } {
-    const buffer = cast(DoeBuffer, buffer_raw) orelse return null;
-    const byte_offset: usize = @intCast(offset);
-    const counts_bytes = 3 * @sizeOf(u32);
-    if (byte_offset + counts_bytes > buffer.size) return null;
-    const contents = bridge.metal_bridge_buffer_contents(buffer.mtl) orelse return null;
-    const base = contents + byte_offset;
-    const ints: *align(1) const [3]u32 = @ptrCast(base);
-    return .{ .x = ints[0], .y = ints[1], .z = ints[2] };
 }
 
 fn try_execute_copy_only_deferred(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*anyopaque) bool {
@@ -283,6 +300,7 @@ fn encode_recorded_dispatch_batch(
             else => break,
         };
         if (d.pso == null) break;
+        if (recordedDispatchHasNonBufferResources(d.bind_groups)) break;
 
         var bufs_copy = d.bufs;
         var buf_count = d.buf_count;
@@ -401,6 +419,7 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
                             }
                         }
                         const repeat_count = if (d.repeat_count == 0) 1 else d.repeat_count;
+                        bindRecordedDispatchResources(encoder, d.bind_groups);
                         var repeat_index: u32 = 0;
                         while (repeat_index < repeat_count) : (repeat_index += 1) {
                             bridge.metal_bridge_compute_encoder_encode_dispatch(
@@ -535,35 +554,48 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
                     has_gpu_work = true;
                 },
                 .dispatch_indirect => |d| {
-                    end_active_compute_encoder(&active_compute_encoder);
                     var bufs_copy = d.bufs;
-                    if (read_indirect_dispatch_counts(d.indirect_buf, d.offset)) |counts| {
-                        bridge.metal_bridge_cmd_buf_encode_compute_dispatch(
-                            mtl_cmd,
-                            d.pso,
-                            @as(?[*]?*anyopaque, &bufs_copy),
-                            d.buf_count,
-                            counts.x,
-                            counts.y,
-                            counts.z,
-                            d.wg_x,
-                            d.wg_y,
-                            d.wg_z,
+                    var buf_count = d.buf_count;
+                    var sizes_mtl: ?*anyopaque = null;
+                    if (d.needs_sizes_buf) {
+                        sizes_mtl = bridge.metal_bridge_device_new_buffer_shared(
+                            q.dev.mtl_device,
+                            SIZES_BUF_BYTES,
                         );
-                    } else {
-                        const indirect_buffer = cast(DoeBuffer, d.indirect_buf) orelse continue;
-                        bridge.metal_bridge_cmd_buf_encode_compute_dispatch_indirect(
-                            mtl_cmd,
+                        if (sizes_mtl) |smtl| {
+                            if (bridge.metal_bridge_buffer_contents(smtl)) |ptr| {
+                                const sizes: *[MSL_SIZES_SLOT + 1]u32 = @ptrCast(@alignCast(ptr));
+                                for (0..MSL_SIZES_SLOT + 1) |i| sizes[i] = 0;
+                                for (0..d.buf_count) |i| sizes[i] = @intCast(d.buf_sizes[i]);
+                            }
+                            bufs_copy[MSL_SIZES_SLOT] = smtl;
+                            if (buf_count <= MSL_SIZES_SLOT) buf_count = MSL_SIZES_SLOT + 1;
+                        }
+                    }
+                    if (active_compute_encoder == null) {
+                        active_compute_encoder = bridge.metal_bridge_cmd_buf_compute_encoder(mtl_cmd);
+                    }
+                    const indirect_buffer = cast(DoeBuffer, d.indirect_buf) orelse {
+                        if (sizes_mtl) |smtl| bridge.metal_bridge_release(smtl);
+                        continue;
+                    };
+                    if (active_compute_encoder) |encoder| {
+                        bindRecordedDispatchResources(encoder, d.bind_groups);
+                        bridge.metal_bridge_compute_encoder_encode_dispatch_indirect(
+                            encoder,
                             d.pso,
                             @as(?[*]?*anyopaque, &bufs_copy),
-                            d.buf_count,
+                            buf_count,
                             indirect_buffer.mtl,
                             d.offset,
                             d.wg_x,
                             d.wg_y,
                             d.wg_z,
                         );
+                    } else {
+                        std.log.err("doe: Metal compute encoder creation failed for indirect dispatch", .{});
                     }
+                    if (sizes_mtl) |smtl| bridge.metal_bridge_release(smtl);
                     has_gpu_work = true;
                 },
                 .render_pass => |r| {

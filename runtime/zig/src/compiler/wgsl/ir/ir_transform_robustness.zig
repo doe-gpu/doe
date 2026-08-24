@@ -174,6 +174,7 @@ fn clamp_sized(
             .name = try ir.dup_string(allocator, "min"),
             .kind = .builtin,
             .args = args,
+            .robustness_generated = true,
         } },
     });
 
@@ -241,6 +242,7 @@ fn clamp_runtime_sized(
             .name = try ir.dup_string(allocator, "min"),
             .kind = .builtin,
             .args = min_args,
+            .robustness_generated = true,
         } },
     });
 

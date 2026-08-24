@@ -175,11 +175,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 14,
+          "endLine": 15,
           "kind": "constant",
           "name": "DoeBuffer",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 14,
+          "startLine": 15,
           "tokenCount": 6
         },
         {
@@ -535,11 +535,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 9,
+          "endLine": 10,
           "kind": "constant",
           "name": "emit_msl",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 9,
+          "startLine": 10,
           "tokenCount": 7
         }
       ],
@@ -1021,11 +1021,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 16,
+          "endLine": 17,
           "kind": "constant",
           "name": "DoeQueue",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 16,
+          "startLine": 17,
           "tokenCount": 6
         },
         {
@@ -1431,6 +1431,14 @@
     {
       "locations": [
         {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
           "endLine": 2,
           "kind": "constant",
           "name": "ir_query",
@@ -1444,6 +1452,22 @@
           "name": "ir_query",
           "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig",
           "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
+          "startLine": 9,
           "tokenCount": 7
         },
         {
@@ -2499,11 +2523,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 10,
+          "endLine": 11,
           "kind": "constant",
           "name": "shared",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 10,
+          "startLine": 11,
           "tokenCount": 7
         },
         {
@@ -3357,11 +3381,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 13,
+          "endLine": 14,
           "kind": "constant",
           "name": "cast",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 13,
+          "startLine": 14,
           "tokenCount": 6
         },
         {
@@ -4215,11 +4239,11 @@
     {
       "locations": [
         {
-          "endLine": 53,
+          "endLine": 86,
           "kind": "function",
           "name": "monotonicNowNs",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 51,
+          "startLine": 84,
           "tokenCount": 19
         },
         {
@@ -4501,28 +4525,6 @@
     {
       "locations": [
         {
-          "endLine": 34,
-          "kind": "constant",
-          "name": "process_roots",
-          "path": "src/backend/metal/metal_pipeline_cache.zig",
-          "startLine": 34,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 13,
-          "kind": "constant",
-          "name": "process_roots",
-          "path": "src/native/queue/doe_queue_lifecycle.zig",
-          "startLine": 13,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "202cfdb88b595a0d2e5f545a7a96c4164f4219932c02119c1bd3f4e1e7383f0f",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 374,
           "kind": "constant",
           "name": "MAX_DEVICE_EXTENSIONS",
@@ -4673,11 +4675,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 49,
+          "endLine": 50,
           "kind": "constant",
           "name": "toOpaque",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 49,
+          "startLine": 50,
           "tokenCount": 6
         },
         {
@@ -5199,11 +5201,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 47,
+          "endLine": 48,
           "kind": "constant",
           "name": "alloc",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 47,
+          "startLine": 48,
           "tokenCount": 6
         },
         {
@@ -5387,11 +5389,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 22,
+          "endLine": 23,
           "kind": "constant",
           "name": "metal_bridge_device_new_buffer_shared",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 22,
+          "startLine": 23,
           "tokenCount": 6
         },
         {
@@ -6437,11 +6439,11 @@
     {
       "locations": [
         {
-          "endLine": 3,
+          "endLine": 4,
           "kind": "constant",
           "name": "maps",
           "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
-          "startLine": 3,
+          "startLine": 4,
           "tokenCount": 7
         },
         {
@@ -7837,11 +7839,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 46,
+          "endLine": 47,
           "kind": "constant",
           "name": "DoeDevice",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 46,
+          "startLine": 47,
           "tokenCount": 6
         },
         {
@@ -8389,11 +8391,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 23,
+          "endLine": 24,
           "kind": "constant",
           "name": "metal_bridge_end_compute_encoding",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 23,
+          "startLine": 24,
           "tokenCount": 6
         }
       ],
@@ -8419,11 +8421,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 48,
+          "endLine": 49,
           "kind": "constant",
           "name": "make",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 48,
+          "startLine": 49,
           "tokenCount": 6
         },
         {
@@ -9149,11 +9151,11 @@
     {
       "locations": [
         {
-          "endLine": 19,
+          "endLine": 20,
           "kind": "constant",
           "name": "MAX_FLAT_BIND",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 19,
+          "startLine": 20,
           "tokenCount": 6
         },
         {
@@ -9587,11 +9589,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 9,
+          "endLine": 10,
           "kind": "constant",
           "name": "maps",
           "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
-          "startLine": 9,
+          "startLine": 10,
           "tokenCount": 7
         },
         {
@@ -10261,11 +10263,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 24,
+          "endLine": 25,
           "kind": "constant",
           "name": "metal_bridge_release",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 24,
+          "startLine": 25,
           "tokenCount": 6
         },
         {
@@ -10935,11 +10937,11 @@
     {
       "locations": [
         {
-          "endLine": 8,
+          "endLine": 9,
           "kind": "constant",
           "name": "layout",
           "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
-          "startLine": 8,
+          "startLine": 9,
           "tokenCount": 7
         },
         {
@@ -11159,11 +11161,11 @@
           "tokenCount": 9
         },
         {
-          "endLine": 16,
+          "endLine": 17,
           "kind": "constant",
           "name": "MAX_OUTPUT",
           "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
-          "startLine": 16,
+          "startLine": 17,
           "tokenCount": 9
         },
         {
@@ -11181,19 +11183,19 @@
     {
       "locations": [
         {
-          "endLine": 28,
+          "endLine": 29,
           "kind": "constant",
           "name": "SIZES_BUF_BYTES",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 28,
+          "startLine": 29,
           "tokenCount": 15
         },
         {
-          "endLine": 23,
+          "endLine": 24,
           "kind": "constant",
           "name": "SIZES_BUF_BYTES",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 23,
+          "startLine": 24,
           "tokenCount": 15
         }
       ],
@@ -13263,11 +13265,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 43,
+          "endLine": 44,
           "kind": "constant",
           "name": "RecordedCmd",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 43,
+          "startLine": 44,
           "tokenCount": 6
         }
       ],
@@ -13783,19 +13785,19 @@
     {
       "locations": [
         {
-          "endLine": 22,
+          "endLine": 23,
           "kind": "function",
           "name": "emit",
           "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
-          "startLine": 18,
+          "startLine": 19,
           "tokenCount": 51
         },
         {
-          "endLine": 25,
+          "endLine": 26,
           "kind": "function",
           "name": "emit",
           "path": "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
-          "startLine": 21,
+          "startLine": 22,
           "tokenCount": 51
         }
       ],
@@ -15237,11 +15239,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 45,
+          "endLine": 46,
           "kind": "constant",
           "name": "DoeComputePipeline",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 45,
+          "startLine": 46,
           "tokenCount": 6
         },
         {
@@ -15469,11 +15471,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 7,
+          "endLine": 8,
           "kind": "constant",
           "name": "queue_flush_breakdown",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 7,
+          "startLine": 8,
           "tokenCount": 7
         },
         {
@@ -18161,11 +18163,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 26,
+          "endLine": 27,
           "kind": "constant",
           "name": "MAX_FLAT_BIND",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 26,
+          "startLine": 27,
           "tokenCount": 6
         }
       ],
@@ -22279,11 +22281,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 8,
+          "endLine": 9,
           "kind": "constant",
           "name": "metal_browser_trace",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 8,
+          "startLine": 9,
           "tokenCount": 7
         }
       ],
@@ -29579,11 +29581,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 24,
+          "endLine": 25,
           "kind": "constant",
           "name": "bridge",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 24,
+          "startLine": 25,
           "tokenCount": 6
         },
         {
@@ -30879,11 +30881,11 @@
           "tokenCount": 11
         },
         {
-          "endLine": 13,
+          "endLine": 14,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
-          "startLine": 10,
+          "startLine": 11,
           "tokenCount": 11
         },
         {
@@ -30895,11 +30897,11 @@
           "tokenCount": 11
         },
         {
-          "endLine": 19,
+          "endLine": 20,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
-          "startLine": 16,
+          "startLine": 17,
           "tokenCount": 11
         }
       ],
@@ -31037,11 +31039,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 13,
+          "endLine": 14,
           "kind": "constant",
           "name": "should_force_literal_cast",
           "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
-          "startLine": 13,
+          "startLine": 14,
           "tokenCount": 6
         }
       ],
@@ -31193,11 +31195,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 25,
+          "endLine": 26,
           "kind": "constant",
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 25,
+          "startLine": 26,
           "tokenCount": 6
         }
       ],
@@ -31813,19 +31815,19 @@
     {
       "locations": [
         {
-          "endLine": 27,
+          "endLine": 28,
           "kind": "constant",
           "name": "MSL_SIZES_SLOT",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 27,
+          "startLine": 28,
           "tokenCount": 8
         },
         {
-          "endLine": 22,
+          "endLine": 23,
           "kind": "constant",
           "name": "MSL_SIZES_SLOT",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 22,
+          "startLine": 23,
           "tokenCount": 8
         }
       ],
@@ -33115,11 +33117,11 @@
     {
       "locations": [
         {
-          "endLine": 7,
+          "endLine": 8,
           "kind": "constant",
           "name": "texture",
           "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
-          "startLine": 7,
+          "startLine": 8,
           "tokenCount": 7
         },
         {
@@ -33180,6 +33182,14 @@
           "name": "native_helpers",
           "path": "src/native/command/doe_immediates_external_native.zig",
           "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "native_helpers",
+          "path": "src/native/compute/doe_compute_bind_groups.zig",
+          "startLine": 4,
           "tokenCount": 7
         },
         {
@@ -33809,11 +33819,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 44,
+          "endLine": 45,
           "kind": "constant",
           "name": "DoeCommandBuffer",
           "path": "src/native/compute/doe_compute_fast.zig",
-          "startLine": 44,
+          "startLine": 45,
           "tokenCount": 6
         },
         {
@@ -33825,11 +33835,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 15,
+          "endLine": 16,
           "kind": "constant",
           "name": "DoeCommandBuffer",
           "path": "src/native/queue/doe_queue_submit_metal.zig",
-          "startLine": 15,
+          "startLine": 16,
           "tokenCount": 6
         },
         {
@@ -34295,11 +34305,11 @@
     {
       "locations": [
         {
-          "endLine": 14,
+          "endLine": 15,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
-          "startLine": 10,
+          "startLine": 11,
           "tokenCount": 13
         },
         {
@@ -36143,9 +36153,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "a1e24ac3eff2fb0e5c4e91fa3ff9ffce689e9ab81813d1b59e7b2049417f9a94",
+  "manifestSha256": "7d8ecdc587bc8b679e1e8d0073a37dc9f60f4c6dc404b6b73a0f8d41b835b47a",
   "reportGeneratorSha256": "4af263e10335e85d6f839348fd011c6d2cc6d1810e1a31ef1744f8751bf9779f",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93"
+  "sourceTreeSha256": "b5f519ef1d01132295f3dee27a7b18f8050e8a1217b205b2ca4f1dc1f6b47039"
 }

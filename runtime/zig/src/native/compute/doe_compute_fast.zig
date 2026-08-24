@@ -18,6 +18,7 @@ const metal_bridge_cmd_buf_encode_blit_copy = bridge.metal_bridge_cmd_buf_encode
 const metal_bridge_cmd_buf_compute_encoder = bridge.metal_bridge_cmd_buf_compute_encoder;
 const metal_bridge_compute_dispatch_batch_copy_signal_commit = bridge.metal_bridge_compute_dispatch_batch_copy_signal_commit;
 const metal_bridge_compute_encoder_encode_dispatch = bridge.metal_bridge_compute_encoder_encode_dispatch;
+const metal_bridge_compute_encoder_bind_resources = bridge.metal_bridge_compute_encoder_bind_resources;
 const metal_bridge_compute_encoder_encode_dispatch_batch = bridge.metal_bridge_compute_encoder_encode_dispatch_batch;
 const metal_bridge_device_new_buffer_shared = bridge.metal_bridge_device_new_buffer_shared;
 const metal_bridge_end_compute_encoding = bridge.metal_bridge_end_compute_encoding;
@@ -47,6 +48,38 @@ const DoeDevice = native_types.DoeDevice;
 const alloc = native_helpers.alloc;
 const make = native_helpers.make;
 const toOpaque = native_helpers.toOpaque;
+
+fn bindMetalResourcesFromRaw(
+    encoder: ?*anyopaque,
+    bg_ptrs: [*]const ?*anyopaque,
+    bg_count: u32,
+) void {
+    var resources = compute_bind_groups.collectFlatResourcesFromRaw(bg_ptrs, bg_count);
+    if (!resources.hasNonBufferResources()) return;
+    metal_bridge_compute_encoder_bind_resources(
+        encoder,
+        @as(?[*]?*anyopaque, &resources.textures),
+        resources.texture_count,
+        @as(?[*]?*anyopaque, &resources.samplers),
+        resources.sampler_count,
+    );
+}
+
+fn dispatchBatchHasNonBufferResources(
+    dispatch_count: usize,
+    bg_ptrs: [*]const ?*anyopaque,
+    bg_counts: [*]const u32,
+) bool {
+    for (0..dispatch_count) |index| {
+        const bg_offset = index * MAX_COMPUTE_BIND_GROUPS;
+        const resources = compute_bind_groups.collectFlatResourcesFromRaw(
+            bg_ptrs + bg_offset,
+            bg_counts[index],
+        );
+        if (resources.hasNonBufferResources()) return true;
+    }
+    return false;
+}
 
 fn monotonicNowNs() u64 {
     return @intCast(std.time.nanoTimestamp());
@@ -162,6 +195,8 @@ fn encodeDispatchToComputeEncoder(
         &bufs,
         &sizes_mtl,
     ) orelse return false;
+
+    bindMetalResourcesFromRaw(encoder, bg_ptrs, bg_count);
 
     metal_bridge_compute_encoder_encode_dispatch(
         encoder,
@@ -341,6 +376,9 @@ fn appendRecordedDispatch(
         &cmd.dispatch.buf_offsets,
         &cmd.dispatch.buf_sizes,
     );
+    for (bind_groups, 0..) |maybe_bg, index| {
+        cmd.dispatch.bind_groups[index] = if (maybe_bg) |bg| toOpaque(bg) else null;
+    }
     vulkan_fast.populateRecordedDispatchBindingState(pipe, bind_groups[0..], &cmd.dispatch);
     if (native_cmds.tryMergeDispatchIntoLast(cmds, &cmd)) return true;
     cmds.append(alloc, cmd) catch std.debug.panic("doe_compute_fast: OOM recording dispatch command", .{});
@@ -504,6 +542,26 @@ pub fn computeDispatchFlushDirect(
         return;
     }
     if (q.dev.backend != .metal) return;
+    if (dispatchBatchHasNonBufferResources(1, bg_ptrs, &[_]u32{bg_count})) {
+        var pipe_ptrs = [_]?*anyopaque{toOpaque(pipe)};
+        var bg_counts = [_]u32{@min(bg_count, MAX_COMPUTE_BIND_GROUPS)};
+        var dispatch_dims = [_]u32{ dx, dy, dz };
+        computeDispatchBatchCopyFlushDirect(
+            q_raw,
+            1,
+            &pipe_ptrs,
+            bg_ptrs,
+            &bg_counts,
+            &dispatch_dims,
+            copy_src,
+            copy_src_off,
+            copy_dst,
+            copy_dst_off,
+            copy_size,
+            breakdown,
+        );
+        return;
+    }
     const before_submit_flush_started_ns = monotonicNowNs();
     const before_submit_flush = queue_submit.flush_before_submit_if_needed_timed(q);
     addDirectDispatchFlushField(
@@ -775,7 +833,12 @@ fn computeDispatchBatchCopyFlushDirect(
     addDirectDispatchQueueFlushBreakdown(breakdown, before_submit_flush);
 
     const replay_started_ns = monotonicNowNs();
-    if (dispatch_count <= MAX_DIRECT_BATCH_DISPATCHES) {
+    const has_non_buffer_resources = dispatchBatchHasNonBufferResources(
+        dispatch_count,
+        bg_ptrs,
+        bg_counts,
+    );
+    if (dispatch_count <= MAX_DIRECT_BATCH_DISPATCHES and !has_non_buffer_resources) {
         var pipelines: [MAX_DIRECT_BATCH_DISPATCHES]?*anyopaque = [_]?*anyopaque{null} ** MAX_DIRECT_BATCH_DISPATCHES;
         var bufs_flat: [MAX_DIRECT_BATCH_DISPATCHES * MAX_FLAT_BIND]?*anyopaque = [_]?*anyopaque{null} ** (MAX_DIRECT_BATCH_DISPATCHES * MAX_FLAT_BIND);
         var buf_counts: [MAX_DIRECT_BATCH_DISPATCHES]u32 = [_]u32{0} ** MAX_DIRECT_BATCH_DISPATCHES;

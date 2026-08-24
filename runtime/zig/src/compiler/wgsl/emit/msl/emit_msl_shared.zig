@@ -6,6 +6,7 @@
 
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const ir_query = @import("../../ir/ir_query.zig");
 const maps = @import("emit_msl_maps.zig");
 
 const assign_op_text = maps.assign_op_text;
@@ -254,6 +255,16 @@ pub fn write_stmt(module: *const ir.Module, function: ir.Function, stmt_id: ir.S
             try write_str(buf, pos, ";\n");
         },
         .assign => |assign| {
+            const write_guard = ir_query.runtimeArrayWriteGuard(&function, assign.lhs);
+            if (write_guard) |guard| {
+                try write_indent(buf, pos, indent.*);
+                try write_str(buf, pos, "if (");
+                try write_expr(module, function, guard.unclamped_index, buf, pos);
+                try write_str(buf, pos, " < ");
+                try write_expr(module, function, guard.array_length, buf, pos);
+                try write_str(buf, pos, ") {\n");
+                indent.* += 4;
+            }
             try write_indent(buf, pos, indent.*);
             try write_expr(module, function, assign.lhs, buf, pos);
             try write_str(buf, pos, " ");
@@ -261,6 +272,11 @@ pub fn write_stmt(module: *const ir.Module, function: ir.Function, stmt_id: ir.S
             try write_str(buf, pos, " ");
             try write_expr(module, function, assign.rhs, buf, pos);
             try write_str(buf, pos, ";\n");
+            if (write_guard != null) {
+                indent.* -= 4;
+                try write_indent(buf, pos, indent.*);
+                try write_str(buf, pos, "}\n");
+            }
         },
         .return_ => |value| {
             try write_indent(buf, pos, indent.*);

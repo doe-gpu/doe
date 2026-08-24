@@ -370,6 +370,9 @@ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_ra
         &cmd.dispatch_indirect.buf_offsets,
         &cmd.dispatch_indirect.buf_sizes,
     );
+    for (pass.bind_groups, 0..) |maybe_bg, index| {
+        cmd.dispatch_indirect.bind_groups[index] = if (maybe_bg) |bg| toOpaque(bg) else null;
+    }
     if (pip.spirv_data != null) {
         cmd.dispatch_indirect.vulkan_binding_state = vulkan_compute.vulkan_collect_recorded_bind_group_state(
             pip,

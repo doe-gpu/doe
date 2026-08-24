@@ -2,6 +2,7 @@
 
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { realpathSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -222,6 +223,19 @@ function normalizeEnvironment(environment) {
   };
 }
 
+function canonicalReadPath(value, label, cwd = null) {
+  const path = value.startsWith('file:')
+    ? fileURLToPath(value)
+    : cwd === null
+      ? value
+      : resolve(cwd, value);
+  try {
+    return realpathSync.native(path);
+  } catch (error) {
+    throw new TypeError(`${label} must resolve to an existing filesystem path: ${error.message}`);
+  }
+}
+
 function normalizeFilesystem(filesystem, cwd) {
   const value = filesystem ?? { mode: 'ambient' };
   assertPlainObject(value, 'process.filesystem');
@@ -238,9 +252,17 @@ function normalizeFilesystem(filesystem, cwd) {
   if (value.mode === 'ambient' && readPaths.length !== 0) {
     throw new TypeError('ambient process.filesystem cannot declare readPaths.');
   }
+  const effectiveReadPaths = readPaths.flatMap((path, index) => {
+    const declaredPath = resolve(cwd, path);
+    const physicalPath = canonicalReadPath(
+      declaredPath,
+      `process.filesystem.readPaths[${index}]`,
+    );
+    return declaredPath === physicalPath ? [physicalPath] : [declaredPath, physicalPath];
+  });
   return {
     mode: value.mode,
-    readPaths: [...new Set(readPaths.map((path) => resolve(cwd, path)))].sort(),
+    readPaths: [...new Set(effectiveReadPaths)].sort(),
   };
 }
 
@@ -251,8 +273,14 @@ function normalizeProcess(processOptions) {
     processOptions.executable ?? process.execPath,
     'process.executable',
   );
-  const cwd = resolve(assertNonEmptyString(processOptions.cwd ?? process.cwd(), 'process.cwd'));
-  const entrypoint = resolve(cwd, assertNonEmptyString(processOptions.entrypoint, 'process.entrypoint'));
+  const cwd = canonicalReadPath(
+    resolve(assertNonEmptyString(processOptions.cwd ?? process.cwd(), 'process.cwd')),
+    'process.cwd',
+  );
+  const entrypoint = canonicalReadPath(
+    resolve(cwd, assertNonEmptyString(processOptions.entrypoint, 'process.entrypoint')),
+    'process.entrypoint',
+  );
   const nodeArgs = assertStringArray(processOptions.nodeArgs ?? [], 'process.nodeArgs');
   const args = assertStringArray(processOptions.args ?? [], 'process.args');
   if (!Number.isSafeInteger(processOptions.timeoutMs) || processOptions.timeoutMs <= 0) {
@@ -317,7 +345,7 @@ function normalizeOptions(options) {
         || typeof options.signal.removeEventListener !== 'function')) {
     throw new TypeError('signal must be an AbortSignal when provided.');
   }
-  const provider = normalizeProvider(options.provider);
+  let provider = normalizeProvider(options.provider);
   const processConfiguration = normalizeProcess(options.process);
   if (options.observeProgram !== undefined
       && typeof options.observeProgram !== 'boolean'
@@ -344,7 +372,10 @@ function normalizeOptions(options) {
       : {},
   };
   if (processConfiguration.filesystem.mode === 'node-permission-read-only') {
-    filesystemPath(provider.module, 'provider.module');
+    provider = {
+      ...provider,
+      module: canonicalReadPath(filesystemPath(provider.module, 'provider.module'), 'provider.module'),
+    };
   }
   return {
     provider,
@@ -378,10 +409,12 @@ function spawnProcess(configuration, provider, abortSignal, programObservation) 
   return new Promise((resolveProcess) => {
     const effectiveReadPaths = configuration.filesystem.mode === 'node-permission-read-only'
       ? [...new Set([
-        loaderPath,
-        ...(programObservation.requested ? [observerPath] : []),
+        canonicalReadPath(loaderPath, 'loader path'),
+        ...(programObservation.requested
+          ? [canonicalReadPath(observerPath, 'observer path')]
+          : []),
         configuration.entrypoint,
-        filesystemPath(provider.module, 'provider.module'),
+        canonicalReadPath(filesystemPath(provider.module, 'provider.module'), 'provider.module'),
         ...configuration.filesystem.readPaths,
       ])].sort()
       : [];

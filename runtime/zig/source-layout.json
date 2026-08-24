@@ -993,7 +993,7 @@
       },
       "src/backend/metal/metal_bridge_decls.zig": {
         "decision": "Keep",
-        "moduleSha256": "29ea5b80249daed3776e7fe0d5bb11834abb2be6009dd27409e888d59d992051",
+        "moduleSha256": "c21eafbcf392bd8525f63bd88fc3ca62cdd3904ed63d237dcfab075bda29e5a6",
         "reason": "Keep: reachable backend implementation shared by 25 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -2187,9 +2187,9 @@
       },
       "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig": {
         "decision": "Keep",
-        "moduleSha256": "f97768329ddcc9d86e13eab123efee4f8004255feab4d8103da33e4355dd9e9f",
-        "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "moduleSha256": "554705f74a90c6415d10a9c438179f0fccb2943c5c5f258fbe22110af8405a61",
+        "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/compiler/wgsl/emit/hlsl/emit_hlsl_builtins.zig": {
         "decision": "Keep",
@@ -2205,9 +2205,9 @@
       },
       "src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig": {
         "decision": "Keep",
-        "moduleSha256": "4e277fe572fd89cb4f1dd7d3fa795c7e7bf70f3ae0be98adf5955dde90a65117",
+        "moduleSha256": "013fa6a3a57a0a127cc3bcde07f0e2032009e8fa9e5c6037442211e6e88ae366",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig": {
         "decision": "Keep",
@@ -2229,9 +2229,9 @@
       },
       "src/compiler/wgsl/emit/msl/emit_msl_ir.zig": {
         "decision": "Keep",
-        "moduleSha256": "24e09d092bd3e92d7af669e88d0b6eb14280d16d85c29224fc5145e47d1374d1",
+        "moduleSha256": "3b3139b0f71cb314c5ef5d26ede6e6e4758047f114571a3fa388a691a2370ea4",
         "reason": "Keep: MSL target lowering context and IR traversal; builtins, textures, and stage-specific behavior already have named owners.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig": {
         "decision": "Keep",
@@ -2247,9 +2247,9 @@
       },
       "src/compiler/wgsl/emit/msl/emit_msl_shared.zig": {
         "decision": "Keep",
-        "moduleSha256": "4175e54423674fc0bdf8b3a994e8e659e0544d5544783f450acab38de1f50a18",
+        "moduleSha256": "185a0e9d40c114c3794e299d9376f367c7c2b6b771fd13a2dc568e4ac92d98a7",
         "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/compiler/wgsl/emit/msl/emit_msl_stage.zig": {
         "decision": "Keep",
@@ -2451,9 +2451,9 @@
       },
       "src/compiler/wgsl/ir/ir.zig": {
         "decision": "Keep",
-        "moduleSha256": "bdba3b4b9c4aa38a572802523470c87cbfef1df6642b64f6ab886ed28c5463e2",
-        "reason": "Keep: reachable compiler implementation shared by 79 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "moduleSha256": "af17ee39fe189b629ed621621ccd5fce42e60e22cc42cec4cb0bebfc738d1613",
+        "reason": "Keep: reachable compiler implementation shared by 97 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/compiler/wgsl/ir/ir_builder.zig": {
         "decision": "Keep",
@@ -2481,15 +2481,15 @@
       },
       "src/compiler/wgsl/ir/ir_query.zig": {
         "decision": "Keep",
-        "moduleSha256": "bbb3cb844b112a9104dbd32102150a538f6af4a91d60848a96c7118e90232c05",
+        "moduleSha256": "9a3922c918ca3e4ce59e9b5a14b2eaf6d5d8475e286c1085c8bc6d5745bbbd43",
         "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/compiler/wgsl/ir/ir_transform_robustness.zig": {
         "decision": "Keep",
-        "moduleSha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6",
+        "moduleSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880",
         "reason": "Keep: one named WGSL IR robustness transform pass with proof-backed precondition emission.",
-        "reviewer": "codex-runtime-correctness-review/2026-08-16"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/compiler/wgsl/ir/ir_validate.zig": {
         "decision": "Keep",
@@ -3501,21 +3501,21 @@
       },
       "src/native/compute/doe_compute_bind_groups.zig": {
         "decision": "Keep",
-        "moduleSha256": "c5e4ace6a28fc811aa6e15d515912f49b0ba00c2bd2ebe0e696ef4cf54768ce9",
+        "moduleSha256": "f2c00ad26a88dbbf8ab6e96aa36ac0fc8bdc2c3ef84da3c1483d346e6b83b4a0",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/native/compute/doe_compute_ext_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "0e086cad3bb6015733a28a73712cf3ddfb9a00b053874957731d0e809f8caa43",
+        "moduleSha256": "b534be51c7a4cae755664ecef3269ad24a2d587766d8df53cba60852dd4dd12b",
         "reason": "Keep: native compute extension ABI boundary consumed by the core export surface.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/native/compute/doe_compute_fast.zig": {
         "decision": "Keep",
-        "moduleSha256": "c4a615bdfe79cb6e0a6f3e98417452b9b212fe47379f0047732de1864f07deb7",
+        "moduleSha256": "973582cf216aff09424d61edf21cdd878564822151feb5ce4d6041e5d11df659",
         "reason": "Keep: promoted native fast-compute API and execution boundary; Vulkan bindings and backend implementation have separate owners.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/native/compute/doe_compute_fast_vulkan.zig": {
         "decision": "Keep",
@@ -3579,9 +3579,9 @@
       },
       "src/native/queue/doe_queue_lifecycle.zig": {
         "decision": "Keep",
-        "moduleSha256": "7283575acf37a104aaeef7a15168bbed5a92d2a4e8b93fd1c908373317310ec8",
+        "moduleSha256": "56e26697e29b4fbda7b20d15c585a6b05386348d63290415a831bf9c5f43612b",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/native/queue/doe_queue_submit_d3d12.zig": {
         "decision": "Keep",
@@ -3591,8 +3591,8 @@
       },
       "src/native/queue/doe_queue_submit_metal.zig": {
         "decision": "Keep",
-        "moduleSha256": "83e1438cdc3a5b425961a078c5cf879fc61b8678df456477149aa72027c7497b",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "moduleSha256": "ef1b0f92e39941fca90844bc85ae08e7c30330a2cb2c2413a1f3f23417d5671a",
+        "reason": "Keep: authoritative Metal recorded-command submission, encoder lifetime, synchronization, and backend resource-binding boundary.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/native/queue/doe_queue_submit_native.zig": {
@@ -3735,9 +3735,9 @@
       },
       "src/native/support/doe_native_command_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "a831137094c6f433cc29f42bf4d9d33ee02003e92edb6a33804462259fc14954",
+        "moduleSha256": "d6ce3477af9d1767961861a0d9393920bf550b2569f70653b34cec253a0d7006",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-runtime-correction/2026-08-16"
+        "reviewer": "codex-doe-completion/2026-08-24"
       },
       "src/native/support/doe_native_exports.zig": {
         "decision": "Keep",

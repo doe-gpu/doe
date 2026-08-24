@@ -10,7 +10,7 @@ const native_rt_helpers = @import("../support/doe_native_runtime_helpers.zig");
 const native_exports = @import("../support/doe_native_exports.zig");
 const queue_flush_breakdown = @import("doe_queue_flush_breakdown.zig");
 const shared = @import("doe_queue_submit_shared.zig");
-const process_roots = @import("../../runtime/process_roots.zig");
+const callback_dispatch = @import("../../runtime/callback_dispatch.zig");
 
 const has_vulkan = (builtin.os.tag == .linux);
 const alloc = native_helpers.alloc;
@@ -276,12 +276,6 @@ const MAX_GLOBAL_WORK_DONE: usize = 128;
 const WGPU_CALLBACK_MODE_ALLOW_PROCESS_EVENTS: u32 = 0x00000002;
 const WGPU_CALLBACK_MODE_ALLOW_SPONTANEOUS: u32 = 0x00000003;
 
-const SpontaneousWorkDone = struct {
-    cb: ?*const fn (abi_callback.WGPUQueueWorkDoneStatus, abi_core.WGPUStringView, ?*anyopaque, ?*anyopaque) callconv(.c) void,
-    userdata1: ?*anyopaque,
-    userdata2: ?*anyopaque,
-};
-
 const WorkDoneEntry = struct {
     cb: ?*const fn (abi_callback.WGPUQueueWorkDoneStatus, abi_core.WGPUStringView, ?*anyopaque, ?*anyopaque) callconv(.c) void,
     userdata1: ?*anyopaque,
@@ -292,44 +286,13 @@ var global_work_done_buf: [MAX_GLOBAL_WORK_DONE]WorkDoneEntry = undefined;
 var global_work_done_count: usize = 0;
 var global_work_done_future_id: u64 = 4;
 
-fn canScheduleSpontaneousMetalWorkDone(q: *const DoeQueue) bool {
+fn shouldDispatchSpontaneousMetalWorkDone(
+    q: *const DoeQueue,
+    info: abi_callback.WGPUQueueWorkDoneCallbackInfo,
+) bool {
     return q.dev.backend == .metal and
-        q.mtl_event != null and
-        q.event_counter > q.completed_event_counter and
-        q.staged_write_cmd == null and
-        q.staged_write_blit == null and
-        q.deferred_copy_count == 0 and
-        q.deferred_resolve_count == 0 and
-        q.deferred_release_count == 0;
-}
-
-fn fireSpontaneousWorkDone(context_raw: ?*anyopaque) callconv(.c) void {
-    const context: *SpontaneousWorkDone = @ptrCast(@alignCast(context_raw orelse return));
-    defer process_roots.callbackJobAllocator().destroy(context);
-    if (context.cb) |cb| {
-        cb(.success, .{ .data = null, .length = 0 }, context.userdata1, context.userdata2);
-    }
-}
-
-fn scheduleSpontaneousMetalWorkDone(q: *DoeQueue, info: abi_callback.WGPUQueueWorkDoneCallbackInfo) bool {
-    if (!canScheduleSpontaneousMetalWorkDone(q) or info.callback == null) return false;
-    const allocator = process_roots.callbackJobAllocator();
-    const context = allocator.create(SpontaneousWorkDone) catch return false;
-    context.* = .{
-        .cb = info.callback,
-        .userdata1 = info.userdata1,
-        .userdata2 = info.userdata2,
-    };
-    if (metal_bridge.metal_bridge_shared_event_notify(
-        q.mtl_event,
-        q.event_counter,
-        fireSpontaneousWorkDone,
-        context,
-    ) == 0) {
-        allocator.destroy(context);
-        return false;
-    }
-    return true;
+        info.mode == WGPU_CALLBACK_MODE_ALLOW_SPONTANEOUS and
+        info.callback != null;
 }
 
 fn next_work_done_future() abi_core.WGPUFuture {
@@ -364,7 +327,17 @@ pub fn drain_global_work_done() void {
 pub fn doeNativeQueueOnSubmittedWorkDone(q_raw: ?*anyopaque, info: abi_callback.WGPUQueueWorkDoneCallbackInfo) abi_core.WGPUFuture {
     const future = next_work_done_future();
     if (cast(DoeQueue, q_raw)) |q| {
-        if (info.mode == WGPU_CALLBACK_MODE_ALLOW_SPONTANEOUS and scheduleSpontaneousMetalWorkDone(q, info)) {
+        if (shouldDispatchSpontaneousMetalWorkDone(q, info)) {
+            // Complete the queue state, including deferred copies, resolves,
+            // releases, and the retained command buffer, before the callback
+            // makes the queue reusable from JavaScript. The shared-event-only
+            // path acknowledged the GPU signal without finalizing this state.
+            shared.flush_pending_work_dropin_sync(q);
+            callback_dispatch.dispatch_work_done_callback(
+                info.callback,
+                info.userdata1,
+                info.userdata2,
+            );
             return future;
         }
         shared.flush_pending_work_dropin_sync(q);
@@ -378,22 +351,27 @@ pub fn doeNativeQueueOnSubmittedWorkDone(q_raw: ?*anyopaque, info: abi_callback.
     return future;
 }
 
-test "spontaneous Metal completion requires a clean pending fence" {
+fn testWorkDoneCallback(
+    _: abi_callback.WGPUQueueWorkDoneStatus,
+    _: abi_core.WGPUStringView,
+    _: ?*anyopaque,
+    _: ?*anyopaque,
+) callconv(.c) void {}
+
+test "spontaneous Metal completion uses finalized asynchronous dispatch" {
     const testing = @import("std").testing;
     var device = native_types.DoeDevice{ .backend = .metal };
     var queue = DoeQueue{
         .dev = &device,
-        .mtl_event = @ptrFromInt(1),
-        .event_counter = 2,
-        .completed_event_counter = 1,
     };
-    try testing.expect(canScheduleSpontaneousMetalWorkDone(&queue));
-
-    queue.deferred_copy_count = 1;
-    try testing.expect(!canScheduleSpontaneousMetalWorkDone(&queue));
-    queue.deferred_copy_count = 0;
-    queue.completed_event_counter = queue.event_counter;
-    try testing.expect(!canScheduleSpontaneousMetalWorkDone(&queue));
+    const info = abi_callback.WGPUQueueWorkDoneCallbackInfo{
+        .nextInChain = null,
+        .mode = WGPU_CALLBACK_MODE_ALLOW_SPONTANEOUS,
+        .callback = testWorkDoneCallback,
+        .userdata1 = null,
+        .userdata2 = null,
+    };
+    try testing.expect(shouldDispatchSpontaneousMetalWorkDone(&queue, info));
 }
 
 test "spontaneous completion stays on the synchronous path for non-Metal queues" {
@@ -401,8 +379,13 @@ test "spontaneous completion stays on the synchronous path for non-Metal queues"
     var device = native_types.DoeDevice{ .backend = .vulkan };
     var queue = DoeQueue{
         .dev = &device,
-        .mtl_event = @ptrFromInt(1),
-        .event_counter = 1,
     };
-    try testing.expect(!canScheduleSpontaneousMetalWorkDone(&queue));
+    const info = abi_callback.WGPUQueueWorkDoneCallbackInfo{
+        .nextInChain = null,
+        .mode = WGPU_CALLBACK_MODE_ALLOW_SPONTANEOUS,
+        .callback = testWorkDoneCallback,
+        .userdata1 = null,
+        .userdata2 = null,
+    };
+    try testing.expect(!shouldDispatchSpontaneousMetalWorkDone(&queue, info));
 }

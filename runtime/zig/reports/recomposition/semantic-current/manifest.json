@@ -89,14 +89,14 @@
   },
   "files": [
     {
-      "path": "abi/libonnxruntime_doe_ep.so.symbols.txt",
-      "sha256": "e237087ac2d50e752bd714bb338719e3e1559b306d056461ebe890b87bf4231b",
-      "sizeBytes": 7988
+      "path": "abi/libonnxruntime_doe_ep.dylib.symbols.txt",
+      "sha256": "9d6fda78daa7522ca16f8efc825ff8c6964db8a81756499e5e2a38fc2dfb7624",
+      "sizeBytes": 3691
     },
     {
-      "path": "abi/libwebgpu_doe.so.symbols.txt",
-      "sha256": "cc063b38394ed0e1d0d85eec19d5ac79721f771c2d4f64d3a4a1cde434fdc494",
-      "sizeBytes": 24540
+      "path": "abi/libwebgpu_doe.dylib.symbols.txt",
+      "sha256": "d0e9acc41cf394850dfc09daa45d9bdcf3e92c714bd791bfd3f76371cca3779a",
+      "sizeBytes": 26186
     },
     {
       "path": "command-input.json",
@@ -135,13 +135,13 @@
     },
     {
       "path": "wgsl-output.hlsl",
-      "sha256": "7c63b99bd092f8bd0e85067410a0d7f7a3ffa5725588c049d21252b88a7836a7",
-      "sizeBytes": 3676
+      "sha256": "57a70f8450a1046d808c82e89ff1c1079b1282952a88e76ec298c8b162351458",
+      "sizeBytes": 3728
     },
     {
       "path": "wgsl-output.msl",
-      "sha256": "b2f56239166459d967c02f04fa908ab6d81fc23b2dcd0cdbbb32c45115614a5a",
-      "sizeBytes": 1128
+      "sha256": "6cc5a7be3da9870d48ad2f3da083d77ddaeb2fd83b4a2c737f7688bcc96735c1",
+      "sizeBytes": 1166
     },
     {
       "path": "wgsl-output.spv",
@@ -155,17 +155,17 @@
     }
   ],
   "git": {
-    "baseCommit": "9127b87283da959bce577318ef42c8f34ef014d8",
-    "requestedRef": "9127b87283da959bce577318ef42c8f34ef014d8",
-    "snapshotKind": "git-archive"
+    "baseCommit": "WORKTREE:b5f519ef1d01132295f3dee27a7b18f8050e8a1217b205b2ca4f1dc1f6b47039",
+    "requestedRef": "WORKTREE",
+    "snapshotKind": "live-worktree"
   },
   "host": {
-    "machine": "x86_64",
-    "operatingSystem": "Linux",
-    "release": "6.12.54-linuxkit"
+    "machine": "arm64",
+    "operatingSystem": "Darwin",
+    "release": "25.3.0"
   },
   "irDigestInstrumentation": {
-    "kind": "native-snapshot",
+    "kind": "native-worktree",
     "observers": [
       {
         "path": "src/cli/entrypoints/main_emit_ir_digest.zig",
@@ -187,21 +187,21 @@
   "schemaVersion": 1,
   "sharedLibraries": [
     {
-      "path": "libonnxruntime_doe_ep.so",
-      "sha256": "0c9b326efb105289cb076b8c3f45018e355fd8766c008204e500fa4cf6120986",
-      "sizeBytes": 6030448,
-      "symbolCount": 100,
-      "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
+      "path": "libonnxruntime_doe_ep.dylib",
+      "sha256": "d0e5974912812556b879765632cea102044e31c60a8e31d81bb2f94adf25f58a",
+      "sizeBytes": 749144,
+      "symbolCount": 57,
+      "symbols": "abi/libonnxruntime_doe_ep.dylib.symbols.txt"
     },
     {
-      "path": "libwebgpu_doe.so",
-      "sha256": "701d5df347cb4cdd13fe0f62974edbd966edca5107831cbecae579028eda4c1f",
-      "sizeBytes": 9969864,
-      "symbolCount": 732,
-      "symbols": "abi/libwebgpu_doe.so.symbols.txt"
+      "path": "libwebgpu_doe.dylib",
+      "sha256": "bde38a3846857c5040bb850e80042f0318b9d50a49d75e20d823ee5d4a40a18d",
+      "sizeBytes": 2043168,
+      "symbolCount": 758,
+      "symbols": "abi/libwebgpu_doe.dylib.symbols.txt"
     }
   ],
-  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
+  "sourceTreeSha256": "b5f519ef1d01132295f3dee27a7b18f8050e8a1217b205b2ca4f1dc1f6b47039",
   "status": "captured",
   "trace": {
     "normalizedOutput": "trace-normalized.jsonl",
@@ -216,7 +216,7 @@
   },
   "wgsl": {
     "input": "wgsl-input.wgsl",
-    "irDigest": "efe442933b781cbfa0a7e38f7381b21ec210de00888ee829150d89e002c062d0",
+    "irDigest": "4fd5d59435fe2c620d839cfd719cbaf60fae7b9baebaf5de304491abc2c12442",
     "outputs": [
       "wgsl-output.csl",
       "wgsl-output.hlsl",
@@ -224,6 +224,6 @@
       "wgsl-output.spv"
     ]
   },
-  "zigExecutableSha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+  "zigExecutableSha256": "78adeedbea88263f19e8aefb31896e092eb265efc570f0a6dfbe9fd01e630ef6",
   "zigVersion": "0.15.2"
 }

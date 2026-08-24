@@ -24,5 +24,7 @@ void main_kernel(constant Uniforms& u [[buffer(0)]], const device float* input [
         return;
     }
     const float x = input[min(idx, (_doe_len_1 - 1))];
-    output[min(idx, (_doe_len_2 - 1))] = gelu(x, u, input, output, _doe_sizes);
+    if (idx < _doe_len_2) {
+        output[min(idx, (_doe_len_2 - 1))] = gelu(x, u, input, output, _doe_sizes);
+    }
 }

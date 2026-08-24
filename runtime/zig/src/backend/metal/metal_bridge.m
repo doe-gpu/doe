@@ -1509,6 +1509,71 @@ void metal_bridge_compute_encoder_encode_dispatch(
     [encoder dispatchThreadgroups:grid_size threadsPerThreadgroup:tg_size];
 }
 
+void metal_bridge_compute_encoder_encode_dispatch_indirect(
+    MetalHandle  encoder_h,
+    MetalHandle  pipeline_h,
+    MetalHandle* buffers,
+    uint32_t     buffer_count,
+    MetalHandle  indirect_buffer_h,
+    uint64_t     indirect_offset,
+    uint32_t     wg_x,
+    uint32_t     wg_y,
+    uint32_t     wg_z)
+{
+    id<MTLComputeCommandEncoder> encoder = (__bridge id<MTLComputeCommandEncoder>)encoder_h;
+    id<MTLComputePipelineState> pipeline = (__bridge id<MTLComputePipelineState>)pipeline_h;
+    id<MTLBuffer> indirect = (__bridge id<MTLBuffer>)indirect_buffer_h;
+    if (encoder == nil || pipeline == nil || indirect == nil) return;
+
+    [encoder setComputePipelineState:pipeline];
+    for (uint32_t i = 0; i < buffer_count; i++) {
+        if (buffers[i] != NULL) {
+            id<MTLBuffer> buffer = (__bridge id<MTLBuffer>)buffers[i];
+            [encoder setBuffer:buffer offset:0 atIndex:i];
+        }
+    }
+
+    MTLSize threadgroup_size;
+    if (wg_x > 0) {
+        threadgroup_size = MTLSizeMake(wg_x, wg_y > 0 ? wg_y : 1, wg_z > 0 ? wg_z : 1);
+    } else {
+        NSUInteger max_threadgroup_size = pipeline.maxTotalThreadsPerThreadgroup;
+        if (max_threadgroup_size == 0) max_threadgroup_size = 256;
+        threadgroup_size = MTLSizeMake(max_threadgroup_size, 1, 1);
+    }
+    [encoder dispatchThreadgroupsWithIndirectBuffer:indirect
+                               indirectBufferOffset:(NSUInteger)indirect_offset
+                              threadsPerThreadgroup:threadgroup_size];
+}
+
+void metal_bridge_compute_encoder_bind_resources(
+    MetalHandle  encoder_h,
+    MetalHandle* textures,
+    uint32_t     texture_count,
+    MetalHandle* samplers,
+    uint32_t     sampler_count)
+{
+    id<MTLComputeCommandEncoder> encoder = (__bridge id<MTLComputeCommandEncoder>)encoder_h;
+    if (encoder == nil) return;
+
+    if (textures != NULL) {
+        for (uint32_t i = 0; i < texture_count; i++) {
+            if (textures[i] != NULL) {
+                id<MTLTexture> texture = (__bridge id<MTLTexture>)textures[i];
+                [encoder setTexture:texture atIndex:i];
+            }
+        }
+    }
+    if (samplers != NULL) {
+        for (uint32_t i = 0; i < sampler_count; i++) {
+            if (samplers[i] != NULL) {
+                id<MTLSamplerState> sampler = (__bridge id<MTLSamplerState>)samplers[i];
+                [encoder setSamplerState:sampler atIndex:i];
+            }
+        }
+    }
+}
+
 static void metal_bridge_compute_encoder_encode_dispatch_batch_impl(
     MetalHandle         encoder_h,
     const MetalHandle*  pipelines,
