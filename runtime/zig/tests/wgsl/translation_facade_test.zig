@@ -184,7 +184,8 @@ test "robustness: runtime-sized array write is guarded in HLSL output" {
     var out: [MAX_HLSL_OUTPUT]u8 = undefined;
     const len = try translateToHlsl(std.testing.allocator, source, &out);
     const hlsl = out[0..len];
-    try std.testing.expect(std.mem.indexOf(u8, hlsl, "if (idx < ") != null);
+    const expect_elided = lean_proof.boundsProven(.gid_1d_storage_buffer);
+    try std.testing.expectEqual(!expect_elided, std.mem.indexOf(u8, hlsl, "if (idx < ") != null);
     try std.testing.expect(std.mem.indexOf(u8, hlsl, "doe_arrayLength_buf()") != null);
 }
 
