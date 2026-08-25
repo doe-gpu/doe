@@ -1,7 +1,7 @@
 {
   "$schema": "doe-product-strategy.schema.json",
-  "schemaVersion": 1,
-  "strategyVersion": "1.0.0",
+  "schemaVersion": 2,
+  "strategyVersion": "1.1.0",
   "artifactKind": "doe-product-strategy",
   "authority": {
     "goals": "GOALS.md",
@@ -15,6 +15,16 @@
     "promise": "Qualify what actually executed and selectively own execution only where physical application evidence proves a material advantage.",
     "governingQuestion": "Did this exact workload run correctly on the declared hardware and provider without hidden fallback, and did runtime ownership materially improve the application outcome?",
     "operatingLaw": "Hexagonal inside; vertically integrated outside."
+  },
+  "independenceBoundary": {
+    "rule": "DoeProof must remain usable around a customer's strongest eligible incumbent without requiring Doppler, Fawn, or DoeRuntime; collaborating products receive no provider preference.",
+    "requiredEvidence": [
+      "paid external I1-to-W0 qualification",
+      "production signer authorization independent of the execution provider",
+      "independent application oracle and replay",
+      "blocking release decision and repeat requalification",
+      "passing application acceptance without a Doppler dependency"
+    ]
   },
   "surfaces": [
     {
@@ -37,8 +47,8 @@
       "id": "fawn",
       "portfolioRole": "product-vector",
       "marketRole": "breakout-distribution",
-      "job": "Distribute agent-native browser state, semantic interaction, recovery, and qualified local compute through a real Chromium artifact.",
-      "promotionGate": "A hash-bound Fawn release wins its admitted A/B/C/D comparison on a complete unchanged agent workflow.",
+      "job": "Distribute local-first persistent private browser state, semantic interaction, recovery, and qualified local compute through a real Chromium artifact.",
+      "promotionGate": "A hash-bound Fawn release wins its admitted A/B/C/D comparison on a complete unchanged agent workflow and demonstrates customer-valued outcomes beside the separately governed K0 external comparator.",
       "authorityPaths": ["docs/browser-lane.md", "browser/chromium/bench/workflows/browser-milestones.json"]
     },
     {
@@ -113,6 +123,37 @@
     ],
     "selectionOutcomes": ["doe-runtime", "incumbent", "dual"]
   },
+  "externalProductComparison": {
+    "authorityPath": "docs/browser-lane.md",
+    "causalMatrixUnchanged": true,
+    "comparators": [
+      {
+        "id": "K0",
+        "product": "Cloudflare Browser Run + Kitesurf",
+        "architecture": "remote-stateless-workers-browser",
+        "role": "external-product-comparator",
+        "eligibilityRule": "Run only workloads supported by the documented product boundary; retain persistent authentication, WebGL, video, and real TLS bot-handshake rows as ineligible rather than scoring them as losses."
+      }
+    ],
+    "suites": [
+      {
+        "id": "shared-agent-tasks",
+        "purpose": "Compare complete product outcomes on tasks supported by every admitted product.",
+        "measurements": ["HTML extraction", "screenshots", "navigation", "automation success", "complete wall time", "context tokens", "observable CPU and memory", "total customer cost"]
+      },
+      {
+        "id": "local-persistent-tasks",
+        "purpose": "Test whether endpoint ownership creates material application value beyond a remote stateless service.",
+        "measurements": ["persistent authentication", "restart recovery", "offline and local operation", "WebGL and WebGPU capability", "private endpoint state", "local model execution", "long-running sessions"]
+      }
+    ],
+    "decisionRules": [
+      "K0 remains separate from A, B, C, and D because it changes execution location and service architecture rather than one component.",
+      "If K0 wins shared tasks and customers assign no material value to the local-persistent suite, Fawn is not promoted as a product.",
+      "B must beat A before Fawn earns standalone value; C must beat B before DoeRuntime earns browser execution; D must beat C before the Direct Protocol survives.",
+      "An ineligible K0 row is retained as an eligibility result and never scored as a Fawn win."
+    ]
+  },
   "evidenceSpine": [
     { "id": "workload-contract", "canonicalJob": "Freeze application work, inputs, executor, output, and comparison scope.", "ownerPaths": ["docs/workload-system.md", "runtime/zig/src/contracts/workload_profile.zig"] },
     { "id": "execution-policy", "canonicalJob": "Declare provider selection, fallback, backend, timing, and admissibility policy.", "ownerPaths": ["config/governed-lanes.json", "docs/process.md"] },
@@ -157,7 +198,7 @@
       "order": 3,
       "id": "fawn-agent-compute-v1",
       "outcome": "A downloadable hash-bound Fawn archive proves its browser shell, runtime, and direct protocol independently on one complete unchanged agent workflow.",
-      "requiredEvidence": ["stock Chromium plus Dawn control", "Fawn plus Dawn", "Fawn plus Doe", "Fawn Direct Protocol plus Doe", "task oracle", "lifecycle and recovery", "matched p50 p95 p99 when performance is claimed"],
+      "requiredEvidence": ["stock Chromium plus Dawn control", "Fawn plus Dawn", "Fawn plus Doe", "Fawn Direct Protocol plus Doe", "separate K0 external-product comparison on eligible shared tasks", "task oracle", "lifecycle and recovery", "matched p50 p95 p99 when performance is claimed"],
       "currentAssessment": "diagnostic",
       "stateAuthorityPaths": ["bench/fawn_matrix/config/matrix-workloads.json", "browser/chromium/bench/workflows/browser-milestones.json"]
     }
@@ -166,6 +207,9 @@
     "forbiddenInferences": [
       "DoeProof value does not imply DoeRuntime ownership.",
       "Fawn shell value does not imply DoeRuntime or Direct Protocol value.",
+      "A K0 limitation or ineligible row does not imply Fawn product value.",
+      "K0 is an external product comparator and never a fifth A/B/C/D causal lane.",
+      "DoeProof value and qualification cannot depend on Doppler availability or provider preference.",
       "A component timing win does not imply an application win.",
       "Node, native, Apple, AMD, browser, and Windows evidence never inherit promotion from one another.",
       "A first qualification does not establish recurring commercial demand."

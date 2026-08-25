@@ -6,6 +6,10 @@ authority. This contract makes the commercial offer, internal product roles,
 comparison law, evidence custody, platform sequence, and milestone claim
 boundaries testable instead of leaving them scattered across prose.
 
+Schema version 2 adds two orthogonal contracts without changing runtime
+behavior: DoeProof product independence and the separate K0 external-product
+comparison. Existing I0/I1/W0/D0/P0 and Fawn A/B/C/D lanes remain unchanged.
+
 ## Product roles
 
 | Surface | Portfolio role | Market job |
@@ -19,6 +23,19 @@ boundaries testable instead of leaving them scattered across prose.
 different. A customer can buy DoeProof while retaining its incumbent. Fawn can
 beat stock Chromium without proving DoeRuntime. DoeRuntime can own one
 capability without becoming a universal runtime replacement.
+
+## Independent trunk and evidence-gated forks
+
+DoeProof must qualify a customer's strongest eligible incumbent without
+requiring Doppler, Fawn, or DoeRuntime. The first external product proof is a
+paid `I1` to `W0` qualification with an independently authorized signer,
+application oracle, replay, blocking release decision, and repeat
+requalification.
+
+`D0` opens only when `W0` exposes a customer-relevant limitation. Fawn and the
+Direct Protocol remain independent forks. Collaboration with Doppler may add a
+workload or provider candidate, but cannot change provider preference or
+qualification law.
 
 ## Physical Compute Qualification
 
@@ -51,6 +68,11 @@ claims remain in `reports/claim-index.json`; browser promotion remains in the
 Fawn milestone artifacts. The three named milestones intentionally remain
 `unestablished`, `unestablished`, and `diagnostic` until their external or
 physical evidence exists.
+
+Kitesurf is recorded as K0, a separate remote external-product comparator. It
+is not added to the A/B/C/D attribution matrix. The browser contract runs K0 on
+eligible shared tasks and retains unsupported rows as ineligible rather than
+converting them into Fawn wins.
 
 Validate the contract with:
 

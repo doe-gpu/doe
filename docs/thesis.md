@@ -57,6 +57,20 @@ while an incumbent keeps execution. Fawn may create browser-shell value while
 DoeRuntime remains unearned. DoeRuntime is promoted only for the capabilities
 whose frozen `D0` comparison proves a material application advantage.
 
+DoeProof is also independent of Doppler. It must qualify the strongest eligible
+incumbent for an external application without importing, requiring, or
+favoring Doppler. Doppler may supply a workload or provider candidate, but it
+never receives qualification preference. `D0`, Fawn, and the Direct Protocol
+remain evidence-gated forks rather than prerequisites for the first paid
+qualification.
+
+Cloudflare's Kitesurf release occupies the generic stateless agent-browser
+description. Fawn therefore targets local-first persistent private workflows:
+endpoint-owned state, local files and models, restart and offline recovery,
+qualified local GPU execution, and replayable evidence. Kitesurf is evaluated
+as the separate K0 external product in [`browser-lane.md`](browser-lane.md);
+it is not a fifth causal A/B/C/D lane.
+
 ## Objective
 
 Doe should become the receipt-backed local compute plane for autonomous
@@ -167,7 +181,7 @@ narrative stays here; implementation and evidence stay in the linked sources.
 
 | ID | Idea | State | What it means now |
 | --- | --- | --- | --- |
-| `DOE-01` | Fawn agent browser | `active` | First-class Doe browser product target at the Chromium WebGPU seam; current evidence remains diagnostic, and browser-wide agent orchestration is outside Doe. |
+| `DOE-01` | Fawn local-first agent browser | `active` | Product target for persistent private endpoint workflows at the Chromium WebGPU seam; K0 remains a separate remote comparator, current evidence remains diagnostic, and browser-wide agent orchestration is outside Doe. |
 | `DOE-02` | DoeKernel accelerator scheduler | `candidate` | Queue/resource contracts and prototypes; no browser-wide scheduler claim. |
 | `DOE-03` | DoeVM portable compute layer | `diagnostic` | WGSL/IR/TSIR/HostPlan/CSL direction; not yet a universal VM. |
 | `DOE-04` | DoeProof execution evidence | `active` | Workload, oracle, receipt, replay, and qualification trunk; provider-neutral callback, unchanged-process, and CLI/CI execution are public through `doe-gpu/node-webgpu`, `doe-gpu/node-webgpu-process`, and `doe-proof-node`. |

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-03-19T00:00:00Z",
+  "updatedAt": "2026-08-24T00:00:00Z",
   "statuses": [
     "planned",
     "in_progress",
@@ -318,7 +318,7 @@
       "title": "Published Fawn release",
       "track": "browser",
       "status": "in_progress",
-      "summary": "Fawn is the first-class browser product target. The Linux x64 release-candidate lane is governed alongside macOS arm64, but no platform has yet produced a clean-install, forced-Doe, exact-oracle release candidate.",
+      "summary": "Fawn is the local-first persistent private browser product candidate. The Linux x64 release-candidate lane is governed alongside macOS arm64, but no platform has yet produced a clean-install, forced-Doe, exact-oracle release candidate, and product promotion remains subject to the separate K0 external comparison.",
       "dependencies": [
         "M3"
       ],
@@ -380,6 +380,14 @@
           "mustExist": true
         },
         {
+          "id": "external_product_comparison_contract",
+          "kind": "doc",
+          "path": "docs/browser-lane.md",
+          "description": "K0 comparison and eligibility law kept separate from the A/B/C/D causal matrix.",
+          "required": true,
+          "mustExist": true
+        },
+        {
           "id": "retained_diagnostic_archive_manifest",
           "kind": "artifact",
           "path": "bench/out/public-browser-release/20260703T233418Z/Fawn-Doe-linux-x64-gui-diagnostic.manifest.json",
@@ -400,7 +408,8 @@
         "A cleanly extracted release-candidate archive launches on its declared platform.",
         "Forced Doe is hash-bound, adapter hardware identity is visible, and hidden fallback is absent.",
         "One unchanged application passes an independent oracle plus reload, teardown, concurrency, and memory-growth checks.",
-        "Any promoted advantage uses matched browser builds, work, timing scope, and release percentiles."
+        "Any promoted advantage uses matched browser builds, work, timing scope, and release percentiles.",
+        "Release-candidate publication grants no Fawn product claim until eligible K0 shared tasks and the local-persistent suite complete under the separate comparison law."
       ],
       "blockers": [
         "The retained Linux archive is a compact diagnostic archive and omits required Chromium runtime support files.",
@@ -411,7 +420,8 @@
       "nextActions": [
         "Restore or rebuild the complete Linux Fawn output with the declared release profile and package every required support member.",
         "Run the extracted archive in forced Dawn and forced Doe modes before WebGPU application qualification.",
-        "Promote one unchanged exact-oracle application only after lifecycle, fallback, hardware identity, replay, and percentile gates pass."
+        "Promote one unchanged exact-oracle application only after lifecycle, fallback, hardware identity, replay, and percentile gates pass.",
+        "After a clean-install candidate exists, run K0 beside A/B/C/D on eligible shared tasks and retain unsupported K0 rows as ineligible rather than Fawn wins."
       ]
     },
     {
