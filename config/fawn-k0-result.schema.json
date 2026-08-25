@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/fawn-k0-result.schema.json",
+  "title": "Fawn K0 external comparator result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "reportKind", "executionId", "comparatorId", "policyDigest", "evidenceStatus", "claimAllowed", "fawnCreditAllowed", "doeRuntimeCreditAllowed", "directProtocolCreditAllowed", "tasks", "generatedAtUtc"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "reportKind": { "const": "fawn-k0-external-comparator-result" },
+    "executionId": { "type": "string", "minLength": 1 },
+    "comparatorId": { "const": "K0" },
+    "policyDigest": { "$ref": "#/$defs/digest" },
+    "evidenceStatus": { "enum": ["passed-unpromoted", "failed-unpromoted"] },
+    "claimAllowed": { "const": false },
+    "fawnCreditAllowed": { "const": false },
+    "doeRuntimeCreditAllowed": { "const": false },
+    "directProtocolCreditAllowed": { "const": false },
+    "tasks": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "items": { "$ref": "#/$defs/taskResult" }
+    },
+    "generatedAtUtc": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "taskResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "suiteId", "eligibility", "eligibilityReason", "executionStatus", "action", "request", "response", "oracle", "observations", "failure", "fawnCreditAllowed"],
+      "properties": {
+        "taskId": { "type": "string", "minLength": 1 },
+        "suiteId": { "enum": ["shared-agent-browser-tasks", "fawn-differentiation-tasks"] },
+        "eligibility": { "enum": ["eligible", "ineligible"] },
+        "eligibilityReason": { "type": "string", "minLength": 1 },
+        "executionStatus": { "enum": ["passed", "failed", "ineligible"] },
+        "action": { "type": ["string", "null"] },
+        "request": { "type": ["object", "null"] },
+        "response": { "type": ["object", "null"] },
+        "oracle": { "type": ["object", "null"] },
+        "observations": { "type": ["object", "null"] },
+        "failure": { "type": ["string", "null"] },
+        "fawnCreditAllowed": { "const": false }
+      }
+    }
+  }
+}

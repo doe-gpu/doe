@@ -139,6 +139,8 @@
         "lastVerifiedAt",
         "freshnessRule",
         "officialSources",
+        "executorPath",
+        "admissionPolicyPath",
         "claimBoundary"
       ],
       "properties": {
@@ -151,11 +153,13 @@
         "freshnessRule": { "$ref": "#/$defs/text" },
         "officialSources": {
           "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true,
           "items": { "type": "string", "format": "uri", "pattern": "^https://" }
         },
+        "executorPath": { "$ref": "#/$defs/path" },
+        "admissionPolicyPath": { "$ref": "#/$defs/path" },
         "claimBoundary": { "$ref": "#/$defs/text" }
       }
     },

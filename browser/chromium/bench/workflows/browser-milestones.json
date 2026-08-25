@@ -388,6 +388,30 @@
           "mustExist": true
         },
         {
+          "id": "k0_admission_policy",
+          "kind": "manifest",
+          "path": "config/fawn-k0-workloads.json",
+          "description": "Schema-backed K0 Quick Action and CDP admission table that retains unsupported workloads as ineligible.",
+          "required": true,
+          "mustExist": true
+        },
+        {
+          "id": "k0_executor",
+          "kind": "script",
+          "path": "bench/fawn_matrix/k0_cli.py",
+          "description": "Cloudflare Browser Run plus Kitesurf executor with caller-bound exact response oracles and no internal component credit.",
+          "required": true,
+          "mustExist": true
+        },
+        {
+          "id": "k0_connector_contract_test",
+          "kind": "script",
+          "path": "bench/tests/test_fawn_k0_connector.py",
+          "description": "Connector test proving admitted execution, explicit ineligibility, exact-oracle failure, and non-promotion.",
+          "required": true,
+          "mustExist": true
+        },
+        {
           "id": "retained_diagnostic_archive_manifest",
           "kind": "artifact",
           "path": "bench/out/public-browser-release/20260703T233418Z/Fawn-Doe-linux-x64-gui-diagnostic.manifest.json",
@@ -416,13 +440,14 @@
         "The retained Linux archive is a compact diagnostic archive and omits required Chromium runtime support files.",
         "The original Chromium checkout and complete build output are not present on this machine.",
         "No unchanged exact-oracle application is yet bound to a clean-install release candidate.",
+        "No customer-authorized Cloudflare K0 execution receipt exists for the unchanged shared-task application.",
         "No public archive, repeated lifecycle receipt, concurrency receipt, or memory-growth receipt is claimable."
       ],
       "nextActions": [
         "Restore or rebuild the complete Linux Fawn output with the declared release profile and package every required support member.",
         "Run the extracted archive in forced Dawn and forced Doe modes before WebGPU application qualification.",
         "Promote one unchanged exact-oracle application only after lifecycle, fallback, hardware identity, replay, and percentile gates pass.",
-        "After a clean-install candidate exists, run K0 beside A/B/C/D on eligible shared tasks and retain unsupported K0 rows as ineligible rather than Fawn wins."
+        "Bind the unchanged shared-task application and exact response oracles, then run the implemented K0 connector beside A/B/C/D; retain differentiation rows as ineligible rather than Fawn wins."
       ]
     },
     {

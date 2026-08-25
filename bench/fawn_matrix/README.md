@@ -42,6 +42,33 @@ are not distinct, a lane fell back, evidence is simulated, samples are not
 interleaved, payload hashes disagree with artifacts, or the semantic oracle fails.
 Aggregate output still requires independent review before publication.
 
+## External K0 comparator
+
+K0 is Cloudflare Browser Run plus Kitesurf. It is not a fifth internal lane and
+cannot award Fawn, DoeRuntime, or Direct Protocol credit. Inspect the governed
+admission table with:
+
+```sh
+python3 -m bench.fawn_matrix.k0_cli inspect
+```
+
+Bind every admitted shared task to an HTTPS URL and an independently frozen exact
+response digest using `config/fawn-k0-bindings.schema.json`, then execute:
+
+```sh
+CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... \
+python3 -m bench.fawn_matrix.k0_cli run \
+  --bindings path/to/k0-bindings.json \
+  --out bench/out/fawn-matrix/k0/result.json
+```
+
+HTML extraction and screenshots use Kitesurf Quick Actions. Navigation and
+automation use Kitesurf's remote CDP endpoint through Playwright. The local-private
+differentiation tasks remain retained `ineligible` rows under
+`config/fawn-k0-workloads.json`; the executor does not call K0 for those rows.
+Every K0 report is non-promoting until unchanged A/B/C/D receipts are joined under
+`config/browser-product-comparison-policy.json`.
+
 ## GPU, agent, and passport workloads
 
 Run the remaining live workloads on a physical platform:

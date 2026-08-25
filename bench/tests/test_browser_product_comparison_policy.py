@@ -16,6 +16,7 @@ STRATEGY_PATH = REPO_ROOT / "config" / "doe-product-strategy.json"
 EXPECTED_CLOUDFLARE_SOURCES = {
     "https://blog.cloudflare.com/kitesurf/",
     "https://developers.cloudflare.com/browser-run/kitesurf/",
+    "https://developers.cloudflare.com/browser-run/quick-actions/",
 }
 
 
@@ -61,6 +62,14 @@ class BrowserProductComparisonPolicyTests(unittest.TestCase):
         self.assertEqual(
             set(comparators[0]["officialSources"]),
             EXPECTED_CLOUDFLARE_SOURCES,
+        )
+        self.assertEqual(
+            comparators[0]["executorPath"],
+            "bench/fawn_matrix/k0_cli.py",
+        )
+        self.assertEqual(
+            comparators[0]["admissionPolicyPath"],
+            "config/fawn-k0-workloads.json",
         )
 
     def test_suites_freeze_shared_and_differentiation_tasks(self) -> None:

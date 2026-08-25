@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/fawn-k0-workloads.schema.json",
+  "title": "Fawn K0 workload admission policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "policyId", "comparatorId", "api", "taskAdmission", "completionLaw"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "policyId": { "type": "string", "const": "fawn-k0-workloads-v1" },
+    "comparatorId": { "type": "string", "const": "K0" },
+    "api": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "product", "baseUrl", "browser", "accountIdEnvironment", "apiTokenEnvironment", "cdpPath", "officialSources", "endpoints"],
+      "properties": {
+        "owner": { "const": "Cloudflare" },
+        "product": { "const": "Cloudflare Browser Run plus Kitesurf" },
+        "baseUrl": { "const": "https://api.cloudflare.com/client/v4/accounts" },
+        "browser": { "const": "kitesurf" },
+        "accountIdEnvironment": { "const": "CLOUDFLARE_ACCOUNT_ID" },
+        "apiTokenEnvironment": { "const": "CLOUDFLARE_API_TOKEN" },
+        "cdpPath": { "const": "browser-run/devtools/browser" },
+        "officialSources": {
+          "type": "array",
+          "const": [
+            "https://developers.cloudflare.com/browser-run/kitesurf/",
+            "https://developers.cloudflare.com/browser-run/quick-actions/"
+          ]
+        },
+        "endpoints": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/endpoint" }
+        }
+      }
+    },
+    "taskAdmission": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "items": { "$ref": "#/$defs/task" }
+    },
+    "completionLaw": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oracle", "ineligibility", "attribution", "promotion"],
+      "properties": {
+        "oracle": { "$ref": "#/$defs/text" },
+        "ineligibility": { "$ref": "#/$defs/text" },
+        "attribution": { "$ref": "#/$defs/text" },
+        "promotion": { "$ref": "#/$defs/text" }
+      }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "path", "responseKind"],
+      "properties": {
+        "action": { "enum": ["content", "screenshot"] },
+        "path": { "enum": ["browser-run/content", "browser-run/screenshot"] },
+        "responseKind": { "const": "bytes" }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "suiteId", "action", "eligibility", "reasonCode"],
+      "properties": {
+        "taskId": {
+          "enum": [
+            "html-extraction",
+            "screenshots",
+            "navigation",
+            "automation-success",
+            "persistent-authentication",
+            "restart-recovery",
+            "offline-local-operation",
+            "webgl",
+            "webgpu",
+            "private-state",
+            "long-running-sessions"
+          ]
+        },
+        "suiteId": { "enum": ["shared-agent-browser-tasks", "fawn-differentiation-tasks"] },
+        "action": { "type": ["string", "null"], "enum": ["content", "screenshot", "cdp-navigation", "cdp-automation", null] },
+        "eligibility": { "enum": ["eligible", "ineligible"] },
+        "reasonCode": {
+          "enum": [
+            "quick-action-admitted",
+            "cdp-admitted",
+            "persistent-state-unsupported",
+            "connector-not-admitted",
+            "external-service-required",
+            "webgl-unsupported",
+            "long-running-session-unsupported"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "policyId": "fawn-k0-workloads-v1",
+  "comparatorId": "K0",
+  "api": {
+    "owner": "Cloudflare",
+    "product": "Cloudflare Browser Run plus Kitesurf",
+    "baseUrl": "https://api.cloudflare.com/client/v4/accounts",
+    "browser": "kitesurf",
+    "accountIdEnvironment": "CLOUDFLARE_ACCOUNT_ID",
+    "apiTokenEnvironment": "CLOUDFLARE_API_TOKEN",
+    "cdpPath": "browser-run/devtools/browser",
+    "officialSources": [
+      "https://developers.cloudflare.com/browser-run/kitesurf/",
+      "https://developers.cloudflare.com/browser-run/quick-actions/"
+    ],
+    "endpoints": [
+      { "action": "content", "path": "browser-run/content", "responseKind": "bytes" },
+      { "action": "screenshot", "path": "browser-run/screenshot", "responseKind": "bytes" }
+    ]
+  },
+  "taskAdmission": [
+    {
+      "taskId": "html-extraction",
+      "suiteId": "shared-agent-browser-tasks",
+      "action": "content",
+      "eligibility": "eligible",
+      "reasonCode": "quick-action-admitted"
+    },
+    {
+      "taskId": "screenshots",
+      "suiteId": "shared-agent-browser-tasks",
+      "action": "screenshot",
+      "eligibility": "eligible",
+      "reasonCode": "quick-action-admitted"
+    },
+    {
+      "taskId": "navigation",
+      "suiteId": "shared-agent-browser-tasks",
+      "action": "cdp-navigation",
+      "eligibility": "eligible",
+      "reasonCode": "cdp-admitted"
+    },
+    {
+      "taskId": "automation-success",
+      "suiteId": "shared-agent-browser-tasks",
+      "action": "cdp-automation",
+      "eligibility": "eligible",
+      "reasonCode": "cdp-admitted"
+    },
+    {
+      "taskId": "persistent-authentication",
+      "suiteId": "fawn-differentiation-tasks",
+      "action": null,
+      "eligibility": "ineligible",
+      "reasonCode": "persistent-state-unsupported"
+    },
+    {
+      "taskId": "restart-recovery",
+      "suiteId": "fawn-differentiation-tasks",
+      "action": null,
+      "eligibility": "ineligible",
+      "reasonCode": "connector-not-admitted"
+    },
+    {
+      "taskId": "offline-local-operation",
+      "suiteId": "fawn-differentiation-tasks",
+      "action": null,
+      "eligibility": "ineligible",
+      "reasonCode": "external-service-required"
+    },
+    {
+      "taskId": "webgl",
+      "suiteId": "fawn-differentiation-tasks",
+      "action": null,
+      "eligibility": "ineligible",
+      "reasonCode": "webgl-unsupported"
+    },
+    {
+      "taskId": "webgpu",
+      "suiteId": "fawn-differentiation-tasks",
+      "action": null,
+      "eligibility": "ineligible",
+      "reasonCode": "connector-not-admitted"
+    },
+    {
+      "taskId": "private-state",
+      "suiteId": "fawn-differentiation-tasks",
+      "action": null,
+      "eligibility": "ineligible",
+      "reasonCode": "persistent-state-unsupported"
+    },
+    {
+      "taskId": "long-running-sessions",
+      "suiteId": "fawn-differentiation-tasks",
+      "action": null,
+      "eligibility": "ineligible",
+      "reasonCode": "long-running-session-unsupported"
+    }
+  ],
+  "completionLaw": {
+    "oracle": "Every eligible execution requires a caller-supplied exact SHA-256 response oracle.",
+    "ineligibility": "Ineligible rows are retained without execution and are never scored as Fawn wins.",
+    "attribution": "K0 is an external product comparator and cannot grant Fawn shell, DoeRuntime, or Direct Protocol credit.",
+    "promotion": "A K0 receipt remains non-promoting until joined with unchanged A/B/C/D task receipts under the browser product comparison policy."
+  }
+}

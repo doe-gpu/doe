@@ -55,8 +55,11 @@
       "freshnessRule": "Reverify both official sources before every funded fork decision or published comparison.",
       "officialSources": [
         "https://blog.cloudflare.com/kitesurf/",
-        "https://developers.cloudflare.com/browser-run/kitesurf/"
+        "https://developers.cloudflare.com/browser-run/kitesurf/",
+        "https://developers.cloudflare.com/browser-run/quick-actions/"
       ],
+      "executorPath": "bench/fawn_matrix/k0_cli.py",
+      "admissionPolicyPath": "config/fawn-k0-workloads.json",
       "claimBoundary": "Cloudflare product documentation establishes comparator scope only; it is not Doe or Fawn execution evidence."
     }
   ],
@@ -174,6 +177,12 @@
   "evidenceReferences": [
     "browser/chromium/bench/workflows/browser-milestones.json",
     "bench/fawn_matrix/config/matrix-workloads.json",
+    "config/fawn-k0-workloads.json",
+    "config/fawn-k0-bindings.schema.json",
+    "config/fawn-k0-result.schema.json",
+    "bench/fawn_matrix/k0.py",
+    "bench/fawn_matrix/k0_cli.py",
+    "bench/tests/test_fawn_k0_connector.py",
     "reports/claim-index.json",
     "docs/status/runtime-backends-and-bench.md"
   ],

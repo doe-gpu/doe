@@ -50,6 +50,17 @@ boundary. Unsupported rows remain `ineligible`: they are retained, are never
 scored as Fawn wins, and do not prove Fawn quality or customer value. Fawn must
 still pass its own application oracle, lifecycle, and release gates.
 
+The repository-owned K0 connector is
+[`bench/fawn_matrix/k0_cli.py`](../bench/fawn_matrix/k0_cli.py). Its admission
+policy is [`config/fawn-k0-workloads.json`](../config/fawn-k0-workloads.json):
+Quick Actions execute HTML extraction and screenshots, while remote CDP executes
+navigation and frozen automation. Every eligible binding supplies an exact
+response SHA-256 oracle. The connector retains all differentiation rows as
+ineligible and emits `claimAllowed: false`, `fawnCreditAllowed: false`,
+`doeRuntimeCreditAllowed: false`, and `directProtocolCreditAllowed: false`.
+Network execution still requires customer-authorized Cloudflare credentials and
+an unchanged externally reachable application.
+
 ### Falsifiable decision rules
 
 1. **If B beats A but C does not beat B:**  

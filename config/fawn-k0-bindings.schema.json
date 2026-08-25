@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/fawn-k0-bindings.schema.json",
+  "title": "Fawn K0 execution bindings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "executionId", "comparatorId", "tasks"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "executionId": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+    "comparatorId": { "type": "string", "const": "K0" },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["taskId", "url", "oracle"],
+        "properties": {
+          "taskId": { "enum": ["html-extraction", "screenshots", "navigation", "automation-success"] },
+          "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["action", "selector"],
+              "properties": {
+                "action": { "enum": ["click", "fill"] },
+                "selector": { "type": "string", "minLength": 1 },
+                "value": { "type": "string" }
+              }
+            }
+          },
+          "observations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "selector", "property"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+                "selector": { "type": "string", "minLength": 1 },
+                "property": { "enum": ["textContent", "value", "checked", "disabled", "attribute"] },
+                "attribute": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          "oracle": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "expectedSha256"],
+            "properties": {
+              "kind": { "const": "exact-response-sha256" },
+              "expectedSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "taskId": { "const": "automation-success" } }, "required": ["taskId"] },
+            "then": { "required": ["steps", "observations"] }
+          }
+        ]
+      }
+    }
+  }
+}
