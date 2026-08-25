@@ -45,9 +45,10 @@ features, retries, recovery, and total task outcomes.
 
 The differentiation suite covers persistent authentication, restart recovery,
 offline local operation, WebGL, WebGPU, private state, and long-running
-sessions. A K0 unsupported result may establish non-substitutability for that
-task, but it does not prove Fawn quality or customer value; Fawn must still pass
-its own application oracle, lifecycle, and release gates.
+sessions. K0 runs only on workloads admitted by its documented product
+boundary. Unsupported rows remain `ineligible`: they are retained, are never
+scored as Fawn wins, and do not prove Fawn quality or customer value. Fawn must
+still pass its own application oracle, lifecycle, and release gates.
 
 ### Falsifiable decision rules
 

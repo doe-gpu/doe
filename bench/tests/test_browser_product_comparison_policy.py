@@ -11,6 +11,7 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 POLICY_PATH = REPO_ROOT / "config" / "browser-product-comparison-policy.json"
+STRATEGY_PATH = REPO_ROOT / "config" / "doe-product-strategy.json"
 
 EXPECTED_CLOUDFLARE_SOURCES = {
     "https://blog.cloudflare.com/kitesurf/",
@@ -112,6 +113,19 @@ class BrowserProductComparisonPolicyTests(unittest.TestCase):
         )
         for reference in policy["evidenceReferences"]:
             self.assertTrue((REPO_ROOT / reference).exists(), reference)
+
+    def test_product_strategy_projects_the_canonical_policy(self) -> None:
+        strategy = json.loads(STRATEGY_PATH.read_text(encoding="utf-8"))
+        comparison = strategy["externalProductComparison"]
+
+        self.assertEqual(
+            comparison["authorityPath"],
+            "config/browser-product-comparison-policy.json",
+        )
+        self.assertEqual(
+            [suite["id"] for suite in comparison["suites"]],
+            ["shared-agent-browser-tasks", "fawn-differentiation-tasks"],
+        )
 
 
 if __name__ == "__main__":

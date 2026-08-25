@@ -65,10 +65,18 @@ purchased `I1` to `W0` DoeProof episode around the customer's incumbent,
 production signer authorization, an independent oracle, replay, lifecycle and
 failure evidence, a blocking decision, and a paid repeat requalification.
 
-Fawn is an evidence-gated fork. Its evaluation begins with a clean-install
-candidate, frozen task suites, explicit provider identity, retained failures,
-and replayable receipts before any product outcome is claimed. The funded
-forks remain separate:
+DoeProof must qualify the strongest eligible incumbent without importing,
+requiring, or favoring Doppler. Doppler may supply a workload or provider
+candidate, but it never receives qualification preference.
+
+Fawn is an evidence-gated fork targeting local-first persistent private
+workflows: endpoint-owned state, local files and models, restart and offline
+recovery, qualified local GPU execution, and replayable evidence. Its
+evaluation begins with a clean-install candidate, frozen task suites, explicit
+provider identity, retained failures, and replayable receipts before any
+product outcome is claimed. Kitesurf is the separate `K0` external product in
+[`browser-lane.md`](browser-lane.md), not a fifth causal lane. The funded forks
+remain separate:
 
 - Fawn shell authority comes only from `B` versus `A`.
 - DoeRuntime browser authority comes only from `C` versus `B`, and remains
@@ -191,7 +199,7 @@ narrative stays here; implementation and evidence stay in the linked sources.
 
 | ID | Idea | State | What it means now |
 | --- | --- | --- | --- |
-| `DOE-01` | Fawn agent browser | `active` | First-class Doe browser product target at the Chromium WebGPU seam; current evidence remains diagnostic, and browser-wide agent orchestration is outside Doe. |
+| `DOE-01` | Fawn local-first agent browser | `active` | Product target for persistent private endpoint workflows at the Chromium WebGPU seam; K0 remains a separate remote comparator, current evidence remains diagnostic, and browser-wide agent orchestration is outside Doe. |
 | `DOE-02` | DoeKernel accelerator scheduler | `candidate` | Queue/resource contracts and prototypes; no browser-wide scheduler claim. |
 | `DOE-03` | DoeVM portable compute layer | `diagnostic` | WGSL/IR/TSIR/HostPlan/CSL direction; not yet a universal VM. |
 | `DOE-04` | DoeProof execution evidence | `active` | Workload, oracle, receipt, replay, and qualification trunk; provider-neutral callback, unchanged-process, and CLI/CI execution are public through `doe-gpu/node-webgpu`, `doe-gpu/node-webgpu-process`, and `doe-proof-node`. |

@@ -18,8 +18,9 @@ evidence boundaries are clear.
   local compute vision, owned tracks, supporting-project roles, Node/Bun wedge,
   downstream portfolio, browser path, and expansion boundaries
 - [`product-strategy-contract.md`](product-strategy-contract.md): validated
-  DoeProof offer, quad roles, comparison law, evidence custody, platform
-  sequence, milestones, and claim boundaries
+  DoeProof offer, product-independence boundary, quad roles, comparison law,
+  K0 external-product comparison, evidence custody, platform sequence,
+  milestones, and claim boundaries
 - Cross-project documentation authority is maintained in the program registry
   outside this repository; Doe remains canonical for Doe behavior and
   measurements
@@ -77,7 +78,8 @@ evidence boundaries are clear.
 
 ## Browser
 
-- [`browser-lane.md`](browser-lane.md)
+- [`browser-lane.md`](browser-lane.md): A/B/C/D attribution plus the separate
+  Cloudflare Kitesurf K0 external-product comparator
 - [`chromium-webgpu-task-list.md`](chromium-webgpu-task-list.md)
 - [`fawn-fork-maintenance-policy.md`](fawn-fork-maintenance-policy.md)
 
