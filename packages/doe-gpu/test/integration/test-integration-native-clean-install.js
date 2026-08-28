@@ -1,17 +1,24 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { release, tmpdir } from 'node:os';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const runnerPath = fileURLToPath(import.meta.url);
+const reliabilityRunnerPath = resolve(
+  here,
+  'test-integration-native-clean-install-reliability.js',
+);
+const candidateFixturePath = resolve(here, '../fixtures/native-release-candidate.mjs');
 const packageRoot = resolve(here, '../..');
 const packagesRoot = dirname(packageRoot);
+const repoRoot = dirname(packagesRoot);
 const requireNative = process.argv.includes('--required')
   || process.env.DOE_REQUIRE_NATIVE_CLEAN_INSTALL === '1';
+const releaseCandidate = process.argv.includes('--release-candidate');
 const outputArgumentIndex = process.argv.indexOf('--out');
 if (outputArgumentIndex !== -1 && !process.argv[outputArgumentIndex + 1]) {
   throw new Error('--out requires a path');
@@ -19,6 +26,21 @@ if (outputArgumentIndex !== -1 && !process.argv[outputArgumentIndex + 1]) {
 const outputPath = outputArgumentIndex === -1
   ? null
   : resolve(process.argv[outputArgumentIndex + 1]);
+const reliabilityArgumentIndex = process.argv.indexOf('--reliability');
+if (reliabilityArgumentIndex !== -1 && !process.argv[reliabilityArgumentIndex + 1]) {
+  throw new Error('--reliability requires a path');
+}
+const requestedReliabilityPath = reliabilityArgumentIndex === -1
+  ? null
+  : resolve(process.argv[reliabilityArgumentIndex + 1]);
+if (releaseCandidate && !outputPath) {
+  throw new Error('--release-candidate requires --out');
+}
+const reliabilityPath = requestedReliabilityPath ?? (
+  releaseCandidate
+    ? outputPath.replace(/\.json$/u, '.reliability.json')
+    : null
+);
 const runtimeArgumentIndex = process.argv.indexOf('--runtime');
 if (runtimeArgumentIndex !== -1 && !process.argv[runtimeArgumentIndex + 1]) {
   throw new Error('--runtime requires node, bun, or electron');
@@ -59,9 +81,10 @@ if (!existsSync(stagedPlatformLibrary)) {
 const scratch = await mkdtemp(join(tmpdir(), 'doe-gpu-native-clean-install-'));
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
-function execute(command, args, cwd = scratch) {
+function execute(command, args, cwd = scratch, env = undefined) {
   return spawnSync(command, args, {
     cwd,
+    ...(env ? { env } : {}),
     encoding: 'utf8',
     maxBuffer: 16 * 1024 * 1024,
   });
@@ -109,6 +132,70 @@ async function sha256File(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
 }
 
+function sha256Json(value) {
+  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
+}
+
+function repoRelativePath(path) {
+  const resolved = resolve(path);
+  const repoRelative = relative(repoRoot, resolved);
+  if (repoRelative === '..' || repoRelative.startsWith(`..${sep}`)) {
+    throw new Error(`release-candidate evidence must stay inside the repository: ${resolved}`);
+  }
+  return repoRelative.split(sep).join('/');
+}
+
+function requireCandidateRun(result, label) {
+  requireSuccess(result, label);
+  let artifact;
+  try {
+    artifact = JSON.parse(result.stdout);
+  } catch (error) {
+    throw new Error(`${label} emitted invalid JSON: ${error.message}\n${result.stdout}`);
+  }
+  const receipt = artifact.receipt;
+  if (artifact.artifactKind !== 'doe-gpu-native-release-candidate-run'
+      || artifact.runtimeHost !== runtimeHost
+      || artifact.ok !== true
+      || artifact.validation?.valid !== true
+      || artifact.errors?.length !== 0
+      || receipt?.schema !== 'doe.governed-node-webgpu-receipt/v1'
+      || receipt?.status !== 'pass'
+      || receipt?.checkpoint !== 'release-complete'
+      || receipt?.provider?.selectedProviderId !== 'doe-native-0.5.0'
+      || receipt?.adapterInfoStatus !== 'observed'
+      || !receipt?.adapterInfo?.vendor
+      || !receipt?.adapterInfo?.device
+      || receipt?.oracle?.status !== 'pass'
+      || receipt?.oracle?.actualOutputSha256 !== receipt?.oracle?.expectedOutputSha256
+      || receipt?.lifecycle?.status !== 'release-complete'
+      || receipt?.lifecycle?.globalsRestored !== true
+      || !receipt?.replay?.workloadSha256
+      || !receipt?.replay?.executionSha256
+      || JSON.stringify(artifact.output) !== JSON.stringify([2, 4, 6, 8, 10, 12, 14, 16])) {
+    throw new Error(`${label} failed the governed candidate contract: ${result.stdout}`);
+  }
+  return artifact;
+}
+
+function requireReliabilityEvidence(report, runtime, wrapper, platform) {
+  if (report?.artifactKind !== 'doe-gpu-native-clean-install-reliability-diagnostic'
+      || report?.status !== 'passed'
+      || report?.tuple?.runtime !== runtime
+      || report?.tuple?.platform !== process.platform
+      || report?.tuple?.arch !== process.arch
+      || report?.packages?.wrapper?.sha256 !== wrapper
+      || report?.packages?.platform?.sha256 !== platform
+      || report?.decision?.boundedCleanProcessReliability
+        !== 'authorized-for-declared-runtime-tuple'
+      || report?.decision?.boundedSameProcessLifecycle
+        !== 'authorized-for-declared-runtime-tuple'
+      || report?.decision?.deliberateDestroyLossSemantics
+        !== 'authorized-for-declared-runtime-tuple') {
+    throw new Error('reliability evidence does not match the release-candidate tuple and bytes');
+  }
+}
+
 function resolveRuntimeIdentity() {
   if (runtimeHost === 'node') {
     return {
@@ -142,6 +229,17 @@ function resolveRuntimeIdentity() {
 
 try {
   const runtime = resolveRuntimeIdentity();
+  if (releaseCandidate && requestedReliabilityPath === null) {
+    const reliability = execute(process.execPath, [
+      reliabilityRunnerPath,
+      '--required',
+      '--runtime',
+      runtimeHost,
+      '--out',
+      reliabilityPath,
+    ], packageRoot);
+    requireSuccess(reliability, `native ${runtimeHost} release-candidate reliability`);
+  }
   const wrapper = pack(packageRoot, 'wrapper');
   const platform = pack(platformPackageRoot, 'platform');
   const fixtureManifest = {
@@ -206,10 +304,65 @@ try {
   if (JSON.stringify(receipt.result?.output) !== JSON.stringify(expected)) {
     throw new Error(`installed native kernel output mismatch: ${executed.stdout}`);
   }
+  let candidateEvidence = null;
+  if (releaseCandidate) {
+    const installedCandidateFixture = resolve(scratch, 'native-release-candidate.mjs');
+    await copyFile(candidateFixturePath, installedCandidateFixture);
+    if (runtimeHost === 'electron') {
+      fixtureManifest.main = 'native-release-candidate.mjs';
+      await writeFile(
+        resolve(scratch, 'package.json'),
+        `${JSON.stringify(fixtureManifest, null, 2)}\n`,
+      );
+    }
+    const candidateEnv = {
+      ...process.env,
+      DOE_NATIVE_RELEASE_CANDIDATE_RUNTIME: runtimeHost,
+    };
+    const candidateArgs = runtimeHost === 'electron'
+      ? electronArgs(scratch)
+      : [installedCandidateFixture];
+    const primary = requireCandidateRun(
+      execute(runtime.executable, candidateArgs, scratch, candidateEnv),
+      `installed native ${runtimeHost} governed candidate primary`,
+    );
+    const replay = requireCandidateRun(
+      execute(runtime.executable, candidateArgs, scratch, candidateEnv),
+      `installed native ${runtimeHost} governed candidate replay`,
+    );
+    const matches = {
+      workload: primary.receipt.replay.workloadSha256
+        === replay.receipt.replay.workloadSha256,
+      execution: primary.receipt.replay.executionSha256
+        === replay.receipt.replay.executionSha256,
+      adapter: sha256Json(primary.receipt.adapterInfo)
+        === sha256Json(replay.receipt.adapterInfo),
+      output: primary.receipt.oracle.actualOutputSha256
+        === replay.receipt.oracle.actualOutputSha256,
+      lifecycle: primary.receipt.lifecycle.status === replay.receipt.lifecycle.status
+        && primary.receipt.lifecycle.globalsRestored === replay.receipt.lifecycle.globalsRestored,
+    };
+    if (Object.values(matches).some((value) => value !== true)) {
+      throw new Error(`governed ${runtimeHost} replay identity mismatch: ${JSON.stringify(matches)}`);
+    }
+    candidateEvidence = { primary, replay, matches };
+  }
   if (outputPath) {
-    const artifact = {
+    const wrapperSha256 = await sha256File(wrapper.tarball);
+    const platformSha256 = await sha256File(platform.tarball);
+    const reliabilityReport = releaseCandidate
+      ? JSON.parse(await readFile(reliabilityPath, 'utf8'))
+      : null;
+    if (releaseCandidate) {
+      requireReliabilityEvidence(
+        reliabilityReport,
+        runtimeHost,
+        wrapperSha256,
+        platformSha256,
+      );
+    }
+    const baseArtifact = {
       schemaVersion: 1,
-      artifactKind: 'doe-gpu-native-clean-install-diagnostic',
       status: 'passed',
       tuple: { platform: process.platform, arch: process.arch },
       runtime: {
@@ -232,12 +385,12 @@ try {
         wrapper: {
           id: wrapper.manifest.id,
           bytes: wrapper.manifest.size,
-          sha256: await sha256File(wrapper.tarball),
+          sha256: wrapperSha256,
         },
         platform: {
           id: platform.manifest.id,
           bytes: platform.manifest.size,
-          sha256: await sha256File(platform.tarball),
+          sha256: platformSha256,
           stagedLibrarySha256: await sha256File(stagedPlatformLibrary),
         },
       },
@@ -272,22 +425,79 @@ try {
         },
       },
       receipt,
-      decision: {
-        nativePackageCleanInstall: 'authorized-for-declared-runtime-tuple',
-        runtimeOwnershipCredit: false,
-        performanceCredit: false,
-        applicationPromotionCredit: false,
-      },
-      limitations: [
-        'One first-kernel execution is package installation evidence, not the promotion reliability floor.',
-        'This artifact does not generalize beyond its declared runtime, platform, and architecture.',
-        ...(runtimeHost === 'electron' ? [
-          'Electron evidence covers main-process Node-side compute without renderer creation.',
-          'This artifact grants no Electron renderer, Chromium WebGPU, or browser lifecycle credit.',
-        ] : []),
-        'No performance interpretation is authorized.',
-      ],
     };
+    const artifact = releaseCandidate
+      ? {
+          ...baseArtifact,
+          artifactKind: 'doe-gpu-native-release-candidate',
+          generatedAt: new Date().toISOString(),
+          sourceCommit: execute('git', ['rev-parse', 'HEAD'], repoRoot).stdout.trim(),
+          host: {
+            platform: process.platform,
+            arch: process.arch,
+            kernelRelease: release(),
+          },
+          implementation: {
+            ...baseArtifact.implementation,
+            candidateFixture: {
+              path: 'packages/doe-gpu/test/fixtures/native-release-candidate.mjs',
+              sha256: await sha256File(candidateFixturePath),
+            },
+          },
+          governedReplay: {
+            primaryReceipt: candidateEvidence.primary.receipt,
+            primaryReceiptSha256: sha256Json(candidateEvidence.primary.receipt),
+            replayReceipt: candidateEvidence.replay.receipt,
+            replayReceiptSha256: sha256Json(candidateEvidence.replay.receipt),
+            workloadSha256: candidateEvidence.primary.receipt.replay.workloadSha256,
+            executionSha256: candidateEvidence.primary.receipt.replay.executionSha256,
+            adapterInfo: candidateEvidence.primary.receipt.adapterInfo,
+            adapterInfoSha256: sha256Json(candidateEvidence.primary.receipt.adapterInfo),
+            outputSha256: candidateEvidence.primary.receipt.oracle.actualOutputSha256,
+            matches: candidateEvidence.matches,
+          },
+          reliabilityEvidence: {
+            path: repoRelativePath(reliabilityPath),
+            sha256: await sha256File(reliabilityPath),
+            artifactKind: reliabilityReport.artifactKind,
+            status: reliabilityReport.status,
+          },
+          decision: {
+            packageReleaseCandidate: 'eligible-for-declared-runtime-tuple',
+            registryPublicationCredit: false,
+            runtimeOwnershipCredit: false,
+            performanceCredit: false,
+            applicationPromotionCredit: false,
+          },
+          limitations: [
+            'Candidate authority is limited to the declared runtime, platform, architecture, adapter, driver, and package bytes.',
+            'Registry publication requires separately authenticated npm publication readiness.',
+            ...(runtimeHost === 'electron' ? [
+              'Electron evidence covers main-process Node-side compute without renderer creation.',
+              'This artifact grants no Electron renderer, Chromium WebGPU, or browser lifecycle credit.',
+            ] : []),
+            'No performance, runtime-ownership, or application-promotion interpretation is authorized.',
+          ],
+        }
+      : {
+          ...baseArtifact,
+          artifactKind: 'doe-gpu-native-clean-install-diagnostic',
+          decision: {
+            nativePackageCleanInstall: 'authorized-for-declared-runtime-tuple',
+            runtimeOwnershipCredit: false,
+            performanceCredit: false,
+            applicationPromotionCredit: false,
+          },
+          limitations: [
+            'One first-kernel execution is package installation evidence, not the promotion reliability floor.',
+            'This artifact does not generalize beyond its declared runtime, platform, and architecture.',
+            ...(runtimeHost === 'electron' ? [
+              'Electron evidence covers main-process Node-side compute without renderer creation.',
+              'This artifact grants no Electron renderer, Chromium WebGPU, or browser lifecycle credit.',
+            ] : []),
+            'No performance interpretation is authorized.',
+          ],
+        };
     await mkdir(dirname(outputPath), { recursive: true });
     await writeFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`, { flag: 'wx' });
   }

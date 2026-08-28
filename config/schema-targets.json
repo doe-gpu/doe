@@ -1316,6 +1316,11 @@
   ],
   "globTargets": [
     {
+      "schema": "config/doe-gpu-native-release-candidate.schema.json",
+      "glob": "reports/benchmarks/*/*/doe-gpu-*-native-release-candidate.json",
+      "allowEmpty": true
+    },
+    {
       "schema": "config/fragility-signature.schema.json",
       "glob": "config/fragility-signatures/**/*.json"
     },

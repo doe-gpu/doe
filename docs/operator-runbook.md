@@ -63,6 +63,35 @@ Repository-wide blocking policy remains defined by `config/gates.json`.
 Promoted Node/Bun releases need the stronger reliability and performance
 contract described in the developer wedge.
 
+## Native package release candidate
+
+After staging the platform package, generate a tuple-specific package candidate
+with the packed wrapper and platform tarballs. The command installs with
+lifecycle scripts disabled and optional dependencies omitted, runs the shipped
+first kernel, generates fresh reliability evidence, and requires governed
+primary/replay identity equality before writing the candidate.
+
+```bash
+node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+  --required --release-candidate --runtime node \
+  --out reports/benchmarks/<backend>/<run-id>/doe-gpu-node-native-release-candidate.json
+
+node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+  --required --release-candidate --runtime bun \
+  --out reports/benchmarks/<backend>/<run-id>/doe-gpu-bun-native-release-candidate.json
+
+DOE_ELECTRON_EXECUTABLE=/absolute/path/to/electron \
+node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+  --required --release-candidate --runtime electron \
+  --out reports/benchmarks/<backend>/<run-id>/doe-gpu-electron-native-release-candidate.json
+```
+
+Each command also writes a sibling `.reliability.json` artifact and binds it by
+path and SHA-256. Candidate validation uses
+`config/doe-gpu-native-release-candidate.schema.json`. A passing tuple does not
+grant registry publication, another platform tuple, performance,
+runtime-ownership, application-promotion, or browser credit.
+
 ## Platform routing
 
 - Apple Metal: run the Metal host preflight, then select a declared Metal

@@ -18,8 +18,16 @@ REPORTS = {
 RELIABILITY_REPORTS = {
     runtime: (
         ROOT
-        / "reports/benchmarks/amd-vulkan/20260815T220824Z"
-        / f"doe-gpu-{runtime}-native-clean-install-reliability-diagnostic.json"
+        / "reports/benchmarks/amd-vulkan/20260828T152721Z"
+        / f"doe-gpu-{runtime}-native-release-candidate.reliability.json"
+    )
+    for runtime in ("node", "bun", "electron")
+}
+CURRENT_CANDIDATES = {
+    runtime: (
+        ROOT
+        / "reports/benchmarks/amd-vulkan/20260828T152721Z"
+        / f"doe-gpu-{runtime}-native-release-candidate.json"
     )
     for runtime in ("node", "bun", "electron")
 }
@@ -59,8 +67,8 @@ class DoeGpuNativeCleanInstallTests(unittest.TestCase):
                     )
                     self.assertFalse(report["launch"]["rendererCreated"])
 
-    def test_reviewed_artifact_binds_current_tracked_inputs(self) -> None:
-        for runtime, path in REPORTS.items():
+    def test_current_candidate_binds_current_tracked_inputs(self) -> None:
+        for runtime, path in CURRENT_CANDIDATES.items():
             with self.subTest(runtime=runtime):
                 report = json.loads(path.read_text())
                 for field in ("runner", "wrapperManifest", "platformManifest"):

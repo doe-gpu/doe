@@ -1,0 +1,361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe GPU native package release candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "status",
+    "generatedAt",
+    "sourceCommit",
+    "tuple",
+    "host",
+    "runtime",
+    "installation",
+    "launch",
+    "packages",
+    "implementation",
+    "receipt",
+    "governedReplay",
+    "reliabilityEvidence",
+    "decision",
+    "limitations"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "const": "doe-gpu-native-release-candidate" },
+    "status": { "const": "passed" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "sourceCommit": { "$ref": "#/$defs/gitCommit" },
+    "tuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platform", "arch"],
+      "properties": {
+        "platform": { "enum": ["linux", "darwin"] },
+        "arch": { "enum": ["x64", "arm64"] }
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platform", "arch", "kernelRelease"],
+      "properties": {
+        "platform": { "enum": ["linux", "darwin"] },
+        "arch": { "enum": ["x64", "arm64"] },
+        "kernelRelease": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "executable", "version", "sha256"],
+      "properties": {
+        "host": { "enum": ["node", "bun", "electron"] },
+        "executable": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "installation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lifecycleScripts",
+        "optionalDependencies",
+        "workspaceLibraryResolution"
+      ],
+      "properties": {
+        "lifecycleScripts": { "const": "disabled" },
+        "optionalDependencies": { "const": "omitted" },
+        "workspaceLibraryResolution": { "const": false }
+      }
+    },
+    "launch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "arguments"],
+      "properties": {
+        "mode": {
+          "enum": [
+            "node-process",
+            "bun-process",
+            "electron-main-process-node-side"
+          ]
+        },
+        "arguments": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "rendererCreated": { "const": false }
+      }
+    },
+    "packages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wrapper", "platform"],
+      "properties": {
+        "wrapper": { "$ref": "#/$defs/package" },
+        "platform": {
+          "allOf": [
+            { "$ref": "#/$defs/package" },
+            {
+              "type": "object",
+              "required": ["stagedLibrarySha256"],
+              "properties": {
+                "stagedLibrarySha256": { "$ref": "#/$defs/sha256" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runner",
+        "candidateFixture",
+        "firstKernel",
+        "wrapperManifest",
+        "platformManifest",
+        "stagedAddon",
+        "stagedBuildMetadata"
+      ],
+      "properties": {
+        "runner": { "$ref": "#/$defs/fileReference" },
+        "candidateFixture": { "$ref": "#/$defs/fileReference" },
+        "firstKernel": { "$ref": "#/$defs/fileReference" },
+        "wrapperManifest": { "$ref": "#/$defs/fileReference" },
+        "platformManifest": { "$ref": "#/$defs/fileReference" },
+        "stagedAddon": { "$ref": "#/$defs/fileReference" },
+        "stagedBuildMetadata": { "$ref": "#/$defs/fileReference" }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "required": [
+        "kind",
+        "schemaVersion",
+        "runtimeHost",
+        "provider",
+        "workload",
+        "result"
+      ],
+      "properties": {
+        "kind": { "const": "doe-gpu.first-kernel.receipt" },
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "runtimeHost": { "enum": ["node", "bun", "electron"] },
+        "provider": { "type": "object" },
+        "workload": { "type": "object" },
+        "result": { "type": "object" }
+      }
+    },
+    "governedReplay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primaryReceipt",
+        "primaryReceiptSha256",
+        "replayReceipt",
+        "replayReceiptSha256",
+        "workloadSha256",
+        "executionSha256",
+        "adapterInfo",
+        "adapterInfoSha256",
+        "outputSha256",
+        "matches"
+      ],
+      "properties": {
+        "primaryReceipt": { "$ref": "#/$defs/governedReceipt" },
+        "primaryReceiptSha256": { "$ref": "#/$defs/sha256" },
+        "replayReceipt": { "$ref": "#/$defs/governedReceipt" },
+        "replayReceiptSha256": { "$ref": "#/$defs/sha256" },
+        "workloadSha256": { "$ref": "#/$defs/prefixedSha256" },
+        "executionSha256": { "$ref": "#/$defs/prefixedSha256" },
+        "adapterInfo": { "$ref": "#/$defs/adapterInfo" },
+        "adapterInfoSha256": { "$ref": "#/$defs/sha256" },
+        "outputSha256": { "$ref": "#/$defs/prefixedSha256" },
+        "matches": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["workload", "execution", "adapter", "output", "lifecycle"],
+          "properties": {
+            "workload": { "const": true },
+            "execution": { "const": true },
+            "adapter": { "const": true },
+            "output": { "const": true },
+            "lifecycle": { "const": true }
+          }
+        }
+      }
+    },
+    "reliabilityEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "artifactKind", "status"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "artifactKind": {
+          "const": "doe-gpu-native-clean-install-reliability-diagnostic"
+        },
+        "status": { "const": "passed" }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packageReleaseCandidate",
+        "registryPublicationCredit",
+        "runtimeOwnershipCredit",
+        "performanceCredit",
+        "applicationPromotionCredit"
+      ],
+      "properties": {
+        "packageReleaseCandidate": { "const": "eligible-for-declared-runtime-tuple" },
+        "registryPublicationCredit": { "const": false },
+        "runtimeOwnershipCredit": { "const": false },
+        "performanceCredit": { "const": false },
+        "applicationPromotionCredit": { "const": false }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "prefixedSha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "gitCommit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "bytes", "sha256"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "stagedLibrarySha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "fileReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "adapterInfo": {
+      "type": "object",
+      "required": [
+        "vendor",
+        "architecture",
+        "device",
+        "description",
+        "vendorID",
+        "deviceID",
+        "driverVersion"
+      ],
+      "properties": {
+        "vendor": { "type": "string", "minLength": 1 },
+        "architecture": { "type": "string", "minLength": 1 },
+        "device": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "isFallbackAdapter": { "type": "boolean" },
+        "vendorID": { "type": "integer", "minimum": 0 },
+        "deviceID": { "type": "integer", "minimum": 0 },
+        "driverVersion": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "governedReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "status",
+        "checkpoint",
+        "workload",
+        "provider",
+        "adapterInfo",
+        "adapterInfoStatus",
+        "oracle",
+        "programEvidence",
+        "execution",
+        "lifecycle",
+        "replay",
+        "errors"
+      ],
+      "properties": {
+        "schema": { "const": "doe.governed-node-webgpu-receipt/v1" },
+        "status": { "const": "pass" },
+        "checkpoint": { "const": "release-complete" },
+        "workload": { "type": "object" },
+        "provider": {
+          "type": "object",
+          "required": ["selectedProviderId", "receipt"],
+          "properties": {
+            "selectedProviderId": { "const": "doe-native-0.5.0" },
+            "receipt": { "type": "object" }
+          }
+        },
+        "adapterInfo": { "$ref": "#/$defs/adapterInfo" },
+        "adapterInfoStatus": { "const": "observed" },
+        "oracle": {
+          "type": "object",
+          "required": [
+            "kind",
+            "status",
+            "expectedOutputSha256",
+            "actualOutputSha256",
+            "outputBytes"
+          ],
+          "properties": {
+            "kind": { "const": "sha256-exact" },
+            "status": { "const": "pass" },
+            "expectedOutputSha256": { "$ref": "#/$defs/prefixedSha256" },
+            "actualOutputSha256": { "$ref": "#/$defs/prefixedSha256" },
+            "outputBytes": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "programEvidence": { "type": "object" },
+        "execution": { "type": "object" },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "globalsRestored"],
+          "properties": {
+            "status": { "const": "release-complete" },
+            "globalsRestored": { "const": true }
+          }
+        },
+        "replay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["workloadSha256", "executionSha256"],
+          "properties": {
+            "workloadSha256": { "$ref": "#/$defs/prefixedSha256" },
+            "executionSha256": { "$ref": "#/$defs/prefixedSha256" }
+          }
+        },
+        "errors": { "type": "array", "maxItems": 0 }
+      }
+    }
+  }
+}

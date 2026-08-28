@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "tuple": {
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "runtime": {
+    "host": "node",
+    "executable": "/usr/bin/node",
+    "version": "v22.22.1",
+    "sha256": "d0efb6fcb9d023ba4e2b160ec2384dc28fe4f17732141ef47f676828fa960505"
+  },
+  "installation": {
+    "lifecycleScripts": "disabled",
+    "optionalDependencies": "omitted",
+    "workspaceLibraryResolution": false
+  },
+  "launch": {
+    "mode": "node-process",
+    "arguments": [
+      "<first-kernel>"
+    ]
+  },
+  "packages": {
+    "wrapper": {
+      "id": "doe-gpu@0.5.0",
+      "bytes": 216744,
+      "sha256": "42c387fd19ba3f73f1c9b158ce9ce1778c2d2d42c2809d51662e80d90a617b05"
+    },
+    "platform": {
+      "id": "doe-gpu-linux-x64@0.5.0",
+      "bytes": 6619054,
+      "sha256": "3bbd21b4393443fcb5b32b174e87b1e0ca533486213f3a1ff05fd541ff3a01a7",
+      "stagedLibrarySha256": "70da870a12d3c4507fbb65a9c656c287f26c686f5c37a32200b84656740054f1"
+    }
+  },
+  "implementation": {
+    "runner": {
+      "path": "packages/doe-gpu/test/integration/test-integration-native-clean-install.js",
+      "sha256": "8e3865db843f79af52d40ad06e78aab55ea171ecbdb80d637a0cc81957ffb496"
+    },
+    "firstKernel": {
+      "path": "packages/doe-gpu/examples/node-first-kernel.mjs",
+      "sha256": "e4e3bcd9528a4df47852f3bc84765adf24a22d01bfd64e30caa83f882b6b2c42"
+    },
+    "wrapperManifest": {
+      "path": "packages/doe-gpu/package.json",
+      "sha256": "31453adc7a6a696d8fdfeef9fd0b534baee74b3f957edd335c5ed19702208520"
+    },
+    "platformManifest": {
+      "path": "packages/doe-gpu-linux-x64/package.json",
+      "sha256": "d3881cdb21c6333b4403d46f4c24c7810d086c995c95bc53acf629e4e464f73b"
+    },
+    "stagedAddon": {
+      "path": "packages/doe-gpu-linux-x64/bin/doe_napi.node",
+      "sha256": "94daa6d1f779856716d74485e4199be79de347a0bbd416f4df168dd70bf27b1f"
+    },
+    "stagedBuildMetadata": {
+      "path": "packages/doe-gpu-linux-x64/bin/doe-build-metadata.json",
+      "sha256": "f36c33541c045938a68f35b948375fe8c506f417559087e16acbfc0eac463b3a"
+    },
+    "candidateFixture": {
+      "path": "packages/doe-gpu/test/fixtures/native-release-candidate.mjs",
+      "sha256": "be82f34c868a3fca43004e851742bc1d89aed3319c49995c8d9906ae559f9d70"
+    }
+  },
+  "receipt": {
+    "kind": "doe-gpu.first-kernel.receipt",
+    "schemaVersion": 1,
+    "runtimeHost": "node",
+    "provider": {
+      "module": "doe-gpu",
+      "loaded": true,
+      "loadError": "",
+      "defaultCreateArgs": [],
+      "doeNative": true,
+      "libraryFlavor": "doe-dropin",
+      "doeLibraryPath": "/tmp/doe-gpu-native-clean-install-5cLIga/node_modules/doe-gpu-linux-x64/bin/libwebgpu_doe.so",
+      "buildMetadataSource": "prebuild",
+      "buildMetadataPath": "/tmp/doe-gpu-native-clean-install-5cLIga/node_modules/doe-gpu-linux-x64/bin/metadata.json",
+      "leanVerifiedBuild": false,
+      "proofArtifactSha256": null,
+      "nativeFastPaths": {
+        "appleFastPathCompiled": false,
+        "queueFlush": true,
+        "queueFlushBreakdown": true,
+        "queueWriteBufferBatch": true,
+        "queueWriteBufferBatchDataPtrs": true,
+        "computeDispatchFlush": true,
+        "computeDispatchFlushBreakdown": true,
+        "computeDispatchBatchFlush": true,
+        "computeDispatchBatchCopyFlush": true,
+        "computeDispatchBatchCopyFlushBreakdown": true,
+        "computePrewarmDispatchBindings": true,
+        "bufferMapReadCopyUnmap": true
+      }
+    },
+    "workload": {
+      "id": "vector-scale-f32",
+      "elementCount": 8,
+      "wgslSha256": "f03b12ba1e7df16b58babac43b326771a30d3e7de9278bfcd3daa8d95faf80b2",
+      "inputSha256": "af7de0621354bafceb193edf0fcf5d421cf21de7146580062fff53c7907f54e5"
+    },
+    "result": {
+      "output": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16
+      ],
+      "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+      "durationMs": 58.259
+    }
+  },
+  "artifactKind": "doe-gpu-native-release-candidate",
+  "generatedAt": "2026-08-28T15:27:39.182Z",
+  "sourceCommit": "d255ff815530daae5254dc05e3a98f52d224f442",
+  "host": {
+    "platform": "linux",
+    "arch": "x64",
+    "kernelRelease": "7.0.0-29-generic"
+  },
+  "governedReplay": {
+    "primaryReceipt": {
+      "schema": "doe.governed-node-webgpu-receipt/v1",
+      "status": "pass",
+      "checkpoint": "release-complete",
+      "workload": {
+        "id": "doe-gpu-release-vector-scale",
+        "version": "0.5.0",
+        "implementationSha256": "sha256:95e539916fe61997816f03a961ac2ccccc3118d32e4c45ddb2c946454c406fae",
+        "inputSha256": "sha256:af7de0621354bafceb193edf0fcf5d421cf21de7146580062fff53c7907f54e5",
+        "inputBytes": 32,
+        "oracle": {
+          "kind": "sha256-exact",
+          "expectedOutputSha256": "sha256:9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf"
+        }
+      },
+      "provider": {
+        "selectedProviderId": "doe-native-0.5.0",
+        "receipt": {
+          "schema": "doe.webgpu-provider-receipt/v1",
+          "contract": "doe.webgpu-provider/v1",
+          "providers": [
+            {
+              "id": "doe-native-0.5.0",
+              "kind": "module",
+              "module": "doe-gpu",
+              "gpu": {
+                "kind": "factory",
+                "path": "create",
+                "args": [
+                  []
+                ],
+                "resultPath": null
+              },
+              "globals": {
+                "GPUBufferUsage": "globals.GPUBufferUsage",
+                "GPUShaderStage": "globals.GPUShaderStage",
+                "GPUMapMode": "globals.GPUMapMode",
+                "GPUTextureUsage": "globals.GPUTextureUsage"
+              }
+            }
+          ],
+          "providerOrder": [
+            "doe-native-0.5.0"
+          ],
+          "adapterOptions": null,
+          "globals": {
+            "mode": "replace",
+            "installed": [
+              "navigator.gpu",
+              "GPUBufferUsage",
+              "GPUShaderStage",
+              "GPUMapMode",
+              "GPUTextureUsage"
+            ],
+            "restored": true
+          },
+          "attempts": [
+            {
+              "providerId": "doe-native-0.5.0",
+              "kind": "module",
+              "module": "doe-gpu",
+              "ok": true,
+              "stage": "complete",
+              "code": null,
+              "detail": null
+            }
+          ],
+          "selectedProviderId": "doe-native-0.5.0",
+          "ok": true
+        }
+      },
+      "adapterInfo": {
+        "vendor": "AMD",
+        "architecture": "vulkan",
+        "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+        "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+        "isFallbackAdapter": false,
+        "subgroupMinSize": 32,
+        "subgroupMaxSize": 32,
+        "vendorID": 4098,
+        "deviceID": 5510,
+        "driverVersion": 109051907
+      },
+      "adapterInfoStatus": "observed",
+      "oracle": {
+        "kind": "sha256-exact",
+        "status": "pass",
+        "expectedOutputSha256": "sha256:9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "actualOutputSha256": "sha256:9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "outputBytes": 32
+      },
+      "programEvidence": {
+        "status": "not-requested",
+        "observationSha256": null,
+        "observation": null
+      },
+      "execution": {
+        "durationMs": 23.414241000000004
+      },
+      "lifecycle": {
+        "status": "release-complete",
+        "globalsRestored": true
+      },
+      "replay": {
+        "workloadSha256": "sha256:0bfc8039fee589deee19e245ccc100c3723f65bdc4c8df39289b107d5734df32",
+        "executionSha256": "sha256:8768b59b441a028a6586a7d0501dc91fbaf542b0fc3f9e83962f5984c69c488f"
+      },
+      "errors": []
+    },
+    "primaryReceiptSha256": "39b7ca27304f5f4dfcebf9c6ee798dcdcea781074b28d27a472496d377e4e811",
+    "replayReceipt": {
+      "schema": "doe.governed-node-webgpu-receipt/v1",
+      "status": "pass",
+      "checkpoint": "release-complete",
+      "workload": {
+        "id": "doe-gpu-release-vector-scale",
+        "version": "0.5.0",
+        "implementationSha256": "sha256:95e539916fe61997816f03a961ac2ccccc3118d32e4c45ddb2c946454c406fae",
+        "inputSha256": "sha256:af7de0621354bafceb193edf0fcf5d421cf21de7146580062fff53c7907f54e5",
+        "inputBytes": 32,
+        "oracle": {
+          "kind": "sha256-exact",
+          "expectedOutputSha256": "sha256:9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf"
+        }
+      },
+      "provider": {
+        "selectedProviderId": "doe-native-0.5.0",
+        "receipt": {
+          "schema": "doe.webgpu-provider-receipt/v1",
+          "contract": "doe.webgpu-provider/v1",
+          "providers": [
+            {
+              "id": "doe-native-0.5.0",
+              "kind": "module",
+              "module": "doe-gpu",
+              "gpu": {
+                "kind": "factory",
+                "path": "create",
+                "args": [
+                  []
+                ],
+                "resultPath": null
+              },
+              "globals": {
+                "GPUBufferUsage": "globals.GPUBufferUsage",
+                "GPUShaderStage": "globals.GPUShaderStage",
+                "GPUMapMode": "globals.GPUMapMode",
+                "GPUTextureUsage": "globals.GPUTextureUsage"
+              }
+            }
+          ],
+          "providerOrder": [
+            "doe-native-0.5.0"
+          ],
+          "adapterOptions": null,
+          "globals": {
+            "mode": "replace",
+            "installed": [
+              "navigator.gpu",
+              "GPUBufferUsage",
+              "GPUShaderStage",
+              "GPUMapMode",
+              "GPUTextureUsage"
+            ],
+            "restored": true
+          },
+          "attempts": [
+            {
+              "providerId": "doe-native-0.5.0",
+              "kind": "module",
+              "module": "doe-gpu",
+              "ok": true,
+              "stage": "complete",
+              "code": null,
+              "detail": null
+            }
+          ],
+          "selectedProviderId": "doe-native-0.5.0",
+          "ok": true
+        }
+      },
+      "adapterInfo": {
+        "vendor": "AMD",
+        "architecture": "vulkan",
+        "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+        "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+        "isFallbackAdapter": false,
+        "subgroupMinSize": 32,
+        "subgroupMaxSize": 32,
+        "vendorID": 4098,
+        "deviceID": 5510,
+        "driverVersion": 109051907
+      },
+      "adapterInfoStatus": "observed",
+      "oracle": {
+        "kind": "sha256-exact",
+        "status": "pass",
+        "expectedOutputSha256": "sha256:9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "actualOutputSha256": "sha256:9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "outputBytes": 32
+      },
+      "programEvidence": {
+        "status": "not-requested",
+        "observationSha256": null,
+        "observation": null
+      },
+      "execution": {
+        "durationMs": 23.357875000000007
+      },
+      "lifecycle": {
+        "status": "release-complete",
+        "globalsRestored": true
+      },
+      "replay": {
+        "workloadSha256": "sha256:0bfc8039fee589deee19e245ccc100c3723f65bdc4c8df39289b107d5734df32",
+        "executionSha256": "sha256:8768b59b441a028a6586a7d0501dc91fbaf542b0fc3f9e83962f5984c69c488f"
+      },
+      "errors": []
+    },
+    "replayReceiptSha256": "c0fd74312a48b2f610734534528d1400685e45c8784c704688eb8811c213dd19",
+    "workloadSha256": "sha256:0bfc8039fee589deee19e245ccc100c3723f65bdc4c8df39289b107d5734df32",
+    "executionSha256": "sha256:8768b59b441a028a6586a7d0501dc91fbaf542b0fc3f9e83962f5984c69c488f",
+    "adapterInfo": {
+      "vendor": "AMD",
+      "architecture": "vulkan",
+      "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+      "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+      "isFallbackAdapter": false,
+      "subgroupMinSize": 32,
+      "subgroupMaxSize": 32,
+      "vendorID": 4098,
+      "deviceID": 5510,
+      "driverVersion": 109051907
+    },
+    "adapterInfoSha256": "98dc77a7561bc747a0648f51b201138ae390e01075fa3bcfb32c59a0f9722bb6",
+    "outputSha256": "sha256:9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+    "matches": {
+      "workload": true,
+      "execution": true,
+      "adapter": true,
+      "output": true,
+      "lifecycle": true
+    }
+  },
+  "reliabilityEvidence": {
+    "path": "reports/benchmarks/amd-vulkan/20260828T152721Z/doe-gpu-node-native-release-candidate.reliability.json",
+    "sha256": "7f357c01ef7b7b70109f3fe5f5cbfe826bf811572ed6a095668ceb536dd2629f",
+    "artifactKind": "doe-gpu-native-clean-install-reliability-diagnostic",
+    "status": "passed"
+  },
+  "decision": {
+    "packageReleaseCandidate": "eligible-for-declared-runtime-tuple",
+    "registryPublicationCredit": false,
+    "runtimeOwnershipCredit": false,
+    "performanceCredit": false,
+    "applicationPromotionCredit": false
+  },
+  "limitations": [
+    "Candidate authority is limited to the declared runtime, platform, architecture, adapter, driver, and package bytes.",
+    "Registry publication requires separately authenticated npm publication readiness.",
+    "No performance, runtime-ownership, or application-promotion interpretation is authorized."
+  ]
+}

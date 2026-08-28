@@ -6,6 +6,17 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- `doe-gpu` 0.5.0 now has schema-backed Linux x64 package
+  release-candidate evidence under
+  `reports/benchmarks/amd-vulkan/20260828T152721Z/` for Node, Bun, and Electron
+  main-process execution. Each candidate binds the packed wrapper and platform
+  bytes, runtime executable, Linux kernel, AMD Vulkan adapter and driver,
+  exact-output oracle, terminal lifecycle restoration, fresh reliability
+  artifact, and matching governed workload/execution replay identities. This
+  authorizes the declared Linux runtime tuples as package release candidates
+  only. npm publication authentication and the independently executed macOS
+  arm64 package candidate remain separate requirements; the evidence grants no
+  performance, runtime-ownership, application-promotion, or browser credit.
 - The schema-backed browser product comparison policy now preserves A/B/C/D as
   internal causal lanes and records Cloudflare Browser Run plus Kitesurf as the
   separate K0 external product comparator. It freezes shared and
