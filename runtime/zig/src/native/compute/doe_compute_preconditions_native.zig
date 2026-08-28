@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const dispatch_preconditions = @import("../../core/compute/dispatch_preconditions.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
@@ -109,7 +110,8 @@ fn required_uniform_extent_bytes(
 fn bufferContents(buffer: *const native_types.DoeBuffer) ?[*]u8 {
     if (buffer.vk_mapped_ptr) |mapped_ptr| return mapped_ptr;
     if (buffer.d3d12_mapped_ptr) |mapped_ptr| return @ptrCast(mapped_ptr);
-    return bridge.metal_bridge_buffer_contents(buffer.mtl);
+    if (builtin.os.tag == .macos) return bridge.metal_bridge_buffer_contents(buffer.mtl);
+    return null;
 }
 
 fn required_texture_axis_extent(

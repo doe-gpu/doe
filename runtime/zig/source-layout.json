@@ -3525,7 +3525,7 @@
       },
       "src/native/compute/doe_compute_preconditions_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "7834f762cddedf4ead548c94f286f4f7d1ae8aeb0dc498fe16ca70098c7f3cdb",
+        "moduleSha256": "dd99a2de62dda79f18f051b3233961761f7ad75d886085960d21a8c36cd52634",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },

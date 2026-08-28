@@ -401,6 +401,24 @@ void metal_bridge_compute_encoder_encode_dispatch(MetalHandle encoder, MetalHand
     (void)wg_y;
     (void)wg_z;
 }
+void metal_bridge_compute_encoder_encode_dispatch_indirect(MetalHandle encoder, MetalHandle pipeline, MetalHandle* buffers, uint32_t buffer_count, MetalHandle indirect_buffer, uint64_t indirect_offset, uint32_t wg_x, uint32_t wg_y, uint32_t wg_z) {
+    (void)encoder;
+    (void)pipeline;
+    (void)buffers;
+    (void)buffer_count;
+    (void)indirect_buffer;
+    (void)indirect_offset;
+    (void)wg_x;
+    (void)wg_y;
+    (void)wg_z;
+}
+void metal_bridge_compute_encoder_bind_resources(MetalHandle encoder, MetalHandle* textures, uint32_t texture_count, MetalHandle* samplers, uint32_t sampler_count) {
+    (void)encoder;
+    (void)textures;
+    (void)texture_count;
+    (void)samplers;
+    (void)sampler_count;
+}
 void metal_bridge_compute_encoder_encode_dispatch_batch(MetalHandle encoder, const MetalHandle* pipelines, const MetalHandle* buffers, const uint32_t* buffer_counts, const uint32_t* dispatch_dims, const uint32_t* workgroup_dims, uint32_t dispatch_count, uint32_t max_buffer_count) {
     (void)encoder;
     (void)pipelines;
