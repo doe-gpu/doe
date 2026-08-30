@@ -23,6 +23,7 @@ AUTOMATIC_WORKFLOWS = {
 
 MANUAL_WORKFLOWS = {
     "amd-vulkan-smoke.yml",
+    "doe-gpu-native-release-candidate.yml",
     "dropin-compat.yml",
     "fawn-matrix-physical-runner.yml",
     "macos-browser-refresh.yml",
@@ -50,6 +51,7 @@ STALE_PATH_PATTERNS = {
 WORKFLOW_ENTRYPOINTS = {
     "bench/browser/browser_claim_gate.py",
     "bench/drop-in/dropin_gate.py",
+    "bench/gates/doe_gpu_native_release_candidate_gate.py",
     "bench/native-compare/compare.config.amd.vulkan.release.json",
     "bench/native-compare/compare.config.amd.vulkan.smoke.gpu.json",
     "bench/runners/run_blocking_gates.py",
@@ -154,6 +156,7 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
     def test_physical_workflows_bind_revision_runner_and_failed_evidence(self) -> None:
         for name in (
             "amd-vulkan-smoke.yml",
+            "doe-gpu-native-release-candidate.yml",
             "fawn-matrix-physical-runner.yml",
             "release-gates.yml",
             "windows-d3d12-qualification.yml",
@@ -170,6 +173,28 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
                     r"(?s)if: always\(\).*?uses: actions/upload-artifact@v7",
                 )
                 self.assertIn("SHA256SUMS", text)
+
+    def test_native_candidate_workflow_preserves_complete_macos_bundle(self) -> None:
+        text = workflow_text("doe-gpu-native-release-candidate.yml")
+        required_fragments = (
+            'test "$(uname -m)" = "arm64"',
+            "process.platform}-${process.arch",
+            'bun-version: "1.3.10"',
+            'ELECTRON_VERSION: "43.4.0"',
+            "packages/doe-gpu-darwin-arm64",
+            "--release-candidate",
+            "--runtime node",
+            "--runtime bun",
+            "--runtime electron",
+            "doe_gpu_native_release_candidate_gate.py",
+            "--expected-platform darwin",
+            "--expected-arch arm64",
+            "candidate-bundle",
+            "retention-days: 90",
+        )
+        for fragment in required_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
 
     def test_amd_release_runs_the_frozen_native_sequence(self) -> None:
         text = workflow_text("release-gates.yml")

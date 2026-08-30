@@ -1,10 +1,17 @@
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { release, tmpdir } from 'node:os';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import {
+  bundleRelativePath,
+  retainPackageArtifact,
+  sha256File,
+  sha256Json,
+  unexpectedSourceChanges,
+} from '../lib/native-release-candidate-bundle.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const runnerPath = fileURLToPath(import.meta.url);
@@ -128,14 +135,6 @@ function electronArgs(entry) {
   return ['--headless', '--no-sandbox', '--disable-gpu', entry];
 }
 
-async function sha256File(path) {
-  return createHash('sha256').update(await readFile(path)).digest('hex');
-}
-
-function sha256Json(value) {
-  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
-}
-
 function repoRelativePath(path) {
   const resolved = resolve(path);
   const repoRelative = relative(repoRoot, resolved);
@@ -228,6 +227,37 @@ function resolveRuntimeIdentity() {
 }
 
 try {
+  let sourceCommit = null;
+  if (releaseCandidate) {
+    repoRelativePath(outputPath);
+    repoRelativePath(reliabilityPath);
+    if (!outputPath.endsWith('.json')) {
+      throw new Error('release-candidate --out must end in .json');
+    }
+    if (dirname(outputPath) !== dirname(reliabilityPath)) {
+      throw new Error('release-candidate reliability evidence must share the report directory');
+    }
+    const checkoutStatus = execute(
+      'git',
+      ['status', '--short', '--untracked-files=all'],
+      repoRoot,
+    );
+    requireSuccess(checkoutStatus, 'release-candidate source checkout check');
+    const bundleRoot = repoRelativePath(dirname(outputPath));
+    const unexpectedChanges = unexpectedSourceChanges(
+      checkoutStatus.stdout,
+      bundleRoot,
+    );
+    if (unexpectedChanges.length > 0) {
+      throw new Error(
+        'release-candidate source checkout has changes outside its evidence bundle:\n'
+        + `${unexpectedChanges.join('\n')}\n`,
+      );
+    }
+    const revision = execute('git', ['rev-parse', 'HEAD'], repoRoot);
+    requireSuccess(revision, 'release-candidate source revision');
+    sourceCommit = revision.stdout.trim();
+  }
   const runtime = resolveRuntimeIdentity();
   if (releaseCandidate && requestedReliabilityPath === null) {
     const reliability = execute(process.execPath, [
@@ -350,6 +380,20 @@ try {
   if (outputPath) {
     const wrapperSha256 = await sha256File(wrapper.tarball);
     const platformSha256 = await sha256File(platform.tarball);
+    const retainedArtifacts = releaseCandidate
+      ? {
+          wrapper: await retainPackageArtifact({
+            packed: wrapper,
+            expectedSha256: wrapperSha256,
+            bundleRoot: dirname(outputPath),
+          }),
+          platform: await retainPackageArtifact({
+            packed: platform,
+            expectedSha256: platformSha256,
+            bundleRoot: dirname(outputPath),
+          }),
+        }
+      : null;
     const reliabilityReport = releaseCandidate
       ? JSON.parse(await readFile(reliabilityPath, 'utf8'))
       : null;
@@ -386,11 +430,13 @@ try {
           id: wrapper.manifest.id,
           bytes: wrapper.manifest.size,
           sha256: wrapperSha256,
+          ...(retainedArtifacts ? { artifactPath: retainedArtifacts.wrapper } : {}),
         },
         platform: {
           id: platform.manifest.id,
           bytes: platform.manifest.size,
           sha256: platformSha256,
+          ...(retainedArtifacts ? { artifactPath: retainedArtifacts.platform } : {}),
           stagedLibrarySha256: await sha256File(stagedPlatformLibrary),
         },
       },
@@ -429,9 +475,10 @@ try {
     const artifact = releaseCandidate
       ? {
           ...baseArtifact,
+          schemaVersion: 2,
           artifactKind: 'doe-gpu-native-release-candidate',
           generatedAt: new Date().toISOString(),
-          sourceCommit: execute('git', ['rev-parse', 'HEAD'], repoRoot).stdout.trim(),
+          sourceCommit,
           host: {
             platform: process.platform,
             arch: process.arch,
@@ -457,7 +504,7 @@ try {
             matches: candidateEvidence.matches,
           },
           reliabilityEvidence: {
-            path: repoRelativePath(reliabilityPath),
+            path: bundleRelativePath(reliabilityPath, dirname(outputPath)),
             sha256: await sha256File(reliabilityPath),
             artifactKind: reliabilityReport.artifactKind,
             status: reliabilityReport.status,

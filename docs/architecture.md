@@ -176,6 +176,16 @@ A useful Doe build/run can emit:
 The artifact chain matters as much as the code. Doe treats claims as valid only
 when they are tied back to those emitted contracts.
 
+Native package release candidates use a self-contained custody boundary. The
+candidate report, its runtime-specific reliability report, and the exact
+wrapper and platform tarballs share one bundle directory. Tracked
+implementation references resolve against the declared clean Git commit;
+shipped manifests, first-kernel entrypoints, addons, build metadata, and native
+library hashes resolve from the retained tarballs. `bench` independently joins
+the three Node, Bun, and Electron receipts before package-candidate admission.
+Schema-version-1 reports that bind hashes without retaining the bytes remain
+diagnostic history and cannot cross this boundary.
+
 For native Vulkan, the execution-identity receipt composes the runtime's shader
 artifact manifest with trace metadata and the workload oracle. It verifies the
 exact WGSL, semantic state, IR, SPIR-V bytes, manifest identity, backend lane,

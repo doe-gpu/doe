@@ -42,3 +42,14 @@ workflow owns runtime-specific execution. Hosted execution may skip native
 checks when staged platform artifacts or physical GPUs are absent.
 Repository-wide performance remains advisory rather than a promoted
 JavaScript-runtime release requirement.
+
+The separate manual native-candidate workflow owns the macOS arm64 package
+admission path. It requires an exact full Git revision and approved Apple
+Silicon runner, pins Node, Bun, and Electron, stages the Darwin platform
+package, and emits schema-version-2 candidate and reliability receipts. The
+tested wrapper and platform tarballs stay beside those receipts in a
+self-contained bundle. An independent gate verifies source-commit blobs,
+tarball members and hashes, runtime-set completeness, tuple identity, oracle,
+replay, lifecycle, and reliability joins before the workflow seals and uploads
+all passing or failed evidence. The workflow does not publish to npm or sign a
+customer qualification decision.

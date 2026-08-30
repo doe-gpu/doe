@@ -302,6 +302,36 @@ subsequent device use fails closed. This is not a long-soak leak certificate or
 an unexpected hardware-loss recovery test. The commands do not establish
 performance, application promotion, or release readiness.
 
+A native package release candidate is stricter than either diagnostic command.
+From the repository root, run all three hosts from one checkout with no tracked
+or untracked source changes outside the evidence-bundle directory, and on one
+physical tuple:
+
+```bash
+candidate_root=reports/benchmarks/<backend>/<run-id>
+node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+  --required --release-candidate --runtime node \
+  --out "$candidate_root/doe-gpu-node-native-release-candidate.json"
+node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+  --required --release-candidate --runtime bun \
+  --out "$candidate_root/doe-gpu-bun-native-release-candidate.json"
+DOE_ELECTRON_EXECUTABLE=/absolute/path/to/electron \
+  node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+  --required --release-candidate --runtime electron \
+  --out "$candidate_root/doe-gpu-electron-native-release-candidate.json"
+python3 bench/gates/doe_gpu_native_release_candidate_gate.py \
+  --expected-platform <linux-or-darwin> \
+  --expected-arch <x64-or-arm64> \
+  "$candidate_root"/doe-gpu-*-native-release-candidate.json
+```
+
+Schema version 2 retains the exact tested tarballs under
+`$candidate_root/packages/`; those bytes and all reliability reports are part
+of the evidence bundle and must stay together. The runner rejects source
+changes outside that bundle, conflicting retained package bytes, evidence paths
+outside the bundle, and partial runtime sets. Version-1 reports remain readable
+diagnostics but cannot satisfy the retained-package candidate gate.
+
 Node 18 or newer is required for the default entrypoint. Bun and Deno use their
 declared package export conditions. Electron uses the default Node-compatible
 entrypoint in its main process. Actual platform support remains limited to

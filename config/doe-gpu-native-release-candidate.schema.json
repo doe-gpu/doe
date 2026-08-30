@@ -23,7 +23,7 @@
     "limitations"
   ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
+    "schemaVersion": { "type": "integer", "enum": [1, 2] },
     "artifactKind": { "const": "doe-gpu-native-release-candidate" },
     "status": { "const": "passed" },
     "generatedAt": { "type": "string", "format": "date-time" },
@@ -229,6 +229,26 @@
       "items": { "type": "string", "minLength": 1 }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": { "const": 2 }
+        },
+        "required": ["schemaVersion"]
+      },
+      "then": {
+        "properties": {
+          "packages": {
+            "properties": {
+              "wrapper": { "required": ["artifactPath"] },
+              "platform": { "required": ["artifactPath"] }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "sha256": {
       "type": "string",
@@ -250,8 +270,13 @@
         "id": { "type": "string", "minLength": 1 },
         "bytes": { "type": "integer", "minimum": 1 },
         "sha256": { "$ref": "#/$defs/sha256" },
+        "artifactPath": { "$ref": "#/$defs/bundlePath" },
         "stagedLibrarySha256": { "$ref": "#/$defs/sha256" }
       }
+    },
+    "bundlePath": {
+      "type": "string",
+      "minLength": 1
     },
     "fileReference": {
       "type": "object",

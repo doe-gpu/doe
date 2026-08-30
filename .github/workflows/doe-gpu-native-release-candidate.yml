@@ -1,0 +1,166 @@
+name: doe-gpu native release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      exact_revision:
+        description: Exact 40-character Doe commit to qualify
+        required: true
+        type: string
+      approved_runner_name:
+        description: Exact approved Apple Silicon runner name
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  macos-arm64-candidate:
+    runs-on:
+      - self-hosted
+      - macOS
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.exact_revision }}
+          clean: true
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+
+      - name: Bind exact revision and approved Apple host
+        env:
+          APPROVED_RUNNER_NAME: ${{ inputs.approved_runner_name }}
+          EXACT_REVISION: ${{ inputs.exact_revision }}
+        run: |
+          set -euo pipefail
+          [[ "${EXACT_REVISION}" =~ ^[0-9a-f]{40}$ ]]
+          test "${RUNNER_NAME}" = "${APPROVED_RUNNER_NAME}"
+          test "$(git rev-parse HEAD)" = "${EXACT_REVISION}"
+          test -z "$(git status --short)"
+          test "$(uname -m)" = "arm64"
+          test "$(node -p '`${process.platform}-${process.arch}`')" = "darwin-arm64"
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          candidate_root="reports/benchmarks/apple-metal/${stamp}"
+          evidence_root="${RUNNER_TEMP}/doe-gpu-native-candidate-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          mkdir -p "${candidate_root}" "${evidence_root}/logs"
+          echo "CANDIDATE_ROOT=${candidate_root}" >> "${GITHUB_ENV}"
+          echo "EVIDENCE_ROOT=${evidence_root}" >> "${GITHUB_ENV}"
+          git rev-parse HEAD | tee "${evidence_root}/commit.txt"
+          printf 'runnerName=%s\nrunnerOs=%s\nrunnerArch=%s\n' \
+            "${RUNNER_NAME}" "${RUNNER_OS}" "${RUNNER_ARCH}" \
+            | tee "${evidence_root}/runner.txt"
+          {
+            uname -a
+            node --version
+            bun --version
+            zig version
+          } 2>&1 | tee "${evidence_root}/logs/environment.log"
+
+      - name: Install pinned Electron main-process runtime
+        env:
+          ELECTRON_VERSION: "43.4.0"
+        run: |
+          set -euo pipefail
+          electron_root="${RUNNER_TEMP}/doe-electron-main-process"
+          npm install \
+            --prefix "${electron_root}" \
+            --ignore-scripts \
+            --no-audit \
+            --no-fund \
+            --save-exact \
+            "electron@${ELECTRON_VERSION}"
+          node "${electron_root}/node_modules/electron/install.js"
+          electron_executable="${electron_root}/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron"
+          test "$("${electron_executable}" --headless --no-sandbox --disable-gpu --version)" = \
+            "v${ELECTRON_VERSION}"
+          echo "DOE_ELECTRON_EXECUTABLE=${electron_executable}" >> "${GITHUB_ENV}"
+
+      - name: Build and stage darwin-arm64 package
+        run: |
+          set -euo pipefail
+          unset DOE_PROOF_SIGNING_KEY
+          (cd runtime/zig && zig build dropin -Doptimize=ReleaseFast) \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/zig-dropin-release.log"
+          (cd packages/doe-gpu-darwin-arm64 && npm run stage) \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/stage-darwin-arm64.log"
+
+      - name: Execute Node package candidate
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+            --required \
+            --release-candidate \
+            --runtime node \
+            --out "${CANDIDATE_ROOT}/doe-gpu-node-native-release-candidate.json" \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/node-candidate.log"
+
+      - name: Execute Bun package candidate
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+            --required \
+            --release-candidate \
+            --runtime bun \
+            --out "${CANDIDATE_ROOT}/doe-gpu-bun-native-release-candidate.json" \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/bun-candidate.log"
+
+      - name: Execute Electron package candidate
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          node packages/doe-gpu/test/integration/test-integration-native-clean-install.js \
+            --required \
+            --release-candidate \
+            --runtime electron \
+            --out "${CANDIDATE_ROOT}/doe-gpu-electron-native-release-candidate.json" \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/electron-candidate.log"
+
+      - name: Verify complete retained candidate set
+        run: |
+          set -euo pipefail
+          python3 bench/gates/doe_gpu_native_release_candidate_gate.py \
+            --expected-platform darwin \
+            --expected-arch arm64 \
+            "${CANDIDATE_ROOT}/doe-gpu-node-native-release-candidate.json" \
+            "${CANDIDATE_ROOT}/doe-gpu-bun-native-release-candidate.json" \
+            "${CANDIDATE_ROOT}/doe-gpu-electron-native-release-candidate.json" \
+            2>&1 | tee "${EVIDENCE_ROOT}/logs/candidate-gate.log"
+
+      - name: Seal candidate bytes, receipts, and failures
+        if: always()
+        run: |
+          set -euo pipefail
+          if [[ -n "${CANDIDATE_ROOT:-}" && -d "${CANDIDATE_ROOT}" ]]; then
+            mkdir -p "${EVIDENCE_ROOT}/candidate-bundle"
+            cp -a "${CANDIDATE_ROOT}/." "${EVIDENCE_ROOT}/candidate-bundle/"
+          fi
+          git status --short > "${EVIDENCE_ROOT}/final-git-status.txt"
+          python3 - <<'PY'
+          import hashlib
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["EVIDENCE_ROOT"])
+          entries = []
+          for path in sorted(root.rglob("*")):
+              if path.is_file() and path.name != "SHA256SUMS":
+                  digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                  entries.append(f"{digest}  {path.relative_to(root).as_posix()}")
+          (root / "SHA256SUMS").write_text("\n".join(entries) + "\n")
+          PY
+
+      - name: Upload immutable native candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: doe-gpu-darwin-arm64-${{ inputs.exact_revision }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.EVIDENCE_ROOT }}/
+          if-no-files-found: error
+          retention-days: 90

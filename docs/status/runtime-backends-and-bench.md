@@ -6,17 +6,32 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
-- `doe-gpu` 0.5.0 now has schema-backed Linux x64 package
-  release-candidate evidence under
-  `reports/benchmarks/amd-vulkan/20260828T152721Z/` for Node, Bun, and Electron
-  main-process execution. Each candidate binds the packed wrapper and platform
-  bytes, runtime executable, Linux kernel, AMD Vulkan adapter and driver,
-  exact-output oracle, terminal lifecycle restoration, fresh reliability
-  artifact, and matching governed workload/execution replay identities. This
-  authorizes the declared Linux runtime tuples as package release candidates
-  only. npm publication authentication and the independently executed macOS
-  arm64 package candidate remain separate requirements; the evidence grants no
-  performance, runtime-ownership, application-promotion, or browser credit.
+- The checked-in `doe-gpu` 0.5.0 Linux x64 package reports under
+  `reports/benchmarks/amd-vulkan/20260828T152721Z/` remain readable historical
+  schema-version-1 diagnostics for Node, Bun, and Electron main-process
+  execution. They bind package hashes, runtime, AMD Vulkan adapter, oracle,
+  lifecycle, reliability, and replay, but the exact tarballs were deleted with
+  the clean-install scratch directory. Their declared source commit also
+  predates the candidate fixture and does not reproduce the recorded runner
+  hash. They therefore do not satisfy current package-candidate custody or
+  source-provenance admission and must not be promoted by relabeling.
+- Native package candidate schema version 2 requires the exact wrapper and
+  platform tarballs to remain inside one self-contained evidence bundle. The
+  independent gate rehashes those bytes, inspects the package members, resolves
+  tracked implementation hashes from the declared clean source commit, joins
+  reliability evidence, recomputes receipt and adapter digests, and requires a
+  complete Node/Bun/Electron set on one physical tuple. The manual Apple
+  Silicon workflow freezes an exact revision and approved runner, builds and
+  stages `doe-gpu-darwin-arm64`, executes all three runtimes, seals failures as
+  well as passes, and uploads the complete bundle. No such macOS arm64 run has
+  been executed yet. Migration: schema-version-1 reports stay readable as
+  diagnostics; regenerate from a checkout with no tracked or untracked source
+  changes outside its evidence-bundle directory, then preserve the version-2
+  `packages/` directory before candidate admission.
+  npm publication authentication, a production trust anchor, and independent
+  customer reproduction remain separate requirements. No package evidence
+  grants performance, runtime-ownership, application-promotion, or browser
+  credit.
 - The schema-backed browser product comparison policy now preserves A/B/C/D as
   internal causal lanes and records Cloudflare Browser Run plus Kitesurf as the
   separate K0 external product comparator. It freezes shared and
