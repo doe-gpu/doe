@@ -1035,8 +1035,7 @@ def reproduce_external_project(
             environment=environment,
         )
         payload["workload"] = workload.receipt
-        _require_process(workload, "workload")
-
+        evidence_paths: list[tuple[dict[str, Any], Path]] = []
         for evidence_spec in selection.manifest["reproduction"]["evidenceFiles"]:
             evidence_path = (selection.run_root / str(evidence_spec["path"])).resolve()
             try:
@@ -1046,9 +1045,18 @@ def reproduce_external_project(
                     "contract",
                     f"evidence path escapes run root: {evidence_spec['path']}",
                 ) from exc
-            payload["evidence"].append(
-                _artifact(selection.root, str(evidence_spec["id"]), evidence_path)
-            )
+            evidence_paths.append((evidence_spec, evidence_path))
+            if evidence_path.is_file():
+                payload["evidence"].append(
+                    _artifact(selection.root, str(evidence_spec["id"]), evidence_path)
+                )
+        _require_process(workload, "workload")
+        for evidence_spec, evidence_path in evidence_paths:
+            if not evidence_path.is_file():
+                raise ReproductionError(
+                    "evidence",
+                    f"required evidence is missing: {evidence_spec['path']}",
+                )
         payload["status"] = "passed"
         if payload["preparation"]["claimEligible"]:
             payload["evidenceMaturity"] = "claimable-candidate"

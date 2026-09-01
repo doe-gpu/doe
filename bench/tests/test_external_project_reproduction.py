@@ -366,6 +366,35 @@ class ExternalProjectReproductionExecutionTests(unittest.TestCase):
             ["install-fixture-dependencies", "install-fixture-verification"],
         )
 
+    def test_failed_workload_retains_existing_evidence(self) -> None:
+        manifest_path = (
+            self.root
+            / "bench/external-projects/sample-actor/sample.harness.json"
+        )
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["workload"]["command"] = [
+            sys.executable,
+            "-c",
+            (
+                "import pathlib,sys; "
+                "pathlib.Path(sys.argv[1]).write_text('{\"failed\":true}'); "
+                "sys.exit(7)"
+            ),
+        ]
+        self._write_json(manifest_path, manifest)
+
+        receipt, _ = reproduce_external_project(
+            self._selection("integration-failed-evidence")
+        )
+
+        self.assertEqual(receipt["status"], "failed")
+        self.assertEqual(receipt["failure"]["stage"], "workload")
+        self.assertEqual(receipt["workload"]["exitCode"], 7)
+        self.assertEqual(
+            [artifact["id"] for artifact in receipt["evidence"]],
+            ["raw"],
+        )
+
     def test_duplicate_install_step_ids_are_rejected(self) -> None:
         manifest_path = (
             self.root

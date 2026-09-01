@@ -59,6 +59,9 @@ class Gemma270mQualificationStatusTests(unittest.TestCase):
     def test_correctness_rejects_decode_drift_with_nonzero_kv(self) -> None:
         gate = status.correctness_gate(
             {
+                "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+                "requestedDecodeSteps": 2,
+                "identity": {"pass": True},
                 "pass": False,
                 "stepCountPass": True,
                 "logitsComparisons": [
@@ -69,11 +72,57 @@ class Gemma270mQualificationStatusTests(unittest.TestCase):
                 "kv": {"W0": True, "D0": True},
                 "modelCheckpoints": {"pass": False},
             },
+            {
+                "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+                "execution": {"decodeSteps": 2},
+            },
             [],
         )
         self.assertEqual(gate["status"], "FAIL")
         self.assertIn("1 failed", gate["detail"])
         self.assertIn("non-zero KV W0/D0=true", gate["detail"])
+
+    def test_node_diagnostics_do_not_become_electron_correctness_failure(self) -> None:
+        gate = status.correctness_gate(
+            {
+                "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+                "requestedDecodeSteps": 4,
+                "identity": {"pass": False},
+                "pass": False,
+                "stepCountPass": True,
+                "logitsComparisons": [
+                    {"stepIndex": 0, "pass": False, "maxAbs": 0.0069},
+                ],
+                "checkpointCoverage": {
+                    "W0": {"pass": True},
+                    "D0": {"pass": True},
+                },
+                "kv": {"W0": True, "D0": True},
+                "modelCheckpoints": {"pass": False},
+            },
+            {
+                "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+                "execution": {"decodeSteps": 4},
+            },
+            [],
+        )
+        self.assertEqual(gate["status"], "NOT_TESTED")
+        self.assertIn("diagnostic comparisons are non-qualifying", gate["detail"])
+
+    def test_stale_decode_count_is_not_current_correctness_evidence(self) -> None:
+        contract = {
+            "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+            "execution": {"decodeSteps": 4},
+        }
+        passed, detail = status.oracle_contract_matches(
+            {
+                "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+                "requestedDecodeSteps": 3,
+            },
+            contract,
+        )
+        self.assertFalse(passed)
+        self.assertIn("expected model='gemma-3-270m-it-q4k-ehf16-af32' decodeSteps=4", detail)
 
     def test_failed_physical_reproduction_is_not_identity_evidence(self) -> None:
         self.assertFalse(status.reproduction_execution_pass({
@@ -91,6 +140,101 @@ class Gemma270mQualificationStatusTests(unittest.TestCase):
             )
         self.assertEqual(gate["status"], "NOT_TESTED")
         self.assertEqual(gate["evidence"], [])
+
+    def test_failed_electron_workload_is_reliability_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            reproduction_path = root / "reproduction.json"
+            reproduction_path.write_text("{}\n", encoding="utf-8")
+            result_path = root / "result.json"
+            result_path.write_text(
+                '{"runs":{"W0":{"exitCode":null,"signal":"SIGABRT",'
+                '"timedOut":false,"outputLimitExceeded":false}}}\n',
+                encoding="utf-8",
+            )
+            gate = status.reliability_gate(
+                {
+                    "status": "failed",
+                    "failure": {"stage": "workload", "message": "SIGABRT"},
+                    "workload": {"exitCode": 1},
+                    "evidence": [
+                        {
+                            "id": "qualification-result",
+                            "path": str(result_path),
+                            "sha256": status.sha256_file(result_path),
+                        }
+                    ],
+                },
+                reproduction_path,
+                root / "missing-campaign.json",
+            )
+        self.assertEqual(gate["status"], "FAIL")
+        self.assertIn("signal='SIGABRT'", gate["detail"])
+        self.assertEqual(len(gate["evidence"]), 2)
+
+    def test_correctness_exit_without_lane_failure_is_not_reliability_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            reproduction_path = root / "reproduction.json"
+            reproduction_path.write_text("{}\n", encoding="utf-8")
+            result_path = root / "result.json"
+            result_path.write_text(
+                '{"runs":{"W0":{"exitCode":0,"signal":null,'
+                '"timedOut":false,"outputLimitExceeded":false},'
+                '"D0":{"exitCode":0,"signal":null,'
+                '"timedOut":false,"outputLimitExceeded":false}}}\n',
+                encoding="utf-8",
+            )
+            gate = status.reliability_gate(
+                {
+                    "status": "failed",
+                    "failure": {"stage": "workload", "message": "oracle failed"},
+                    "workload": {"exitCode": 1},
+                    "evidence": [
+                        {
+                            "id": "qualification-result",
+                            "path": str(result_path),
+                            "sha256": status.sha256_file(result_path),
+                        }
+                    ],
+                },
+                reproduction_path,
+                root / "missing-campaign.json",
+            )
+        self.assertEqual(gate["status"], "NOT_TESTED")
+
+    def test_tampered_result_cannot_drive_reliability_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            reproduction_path = root / "reproduction.json"
+            reproduction_path.write_text("{}\n", encoding="utf-8")
+            result_path = root / "result.json"
+            result_path.write_text(
+                '{"runs":{"W0":{"exitCode":0}}}\n',
+                encoding="utf-8",
+            )
+            declared_sha256 = status.sha256_file(result_path)
+            result_path.write_text(
+                '{"runs":{"W0":{"exitCode":null,"signal":"SIGABRT"}}}\n',
+                encoding="utf-8",
+            )
+            gate = status.reliability_gate(
+                {
+                    "status": "failed",
+                    "evidence": [
+                        {
+                            "id": "qualification-result",
+                            "path": str(result_path),
+                            "sha256": declared_sha256,
+                        }
+                    ],
+                },
+                reproduction_path,
+                root / "missing-campaign.json",
+            )
+        self.assertEqual(gate["status"], "FAIL")
+        self.assertIn("evidence hash mismatch", gate["detail"])
+        self.assertEqual(len(gate["evidence"]), 1)
 
     def test_ownership_rejects_any_nonpassing_prerequisite(self) -> None:
         gate = status.ownership_gate([

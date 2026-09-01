@@ -54,6 +54,27 @@ def evidence_ref(path: Path) -> dict[str, str]:
     return {"path": display_path(path), "sha256": sha256_file(path)}
 
 
+def resolve_bound_evidence(
+    artifact: dict[str, Any],
+) -> tuple[Path | None, str]:
+    raw_path = artifact.get("path")
+    expected_sha256 = artifact.get("sha256")
+    if not isinstance(raw_path, str) or not raw_path:
+        return None, "evidence path is absent"
+    if not isinstance(expected_sha256, str) or len(expected_sha256) != 64:
+        return None, f"evidence sha256 is invalid for {raw_path}"
+    path = resolve_path(raw_path)
+    if not path.is_file():
+        return None, f"evidence file is missing: {raw_path}"
+    actual_sha256 = sha256_file(path)
+    if actual_sha256 != expected_sha256:
+        return None, (
+            f"evidence hash mismatch for {raw_path}: "
+            f"expected {expected_sha256}, observed {actual_sha256}"
+        )
+    return path, f"evidence hash matches for {raw_path}"
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
@@ -97,6 +118,23 @@ def reproduction_execution_pass(receipt: dict[str, Any]) -> bool:
         and receipt.get("status") == "passed"
         and receipt.get("failure") is None
         and receipt.get("preparation", {}).get("status") == "passed"
+    )
+
+
+def oracle_contract_matches(
+    oracle: dict[str, Any], contract: dict[str, Any]
+) -> tuple[bool, str]:
+    expected_model = contract.get("modelId")
+    expected_steps = contract.get("execution", {}).get("decodeSteps")
+    actual_model = oracle.get("modelId")
+    actual_steps = oracle.get("requestedDecodeSteps")
+    passed = actual_model == expected_model and actual_steps == expected_steps
+    if passed:
+        return True, f"oracle binds model={expected_model} decodeSteps={expected_steps}"
+    return False, (
+        f"stale oracle contract: expected model={expected_model!r} "
+        f"decodeSteps={expected_steps!r}; observed model={actual_model!r} "
+        f"decodeSteps={actual_steps!r}"
     )
 
 
@@ -181,11 +219,15 @@ def identity_gate(
         adapter=target.get("adapter", ""),
         driver=target.get("driver", ""),
     )
+    oracle_contract_pass, oracle_contract_detail = oracle_contract_matches(
+        oracle, contract
+    )
     oracle_identity_pass = oracle.get("identity", {}).get("pass") is True
     reproduction_pass = reproduction_execution_pass(reproduction)
     passed = (
         contract_bound
         and reproduction_pass
+        and oracle_contract_pass
         and oracle_identity_pass
         and w0_pass
         and d0_pass
@@ -202,6 +244,7 @@ def identity_gate(
             if oracle_identity_pass
             else "W0/D0 transcript identity does not match the frozen application contract"
         ),
+        oracle_contract_detail,
         w0_detail,
         d0_detail,
     ]
@@ -214,7 +257,9 @@ def identity_gate(
 
 
 def correctness_gate(
-    oracle: dict[str, Any], evidence: list[dict[str, str]]
+    oracle: dict[str, Any],
+    contract: dict[str, Any],
+    evidence: list[dict[str, str]],
 ) -> dict[str, Any]:
     logits = oracle.get("logitsComparisons", [])
     failing_logits = [row for row in logits if isinstance(row, dict) and row.get("pass") is not True]
@@ -229,8 +274,10 @@ def correctness_gate(
     )
     nonzero_kv = all(kv.get(lane) is True for lane in ("W0", "D0"))
     identity_pass = oracle.get("identity", {}).get("pass") is True
+    contract_pass, contract_detail = oracle_contract_matches(oracle, contract)
     passed = (
-        identity_pass
+        contract_pass
+        and identity_pass
         and oracle.get("pass") is True
         and oracle.get("stepCountPass") is True
         and oracle.get("modelCheckpoints", {}).get("pass") is True
@@ -242,11 +289,18 @@ def correctness_gate(
         f"{len(logits)} prefill/decode logits comparisons; {len(failing_logits)} failed; "
         f"maxAbs={max_abs:.10g}; checkpoint coverage complete={str(complete_coverage).lower()}; "
         f"non-zero KV W0/D0={str(nonzero_kv).lower()}; "
-        f"Electron transcript identity={str(identity_pass).lower()}"
+        f"Electron transcript identity={str(identity_pass).lower()}; {contract_detail}"
     )
+    if not contract_pass or not identity_pass:
+        detail = (
+            "identity-valid Electron correctness evidence is unavailable; "
+            f"diagnostic comparisons are non-qualifying; {detail}"
+        )
     return {
         "id": "correctness",
-        "status": "PASS" if passed else "FAIL",
+        "status": "PASS" if passed else (
+            "NOT_TESTED" if not contract_pass or not identity_pass else "FAIL"
+        ),
         "detail": detail,
         "evidence": evidence,
     }
@@ -318,6 +372,65 @@ def optional_campaign_gate(gate_id: str, path: Path) -> dict[str, Any]:
     }
 
 
+def reliability_gate(
+    reproduction: dict[str, Any],
+    reproduction_path: Path,
+    campaign_path: Path,
+) -> dict[str, Any]:
+    result_ref = next(
+        (
+            item
+            for item in reproduction.get("evidence", [])
+            if isinstance(item, dict)
+            and item.get("id") == "qualification-result"
+            and isinstance(item.get("path"), str)
+        ),
+        None,
+    )
+    result_path = None
+    if result_ref is not None:
+        result_path, result_integrity = resolve_bound_evidence(result_ref)
+        if result_path is None:
+            return {
+                "id": "reliability",
+                "status": "FAIL",
+                "detail": (
+                    "canonical Electron result evidence is not trustworthy; "
+                    + result_integrity
+                ),
+                "evidence": [evidence_ref(reproduction_path)],
+            }
+    result = load_json_object(result_path) if result_path is not None else {}
+    failed_lanes = []
+    for lane, run in result.get("runs", {}).items():
+        if not isinstance(run, dict):
+            continue
+        if (
+            run.get("exitCode") != 0
+            or run.get("signal") is not None
+            or run.get("timedOut") is True
+            or run.get("outputLimitExceeded") is True
+        ):
+            failed_lanes.append(
+                f"{lane}(exitCode={run.get('exitCode')!r}, "
+                f"signal={run.get('signal')!r}, timedOut={run.get('timedOut')!r})"
+            )
+    if failed_lanes:
+        evidence = [evidence_ref(reproduction_path)]
+        if result_path is not None:
+            evidence.append(evidence_ref(result_path))
+        return {
+            "id": "reliability",
+            "status": "FAIL",
+            "detail": (
+                "canonical Electron lane failed before clean completion; "
+                + ", ".join(failed_lanes)
+            ),
+            "evidence": evidence,
+        }
+    return optional_campaign_gate("reliability", campaign_path)
+
+
 def ownership_gate(gates: list[dict[str, Any]]) -> dict[str, Any]:
     blockers = [gate["id"] for gate in gates if gate.get("status") != "PASS"]
     accepted = not blockers
@@ -372,14 +485,14 @@ def build_status_bundle(
             plan["tupleId"],
             source_refs,
         ),
-        correctness_gate(oracle, [evidence_ref(oracle_path)]),
+        correctness_gate(oracle, contract, [evidence_ref(oracle_path)]),
         compatibility_gate(
             coverage,
             w0_cts,
             d0_cts,
             [evidence_ref(coverage_path), evidence_ref(w0_cts_path), evidence_ref(d0_cts_path)],
         ),
-        optional_campaign_gate("reliability", reliability_path),
+        reliability_gate(reproduction, reproduction_path, reliability_path),
         optional_campaign_gate("performance", performance_path),
     ]
     gates.append(ownership_gate(gates))
