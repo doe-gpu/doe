@@ -74,7 +74,7 @@ class DopplerGemma270mElectronHarnessTests(unittest.TestCase):
 
         self.assertEqual(
             resolved["upstream"]["commit"],
-            "7e267f657d35ff64f808a4a93e2156a2c238b3f6",
+            "c27d1354b24f2ddfaaccd2742d1550a848db1931",
         )
         self.assertEqual(
             model["manifest"]["path"],

@@ -121,6 +121,40 @@ def reproduction_execution_pass(receipt: dict[str, Any]) -> bool:
     )
 
 
+def reproduction_contract_matches(
+    receipt: dict[str, Any], expected_commit: str
+) -> tuple[bool, str]:
+    if not reproduction_execution_pass(receipt):
+        return False, "canonical Electron reproduction did not complete"
+    preparation_ref = receipt.get("preparation")
+    if not isinstance(preparation_ref, dict):
+        return False, "reproduction receipt does not bind its preparation receipt"
+    preparation_path, integrity_detail = resolve_bound_evidence(preparation_ref)
+    if preparation_path is None:
+        return False, integrity_detail
+    preparation = load_json_object(preparation_path)
+    source = preparation.get("source", {})
+    identity_pass = (
+        preparation.get("status") == "passed"
+        and preparation.get("actorId") == receipt.get("actorId")
+        and preparation.get("harnessId") == receipt.get("harnessId")
+        and preparation.get("runId") == receipt.get("runId")
+        and source.get("requestedCommit") == expected_commit
+        and source.get("actualCommit") == expected_commit
+        and source.get("clean") is True
+    )
+    if identity_pass:
+        return True, (
+            f"canonical Electron reproduction binds clean Doppler commit "
+            f"{expected_commit}; {integrity_detail}"
+        )
+    return False, (
+        f"stale reproduction contract: expected clean Doppler commit "
+        f"{expected_commit}; requested={source.get('requestedCommit')!r}, "
+        f"actual={source.get('actualCommit')!r}"
+    )
+
+
 def oracle_contract_matches(
     oracle: dict[str, Any], contract: dict[str, Any]
 ) -> tuple[bool, str]:
@@ -223,7 +257,9 @@ def identity_gate(
         oracle, contract
     )
     oracle_identity_pass = oracle.get("identity", {}).get("pass") is True
-    reproduction_pass = reproduction_execution_pass(reproduction)
+    reproduction_pass, reproduction_detail = reproduction_contract_matches(
+        reproduction, harness.get("upstream", {}).get("commit", "")
+    )
     passed = (
         contract_bound
         and reproduction_pass
@@ -234,11 +270,7 @@ def identity_gate(
     )
     details = [
         "hash-bound harness contract is complete" if contract_bound else "harness contract identity is incomplete",
-        (
-            "canonical Electron reproduction completed"
-            if reproduction_pass
-            else "canonical Electron reproduction failed before qualification transcripts"
-        ),
+        reproduction_detail,
         (
             "W0/D0 transcripts match the frozen application contract"
             if oracle_identity_pass

@@ -133,6 +133,42 @@ class Gemma270mQualificationStatusTests(unittest.TestCase):
             "failure": {"stage": "workload"},
         }))
 
+    def test_reproduction_contract_rejects_stale_upstream_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            preparation_path = root / "preparation.json"
+            preparation_path.write_text(
+                '{"status":"passed","actorId":"doppler",'
+                '"harnessId":"gemma270m-electron","runId":"physical",'
+                '"source":{"requestedCommit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",'
+                '"actualCommit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",'
+                '"clean":true}}\n',
+                encoding="utf-8",
+            )
+            reproduction = {
+                "actorId": "doppler",
+                "harnessId": "gemma270m-electron",
+                "runId": "physical",
+                "status": "passed",
+                "failure": None,
+                "preparation": {
+                    "status": "passed",
+                    "path": str(preparation_path),
+                    "sha256": status.sha256_file(preparation_path),
+                },
+            }
+            passed, detail = status.reproduction_contract_matches(
+                reproduction,
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            )
+            stale, stale_detail = status.reproduction_contract_matches(
+                reproduction,
+                "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            )
+        self.assertTrue(passed, detail)
+        self.assertFalse(stale)
+        self.assertIn("stale reproduction contract", stale_detail)
+
     def test_absent_campaign_is_not_tested(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             gate = status.optional_campaign_gate(

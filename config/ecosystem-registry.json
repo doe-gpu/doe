@@ -1395,12 +1395,12 @@
       "organization": "clocksmith",
       "source": {
         "repositoryUrl": "https://github.com/clocksmith/doppler",
-        "upstreamCommit": "7e267f657d35ff64f808a4a93e2156a2c238b3f6",
-        "commitVerifiedAt": "2026-09-01T14:47:22Z",
+        "upstreamCommit": "c27d1354b24f2ddfaaccd2742d1550a848db1931",
+        "commitVerifiedAt": "2026-09-01T20:10:21Z",
         "license": {
           "identifier": "MIT",
-          "evidenceUrl": "https://github.com/clocksmith/doppler/blob/7e267f657d35ff64f808a4a93e2156a2c238b3f6/LICENSE",
-          "verifiedAt": "2026-09-01T14:47:22Z"
+          "evidenceUrl": "https://github.com/clocksmith/doppler/blob/c27d1354b24f2ddfaaccd2742d1550a848db1931/LICENSE",
+          "verifiedAt": "2026-09-01T20:10:21Z"
         }
       },
       "engagementStatus": "harness-ready",
@@ -1411,8 +1411,8 @@
         {
           "id": "gemma270m-q4-electron-workload",
           "summary": "The pinned Doppler source contains a complete Gemma 3 270M Q4 artifact whose manifest binds the model shards, tokenizer, execution graph, shader entries, and decode-capable WebGPU pipeline used by the Electron qualification harness.",
-          "evidenceUrl": "https://github.com/clocksmith/doppler/blob/7e267f657d35ff64f808a4a93e2156a2c238b3f6/models/local/gemma-3-270m-it-q4k-ehf16-af32/manifest.json",
-          "observedAt": "2026-09-01T14:47:22Z"
+          "evidenceUrl": "https://github.com/clocksmith/doppler/blob/c27d1354b24f2ddfaaccd2742d1550a848db1931/models/local/gemma-3-270m-it-q4k-ehf16-af32/manifest.json",
+          "observedAt": "2026-09-01T20:10:21Z"
         }
       ],
       "scoreHistory": [

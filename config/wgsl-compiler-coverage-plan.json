@@ -3,7 +3,7 @@
   "artifactKind": "wgsl_compiler_coverage_plan",
   "ledgerId": "gemma270m-amd-vulkan-wgsl",
   "claimScope": "amd_vulkan_gemma270m_admitted_compute",
-  "upstreamCommit": "7e267f657d35ff64f808a4a93e2156a2c238b3f6",
+  "upstreamCommit": "c27d1354b24f2ddfaaccd2742d1550a848db1931",
   "testCommands": [
     {
       "id": "test-wgsl",

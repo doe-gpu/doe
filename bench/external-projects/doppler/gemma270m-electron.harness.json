@@ -5,10 +5,10 @@
   "harnessId": "gemma270m-electron",
   "upstream": {
     "repositoryUrl": "https://github.com/clocksmith/doppler",
-    "commit": "7e267f657d35ff64f808a4a93e2156a2c238b3f6",
+    "commit": "c27d1354b24f2ddfaaccd2742d1550a848db1931",
     "license": {
       "identifier": "MIT",
-      "evidenceUrl": "https://github.com/clocksmith/doppler/blob/7e267f657d35ff64f808a4a93e2156a2c238b3f6/LICENSE"
+      "evidenceUrl": "https://github.com/clocksmith/doppler/blob/c27d1354b24f2ddfaaccd2742d1550a848db1931/LICENSE"
     }
   },
   "providerSubstitution": {
