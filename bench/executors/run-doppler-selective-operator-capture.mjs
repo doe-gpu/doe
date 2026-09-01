@@ -16,9 +16,16 @@ const baseScenarioPath = resolve(
   repoRoot,
   'bench/vendor-node/doppler_provider_logit_divergence_gemma270m_commands.json',
 );
-const EXPECTED_TOKEN_ID = 818;
-const EXPECTED_LOGITS_DIGEST =
-  'sha256:71a1e8031fc2186659689458869ea1b6d42f83c6c76cc00755c5d2935ffeda4c';
+const EXPECTED_BY_EXECUTION_API = Object.freeze({
+  generation: Object.freeze({
+    tokenId: 563,
+    logitsDigest: 'sha256:53d62148a0c0d59582ef9509a827f63c1ee3d7aeb8c3f1d01f2a7bf38cf2db07',
+  }),
+  'prefill-logits': Object.freeze({
+    tokenId: 563,
+    logitsDigest: 'sha256:740ba321c8fae6c503f19e926d834cf3fe550560b1fc1435c6fd7ace2de00367',
+  }),
+});
 
 function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -33,6 +40,7 @@ function parseArgs(argv) {
     suppressDiagnosticCopies: false,
     suppressDiagnosticAllocations: false,
     diagnosticAllocationBytes: null,
+    disableCommandBatching: false,
     runId: null,
     scenarioPath: baseScenarioPath,
   };
@@ -58,6 +66,8 @@ function parseArgs(argv) {
       if (!Number.isInteger(options.diagnosticAllocationBytes) || options.diagnosticAllocationBytes < 1) {
         throw new Error('--diagnostic-allocation-bytes must be a positive integer');
       }
+    } else if (argument === '--disable-command-batching') {
+      options.disableCommandBatching = true;
     } else if (argument === '--run-id') {
       options.runId = argv[++index] ?? null;
     } else if (argument === '--scenario') {
@@ -265,6 +275,7 @@ async function main() {
     if (options.executionApi === 'prefill-logits') {
       const prefill = await harness.pipeline.prefillWithLogits(prompt.prompt, {
         useChatTemplate: scenario.useChatTemplate,
+        disableCommandBatching: options.disableCommandBatching,
         diagnostics: { enabled: true, captureConfig },
       });
       const logits = prefill.logits;
@@ -277,6 +288,7 @@ async function main() {
     } else {
       generation = await textHelpers.runGeneration(harness.pipeline, runtimeConfig, {
         prompt: prompt.prompt,
+        useChatTemplate: scenario.useChatTemplate,
         maxTokens: scenario.promptWorkload.decodeTokens,
         sampling: {
           temperature: scenario.promptWorkload.temperature,
@@ -291,6 +303,7 @@ async function main() {
     const logitsDigest = generation.logitsDigests.length === 1
       ? generation.logitsDigests[0]?.digest ?? generation.logitsDigests[0]
       : null;
+    const expected = EXPECTED_BY_EXECUTION_API[options.executionApi];
     const capturedRecords = operatorDiagnostics?.timeline?.filter((record) => record.capture != null) ?? [];
     const nativeTraceBytes = await readFile(nativeTracePath);
     const nativeTraceRows = nativeTraceBytes.toString('utf8').split('\n').filter(Boolean);
@@ -313,6 +326,7 @@ async function main() {
         suppressDiagnosticCopies: options.suppressDiagnosticCopies,
         suppressDiagnosticAllocations: options.suppressDiagnosticAllocations,
         diagnosticAllocationBytes: options.diagnosticAllocationBytes,
+        disableCommandBatching: options.disableCommandBatching,
       },
       source: {
         baseScenario: { path: options.scenarioPath, sha256: sha256(baseScenarioBytes) },
@@ -332,12 +346,13 @@ async function main() {
         tokenId,
         logitsDigest,
         output: generation.output,
-        expectedTokenId: EXPECTED_TOKEN_ID,
-        expectedLogitsDigest: EXPECTED_LOGITS_DIGEST,
-        exact: tokenId === EXPECTED_TOKEN_ID && logitsDigest === EXPECTED_LOGITS_DIGEST,
+        expectedTokenId: expected.tokenId,
+        expectedLogitsDigest: expected.logitsDigest,
+        exact: tokenId === expected.tokenId && logitsDigest === expected.logitsDigest,
         operatorRecordCount: operatorDiagnostics?.recordCount ?? null,
         capturedRecordCount: capturedRecords.length,
         capturedOpIds: capturedRecords.map((record) => record.opId),
+        capturedRecords,
       },
     };
     const resultPath = resolve(outDir, 'result.json');

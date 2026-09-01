@@ -123,6 +123,7 @@ pub const VkPhysicalDeviceProperties2 = capability_structs.VkPhysicalDevicePrope
 pub const VkPhysicalDeviceSubgroupProperties = capability_structs.VkPhysicalDeviceSubgroupProperties;
 pub const VkPhysicalDeviceSubgroupSizeControlProperties = capability_structs.VkPhysicalDeviceSubgroupSizeControlProperties;
 pub const VkPhysicalDevice16BitStorageFeatures = capability_structs.VkPhysicalDevice16BitStorageFeatures;
+pub const VkPhysicalDeviceVariablePointersFeatures = capability_structs.VkPhysicalDeviceVariablePointersFeatures;
 pub const VkPhysicalDeviceSubgroupSizeControlFeatures = capability_structs.VkPhysicalDeviceSubgroupSizeControlFeatures;
 pub const VkPhysicalDeviceVulkan12Features = capability_structs.VkPhysicalDeviceVulkan12Features;
 
@@ -269,6 +270,7 @@ pub const VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER: i32 = 44;
 pub const VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER: i32 = 45;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES: i32 = 1000094000;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES: i32 = 1000083000;
+pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: i32 = 1000120000;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES: i32 = 1000225000;
 pub const VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO: i32 = 1000225001;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES: i32 = 1000225002;

@@ -30,6 +30,12 @@ RUNTIME_QUEUE_SHARED_PATH = (
 RUNTIME_COMPUTE_FAST_PATH = (
     REPO_ROOT / "runtime" / "zig" / "src" / "native" / "compute" / "doe_compute_fast.zig"
 )
+RUNTIME_COMPUTE_FAST_VULKAN_PATH = (
+    REPO_ROOT / "runtime" / "zig" / "src" / "native" / "compute" / "doe_compute_fast_vulkan.zig"
+)
+RUNTIME_VULKAN_FEATURE_CAPS_PATH = (
+    REPO_ROOT / "runtime" / "zig" / "src" / "backend" / "vulkan" / "vk_feature_caps.zig"
+)
 NAPI_QUEUE_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_queue.c"
 NAPI_BUFFER_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_buffer.c"
 NAPI_CAPS_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_caps.c"
@@ -1670,6 +1676,36 @@ console.log(JSON.stringify({{
         )
         self.assertIn("doeNativeComputeDispatchBatchCopyFlush", bun_source)
         self.assertIn("dispatchThenCopy", bun_source)
+
+    def test_vulkan_batch_dispatch_refreshes_replay_command_buffer_after_preparation(self) -> None:
+        source = RUNTIME_COMPUTE_FAST_VULKAN_PATH.read_text(encoding="utf-8")
+        batch_section = source[source.index("pub fn dispatchBatchCopyFlush("):]
+
+        dispatch_loop = batch_section.index("for (0..dispatch_count) |index| {")
+        prepare_call = batch_section.index("vulkan_prepare_dispatch_binding_state(", dispatch_loop)
+        refresh_call = batch_section.index(
+            "const replay_command_buffer = rt.begin_prepared_dispatch_replay()",
+            prepare_call,
+        )
+        record_call = batch_section.index(
+            "rt.record_prepared_dispatch_replay_on(",
+            refresh_call,
+        )
+
+        self.assertLess(dispatch_loop, prepare_call)
+        self.assertLess(prepare_call, refresh_call)
+        self.assertLess(refresh_call, record_call)
+        self.assertNotIn("var replay_command_buffer = rt.replay_command_buffer", batch_section)
+
+    def test_vulkan_subgroup_advertisement_has_no_global_disable_escape_hatch(self) -> None:
+        feature_source = RUNTIME_VULKAN_FEATURE_CAPS_PATH.read_text(encoding="utf-8")
+        shared_contract_source = (
+            REPO_ROOT / "bench" / "tools" / "run_doe_webgpu_shared_contract.py"
+        ).read_text(encoding="utf-8")
+
+        self.assertNotIn("DOE_DISABLE_SUBGROUPS", feature_source)
+        self.assertNotIn("DOE_DISABLE_SUBGROUPS", shared_contract_source)
+        self.assertIn("const has_subgroups = subgroup_properties.subgroupSize > 0", feature_source)
 
     def test_evaluate_execution_determinism_uses_host_byte_policy(self) -> None:
         script = f"""

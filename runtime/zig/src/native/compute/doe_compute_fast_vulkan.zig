@@ -298,7 +298,6 @@ pub fn dispatchBatchCopyFlush(
     var prepared_binding_state = vulkan_compute.VulkanDispatchBindingState{};
     var prepared_cache: [BATCH_PREPARED_CACHE_CAPACITY]PreparedDispatchCacheEntry = undefined;
     var prepared_cache_count: usize = 0;
-    var replay_command_buffer = rt.replay_command_buffer;
     for (0..dispatch_count) |index| {
         const pipe = native_helpers.cast(DoeComputePipeline, pipe_ptrs[index]) orelse continue;
         const bg_offset = index * MAX_COMPUTE_BIND_GROUPS;
@@ -365,13 +364,15 @@ pub fn dispatchBatchCopyFlush(
         }
         if (collect_timings) timings.command_replay_prepare_ns += monotonicNowNs() - prepare_started_ns;
         const record_started_ns = if (collect_timings) monotonicNowNs() else 0;
-        if (replay_command_buffer == null) {
-            replay_command_buffer = rt.begin_prepared_dispatch_replay() catch |err| {
-                std.log.err("doe_compute_fast_vulkan: begin prepared replay batch failed: {s}", .{@errorName(err)});
-                if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
-                continue;
-            };
-        }
+        // Pipeline and descriptor preparation may finalize the active replay
+        // command buffer while preserving the enclosing WebGPU submit. Resolve
+        // the current buffer after every preparation boundary instead of
+        // retaining a stale local handle across the dispatch batch.
+        const replay_command_buffer = rt.begin_prepared_dispatch_replay() catch |err| {
+            std.log.err("doe_compute_fast_vulkan: begin prepared replay batch failed: {s}", .{@errorName(err)});
+            if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
+            continue;
+        };
         rt.record_prepared_dispatch_replay_on(
             replay_command_buffer,
             dispatch_dims[dim_offset],

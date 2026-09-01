@@ -64,6 +64,8 @@ pub const Tag = enum(u8) {
     caret_eq, // ^=
     shift_left, // <<
     shift_right, // >>
+    shift_left_eq, // <<=
+    shift_right_eq, // >>=
     lte, // <=
     gte, // >=
     eq_eq, // ==

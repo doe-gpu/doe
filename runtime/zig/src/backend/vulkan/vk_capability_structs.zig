@@ -83,6 +83,13 @@ pub const VkPhysicalDevice16BitStorageFeatures = extern struct {
     storageInputOutput16: vk.VkBool32,
 };
 
+pub const VkPhysicalDeviceVariablePointersFeatures = extern struct {
+    sType: vk.VkStructureType,
+    pNext: ?*anyopaque,
+    variablePointersStorageBuffer: vk.VkBool32,
+    variablePointers: vk.VkBool32,
+};
+
 pub const VkPhysicalDeviceSubgroupSizeControlFeatures = extern struct {
     sType: vk.VkStructureType,
     pNext: ?*anyopaque,

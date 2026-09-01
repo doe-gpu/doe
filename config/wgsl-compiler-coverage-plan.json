@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "wgsl_compiler_coverage_plan",
+  "ledgerId": "gemma270m-amd-vulkan-wgsl",
+  "claimScope": "amd_vulkan_gemma270m_admitted_compute",
+  "upstreamCommit": "7e267f657d35ff64f808a4a93e2156a2c238b3f6",
+  "testCommands": [
+    {
+      "id": "test-wgsl",
+      "workdir": "runtime/zig",
+      "command": ["../../.tooling/zig-0.15.2/zig", "build", "test-wgsl"]
+    }
+  ],
+  "spirvValidator": {
+    "emitterPath": "runtime/zig/zig-out/bin/doe-emit-spirv",
+    "validatorPath": "/usr/bin/spirv-val",
+    "reportPath": "bench/out/qualification/gemma270m-amd/spirv-val-fixed.json",
+    "reportSha256": "b92fb1c32e115633a04a0f9a3ee4cbb6de30e0a9cc21cbc6d60ee7623faa618a"
+  },
+  "admittedShaders": [
+    {
+      "id": "attention-decode-online-head256-f16kv",
+      "path": "../doppler/src/gpu/kernels/attention_decode_online_head256_f16kv.wgsl",
+      "sha256": "1cc3ee644b5a87cf21c94590edc98980af8779d9eb92d0ece086546dfcd2630c"
+    },
+    {
+      "id": "attention-head256-f16kv",
+      "path": "../doppler/src/gpu/kernels/attention_head256_f16kv.wgsl",
+      "sha256": "1e22c16dca7f877bf9150c81ed11e7cc82fe681ffb81ae41d9a82cba21d0eadd"
+    },
+    {
+      "id": "attention-small-f16kv",
+      "path": "../doppler/src/gpu/kernels/attention_small_f16kv.wgsl",
+      "sha256": "d06953f85b75a70a7423bd92afbbb476bff77acaf0f8378135465d0f742bb276"
+    },
+    {
+      "id": "gather",
+      "path": "../doppler/src/gpu/kernels/gather.wgsl",
+      "sha256": "85b2d7fff9358bf4087d9b3f0804803ba798111a3d728db9561b53789280032c"
+    },
+    {
+      "id": "gelu",
+      "path": "../doppler/src/gpu/kernels/gelu.wgsl",
+      "sha256": "e6fb22edd25c1e210e7dfc61e0b67d31832c1d9d3caf985e4c56f61dd7b57ac6"
+    },
+    {
+      "id": "matmul-f16w-f32a-tiled",
+      "path": "../doppler/src/gpu/kernels/matmul_f16w_f32a_tiled.wgsl",
+      "sha256": "569971d79c3ea3ae9e632a06befe43bc9d9a1a657ddd53357368fa24b073cd7d"
+    },
+    {
+      "id": "matmul-gemv-subgroup",
+      "path": "../doppler/src/gpu/kernels/matmul_gemv_subgroup.wgsl",
+      "sha256": "04db4c712bc4f88ccd07588d68f852acd65f7db705c3b1f4217bf67eff8082ed"
+    },
+    {
+      "id": "residual",
+      "path": "../doppler/src/gpu/kernels/residual.wgsl",
+      "sha256": "e5d606c42ae57cb72cca129d7ad85e95021158a7d9fbce68af3119630bbcb698"
+    },
+    {
+      "id": "rmsnorm",
+      "path": "../doppler/src/gpu/kernels/rmsnorm.wgsl",
+      "sha256": "57c810ce293ec2ae292ab2e3deebf5c2d4d7bb6183ac2d5e09e747f2244e2683"
+    },
+    {
+      "id": "rope",
+      "path": "../doppler/src/gpu/kernels/rope.wgsl",
+      "sha256": "a4472c7134a08c77ecefc665918652a7eb4d79acb373a5dc5fdc865b9ccb937d"
+    },
+    {
+      "id": "sample",
+      "path": "../doppler/src/gpu/kernels/sample.wgsl",
+      "sha256": "36437b17a1a7f624ae31d3420ed8142df194b7b8ca800d30a1855fc52e754cd4"
+    }
+  ],
+  "ctsReports": [
+    {
+      "lane": "W0",
+      "path": "bench/out/qualification/gemma270m-amd/subgroup-cts-w0.json",
+      "sha256": "acce6472bc244a74d166e6dbf74022ee50bdb2c6acda3c2fc3519c494fe8b748",
+      "requiredQueryIds": ["subgroup_add_uniform_u32", "subgroup_add_predicated"]
+    },
+    {
+      "lane": "D0",
+      "path": "bench/out/qualification/gemma270m-amd/subgroup-cts-d0-replay-sync-fixed.json",
+      "sha256": "510b2e2a6289280e0dc35c173169d9d4890db044a26c4a077f74dfdd9d99b541",
+      "requiredQueryIds": ["subgroup_add_uniform_u32", "subgroup_add_predicated"]
+    }
+  ],
+  "workarounds": [
+    {
+      "id": "subgroup-capability-removal",
+      "forbiddenPattern": "DOE_DISABLE_SUBGROUPS",
+      "searchPaths": [
+        "runtime/zig/src/backend/vulkan/vk_feature_caps.zig",
+        "runtime/zig/src/backend/vulkan"
+      ]
+    }
+  ],
+  "supportViewPath": "runtime/zig/src/compiler/wgsl/WGSL_COVERAGE.md"
+}

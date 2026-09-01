@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schema/gemma270m-qualification-dashboard-plan.schema.json",
+  "title": "Gemma 270M qualification dashboard plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "artifactKind", "dashboardId", "harnessPath", "tupleId", "evidence"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "artifactKind": { "const": "gemma270m_qualification_dashboard_plan" },
+    "dashboardId": { "const": "gemma270m-electron-amd-vulkan" },
+    "harnessPath": { "$ref": "#/$defs/path" },
+    "tupleId": { "const": "gemma-3-270m-it-q4k-ehf16-af32-electron-43-4-0-linux-x86-64-amd-vulkan" },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reproductionReceipt", "checkpointOracle", "compilerCoverage", "subgroupCtsW0", "subgroupCtsD0", "reliabilityCampaign", "performanceComparison"],
+      "properties": {
+        "reproductionReceipt": { "$ref": "#/$defs/path" },
+        "checkpointOracle": { "$ref": "#/$defs/path" },
+        "compilerCoverage": { "$ref": "#/$defs/path" },
+        "subgroupCtsW0": { "$ref": "#/$defs/path" },
+        "subgroupCtsD0": { "$ref": "#/$defs/path" },
+        "reliabilityCampaign": { "$ref": "#/$defs/path" },
+        "performanceComparison": { "$ref": "#/$defs/path" }
+      }
+    }
+  },
+  "$defs": {
+    "path": { "type": "string", "minLength": 1 }
+  }
+}

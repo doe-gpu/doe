@@ -69,6 +69,21 @@
     <code>executionBlocker</code> fields — the dashboard never re-labels them.
   </p>
 
+  <div class="section-head">Frozen application qualification</div>
+  <p id="qualification-tuple" class="lede">Loading generated Gemma 270M qualification status…</p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:20%">Gate</th>
+        <th style="width:16%">Status</th>
+        <th>Generated verdict / evidence</th>
+      </tr>
+    </thead>
+    <tbody id="qualification-rows">
+      <tr><td colspan="3"><span class="badge badge-loading">loading…</span></td></tr>
+    </tbody>
+  </table>
+
   <div class="section-head">Proven today</div>
   <table>
     <thead>
@@ -157,6 +172,12 @@
     return `<a class="mono" href="${repoRoot}${path}">${path}</a>`;
   }
 
+  function escapeHtml(value) {
+    const el = document.createElement('span');
+    el.textContent = String(value);
+    return el.innerHTML;
+  }
+
   function row(cells) {
     const tr = document.createElement('tr');
     for (const c of cells) tr.appendChild(c);
@@ -175,6 +196,45 @@
   function addError(tbodyId, capability, message) {
     addRow(tbodyId, capability, badge('blocked', 'error'),
       `<div class="error">${message}</div>`);
+  }
+
+  // ── Generated Gemma 270M qualification decision ────────────────
+  // Gate status and detail come only from the schema-validated bundle.
+  try {
+    const path = 'bench/out/qualification/gemma270m-amd/status-bundle.json';
+    const qualification = await fetchJson(path);
+    const tuple = qualification.tuple || {};
+    const providers = tuple.providers || {};
+    document.getElementById('qualification-tuple').textContent =
+      `${tuple.modelId} × ${tuple.application} × ${tuple.os}/${tuple.arch} × ` +
+      `${tuple.adapter} (${tuple.driver}) · W0=${providers.W0} · D0=${providers.D0} · ` +
+      `decision=${qualification.decision}`;
+    const tbody = document.getElementById('qualification-rows');
+    tbody.innerHTML = '';
+    const badgeKinds = {
+      PASS: 'pass',
+      FAIL: 'blocked',
+      REJECTED: 'blocked',
+      NOT_TESTED: 'partial',
+    };
+    for (const gate of qualification.gates || []) {
+      const links = (gate.evidence || []).map(ref =>
+        `${evidenceLink(escapeHtml(ref.path))} <code>sha256:${escapeHtml(ref.sha256.slice(0, 12))}…</code>`
+      );
+      const evidence = links.length ? `<br>${links.join('<br>')}` : '';
+      tbody.appendChild(row([
+        td(gate.id),
+        tdHtml(badge(badgeKinds[gate.status] || 'loading', escapeHtml(gate.status))),
+        tdHtml(`${escapeHtml(gate.detail)}${evidence}`),
+      ]));
+    }
+    if (!qualification.gates || qualification.gates.length === 0) {
+      throw new Error('generated qualification bundle contains no gates');
+    }
+  } catch (e) {
+    document.getElementById('qualification-tuple').textContent =
+      'Generated qualification status unavailable.';
+    addError('qualification-rows', 'Gemma 270M qualification', e.message);
   }
 
   // ── Proven rows ──────────────────────────────────────────────────

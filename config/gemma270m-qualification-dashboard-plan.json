@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "gemma270m_qualification_dashboard_plan",
+  "dashboardId": "gemma270m-electron-amd-vulkan",
+  "harnessPath": "bench/external-projects/doppler/gemma270m-electron.harness.json",
+  "tupleId": "gemma-3-270m-it-q4k-ehf16-af32-electron-43-4-0-linux-x86-64-amd-vulkan",
+  "evidence": {
+    "reproductionReceipt": "bench/out/external-projects/doppler/amd-gemma270m-qm0/reproduction.json",
+    "checkpointOracle": "bench/out/qualification/gemma270m-amd/checkpoint-oracle.json",
+    "compilerCoverage": "bench/out/qualification/gemma270m-amd/wgsl-compiler-coverage.json",
+    "subgroupCtsW0": "bench/out/qualification/gemma270m-amd/subgroup-cts-w0.json",
+    "subgroupCtsD0": "bench/out/qualification/gemma270m-amd/subgroup-cts-d0-replay-sync-fixed.json",
+    "reliabilityCampaign": "bench/out/qualification/gemma270m-amd/reliability-campaign.json",
+    "performanceComparison": "bench/out/qualification/gemma270m-amd/performance-comparison.json"
+  }
+}

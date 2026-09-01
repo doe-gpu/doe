@@ -418,6 +418,16 @@ def reproduction_plan(selection: Selection, *, offline: bool = False) -> dict[st
         _render_template(str(argument), values)
         for argument in reproduction["arguments"]
     )
+    resolved_evidence = [
+        {
+            "id": str(item["id"]),
+            "path": _display_path(
+                selection.root,
+                selection.run_root / str(item["path"]),
+            ),
+        }
+        for item in reproduction["evidenceFiles"]
+    ]
     return {
         "schemaVersion": 1,
         "artifactKind": "external-project-reproduction-plan",
@@ -427,6 +437,12 @@ def reproduction_plan(selection: Selection, *, offline: bool = False) -> dict[st
         "offline": offline,
         "upstreamRoot": _display_path(selection.root, selection.upstream_root),
         "runRoot": _display_path(selection.root, selection.run_root),
+        "resolvedContract": {
+            "upstream": upstream,
+            "providerSubstitution": selection.manifest["providerSubstitution"],
+            "modelContract": selection.manifest["workload"].get("modelContract"),
+            "supportTargets": selection.manifest["supportTargets"],
+        },
         "sourceCommands": source_commands,
         "bootstrapCommands": [
             item["command"] for item in selection.policy["bootstrapCommands"]
@@ -448,6 +464,17 @@ def reproduction_plan(selection: Selection, *, offline: bool = False) -> dict[st
         "gateCommands": [item["command"] for item in selection.policy["gateCommands"]],
         "workloadCommand": workload_command,
         "evidenceFiles": reproduction["evidenceFiles"],
+        "outputs": {
+            "preparationReceipt": _display_path(
+                selection.root,
+                selection.run_root / "preparation.json",
+            ),
+            "reproductionReceipt": _display_path(
+                selection.root,
+                selection.run_root / "reproduction.json",
+            ),
+            "evidence": resolved_evidence,
+        },
     }
 
 

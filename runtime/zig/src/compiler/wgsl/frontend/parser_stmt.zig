@@ -437,6 +437,8 @@ fn isAssignOp(tag: Tag) bool {
         .amp_eq,
         .pipe_eq,
         .caret_eq,
+        .shift_left_eq,
+        .shift_right_eq,
         => true,
         else => false,
     };

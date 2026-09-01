@@ -228,6 +228,8 @@ pub fn assign_op_to_binary(op: ir.AssignOp) ir.BinaryOp {
         .bit_and => .bit_and,
         .bit_or => .bit_or,
         .bit_xor => .bit_xor,
+        .shift_left => .shift_left,
+        .shift_right => .shift_right,
     };
 }
 

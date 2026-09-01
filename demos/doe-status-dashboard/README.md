@@ -2,6 +2,8 @@
 
 Single-page static demo that binds to Doe's artifact schemas and renders the
 current state of WGSL → multi-backend compile + CSL runtime readiness.
+The first table also renders the generated, hash-bound qualification decision
+for Gemma 3 270M under Electron on the admitted AMD Vulkan tuple.
 
 ## View
 
@@ -14,6 +16,13 @@ python3 -m http.server 8000
 
 Then open <http://localhost:8000/demos/doe-status-dashboard/>.
 
+Generate the Gemma qualification bundle from its machine-owned plan and
+evidence before serving the page:
+
+```bash
+python3 bench/tools/generate_gemma270m_qualification_status.py
+```
+
 ## What it binds to
 
 Each row is re-derived from a JSON artifact at view time. No labels are
@@ -23,6 +32,7 @@ artifact cannot drift.
 
 | row | source |
 | --- | --- |
+| Gemma 270M Electron qualification | `bench/out/qualification/gemma270m-amd/status-bundle.json`, generated from `config/gemma270m-qualification-dashboard-plan.json` |
 | WGSL → multi-backend compile | `bench/out/cross-backend-matrix/wgsl-backend-matrix.json` |
 | WGSL backend equivalence crosswalk | `bench/out/wgsl-backend-equivalence/index.json` |
 | SdkLayout streaming executor primitives | `bench/out/e2b-full-graph/gemma-4-e2b-runtime-receipt.json` → `streamingExecutorPrimitivesEvidence` |
@@ -36,6 +46,8 @@ artifact cannot drift.
 This is a static page. It doesn't re-run any gate, regenerate any artifact,
 or validate against schemas at view time — it trusts that the sweep has
 already done that. Schema validation lives in `bench/gates/schema_gate.py`.
+The page does not infer or hardcode the Gemma gate statuses; it displays the
+six generated gate records and their hash-bound evidence links.
 
 ## Intentional distinction
 

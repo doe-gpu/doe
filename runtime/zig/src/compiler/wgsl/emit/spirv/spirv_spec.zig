@@ -28,6 +28,7 @@ pub const Capability = struct {
     pub const StorageImageExtendedFormats: u32 = 49;
     pub const ImageQuery: u32 = 50;
     pub const DerivativeControl: u32 = 51;
+    pub const VariablePointersStorageBuffer: u32 = 4441;
 };
 
 pub const AddressingModel = struct {

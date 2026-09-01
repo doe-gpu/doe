@@ -285,13 +285,9 @@ pub fn make_prior_compute_writes_visible_for_current_bindings(
 }
 
 pub fn make_replay_compute_writes_visible(command_buffer: c.VkCommandBuffer) void {
-    // Recorded WebGPU command buffers can bind distinct logical buffers
-    // backed by overlapping regions of Doe's Vulkan heap allocation.
-    // Resource-handle overlap is therefore insufficient to prove that a
-    // compute dependency is absent. A conservative barrier before each
-    // replayed dispatch preserves WebGPU command order until physical
-    // allocation ranges are part of the hazard identity. Pending-write state
-    // is retained so a following transfer still receives its own barrier.
+    // Replay submissions can outlive the WebGPU resources tracked above. A later
+    // resource may reuse the same Vulkan allocation under a different handle, so
+    // handle-intersection alone cannot prove that the memory is independent.
     const barrier = c.VkMemoryBarrier{
         .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
         .pNext = null,

@@ -178,6 +178,7 @@
             "reviewStatus": { "type": "string", "const": "reviewed" }
           }
         },
+        "modelContract": { "$ref": "#/$defs/modelContract" },
         "sameWorkPolicy": { "type": "string", "minLength": 1 },
         "completionBoundary": { "type": "string", "minLength": 1 }
       }
@@ -430,6 +431,189 @@
         "path": {
           "type": "string",
           "pattern": "^(?:\\.|(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^{}]+)$"
+        }
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "hashBoundPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/workspacePath" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "modelProviderIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "wrapper", "targetRoot", "target"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["dawn-node-webgpu", "doe-gpu"]
+        },
+        "wrapper": { "$ref": "#/$defs/hashBoundPath" },
+        "targetRoot": {
+          "type": "string",
+          "enum": ["repo", "upstream"]
+        },
+        "target": { "$ref": "#/$defs/hashBoundPath" }
+      }
+    },
+    "modelArtifactSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project", "path", "origin"],
+      "properties": {
+        "project": { "$ref": "#/$defs/id" },
+        "path": { "$ref": "#/$defs/workspacePath" },
+        "origin": { "$ref": "#/$defs/hashBoundPath" }
+      }
+    },
+    "modelContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelId",
+        "artifactSource",
+        "manifest",
+        "tokenizer",
+        "shaderIdentity",
+        "application",
+        "prompt",
+        "execution",
+        "providerContract",
+        "providers"
+      ],
+      "properties": {
+        "modelId": { "type": "string", "minLength": 1 },
+        "artifactSource": { "$ref": "#/$defs/modelArtifactSource" },
+        "manifest": { "$ref": "#/$defs/hashBoundPath" },
+        "tokenizer": { "$ref": "#/$defs/hashBoundPath" },
+        "shaderIdentity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "sha256"],
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "manifest.inference.execution.kernels"
+            },
+            "sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "application": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["runtime", "version", "mode", "package", "entrypoint"],
+          "properties": {
+            "runtime": { "type": "string", "const": "electron" },
+            "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+            "mode": { "type": "string", "const": "main-process-node-side" },
+            "package": { "$ref": "#/$defs/hashBoundPath" },
+            "entrypoint": { "$ref": "#/$defs/hashBoundPath" }
+          }
+        },
+        "prompt": { "$ref": "#/$defs/hashBoundPath" },
+        "providerContract": { "$ref": "#/$defs/hashBoundPath" },
+        "execution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "decodeSteps",
+            "useChatTemplate",
+            "runtimeProfile",
+            "kernelPathPolicy",
+            "sampling",
+            "checkpointStages",
+            "tolerance"
+          ],
+          "properties": {
+            "decodeSteps": { "type": "integer", "minimum": 2 },
+            "useChatTemplate": { "type": "boolean" },
+            "runtimeProfile": { "type": "string", "minLength": 1 },
+            "kernelPathPolicy": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mode", "sourceScope", "onIncompatible"],
+              "properties": {
+                "mode": { "type": "string", "enum": ["locked", "capability-aware"] },
+                "sourceScope": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "enum": ["model", "manifest", "config"]
+                  }
+                },
+                "onIncompatible": { "type": "string", "enum": ["error", "remap"] }
+              }
+            },
+            "sampling": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["temperature", "topK", "topP", "repetitionPenalty", "seed"],
+              "properties": {
+                "temperature": { "type": "number", "minimum": 0 },
+                "topK": { "type": "integer", "minimum": 1 },
+                "topP": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+                "repetitionPenalty": { "type": "number", "exclusiveMinimum": 0 },
+                "seed": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "checkpointStages": {
+              "type": "array",
+              "minItems": 8,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "embedding",
+                  "rmsnorm",
+                  "qkv",
+                  "rope",
+                  "attention",
+                  "kv",
+                  "mlp",
+                  "logits"
+                ]
+              },
+              "allOf": [
+                { "contains": { "const": "embedding" } },
+                { "contains": { "const": "rmsnorm" } },
+                { "contains": { "const": "qkv" } },
+                { "contains": { "const": "rope" } },
+                { "contains": { "const": "attention" } },
+                { "contains": { "const": "kv" } },
+                { "contains": { "const": "mlp" } },
+                { "contains": { "const": "logits" } }
+              ]
+            },
+            "tolerance": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["metric", "atol", "rtol"],
+              "properties": {
+                "metric": { "type": "string", "const": "abs-or-relative" },
+                "atol": { "type": "number", "minimum": 0 },
+                "rtol": { "type": "number", "minimum": 0 }
+              }
+            }
+          }
+        },
+        "providers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["W0", "D0"],
+          "properties": {
+            "W0": { "$ref": "#/$defs/modelProviderIdentity" },
+            "D0": { "$ref": "#/$defs/modelProviderIdentity" }
+          }
         }
       }
     },

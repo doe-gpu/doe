@@ -1,7 +1,8 @@
 {
   "schemaVersion": 1,
   "workdir": "bench/vendor/dawn/third_party/webgpu-cts",
-  "commandTemplate": "node tools/run_node --quiet --gpu-provider {repo_root}/bench/cts/fawn-node-gpu-provider.cjs {query}",
+  "commandTemplate": "node tools/run_node --gpu-provider {repo_root}/bench/cts/fawn-node-gpu-provider.cjs {query}",
+  "requireTextSummary": true,
   "identityProbe": {
     "commandTemplate": "node {repo_root}/bench/cts/probe-fawn-node-adapter.cjs",
     "required": true

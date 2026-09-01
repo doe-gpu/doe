@@ -376,6 +376,8 @@ pub const AssignOp = enum {
     bit_and,
     bit_or,
     bit_xor,
+    shift_left,
+    shift_right,
 };
 
 pub const CallKind = enum {

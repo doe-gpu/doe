@@ -583,6 +583,8 @@ fn map_assign_op(tag: Tag) ir.AssignOp {
         .amp_eq => .bit_and,
         .pipe_eq => .bit_or,
         .caret_eq => .bit_xor,
+        .shift_left_eq => .shift_left,
+        .shift_right_eq => .shift_right,
         else => .assign,
     };
 }
@@ -633,6 +635,15 @@ fn constant_from_node(
         },
         .construct_expr => blk: {
             const span = sema_helpers.decode_packed_span(node.data.rhs);
+            if (span.len == 1) {
+                switch (semantic.types.get(semantic.nodeType(node_idx))) {
+                    .scalar => {
+                        const arg_node = tree.extra_data.items[span.start];
+                        break :blk try constant_from_node(allocator, tree, semantic, arg_node, depth + 1);
+                    },
+                    else => {},
+                }
+            }
             var values = try allocator.alloc(ir.ConstantValue, span.len);
             var initialized: usize = 0;
             errdefer {

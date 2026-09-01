@@ -36,6 +36,7 @@ DEFAULT_WGSL_DISCOVERY_DIRS = [
     REPO_ROOT / "bench" / "inference-pipeline" / "kernels",
 ]
 VENDOR_DIR = REPO_ROOT / "bench" / "vendor"
+EXCLUDED_DIRECTORY_NAMES = frozenset({".git", "node_modules", "third_party", "vendor"})
 
 WGSL_COMPUTE_SHADERS = [
     "shader_compile_pipeline_stress.wgsl",
@@ -168,7 +169,11 @@ def collect_spv_files(search_dirs: list[Path]) -> list[Path]:
         if not search_dir.is_dir():
             continue
         for spv in sorted(search_dir.rglob("*.spv")):
-            if VENDOR_DIR in spv.parents or spv.is_relative_to(VENDOR_DIR):
+            if (
+                VENDOR_DIR in spv.parents
+                or spv.is_relative_to(VENDOR_DIR)
+                or EXCLUDED_DIRECTORY_NAMES.intersection(spv.parts)
+            ):
                 continue
             results.append(spv)
     seen: set[Path] = set()

@@ -1121,9 +1121,24 @@ pub fn build(b: *std.Build) void {
     const coverage_gate_step = b.step("coverage-gate", "Validate split core/full coverage ledgers against Zig partitions");
     coverage_gate_step.dependOn(&coverage_gate_check.step);
 
-    const spirv_val_check = b.addSystemCommand(&.{ "python3", "../../bench/gates/spirv_val_gate.py" });
+    const spirv_val_check = b.addSystemCommand(&.{
+        "python3",
+        "../../bench/gates/spirv_val_gate.py",
+        "--discover-wgsl",
+        "--require-subgroup-coverage",
+    });
     const spirv_val_step = b.step("spirv-val", "Validate SPIR-V artifacts with spirv-val (skips gracefully if not installed)");
     spirv_val_step.dependOn(&spirv_val_check.step);
+
+    const wgsl_coverage_check = b.addSystemCommand(&.{
+        "python3",
+        "../../bench/gates/wgsl_compiler_coverage_gate.py",
+    });
+    const wgsl_coverage_step = b.step(
+        "wgsl-coverage-gate",
+        "Validate generated admitted-shader, CTS, SPIR-V, and workaround coverage",
+    );
+    wgsl_coverage_step.dependOn(&wgsl_coverage_check.step);
 
     // Tiered build variants: compute-only and full Dawn drop-in.
     // The default `dropin` step uses the --tier option (default: headless).

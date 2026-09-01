@@ -23,15 +23,6 @@ from bench.tools.run_doe_csl_int4ple_transcript import (
     sha256_file,
     write_json,
 )
-DEFAULT_CONTRACT = Path(
-    "bench/out/doppler-reference/gemma-4-e2b-int4ple-shared-execution-contract.json"
-)
-DEFAULT_OUT = Path(
-    "bench/out/doppler-reference/gemma-4-e2b-int4ple-doe-webgpu-transcript.json"
-)
-DEFAULT_EXPORT_OUT_DIR = Path(
-    "bench/out/doppler-reference/gemma-4-e2b-int4ple-doe-webgpu-export"
-)
 DEFAULT_SCHEMA = Path("config/doe-webgpu-transcript.schema.json")
 DEFAULT_CONTRACT_SCHEMA = Path("config/doe-shared-execution-contract.schema.json")
 DEFAULT_EXPORT_TOOL = Path("bench/tools/export_doppler_int4ple_reference.mjs")
@@ -40,16 +31,16 @@ DEFAULT_RUNTIME_PROFILE = "profiles/production"
 DEFAULT_BUN_PROVIDER = Path("packages/doe-gpu/src/bun.js")
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--shared-contract",
-        default=str(DEFAULT_CONTRACT),
+        required=True,
         help="Shared execution contract to consume.",
     )
     parser.add_argument(
         "--doppler-root",
-        default="/home/x/deco/doppler",
+        required=True,
         help="Doppler checkout used by the reference exporter.",
     )
     parser.add_argument(
@@ -103,7 +94,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--export-out-dir",
-        default=str(DEFAULT_EXPORT_OUT_DIR),
+        required=True,
         help="Directory where the underlying export artifacts are written.",
     )
     parser.add_argument(
@@ -118,10 +109,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--out",
-        default=str(DEFAULT_OUT),
+        required=True,
         help="Output Doe WebGPU transcript receipt.",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def hash_link(path: Path, source: str | None = None) -> dict[str, Any]:
@@ -555,12 +546,6 @@ def main() -> int:
     stderr_log = out_path.parent / "doe-webgpu-export.stderr.log"
     env = dict(os.environ)
     env["DOPPLER_NODE_WEBGPU_MODULE"] = str(provider_module)
-    # Doe's WGSL translator does not yet compile Doppler's subgroup kernel
-    # family. Suppress the native subgroups advertisement so Doppler's
-    # capability-transform resolver picks the `removeSubgroups` variant for
-    # the shared-contract lane. Remove once `doe_wgsl` lands full subgroup
-    # builtin support.
-    env.setdefault("DOE_DISABLE_SUBGROUPS", "1")
     proc = subprocess.run(
         command,
         cwd=REPO_ROOT,

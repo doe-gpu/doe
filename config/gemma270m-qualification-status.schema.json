@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schema/gemma270m-qualification-status.schema.json",
+  "title": "Gemma 270M qualification status bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "artifactKind", "dashboardId", "generatedAtUtc", "sourcePlan", "tuple", "gates", "decision"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "artifactKind": { "const": "gemma270m_qualification_status" },
+    "dashboardId": { "const": "gemma270m-electron-amd-vulkan" },
+    "generatedAtUtc": { "type": "string", "format": "date-time" },
+    "sourcePlan": { "$ref": "#/$defs/ref" },
+    "tuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tupleId", "modelId", "application", "os", "arch", "adapter", "driver", "providers"],
+      "properties": {
+        "tupleId": { "type": "string", "minLength": 1 },
+        "modelId": { "type": "string", "minLength": 1 },
+        "application": { "type": "string", "minLength": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "arch": { "type": "string", "minLength": 1 },
+        "adapter": { "type": "string", "minLength": 1 },
+        "driver": { "type": "string", "minLength": 1 },
+        "providers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["W0", "D0"],
+          "properties": {
+            "W0": { "type": "string", "minLength": 1 },
+            "D0": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "allOf": [
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "identity" } } }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "correctness" } } }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "compatibility" } } }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "reliability" } } }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "performance" } } }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "ownership" } } }, "minContains": 1, "maxContains": 1 }
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "detail", "evidence"],
+        "properties": {
+          "id": { "enum": ["identity", "correctness", "compatibility", "reliability", "performance", "ownership"] },
+          "status": { "enum": ["PASS", "FAIL", "NOT_TESTED", "REJECTED"] },
+          "detail": { "type": "string", "minLength": 1 },
+          "evidence": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/ref" }
+          }
+        }
+      }
+    },
+    "decision": { "enum": ["ACCEPTED", "REJECTED"] }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/hash" }
+      }
+    }
+  }
+}

@@ -71,20 +71,21 @@ class SpirvValGateTests(unittest.TestCase):
             self.assertFalse(ok)
             self.assertIn("invalid magic", msg)
 
-    def test_collect_spv_files_excludes_vendor(self) -> None:
-        """Vendor directory .spv files are excluded from collection."""
+    def test_collect_spv_files_excludes_dependency_trees(self) -> None:
+        """Vendored and third-party .spv files are excluded from collection."""
         with tempfile.TemporaryDirectory(prefix="fawn-spirv-val-gate-") as tmpdir:
             root = Path(tmpdir)
-            # Simulate a non-vendor .spv
             own_spv = root / "own" / "shader.spv"
             own_spv.parent.mkdir(parents=True)
             own_spv.write_bytes(b"\x00" * 20)
+            for directory in ("vendor", "third_party", "node_modules", ".git"):
+                dependency_spv = root / "own" / directory / "bad.spv"
+                dependency_spv.parent.mkdir(parents=True)
+                dependency_spv.write_bytes(b"\xff" * 20)
 
-            # The real collect_spv_files uses VENDOR_DIR constant,
-            # so we just verify the function returns the own file.
-            files = self.module.collect_spv_files([root / "own"])
+            files = self.module.collect_spv_files([root])
             self.assertEqual(len(files), 1)
-            self.assertEqual(files[0].name, "shader.spv")
+            self.assertEqual(files[0], own_spv)
 
     def test_collect_spv_files_deduplicates(self) -> None:
         """Duplicate paths (same resolved location) are deduplicated."""

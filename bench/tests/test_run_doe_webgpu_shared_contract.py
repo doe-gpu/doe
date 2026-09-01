@@ -10,10 +10,31 @@ from bench.tools.run_doe_webgpu_shared_contract import (
     build_receipt,
     export_command,
     kv_cache_evidence,
+    parse_args,
 )
 
 
 class TestRunDoeWebgpuSharedContract(unittest.TestCase):
+    def test_cli_requires_model_neutral_contract_and_output_paths(self) -> None:
+        with self.assertRaises(SystemExit):
+            parse_args([])
+
+        args = parse_args(
+            [
+                "--shared-contract",
+                "contract.json",
+                "--doppler-root",
+                "/workspace/doppler",
+                "--export-out-dir",
+                "export",
+                "--out",
+                "transcript.json",
+            ]
+        )
+        self.assertEqual(args.shared_contract, "contract.json")
+        self.assertEqual(args.export_out_dir, "export")
+        self.assertEqual(args.out, "transcript.json")
+
     def test_export_command_uses_contract_prompt_and_decode(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)

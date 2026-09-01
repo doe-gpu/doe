@@ -66,6 +66,38 @@ fn has_spirv_u32_constant_literal(binary: []const u8, literal: u32) bool {
     return false;
 }
 
+fn has_spirv_f16_constant_literal(binary: []const u8, literal_bits: u16) bool {
+    const word_count = binary.len / 4;
+    var f16_type_id: u32 = 0;
+    var i: usize = 5;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = w & 0xFFFF;
+        const wc = w >> 16;
+        if (op == spirv.Opcode.TypeFloat and wc == 3 and read_u32_le(binary, (i + 2) * 4) == 16) {
+            f16_type_id = read_u32_le(binary, (i + 1) * 4);
+            break;
+        }
+        i += wc;
+    }
+    if (f16_type_id == 0) return false;
+
+    i = 5;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = w & 0xFFFF;
+        const wc = w >> 16;
+        if (op == spirv.Opcode.Constant and wc >= 4 and
+            read_u32_le(binary, (i + 1) * 4) == f16_type_id and
+            @as(u16, @truncate(read_u32_le(binary, (i + 3) * 4))) == literal_bits)
+        {
+            return true;
+        }
+        i += wc;
+    }
+    return false;
+}
+
 fn count_spirv_opcode(binary: []const u8, opcode: u16) u32 {
     const word_count = binary.len / 4;
     var i: usize = 5;
@@ -317,6 +349,68 @@ test "spirv const global: scalar literal emits constant without private variable
 
     try testing.expect(has_spirv_u32_constant_literal(binary, 7));
     try testing.expect(!has_spirv_variable_with_storage_class(binary, spirv.StorageClass.Private));
+}
+
+test "spirv const global: scalar f16 constructor emits typed constant" {
+    const source =
+        \\enable f16;
+        \\const kNegInf = f16(-65504.0);
+        \\@group(0) @binding(0) var<storage, read_write> result: array<f16, 1>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    result[0] = kNegInf;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    const expected_bits: u16 = @bitCast(@as(f16, -65504.0));
+
+    try testing.expect(has_spirv_f16_constant_literal(out[0..len], expected_bits));
+    try testing.expect(!has_spirv_variable_with_storage_class(out[0..len], spirv.StorageClass.Private));
+}
+
+test "spirv assignment: compound shifts lower through parser and IR" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> result: array<u32, 2>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    var right = 8u;
+        \\    right >>= 1u;
+        \\    var left = 1u;
+        \\    left <<= 3u;
+        \\    result[0] = right;
+        \\    result[1] = left;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+
+    try testing.expect(count_spirv_opcode(out[0..len], spirv.Opcode.ShiftRightLogical) > 0);
+    try testing.expect(count_spirv_opcode(out[0..len], spirv.Opcode.ShiftLeftLogical) > 0);
+}
+
+test "spirv storage pointer parameter declares its required capability" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> result: array<u32>;
+        \\
+        \\fn store_value(target: ptr<storage, u32, read_write>, value: u32) {
+        \\    *target = value;
+        \\}
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    store_value(&result[0], 7u);
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+
+    try testing.expect(find_spirv_word_sequence(out[0..len], &.{
+        (@as(u32, 2) << 16) | spirv.Opcode.Capability,
+        spirv.Capability.VariablePointersStorageBuffer,
+    }));
 }
 
 test "spirv private global: variable remains private storage" {

@@ -123,12 +123,14 @@ pub const VulkanFeatureCaps = struct {
     required_subgroup_size_stages: u32 = 0,
     texture_formats_tier1: bool = false,
     texture_formats_tier2: bool = false,
+    variable_pointers_storage_buffer: bool = false,
 };
 
 pub const VulkanFeatureQuery = struct {
     caps: VulkanFeatureCaps = .{},
     enabled_features: c.VkPhysicalDeviceFeatures = std.mem.zeroes(c.VkPhysicalDeviceFeatures),
     enabled_storage16_features: c.VkPhysicalDevice16BitStorageFeatures = init_enabled_storage16_features(),
+    enabled_variable_pointers_features: c.VkPhysicalDeviceVariablePointersFeatures = init_enabled_variable_pointers_features(),
     enabled_subgroup_size_control_features: c.VkPhysicalDeviceSubgroupSizeControlFeatures = init_enabled_subgroup_size_control_features(),
     enabled_vulkan12_features: c.VkPhysicalDeviceVulkan12Features = init_enabled_vulkan12_features(),
 };
@@ -153,6 +155,13 @@ fn init_enabled_storage16_features() c.VkPhysicalDevice16BitStorageFeatures {
     return features;
 }
 
+fn init_enabled_variable_pointers_features() c.VkPhysicalDeviceVariablePointersFeatures {
+    var features = std.mem.zeroes(c.VkPhysicalDeviceVariablePointersFeatures);
+    features.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES;
+    features.pNext = null;
+    return features;
+}
+
 fn init_enabled_subgroup_size_control_features() c.VkPhysicalDeviceSubgroupSizeControlFeatures {
     var features = std.mem.zeroes(c.VkPhysicalDeviceSubgroupSizeControlFeatures);
     features.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES;
@@ -168,7 +177,9 @@ fn init_enabled_vulkan12_features() c.VkPhysicalDeviceVulkan12Features {
 }
 
 pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
+    var raw_variable_pointers_features = init_enabled_variable_pointers_features();
     var raw_storage16_features = init_enabled_storage16_features();
+    raw_storage16_features.pNext = @ptrCast(&raw_variable_pointers_features);
     var raw_subgroup_size_control_features = init_enabled_subgroup_size_control_features();
     raw_subgroup_size_control_features.pNext = @ptrCast(&raw_storage16_features);
     var raw_vulkan12_features = init_enabled_vulkan12_features();
@@ -189,23 +200,9 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
     properties2.pNext = @ptrCast(&subgroup_size_control_properties);
     c.vkGetPhysicalDeviceProperties2(physical_device, &properties2);
 
-    // Explicit override: DOE_DISABLE_SUBGROUPS=1 suppresses the WebGPU
-    // `subgroups` feature advertisement from Doe's Vulkan adapter. This is a
-    // documented, declared workaround for the Doe WGSL translator gap on
-    // subgroup compute builtins; upstream callers (e.g. Doppler) respond by
-    // applying their `removeSubgroups` capability transform. Remove this gate
-    // once `doe_wgsl` compiles the subgroup kernel family.
-    const subgroup_disabled_by_env = blk: {
-        const value = std.posix.getenv("DOE_DISABLE_SUBGROUPS") orelse break :blk false;
-        if (value.len == 0) break :blk false;
-        const first = value[0];
-        break :blk first == '1' or first == 't' or first == 'T' or first == 'y' or first == 'Y';
-    };
-
     const has_shader_f16 = raw_vulkan12_features.shaderFloat16 == c.VK_TRUE and
         raw_storage16_features.storageBuffer16BitAccess == c.VK_TRUE;
-    const has_subgroups = !subgroup_disabled_by_env and
-        subgroup_properties.subgroupSize > 0 and
+    const has_subgroups = subgroup_properties.subgroupSize > 0 and
         (subgroup_properties.supportedStages & c.VK_SHADER_STAGE_COMPUTE_BIT) != 0 and
         (subgroup_properties.supportedOperations & VK_SUBGROUP_REQUIRED_OPERATIONS) == VK_SUBGROUP_REQUIRED_OPERATIONS and
         raw_vulkan12_features.subgroupBroadcastDynamicId == c.VK_TRUE;
@@ -227,6 +224,7 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
         .required_subgroup_size_stages = subgroup_size_control_properties.requiredSubgroupSizeStages,
         .texture_formats_tier1 = supports_all_formats(physical_device, &TIER1_STORAGE_FORMATS, supports_storage_image),
         .texture_formats_tier2 = false,
+        .variable_pointers_storage_buffer = raw_variable_pointers_features.variablePointersStorageBuffer == c.VK_TRUE,
     };
 
     var resolved_caps = caps;
@@ -256,6 +254,9 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
     }
     if (resolved_caps.subgroup_size_control) {
         query_result.enabled_subgroup_size_control_features.subgroupSizeControl = c.VK_TRUE;
+    }
+    if (resolved_caps.variable_pointers_storage_buffer) {
+        query_result.enabled_variable_pointers_features.variablePointersStorageBuffer = c.VK_TRUE;
     }
     return query_result;
 }

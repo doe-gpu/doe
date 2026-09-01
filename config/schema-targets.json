@@ -354,6 +354,22 @@
       "data": "config/wgsl-browser-corpus.json"
     },
     {
+      "schema": "config/wgsl-compiler-coverage-plan.schema.json",
+      "data": "config/wgsl-compiler-coverage-plan.json"
+    },
+    {
+      "schema": "config/wgsl-compiler-coverage-ledger.schema.json",
+      "data": "bench/out/qualification/gemma270m-amd/wgsl-compiler-coverage.json"
+    },
+    {
+      "schema": "config/gemma270m-qualification-dashboard-plan.schema.json",
+      "data": "config/gemma270m-qualification-dashboard-plan.json"
+    },
+    {
+      "schema": "config/gemma270m-qualification-status.schema.json",
+      "data": "bench/out/qualification/gemma270m-amd/status-bundle.json"
+    },
+    {
       "schema": "config/wgsl-corpus-materialization.schema.json",
       "data": "examples/wgsl-corpus-materialization.sample.json"
     },

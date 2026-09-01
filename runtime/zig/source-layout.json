@@ -38,6 +38,7 @@
   ],
   "wgslRootFiles": [
     "CATSCAN.md",
+    "WGSL_COVERAGE.md",
     "WGSL_SUPPORT.md",
     "mod.zig"
   ],
@@ -1251,9 +1252,9 @@
       },
       "src/backend/vulkan/vk_capability_structs.zig": {
         "decision": "Keep",
-        "moduleSha256": "4f16e7d3e183351af21e65de1a639c4c1b85bc01568561718713d52ba1a1e0b3",
+        "moduleSha256": "6b287a152dca819319596bc858a04bcc699ce86e011adc7f5ed63549f71ad5c0",
         "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
       },
       "src/backend/vulkan/vk_command_buffers.zig": {
         "decision": "Keep",
@@ -1263,21 +1264,21 @@
       },
       "src/backend/vulkan/vk_compute_sync.zig": {
         "decision": "Keep",
-        "moduleSha256": "e13b3ecf30db9586ad5fc310b34b5a9130883b735d98eb00564596dd75b54faf",
+        "moduleSha256": "8fa7df3ee586379270ff15bdb54022d6048313e69870474f34ac03d0bcde5ef5",
         "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
       },
       "src/backend/vulkan/vk_constants.zig": {
         "decision": "Keep",
-        "moduleSha256": "c346fbc99b9d7528b6f81ffbc99dafec4471fae84f319fa3e83cc216cd1b2807",
-        "reason": "Keep: reachable backend implementation shared by 21 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "5bd0981093c3485ca1d7b4350bbf2f35c5c9bed02601fa54de086a4c0f159064",
+        "reason": "Keep: reachable backend implementation shared by 22 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
       },
       "src/backend/vulkan/vk_device.zig": {
         "decision": "Keep",
-        "moduleSha256": "11079dec4c0840942af200bfb40b6df0b63e1dfc2ffa0ac10d8f82aca8d1f2e3",
+        "moduleSha256": "756fd4a51fe347b360427783a6084b79e5d3ed1708bcfacc6246d7a150e0db4b",
         "reason": "Keep: reachable backend implementation shared by 11 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-architecture-refactor/2026-08-23"
+        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
       },
       "src/backend/vulkan/vk_device_caps.zig": {
         "decision": "Keep",
@@ -1299,9 +1300,9 @@
       },
       "src/backend/vulkan/vk_feature_caps.zig": {
         "decision": "Keep",
-        "moduleSha256": "2e3af8d281f06146051e9c083bc59523c6d9e7685990c78e6ec1991a7be87b2c",
+        "moduleSha256": "e3cf69a5008e3e5bd420a377fec9f228b07de1d744b3edea780d23695345a9f1",
         "reason": "Keep: reachable backend implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-runtime-correctness-review/2026-08-16"
+        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
       },
       "src/backend/vulkan/vk_feature_probe.zig": {
         "decision": "Keep",
@@ -2061,9 +2062,9 @@
       },
       "src/compiler/wgsl/emit/csl/emit_csl_maps.zig": {
         "decision": "Keep",
-        "moduleSha256": "411750e5463c3108e2825f1c4d83ededbb83718ab1f50a0bb3b141a6a1aae061",
+        "moduleSha256": "aac89a7b1495863163251583bc8d52730639c4a5eb02cd78d8c3d1981f630efd",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig": {
         "decision": "Keep",
@@ -2283,15 +2284,15 @@
       },
       "src/compiler/wgsl/emit/operator_text.zig": {
         "decision": "Keep",
-        "moduleSha256": "a8a4a6e899af927daa0fbeb2e14c494345496854672d391a3e587fca88f0bef9",
-        "reason": "Keep: canonical target-neutral operator spellings shared by the HLSL and MSL emitters.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "moduleSha256": "d98f0a3388c530356b6aa174f2aee3f607e512163df1584926409d2cb9d88976",
+        "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv.zig": {
         "decision": "Keep",
-        "moduleSha256": "d58fb8f25ba42b8cd375355194a7771a46b97099f310e96a67a84f0151264dac",
-        "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "moduleSha256": "2fcca833a49003e898b3d09d2cd94907714dc0387b736b76e9952b6be3ee7134",
+        "reason": "Keep: reachable compiler implementation shared by 5 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig": {
         "decision": "Keep",
@@ -2307,9 +2308,9 @@
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_fn_helpers.zig": {
         "decision": "Keep",
-        "moduleSha256": "5fa427dfd02866b3f3821b5cfdf6e827af27c125c0a061b2a31e826b4fb2c61d",
+        "moduleSha256": "f37bdf4918f32f0937c1ab2b0bb8e6b8b60b474eca1d3cf25cd46fb9273f2a06",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_matrix.zig": {
         "decision": "Keep",
@@ -2343,9 +2344,9 @@
       },
       "src/compiler/wgsl/emit/spirv/spirv_spec.zig": {
         "decision": "Keep",
-        "moduleSha256": "ae519de8d58911090267539fe69a1b99667f2f41b5fb031f48b7bce9ea81bd11",
+        "moduleSha256": "c46fdd2fd6ec257561f264b728669117dbc6bfce1e33e535c36a4db6edb1b140",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-doe-compiler-correctness/2026-09-01"
+        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
       },
       "src/compiler/wgsl/emit/toolchain.zig": {
         "decision": "Keep",
@@ -2361,9 +2362,9 @@
       },
       "src/compiler/wgsl/frontend/lexer.zig": {
         "decision": "Keep",
-        "moduleSha256": "31f3da6950429d384ba6fabf741c7a910941c30dd7fe7d583ecf5b633386879f",
+        "moduleSha256": "4aceabeeac548b00c2c801a2cd0dc9a38a92ca92e89f6c2bc435626cea83a5a2",
         "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/frontend/parser.zig": {
         "decision": "Keep",
@@ -2391,9 +2392,9 @@
       },
       "src/compiler/wgsl/frontend/parser_stmt.zig": {
         "decision": "Keep",
-        "moduleSha256": "930e1e295272b7ba892d7eb136b6d10dbacd6de8f35adb54913d3e19799e8d39",
+        "moduleSha256": "c8f8cddc2a75a8e1b2e2cad3e2823e59ccd484e86380a6277a8fce13e6fc879b",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/frontend/sema.zig": {
         "decision": "Keep",
@@ -2409,9 +2410,9 @@
       },
       "src/compiler/wgsl/frontend/sema_expr.zig": {
         "decision": "Keep",
-        "moduleSha256": "a660118e9b9de5226809fb6d44ea05f815015dc6bdb83d18e4ee0d72e1eebc78",
+        "moduleSha256": "9ff9e4cb232499000ae2ab520572192a880d7cc6eb2130f3e9188911ec67b2b2",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/frontend/sema_helpers.zig": {
         "decision": "Keep",
@@ -2445,21 +2446,21 @@
       },
       "src/compiler/wgsl/frontend/token.zig": {
         "decision": "Keep",
-        "moduleSha256": "8f5b47431dd37246ce29e32093292b76d71691ccdd4fc364acde9799ce283329",
-        "reason": "Keep: reachable compiler implementation shared by 11 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "882a686eb333be897f8138645d7f645da39aa108ddf0ff8e81434479548de7f3",
+        "reason": "Keep: reachable compiler implementation shared by 12 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/ir/ir.zig": {
         "decision": "Keep",
-        "moduleSha256": "af17ee39fe189b629ed621621ccd5fce42e60e22cc42cec4cb0bebfc738d1613",
+        "moduleSha256": "d49f76348e2320c0c0b3c9cfbceec967b9affb2230ab753dab3576a547972dae",
         "reason": "Keep: reachable compiler implementation shared by 97 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-doe-completion/2026-08-24"
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/ir/ir_builder.zig": {
         "decision": "Keep",
-        "moduleSha256": "cbe52f827f0d1b5c707b933889099697b8b07ea2afc65db62b8b5702ed030213",
-        "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "moduleSha256": "c0fa9b9cd46a74777972951322ca4a7fabbc0d8fad11afa75a147c9b2983efc7",
+        "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
       },
       "src/compiler/wgsl/ir/ir_const_eval.zig": {
         "decision": "Keep",
@@ -3519,9 +3520,9 @@
       },
       "src/native/compute/doe_compute_fast_vulkan.zig": {
         "decision": "Keep",
-        "moduleSha256": "d62c0f59798696a947e3180eddf87e9f2944769d0bc4beb0bed5efcad754a108",
+        "moduleSha256": "850717feb79a2d40b1e1df6c6319c3591edc120cac32c685ceebdf83158cf3ac",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
       },
       "src/native/compute/doe_compute_preconditions_native.zig": {
         "decision": "Keep",

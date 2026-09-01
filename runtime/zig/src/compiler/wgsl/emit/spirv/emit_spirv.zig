@@ -226,6 +226,12 @@ pub const Emitter = struct {
         var param_types = std.ArrayListUnmanaged(u32){};
         defer param_types.deinit(self.alloc);
         for (function.params.items) |param| {
+            switch (self.module.types.get(param.ty)) {
+                .ref => |ref_ty| if (ref_ty.addr_space == .storage) {
+                    try self.builder.emit_capability(spirv.Capability.VariablePointersStorageBuffer);
+                },
+                else => {},
+            }
             try param_types.append(self.alloc, try self.lower_param_type(param.ty));
         }
 

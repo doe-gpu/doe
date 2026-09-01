@@ -36,6 +36,8 @@ pub fn analyze_assignment_value_type(
         .amp_eq => .@"&",
         .pipe_eq => .@"|",
         .caret_eq => .@"^",
+        .shift_left_eq => .shift_left,
+        .shift_right_eq => .shift_right,
         else => return error.InvalidWgsl,
     };
     return analyze_binary_type(self, lhs_ty, rhs_ty, binary_op);

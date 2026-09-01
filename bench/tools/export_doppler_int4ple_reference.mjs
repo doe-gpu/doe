@@ -337,6 +337,7 @@ async function loadDopplerModules(dopplerRoot) {
     sampling,
     bufferPool,
     harnessText,
+    tooling,
   ] = await Promise.all([
     importDopplerModule(dopplerRoot, 'src/config/runtime.js'),
     importDopplerModule(dopplerRoot, 'src/inference/test-harness.js'),
@@ -352,6 +353,7 @@ async function loadDopplerModules(dopplerRoot) {
       dopplerRoot,
       'src/inference/browser-harness-text-helpers.js'
     ),
+    importDopplerModule(dopplerRoot, 'src/tooling-exports.shared.js'),
   ]);
   return {
     getRuntimeConfig: runtime.getRuntimeConfig,
@@ -364,6 +366,8 @@ async function loadDopplerModules(dopplerRoot) {
     sample: sampling.sample,
     releaseBuffer: bufferPool.releaseBuffer,
     captureKvCacheByteProof: harnessText.captureKvCacheByteProof,
+    buildModelCheckpointEvidence: tooling.buildModelCheckpointEvidence,
+    flattenModelCheckpointDigests: tooling.flattenModelCheckpointDigests,
   };
 }
 
@@ -729,6 +733,133 @@ async function buildDecodeTranscript(options) {
   };
 }
 
+function assertSameTokenIds(expected, actual) {
+  if (expected.length !== actual.length) {
+    throw new Error(
+      `diagnostic checkpoint token count mismatch: expected ${expected.length}, received ${actual.length}`
+    );
+  }
+  for (let index = 0; index < expected.length; index += 1) {
+    if (expected[index] !== actual[index]) {
+      throw new Error(
+        `diagnostic checkpoint token mismatch at step ${index}: expected ${expected[index]}, received ${actual[index]}`
+      );
+    }
+  }
+}
+
+async function captureModelCheckpoints(options) {
+  const {
+    modules,
+    pipeline,
+    prompt,
+    useChatTemplate,
+    decodeSteps,
+    samplingConfig,
+    expectedTokenIds,
+    expectedKvCacheByteProof,
+  } = options;
+  if (decodeSteps <= 0) return null;
+
+  pipeline.reset();
+  const generationOptions = {
+    maxTokens: decodeSteps,
+    temperature: samplingConfig.temperature,
+    topK: samplingConfig.topK,
+    topP: samplingConfig.topP,
+    repetitionPenalty: samplingConfig.repetitionPenalty,
+    useChatTemplate,
+    diagnostics: {
+      enabled: true,
+      captureConfig: {
+        defaultLevel: 'full',
+        targetLevel: 'full',
+      },
+    },
+  };
+  if (samplingConfig.seed !== null) {
+    generationOptions.seed = samplingConfig.seed;
+  }
+  const generation = await pipeline.generateTokenIds(prompt, generationOptions);
+  const generatedTokenIds = normalizeTokens(generation?.tokenIds);
+  assertSameTokenIds(expectedTokenIds, generatedTokenIds);
+
+  const kvCacheByteProof = await modules.captureKvCacheByteProof(pipeline, true);
+  if (
+    expectedKvCacheByteProof?.digest
+    && kvCacheByteProof?.digest !== expectedKvCacheByteProof.digest
+  ) {
+    throw new Error(
+      'diagnostic checkpoint KV digest differs from the governed prefill/decode transcript'
+    );
+  }
+  const evidence = modules.buildModelCheckpointEvidence({
+    operatorDiagnostics: generation?.stats?.operatorDiagnostics ?? null,
+    kvCacheByteProof,
+    expectedStepCount: decodeSteps,
+    minimumDecodeSteps: 2,
+  });
+  if (!evidence || evidence.status !== 'complete') {
+    const stepMissing = evidence?.steps
+      ?.filter((step) => step.missing.length > 0)
+      .map((step) => `${step.phase}[${step.stepIndex}]=${step.missing.join(',')}`)
+      .join('; ');
+    throw new Error(
+      `full-model checkpoint evidence is incomplete: ${(evidence?.blockers ?? ['missing evidence']).join('; ')}`
+      + (stepMissing ? `; ${stepMissing}` : '')
+    );
+  }
+  const checkpointDigests = modules.flattenModelCheckpointDigests(evidence).map((entry) => ({
+    stage: entry.stage,
+    phase: entry.phase,
+    stepIndex: entry.stepIndex,
+    digest: entry.digest,
+    recordCount: entry.recordCount,
+  }));
+  return {
+    evidence,
+    checkpointDigests,
+    kvCacheByteProof,
+  };
+}
+
+function materializeModelCheckpointValues(evidence, valuesPath) {
+  const chunks = [];
+  let byteOffset = 0;
+  for (const step of evidence.steps) {
+    for (const checkpoint of Object.values(step.checkpoints)) {
+      for (const record of checkpoint.records) {
+        if (!Array.isArray(record.data)) {
+          throw new Error(
+            `checkpoint ${checkpoint.stage} ${record.opId ?? 'unknown'} has no full tensor data`
+          );
+        }
+        const values = Float32Array.from(record.data);
+        const bytes = Buffer.from(values.buffer, values.byteOffset, values.byteLength);
+        record.dataArtifact = {
+          path: path.basename(valuesPath),
+          dtype: 'float32',
+          byteOffset,
+          byteLength: bytes.byteLength,
+          elementCount: values.length,
+          sha256: sha256Bytes(bytes),
+        };
+        delete record.data;
+        chunks.push(bytes);
+        byteOffset += bytes.byteLength;
+      }
+    }
+  }
+  const output = Buffer.concat(chunks, byteOffset);
+  writeFileSync(valuesPath, output);
+  return {
+    path: repoRelative(valuesPath),
+    sha256: sha256File(valuesPath),
+    byteLength: output.byteLength,
+    recordCount: chunks.length,
+  };
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   if (args.help) {
@@ -758,7 +889,11 @@ async function main() {
       await modules.applyRuntimeProfile(args.runtimeProfile);
     }
 
-    const bootstrap = await modules.bootstrapNodeWebGPU();
+    const providerContractModule =
+      process.env.DOE_DOPPLER_QUALIFICATION_PROVIDER_CONTRACT?.trim() || undefined;
+    const bootstrap = await modules.bootstrapNodeWebGPU(
+      providerContractModule === undefined ? {} : { providerContractModule }
+    );
     if (!bootstrap?.ok) {
       throw new Error(
         `WebGPU bootstrap failed: ${bootstrap?.detail ?? 'unknown error'}`
@@ -785,6 +920,8 @@ async function main() {
     const logitsPath = path.join(outDir, 'final_logits.f32');
     const generatedTokensPath = path.join(outDir, 'generated_tokens.u32');
     const transcriptPath = path.join(outDir, 'decode_transcript.json');
+    const modelCheckpointsPath = path.join(outDir, 'model_checkpoints.json');
+    const modelCheckpointValuesPath = path.join(outDir, 'model_checkpoint_values.f32');
     const executionGraphPath = path.join(outDir, 'execution_graph.json');
     const receiptPath = path.join(
       outDir,
@@ -857,11 +994,35 @@ async function main() {
       samplingConfig,
       manifestEosTokenIds: manifest?.eos_token_id,
     });
-    const kvCacheByteProof = await modules.captureKvCacheByteProof(
+    const transcriptKvCacheByteProof = await modules.captureKvCacheByteProof(
       harness.pipeline,
       true
     );
+    const decodedTranscript = decodeTranscript
+      ? JSON.parse(readFileSync(transcriptPath, 'utf8'))
+      : null;
+    const modelCheckpointCapture = await captureModelCheckpoints({
+      modules,
+      pipeline: harness.pipeline,
+      prompt: args.prompt,
+      useChatTemplate: args.useChatTemplate,
+      decodeSteps: args.decodeSteps,
+      samplingConfig,
+      expectedTokenIds: decodedTranscript?.generatedTokenIds ?? [],
+      expectedKvCacheByteProof: transcriptKvCacheByteProof,
+    });
+    const kvCacheByteProof = modelCheckpointCapture?.kvCacheByteProof
+      ?? transcriptKvCacheByteProof;
     const kvCacheEvidence = buildKvCacheEvidence(kvCacheByteProof);
+    const modelCheckpointValues = modelCheckpointCapture
+      ? materializeModelCheckpointValues(
+        modelCheckpointCapture.evidence,
+        modelCheckpointValuesPath
+      )
+      : null;
+    if (modelCheckpointCapture) {
+      writeJson(modelCheckpointsPath, modelCheckpointCapture.evidence);
+    }
     const stats = harness.pipeline.getStats?.() ?? {};
     const receipt = {
       schemaVersion: 1,
@@ -905,10 +1066,24 @@ async function main() {
         byteLength: logits.byteLength,
         preview: Array.from(logits.slice(0, PREVIEW_LIMIT)),
       },
+      checkpointDigests: modelCheckpointCapture?.checkpointDigests ?? [],
+      modelCheckpointEvidence: modelCheckpointCapture
+        ? {
+          status: modelCheckpointCapture.evidence.status,
+          path: repoRelative(modelCheckpointsPath),
+          sha256: sha256File(modelCheckpointsPath),
+          stepCount: modelCheckpointCapture.evidence.stepCount,
+          decodeStepCount: modelCheckpointCapture.evidence.decodeStepCount,
+          capturedStages: modelCheckpointCapture.evidence.capturedStages,
+          values: modelCheckpointValues,
+        }
+        : null,
       kvCacheEvidence,
       ...(decodeTranscript ? { decodeTranscript } : {}),
       producer: {
-        runtime: 'doppler_node_webgpu',
+        runtime: process.versions.electron
+          ? 'doppler_electron_main_process_webgpu'
+          : 'doppler_node_webgpu',
         toolPath: repoRelative(SCRIPT_PATH),
         dopplerRoot,
         runtimeProfile: args.runtimeProfile,
@@ -917,6 +1092,7 @@ async function main() {
         kernelPathSource:
           stats.kernelPathSource ?? harness.pipeline.kernelPathSource ?? null,
         nodeVersion: process.version,
+        electronVersion: process.versions.electron ?? null,
         emittedAt: new Date().toISOString(),
       },
       inputsSynthetic: false,

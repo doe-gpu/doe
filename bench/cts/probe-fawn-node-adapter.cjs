@@ -1,4 +1,6 @@
-const provider = require('./fawn-node-gpu-provider.cjs');
+const providerPath = process.env.DOE_CTS_PROBE_PROVIDER || './fawn-node-gpu-provider.cjs';
+const provider = require(providerPath);
+const providerId = process.env.DOE_CTS_PROBE_PROVIDER_ID || 'fawn-node-gpu-provider';
 
 const ADAPTER_INFO_FIELDS = Object.freeze([
   'vendor',
@@ -29,7 +31,7 @@ function snapshotAdapterInfo(adapterInfo) {
 }
 
 async function main() {
-  const adapter = await provider.create().requestAdapter();
+  const adapter = await provider.create([]).requestAdapter();
   if (!adapter) {
     throw new Error('Doe CTS provider returned no adapter');
   }
@@ -38,7 +40,7 @@ async function main() {
   console.log(JSON.stringify({
     schemaVersion: 1,
     artifactKind: 'webgpu_cts_adapter_identity',
-    provider: 'fawn-node-gpu-provider',
+    provider: providerId,
     adapterInfo,
   }));
   device?.destroy?.();

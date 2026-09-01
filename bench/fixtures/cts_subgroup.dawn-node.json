@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "workdir": "bench/vendor/dawn/third_party/webgpu-cts",
+  "commandTemplate": "env DOE_CTS_DAWN_PROVIDER_TARGET={repo_root}/../doppler/node_modules/webgpu/index.js node tools/run_node --gpu-provider {repo_root}/bench/cts/dawn-node-gpu-provider.cjs {query}",
+  "requireTextSummary": true,
+  "identityProbe": {
+    "commandTemplate": "env DOE_CTS_DAWN_PROVIDER_TARGET={repo_root}/../doppler/node_modules/webgpu/index.js DOE_CTS_PROBE_PROVIDER={repo_root}/bench/cts/dawn-node-gpu-provider.cjs DOE_CTS_PROBE_PROVIDER_ID=dawn-node-gpu-provider node {repo_root}/bench/cts/probe-fawn-node-adapter.cjs",
+    "required": true
+  },
+  "requiredPaths": [
+    "node_modules/ts-node",
+    "node_modules/typescript"
+  ],
+  "requirementsNote": "The pinned WebGPU CTS submodule, governed Dawn package, and npm dependencies must be materialized.",
+  "queries": [
+    {
+      "id": "subgroup_add_uniform_u32",
+      "bucket": "subgroup_execution",
+      "query": "webgpu:shader,execution,expression,call,builtin,subgroupAdd:data_types:type=%22u32%22",
+      "notes": "Uniform integer reduction and scan execution across the CTS workgroup-size matrix."
+    },
+    {
+      "id": "subgroup_add_predicated",
+      "bucket": "subgroup_execution",
+      "query": "webgpu:shader,execution,expression,call,builtin,subgroupAdd:compute,split:*",
+      "notes": "Active-invocation semantics for subgroup reductions and scans."
+    }
+  ]
+}

@@ -116,6 +116,7 @@ pub fn create_device_and_queue(self: anytype) !void {
     );
     var feature_query = vk_feature_caps.query(self.physical_device);
     if (!feature_query.caps.robust_buffer_access) return error.UnsupportedFeature;
+    feature_query.enabled_storage16_features.pNext = @ptrCast(&feature_query.enabled_variable_pointers_features);
     const enable_subgroup_size_control = subgroup_size_control_available and feature_query.caps.subgroup_size_control;
     if (enable_subgroup_size_control) {
         feature_query.enabled_subgroup_size_control_features.pNext = @ptrCast(&feature_query.enabled_storage16_features);

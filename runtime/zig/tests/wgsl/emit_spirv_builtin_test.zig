@@ -632,6 +632,36 @@ test "spirv builtin: subgroupShuffle produces valid SPIR-V" {
     try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
 }
 
+test "spirv builtin: mixed plain and subgroup entry points preserve inner scope" {
+    const source =
+        \\enable subgroups;
+        \\@group(0) @binding(0) var<storage, read_write> buf: array<f32>;
+        \\@compute @workgroup_size(64)
+        \\fn main_plain(@builtin(local_invocation_index) lane: u32) {
+        \\    buf[lane] = buf[lane] + 1.0;
+        \\}
+        \\@compute @workgroup_size(64)
+        \\fn main_subgroup(
+        \\    @builtin(local_invocation_index) lane: u32,
+        \\    @builtin(subgroup_size) subgroup_size: u32,
+        \\) {
+        \\    let subgroup_count = (64u + subgroup_size - 1u) / subgroup_size;
+        \\    let sum = subgroupAdd(buf[lane]);
+        \\    if (lane == 0u) {
+        \\        var total = sum;
+        \\        for (var index = 1u; index < subgroup_count; index = index + 1u) {
+        \\            total = total + f32(index);
+        \\        }
+        \\        buf[0] = total;
+        \\    }
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try testing.expectEqual(@as(u32, 2), count_spirv_opcode(out[0..len], spirv.Opcode.EntryPoint));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.GroupNonUniformFAdd));
+}
+
 test "spirv builtin: workgroupBarrier produces valid SPIR-V" {
     const source =
         \\var<workgroup> shared: array<f32, 64>;

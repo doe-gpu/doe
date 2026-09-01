@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "32",
+  "registryRevision": "33",
   "scoringPolicyVersion": "1.0.0",
   "promotionPolicyVersion": "1.1.0",
   "evaluationQueue": [
@@ -53,6 +53,13 @@
       "actorId": "electronicarts-cpp-ml-intro",
       "plannedHarnessIds": [
         "mnist-webgpu-demo"
+      ]
+    },
+    {
+      "position": 8,
+      "actorId": "doppler",
+      "plannedHarnessIds": [
+        "gemma270m-electron"
       ]
     }
   ],
@@ -1380,6 +1387,93 @@
       ],
       "claimIndexRefs": [],
       "lastReviewedAt": "2026-08-16T04:57:56Z"
+    },
+    {
+      "id": "doppler",
+      "name": "Doppler",
+      "type": "project",
+      "organization": "clocksmith",
+      "source": {
+        "repositoryUrl": "https://github.com/clocksmith/doppler",
+        "upstreamCommit": "7e267f657d35ff64f808a4a93e2156a2c238b3f6",
+        "commitVerifiedAt": "2026-09-01T14:47:22Z",
+        "license": {
+          "identifier": "MIT",
+          "evidenceUrl": "https://github.com/clocksmith/doppler/blob/7e267f657d35ff64f808a4a93e2156a2c238b3f6/LICENSE",
+          "verifiedAt": "2026-09-01T14:47:22Z"
+        }
+      },
+      "engagementStatus": "harness-ready",
+      "evidenceMaturity": "source-only",
+      "adoptionStage": "none",
+      "promotionStatus": "not-promoted",
+      "observations": [
+        {
+          "id": "gemma270m-q4-electron-workload",
+          "summary": "The pinned Doppler source contains a complete Gemma 3 270M Q4 artifact whose manifest binds the model shards, tokenizer, execution graph, shader entries, and decode-capable WebGPU pipeline used by the Electron qualification harness.",
+          "evidenceUrl": "https://github.com/clocksmith/doppler/blob/7e267f657d35ff64f808a4a93e2156a2c238b3f6/models/local/gemma-3-270m-it-q4k-ehf16-af32/manifest.json",
+          "observedAt": "2026-09-01T14:47:22Z"
+        }
+      ],
+      "scoreHistory": [
+        {
+          "revisionId": "gemma270m-electron-harness-review",
+          "recordedAt": "2026-09-01T14:47:22Z",
+          "reviewer": "codex",
+          "reviewStatus": "provisional",
+          "registryRevision": "33",
+          "scoringPolicyVersion": "1.0.0",
+          "changedByObservationRefs": [
+            "gemma270m-q4-electron-workload"
+          ],
+          "doeLeverage": {
+            "score": 5,
+            "reasons": [
+              {
+                "summary": "The frozen full-model Electron workload can exercise Doe correctness, subgroup compilation, lifecycle, evidence, and application-level performance against governed Dawn on the named AMD Vulkan tuple.",
+                "observationRefs": [
+                  "gemma270m-q4-electron-workload"
+                ]
+              }
+            ]
+          },
+          "existingCapabilityCoverage": {
+            "score": 5,
+            "reasons": [
+              {
+                "summary": "Doppler already owns the model artifact, tokenizer, WebGPU execution graph, shader selection, inference orchestration, and prefill/decode surface needed by the application contract.",
+                "observationRefs": [
+                  "gemma270m-q4-electron-workload"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "harnesses": [
+        {
+          "id": "gemma270m-electron",
+          "status": "ready",
+          "manifestPath": "bench/external-projects/doppler/gemma270m-electron.harness.json",
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "performance",
+            "installation",
+            "diagnosis",
+            "compatibility"
+          ],
+          "oracle": {
+            "status": "reviewed",
+            "observationRefs": [
+              "gemma270m-q4-electron-workload"
+            ]
+          }
+        }
+      ],
+      "reviewedReports": [],
+      "claimIndexRefs": [],
+      "lastReviewedAt": "2026-09-01T14:47:22Z"
     },
     {
       "id": "dawn-node-webgpu",

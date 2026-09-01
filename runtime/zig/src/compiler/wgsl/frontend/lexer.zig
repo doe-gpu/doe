@@ -70,12 +70,18 @@ pub const Lexer = struct {
                 return self.single(.@"|");
             },
             '<' => {
-                if (self.peek(1) == '<') return self.double(.shift_left);
+                if (self.peek(1) == '<') {
+                    if (self.peek(2) == '=') return self.triple(.shift_left_eq);
+                    return self.double(.shift_left);
+                }
                 if (self.peek(1) == '=') return self.double(.lte);
                 return self.single(.@"<");
             },
             '>' => {
-                if (self.peek(1) == '>') return self.double(.shift_right);
+                if (self.peek(1) == '>') {
+                    if (self.peek(2) == '=') return self.triple(.shift_right_eq);
+                    return self.double(.shift_right);
+                }
                 if (self.peek(1) == '=') return self.double(.gte);
                 return self.single(.@">");
             },
@@ -114,6 +120,12 @@ pub const Lexer = struct {
     fn double(self: *Lexer, tag: Tag) Token {
         const start = self.pos;
         self.pos += 2;
+        return .{ .tag = tag, .loc = .{ .start = start, .end = self.pos } };
+    }
+
+    fn triple(self: *Lexer, tag: Tag) Token {
+        const start = self.pos;
+        self.pos += 3;
         return .{ .tag = tag, .loc = .{ .start = start, .end = self.pos } };
     }
 
@@ -295,12 +307,12 @@ test "lex number literals" {
 }
 
 test "lex compound operators" {
-    var lex = Lexer.init("-> += -= *= /= %= &= |= ^= << >> <= >= == != && ||");
+    var lex = Lexer.init("-> += -= *= /= %= &= |= ^= << >> <<= >>= <= >= == != && ||");
     const expected = [_]Tag{
-        .arrow,       .plus_eq, .minus_eq, .star_eq,  .slash_eq,
-        .percent_eq,  .amp_eq,  .pipe_eq,  .caret_eq, .shift_left,
-        .shift_right, .lte,     .gte,      .eq_eq,    .not_eq,
-        .and_and,     .or_or,   .eof,
+        .arrow,       .plus_eq,       .minus_eq,       .star_eq,  .slash_eq,
+        .percent_eq,  .amp_eq,        .pipe_eq,        .caret_eq, .shift_left,
+        .shift_right, .shift_left_eq, .shift_right_eq, .lte,      .gte,
+        .eq_eq,       .not_eq,        .and_and,        .or_or,    .eof,
     };
     for (expected) |exp| {
         try std.testing.expectEqual(exp, lex.next().tag);

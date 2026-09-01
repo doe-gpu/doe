@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 4,
+  "artifactKind": "external-project-harness",
+  "actorId": "doppler",
+  "harnessId": "gemma270m-electron",
+  "upstream": {
+    "repositoryUrl": "https://github.com/clocksmith/doppler",
+    "commit": "7e267f657d35ff64f808a4a93e2156a2c238b3f6",
+    "license": {
+      "identifier": "MIT",
+      "evidenceUrl": "https://github.com/clocksmith/doppler/blob/7e267f657d35ff64f808a4a93e2156a2c238b3f6/LICENSE"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "The Electron main process sets Doppler's declared Node WebGPU provider module to a hash-bound W0 or D0 wrapper; Doppler model, application, prompt, tokenizer, manifest shader graph, synchronization, readback, and decode request remain unchanged.",
+    "patchPaths": []
+  },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "persistent-performance-control",
+    "incumbentLimitation": "Governed Dawn preserves execution evidence but may leave Electron Gemma prefill or decode latency, tail behavior, memory, or lifecycle outcomes above the frozen application boundary.",
+    "applicationConsequence": "The Electron application pays the losing provider's full model-load, translation, pipeline, upload, prefill, decode, readback, and teardown costs on every corresponding cold or retained-device operation.",
+    "materialOutcome": {
+      "metric": "oracle-valid end-to-end Electron TTFT, prefill, decode, memory, failure, and tail distributions",
+      "decisionRule": "DoeRuntime earns ownership only when D0 preserves all blocking checkpoint, KV, provider, and fallback gates and materially beats W0 plus every eligible bounded P0 correction under the unchanged contract."
+    },
+    "lanes": {
+      "I0": {
+        "requirement": "required",
+        "construction": "The pinned Doppler application with its ambient WebGPU provider and no DoeProof interpretation."
+      },
+      "I1": {
+        "requirement": "required",
+        "construction": "The exact webgpu package resolved by the pinned Doppler lockfile under Electron 43.4.0."
+      },
+      "W0": {
+        "requirement": "required",
+        "construction": "I1 under the hash-bound model, shader, prompt, provider, checkpoint, KV, timing, hardware, receipt, and replay contract."
+      },
+      "D0": {
+        "requirement": "required",
+        "construction": "DoeRuntime under the same Electron application and complete W0 contract."
+      },
+      "P0": {
+        "requirement": "conditional",
+        "construction": "Every credible bounded Dawn or application correction identified from the losing W0 phase, required before D0 receives material-win credit."
+      }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "application-exceptions",
+      "regression-support"
+    ]
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": [
+      "cpu",
+      "mock",
+      "software-renderer",
+      "unknown-provider"
+    ],
+    "providerIdentityAssertion": "W0 and D0 must load their exact hash-bound wrapper and provider target, bind Radeon 8060S Graphics through RADV on Mesa 26.0.3, and reject CPU, mock, software, unknown, or capability-removal substitution."
+  },
+  "workload": {
+    "command": [
+      "node",
+      "bench/external-projects/doppler/run-gemma270m-electron.mjs"
+    ],
+    "immutableInputRefs": [
+      "bench/external-projects/doppler/prompt.txt",
+      "bench/external-projects/doppler/electron-app/package.json",
+      "bench/external-projects/doppler/electron-app/main.mjs",
+      "bench/external-projects/doppler/provider-dawn.mjs",
+      "bench/external-projects/doppler/provider-doe.mjs",
+      "bench/external-projects/doppler/oracle.md",
+      "bench/external-projects/doppler/oracle.mjs",
+      "bench/external-projects/doppler/run-gemma270m-electron.mjs"
+    ],
+    "oracle": {
+      "kind": "independent-replacement",
+      "path": "bench/external-projects/doppler/oracle.md",
+      "reviewStatus": "reviewed"
+    },
+    "modelContract": {
+      "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+      "artifactSource": {
+        "project": "doppler",
+        "path": "models/local/gemma-3-270m-it-q4k-ehf16-af32",
+        "origin": {
+          "path": "origin.json",
+          "sha256": "4e1d26c6502080a66c14169f5b289d43b67991bc3096d4f230e2aa82d44a1bcc"
+        }
+      },
+      "manifest": {
+        "path": "models/local/gemma-3-270m-it-q4k-ehf16-af32/manifest.json",
+        "sha256": "230104df762ff394095326d8e9fa4dc144d431bbd61ad5139e1030e66836ab78"
+      },
+      "tokenizer": {
+        "path": "models/local/gemma-3-270m-it-q4k-ehf16-af32/tokenizer.json",
+        "sha256": "be6955513a2509d69d18e82180c2a477ad99358d15212fb81d957566d8186075"
+      },
+      "shaderIdentity": {
+        "source": "manifest.inference.execution.kernels",
+        "sha256": "04e0e534f6d70514eb95678ee5df46f4f709c05c15df022ff398f6a7c99d9cb8"
+      },
+      "application": {
+        "runtime": "electron",
+        "version": "43.4.0",
+        "mode": "main-process-node-side",
+        "package": {
+          "path": "bench/external-projects/doppler/electron-app/package.json",
+          "sha256": "90055f8e8345cd547166e6f29671333b8951e229626d95adbb136af45cf75e96"
+        },
+        "entrypoint": {
+          "path": "bench/external-projects/doppler/electron-app/main.mjs",
+          "sha256": "354b5921dcb928025250b50260559c8c6e86c251239ada16b67ec8951b3c4169"
+        }
+      },
+      "prompt": {
+        "path": "bench/external-projects/doppler/prompt.txt",
+        "sha256": "6bb1d580b99f0f1893b64f3b11d7c12c66ef869b64b6aeb2517ee30a776f56bf"
+      },
+      "providerContract": {
+        "path": "packages/doe-gpu/src/node-webgpu.js",
+        "sha256": "171a4b0894f1f352dfabd9a230e873c5f90da64b54bc2b5aa3026e59bb17d85e"
+      },
+      "execution": {
+        "decodeSteps": 4,
+        "useChatTemplate": false,
+        "runtimeProfile": "profiles/production",
+        "kernelPathPolicy": {
+          "mode": "locked",
+          "sourceScope": [
+            "model",
+            "manifest",
+            "config"
+          ],
+          "onIncompatible": "error"
+        },
+        "sampling": {
+          "temperature": 0,
+          "topK": 1,
+          "topP": 1,
+          "repetitionPenalty": 1,
+          "seed": 0
+        },
+        "checkpointStages": [
+          "embedding",
+          "rmsnorm",
+          "qkv",
+          "rope",
+          "attention",
+          "kv",
+          "mlp",
+          "logits"
+        ],
+        "tolerance": {
+          "metric": "abs-or-relative",
+          "atol": 0.001,
+          "rtol": 0
+        }
+      },
+      "providers": {
+        "W0": {
+          "id": "dawn-node-webgpu",
+          "wrapper": {
+            "path": "bench/external-projects/doppler/provider-dawn.mjs",
+            "sha256": "61422ded8d5d3334dbe568be23a6ca3e41631a157ade8f4bf0132465c68a8d33"
+          },
+          "targetRoot": "upstream",
+          "target": {
+            "path": "node_modules/webgpu/index.js",
+            "sha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4"
+          }
+        },
+        "D0": {
+          "id": "doe-gpu",
+          "wrapper": {
+            "path": "bench/external-projects/doppler/provider-doe.mjs",
+            "sha256": "b0b32da0a28f612b7d17531dbe9ae1d5917fa8c7caeddd5a30ea66dfa4d3809f"
+          },
+          "targetRoot": "repo",
+          "target": {
+            "path": "packages/doe-gpu/src/compute.js",
+            "sha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7"
+          }
+        }
+      }
+    },
+    "sameWorkPolicy": "W0 and D0 execute the same Q4 shards, manifest-selected subgroup shader entries, exact prompt and tokenizer, four greedy decode steps, command boundaries, synchronization, readback, checkpoints, Electron main-process application, and AMD Vulkan tuple.",
+    "completionBoundary": "A lane completes only after the final decode logits and non-zero KV state are read back, all required checkpoint digests are emitted, the provider is released, Electron exits cleanly, and the independent oracle has evaluated every decode step."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "provider-factory",
+    "productionStatus": "harness-only",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "installSteps": [
+      {
+        "id": "doppler-dependencies",
+        "command": [
+          "npm",
+          "ci",
+          "--include=optional"
+        ],
+        "workingDirectory": {
+          "scope": "upstream",
+          "path": "."
+        },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "electron-runtime",
+        "command": [
+          "npm",
+          "install",
+          "--no-save",
+          "--package-lock=false",
+          "electron@43.4.0"
+        ],
+        "workingDirectory": {
+          "scope": "upstream",
+          "path": "."
+        },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "electron-binary",
+        "command": [
+          "node",
+          "node_modules/electron/install.js"
+        ],
+        "workingDirectory": {
+          "scope": "upstream",
+          "path": "."
+        },
+        "timeoutSeconds": 1800
+      }
+    ],
+    "validationCommand": [
+      "node",
+      "tools/run-node-tests.js",
+      "tests/inference/gemma3-270m-head256-decode-path.test.js"
+    ],
+    "timeoutSeconds": 7200
+  },
+  "reproduction": {
+    "providerModulePath": "bench/external-projects/doppler/provider-doe.mjs",
+    "arguments": [
+      "--run-id",
+      "{runId}",
+      "--upstream-root",
+      "{upstreamRoot}",
+      "--preparation-receipt",
+      "{preparationReceipt}",
+      "--out",
+      "{runRoot}/result.json"
+    ],
+    "evidenceFiles": [
+      {
+        "id": "qualification-result",
+        "path": "result.json"
+      },
+      {
+        "id": "checkpoint-oracle",
+        "path": "oracle.json"
+      },
+      {
+        "id": "w0-transcript",
+        "path": "lanes/W0/doppler_int4ple_reference_export.json"
+      },
+      {
+        "id": "d0-transcript",
+        "path": "lanes/D0/doppler_int4ple_reference_export.json"
+      }
+    ]
+  },
+  "supportTargets": [
+    {
+      "id": "linux-x64-radeon-8060s-radv-26-0-3-electron-43-4-0",
+      "os": "linux",
+      "arch": "x86_64",
+      "runtime": "electron-43.4.0",
+      "adapter": "Radeon 8060S Graphics",
+      "driver": "Mesa 26.0.3",
+      "status": "validated"
+    }
+  ],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 1,
+    "concurrencyLevel": 1,
+    "concurrencyRunsPerProvider": 0,
+    "teardownCyclesPerProvider": 0,
+    "stressIterationsPerProvider": 0,
+    "processTimeoutSeconds": 7200,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "Electron main-process launch through model load, prefill, four decode steps, final readback, provider release, and clean process exit",
+    "coldSamplesPerProvider": 1,
+    "warmupSamplesPerProvider": 0,
+    "warmSamplesPerProvider": 1,
+    "requiredPercentiles": [
+      "p50",
+      "p95",
+      "p99"
+    ],
+    "throughputMetric": "oracle-valid decode tokens per second",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": true,
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "not-promoted",
+    "blocking": false,
+    "command": [
+      "node",
+      "bench/external-projects/doppler/run-gemma270m-electron.mjs"
+    ],
+    "promotionReportIds": []
+  }
+}

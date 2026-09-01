@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schema/wgsl-compiler-coverage-plan.schema.json",
+  "title": "Doe WGSL compiler coverage plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "ledgerId",
+    "claimScope",
+    "upstreamCommit",
+    "testCommands",
+    "spirvValidator",
+    "admittedShaders",
+    "ctsReports",
+    "workarounds",
+    "supportViewPath"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "artifactKind": { "const": "wgsl_compiler_coverage_plan" },
+    "ledgerId": { "$ref": "#/$defs/id" },
+    "claimScope": { "const": "amd_vulkan_gemma270m_admitted_compute" },
+    "upstreamCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "testCommands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "workdir", "command"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "workdir": { "$ref": "#/$defs/path" },
+          "command": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "spirvValidator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["emitterPath", "validatorPath", "reportPath", "reportSha256"],
+      "properties": {
+        "emitterPath": { "$ref": "#/$defs/path" },
+        "validatorPath": { "$ref": "#/$defs/path" },
+        "reportPath": { "$ref": "#/$defs/path" },
+        "reportSha256": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "admittedShaders": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "sha256"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "path": { "$ref": "#/$defs/path" },
+          "sha256": { "$ref": "#/$defs/hash" }
+        }
+      }
+    },
+    "ctsReports": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["lane", "path", "sha256", "requiredQueryIds"],
+        "properties": {
+          "lane": { "enum": ["W0", "D0"] },
+          "path": { "$ref": "#/$defs/path" },
+          "sha256": { "$ref": "#/$defs/hash" },
+          "requiredQueryIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/id" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "contains": { "properties": { "lane": { "const": "W0" } }, "required": ["lane"] },
+          "minContains": 1
+        },
+        {
+          "contains": { "properties": { "lane": { "const": "D0" } }, "required": ["lane"] },
+          "minContains": 1
+        }
+      ]
+    },
+    "workarounds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "forbiddenPattern", "searchPaths"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "forbiddenPattern": { "type": "string", "minLength": 1 },
+          "searchPaths": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/path" }
+          }
+        }
+      }
+    },
+    "supportViewPath": { "$ref": "#/$defs/path" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+    "path": { "type": "string", "minLength": 1 },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

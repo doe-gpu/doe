@@ -53,6 +53,8 @@ pub fn assignOpText(op: ir.AssignOp) []const u8 {
         .bit_and => "&=",
         .bit_or => "|=",
         .bit_xor => "^=",
+        .shift_left => "<<=",
+        .shift_right => ">>=",
     };
 }
 

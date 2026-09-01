@@ -2,6 +2,10 @@
 
 Quick-reference for doe_wgsl backend and feature status.
 
+The machine-generated qualification verdict for the admitted Gemma 270M AMD
+Vulkan compute corpus is in [`WGSL_COVERAGE.md`](WGSL_COVERAGE.md). A `Full`
+label below is not promotable when that generated view is partial or failing.
+
 ## Backend targets
 
 | Backend | Status              | Notes                                              |

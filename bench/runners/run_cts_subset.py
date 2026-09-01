@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shlex
 import subprocess
 import sys
@@ -22,6 +23,10 @@ from bench.lib.bench_utils import load_json_object, write_json_object
 
 CTS_REPORT_SCHEMA_VERSION = 2
 IDENTITY_ARTIFACT_KIND = "webgpu_cts_adapter_identity"
+CTS_SUMMARY_RE = re.compile(
+    r"^(Passed\s+w/o\s+warnings|Passed\s+with\s+warnings|Skipped|Failed)\s*=\s*(\d+)\s*/\s*(\d+)",
+    re.IGNORECASE,
+)
 
 
 def normalize_label(value: str) -> str:
@@ -264,6 +269,30 @@ def summarize_buckets(rows: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
     return summary
 
 
+def parse_cts_text_summary(stdout: str, stderr: str) -> dict[str, int] | None:
+    counts: dict[str, int] = {}
+    total = None
+    for line in f"{stdout}\n{stderr}".splitlines():
+        match = CTS_SUMMARY_RE.match(line.strip())
+        if match is None:
+            continue
+        label = " ".join(match.group(1).lower().split())
+        key = {
+            "passed w/o warnings": "passedWithoutWarnings",
+            "passed with warnings": "passedWithWarnings",
+            "skipped": "skipped",
+            "failed": "failed",
+        }[label]
+        counts[key] = int(match.group(2))
+        row_total = int(match.group(3))
+        total = row_total if total is None else max(total, row_total)
+    required = {"passedWithoutWarnings", "passedWithWarnings", "skipped", "failed"}
+    if not required.issubset(counts) or total is None:
+        return None
+    counts["total"] = total
+    return counts
+
+
 def markdown(payload: dict[str, Any]) -> str:
     lines: list[str] = []
     lines.append("# CTS Subset Report")
@@ -326,6 +355,7 @@ def run_query(command: list[str], workdir: Path) -> dict[str, Any]:
     return {
         "exitCode": proc.returncode,
         "wallMs": wall_ms,
+        "ctsSummary": parse_cts_text_summary(proc.stdout or "", proc.stderr or ""),
         "stdoutTail": (proc.stdout or "").splitlines()[-20:],
         "stderrTail": (proc.stderr or "").splitlines()[-20:],
     }
@@ -347,11 +377,15 @@ def main() -> int:
     workdir_raw = config.get("workdir")
     command_template = config.get("commandTemplate")
     requirement_note = config.get("requirementsNote")
+    require_text_summary = config.get("requireTextSummary", False)
     if not isinstance(workdir_raw, str) or not workdir_raw.strip():
         print("FAIL: invalid config workdir")
         return 1
     if not isinstance(command_template, str) or "{query}" not in command_template:
         print("FAIL: invalid config commandTemplate (must include {query})")
+        return 1
+    if not isinstance(require_text_summary, bool):
+        print("FAIL: invalid config requireTextSummary")
         return 1
     try:
         queries = load_query_entries(config.get("queries"))
@@ -419,7 +453,11 @@ def main() -> int:
             continue
 
         run = run_query(command, workdir)
-        is_pass = run["exitCode"] == 0
+        cts_summary = run["ctsSummary"]
+        summary_pass = cts_summary is not None and cts_summary["failed"] == 0
+        is_pass = run["exitCode"] == 0 and (
+            summary_pass if require_text_summary else cts_summary is None or summary_pass
+        )
         if is_pass:
             pass_count += 1
         else:
@@ -434,6 +472,7 @@ def main() -> int:
                 "exitCode": run["exitCode"],
                 "wallMs": run["wallMs"],
                 "pass": is_pass,
+                "ctsSummary": cts_summary,
                 "stdoutTail": run["stdoutTail"],
                 "stderrTail": run["stderrTail"],
             }
@@ -456,6 +495,7 @@ def main() -> int:
         "workdir": str(workdir),
         "commandTemplate": command_template,
         "requirementsNote": requirement_note if isinstance(requirement_note, str) else "",
+        "requireTextSummary": require_text_summary,
         "identityProbe": identity_probe,
         "summary": summary,
         "rows": rows,
