@@ -284,6 +284,34 @@ pub fn make_prior_compute_writes_visible_for_current_bindings(
     }
 }
 
+pub fn make_replay_compute_writes_visible(command_buffer: c.VkCommandBuffer) void {
+    // Recorded WebGPU command buffers can bind distinct logical buffers
+    // backed by overlapping regions of Doe's Vulkan heap allocation.
+    // Resource-handle overlap is therefore insufficient to prove that a
+    // compute dependency is absent. A conservative barrier before each
+    // replayed dispatch preserves WebGPU command order until physical
+    // allocation ranges are part of the hazard identity. Pending-write state
+    // is retained so a following transfer still receives its own barrier.
+    const barrier = c.VkMemoryBarrier{
+        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+        .pNext = null,
+        .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT,
+        .dstAccessMask = c.VK_ACCESS_SHADER_READ_BIT | c.VK_ACCESS_SHADER_WRITE_BIT,
+    };
+    c.vkCmdPipelineBarrier(
+        command_buffer,
+        c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        0,
+        1,
+        @ptrCast(&barrier),
+        0,
+        null,
+        0,
+        null,
+    );
+}
+
 pub fn remember_current_compute_writes(self: anytype) void {
     if (!self.current_compute_binding_tracking_complete) {
         clear_pending_compute_write_buffers(self);

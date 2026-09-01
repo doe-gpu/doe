@@ -26,6 +26,7 @@ function sha256(value) {
 
 function parseArgs(argv) {
   const options = {
+    executionApi: 'generation',
     operatorClasses: null,
     opIds: null,
     layers: null,
@@ -33,6 +34,7 @@ function parseArgs(argv) {
     suppressDiagnosticAllocations: false,
     diagnosticAllocationBytes: null,
     runId: null,
+    scenarioPath: baseScenarioPath,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -58,6 +60,13 @@ function parseArgs(argv) {
       }
     } else if (argument === '--run-id') {
       options.runId = argv[++index] ?? null;
+    } else if (argument === '--scenario') {
+      options.scenarioPath = resolve(argv[++index] ?? '');
+    } else if (argument === '--execution-api') {
+      options.executionApi = argv[++index] ?? '';
+      if (!['generation', 'prefill-logits'].includes(options.executionApi)) {
+        throw new Error('--execution-api must be generation or prefill-logits');
+      }
     } else {
       throw new Error(`unknown argument: ${argument}`);
     }
@@ -70,7 +79,20 @@ function parseArgs(argv) {
   if (!options.runId || !/^[A-Za-z0-9._-]+$/u.test(options.runId)) {
     throw new Error('--run-id must contain only letters, digits, dots, underscores, or hyphens');
   }
+  if (!options.scenarioPath) throw new Error('--scenario requires a path');
   return options;
+}
+
+function argmax(values) {
+  let bestIndex = 0;
+  let bestValue = Number.NEGATIVE_INFINITY;
+  for (let index = 0; index < values.length; index += 1) {
+    if (values[index] > bestValue) {
+      bestIndex = index;
+      bestValue = values[index];
+    }
+  }
+  return bestIndex;
 }
 
 function suppressDiagnosticSideEffects(device, suppressAllocations, diagnosticAllocationBytes) {
@@ -186,8 +208,8 @@ async function main() {
   process.env.XDG_RUNTIME_DIR = runtimeDir;
   process.env.DOE_PROGRAM_IDENTITY_TRACE_PATH = nativeTracePath;
 
-  const baseScenarioBytes = await readFile(baseScenarioPath);
-  const scenario = await loadVendorNodeScenario(baseScenarioPath);
+  const baseScenarioBytes = await readFile(options.scenarioPath);
+  const scenario = await loadVendorNodeScenario(options.scenarioPath);
   const providerModulePath = resolveRepoPath('packages/doe-gpu/src/compute.js');
   const providerContractPath = resolveRepoPath('packages/doe-gpu/src/node-webgpu.js');
   const nativeAddonPath = resolve(repoRoot, 'packages/doe-gpu/build/Release/doe_napi.node');
@@ -239,16 +261,31 @@ async function main() {
     // Native tracing opens the file per row, so truncating at this quiescent
     // boundary yields an exact generation-only dispatch stream.
     await writeFile(nativeTracePath, '');
-    const generation = await textHelpers.runGeneration(harness.pipeline, runtimeConfig, {
-      prompt: prompt.prompt,
-      maxTokens: scenario.promptWorkload.decodeTokens,
-      sampling: {
-        temperature: scenario.promptWorkload.temperature,
-        topK: scenario.promptWorkload.topK,
-        topP: scenario.promptWorkload.topP,
-      },
-      diagnostics: { enabled: true, captureConfig },
-    });
+    let generation;
+    if (options.executionApi === 'prefill-logits') {
+      const prefill = await harness.pipeline.prefillWithLogits(prompt.prompt, {
+        useChatTemplate: scenario.useChatTemplate,
+        diagnostics: { enabled: true, captureConfig },
+      });
+      const logits = prefill.logits;
+      const selectedTokenId = argmax(logits);
+      generation = {
+        tokenIds: [selectedTokenId],
+        logitsDigests: [`sha256:${sha256(Buffer.from(logits.buffer, logits.byteOffset, logits.byteLength))}`],
+        output: harness.pipeline.tokenizer?.decode?.([selectedTokenId]) ?? '',
+      };
+    } else {
+      generation = await textHelpers.runGeneration(harness.pipeline, runtimeConfig, {
+        prompt: prompt.prompt,
+        maxTokens: scenario.promptWorkload.decodeTokens,
+        sampling: {
+          temperature: scenario.promptWorkload.temperature,
+          topK: scenario.promptWorkload.topK,
+          topP: scenario.promptWorkload.topP,
+        },
+        diagnostics: { enabled: true, captureConfig },
+      });
+    }
     const operatorDiagnostics = harness.pipeline.stats?.operatorDiagnostics ?? null;
     const tokenId = generation.tokenIds.length === 1 ? generation.tokenIds[0] : null;
     const logitsDigest = generation.logitsDigests.length === 1
@@ -269,6 +306,7 @@ async function main() {
       evidenceClass: 'diagnostic-correctness-localization',
       runId: options.runId,
       selector: {
+        executionApi: options.executionApi,
         operatorClasses: options.operatorClasses,
         opIds: options.opIds,
         layers: options.layers,
@@ -277,7 +315,7 @@ async function main() {
         diagnosticAllocationBytes: options.diagnosticAllocationBytes,
       },
       source: {
-        baseScenario: { path: baseScenarioPath, sha256: sha256(baseScenarioBytes) },
+        baseScenario: { path: options.scenarioPath, sha256: sha256(baseScenarioBytes) },
         dopplerRoot: scenario.dopplerRoot,
         dopplerSourceCommit: scenario.doppler.sourceCommit,
         providerModule: { path: providerModulePath, sha256: sha256(await readFile(providerModulePath)) },

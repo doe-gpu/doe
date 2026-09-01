@@ -584,6 +584,7 @@ pub const NativeVulkanRuntime = struct {
         if (x == 0 or y == 0 or z == 0) return error.InvalidArgument;
         if (!self.has_pipeline) return error.Unsupported;
         if (command_buffer == null) return error.InvalidState;
+        vk_compute_sync.make_replay_compute_writes_visible(command_buffer);
         vk_compute_sync.make_prior_transfer_writes_visible(self, command_buffer);
         vk_compute_sync.make_prior_compute_writes_visible_for_current_bindings(self, command_buffer);
         vk_pipeline.bind_compute_pipeline_if_needed(self, command_buffer);

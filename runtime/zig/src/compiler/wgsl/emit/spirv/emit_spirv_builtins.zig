@@ -402,7 +402,13 @@ fn emit_subgroup_exclusive_scan(self: anytype, call: anytype, result_ty: ir.Type
 fn emit_subgroup_shuffle_like(self: anytype, call: anytype, result_ty: ir.TypeId, opcode: u16) !u32 {
     if (call.args.len != 2) return error.InvalidIr;
     try self.emitter.builder.emit_capability(spirv.Capability.GroupNonUniform);
-    try self.emitter.builder.emit_capability(spirv.Capability.GroupNonUniformShuffle);
+    const capability = switch (opcode) {
+        spirv.Opcode.GroupNonUniformShuffleUp,
+        spirv.Opcode.GroupNonUniformShuffleDown,
+        => spirv.Capability.GroupNonUniformShuffleRelative,
+        else => spirv.Capability.GroupNonUniformShuffle,
+    };
+    try self.emitter.builder.emit_capability(capability);
     const scope_id = try self.emitter.builder.const_u32(spirv.Scope.Subgroup);
     return try emit_result_inst(
         self,

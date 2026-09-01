@@ -28,6 +28,22 @@ fn count_spirv_opcode(binary: []const u8, opcode: u16) u32 {
     return count;
 }
 
+fn count_spirv_capability(binary: []const u8, capability: u32) u32 {
+    const word_count = binary.len / 4;
+    var i: usize = 5;
+    var count: u32 = 0;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = @as(u16, @truncate(w));
+        const wc: usize = @intCast(w >> 16);
+        if (op == spirv.Opcode.Capability and wc == 2 and read_u32_le(binary, (i + 1) * 4) == capability) {
+            count += 1;
+        }
+        i += wc;
+    }
+    return count;
+}
+
 fn spirv_constant_u32(binary: []const u8, result_id: u32) ?u32 {
     const word_count = binary.len / 4;
     var i: usize = 5;
@@ -856,6 +872,8 @@ test "spirv builtin: subgroupShuffleDown produces valid SPIR-V" {
     const len = try translateToSpirv(allocator, source, &out);
     try testing.expect(len >= 20);
     try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_capability(out[0..len], spirv.Capability.GroupNonUniformShuffleRelative));
+    try testing.expectEqual(@as(u32, 0), count_spirv_capability(out[0..len], spirv.Capability.GroupNonUniformShuffle));
 }
 
 test "spirv builtin: subgroupInclusiveAdd produces valid SPIR-V" {

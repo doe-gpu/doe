@@ -1227,9 +1227,9 @@
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "d47f5214e14d5a7665539b68138625857a710ab6f68064d5caab84716270e107",
+        "moduleSha256": "6f03b3f21f8c3c5dbe2cf08bff18237cb9c1974d2e746824733e21d038b61d2a",
         "reason": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
-        "reviewer": "codex-architecture-refactor/2026-08-23"
+        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
       },
       "src/backend/vulkan/vk_adapter_probe.zig": {
         "decision": "Keep",
@@ -1263,9 +1263,9 @@
       },
       "src/backend/vulkan/vk_compute_sync.zig": {
         "decision": "Keep",
-        "moduleSha256": "6b02b3ba9f16890218ed11bf02e2c3d28d252e4e93731a0a18739cbdbdd17a28",
+        "moduleSha256": "e13b3ecf30db9586ad5fc310b34b5a9130883b735d98eb00564596dd75b54faf",
         "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-runtime-correctness-review/2026-08-16"
+        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
       },
       "src/backend/vulkan/vk_constants.zig": {
         "decision": "Keep",
@@ -1287,9 +1287,9 @@
       },
       "src/backend/vulkan/vk_dispatch_indirect.zig": {
         "decision": "Keep",
-        "moduleSha256": "30e228bd5b24398bd7e6bace4ef37ea36973b15fdc326e23a98e8f072e413dbc",
+        "moduleSha256": "dd55953ae80ba32080a0d19441b87a1da4a0a3b2bf666593a08584e018a06020",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
       },
       "src/backend/vulkan/vk_dispatch_repeat.zig": {
         "decision": "Keep",
@@ -2295,9 +2295,9 @@
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig": {
         "decision": "Keep",
-        "moduleSha256": "e438e2df161edda056957e5813bbe26822aedd4c1f60c1f638ff48d793e115dd",
+        "moduleSha256": "c42c13184d62811aaf480a9f3f7b884a00947862c5716aa8d4b65826b390f3a3",
         "reason": "Keep: authoritative SPIR-V builtin lowering family independent from function and texture lowering.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "reviewer": "codex-doe-compiler-correctness/2026-09-01"
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig": {
         "decision": "Keep",
@@ -2343,9 +2343,9 @@
       },
       "src/compiler/wgsl/emit/spirv/spirv_spec.zig": {
         "decision": "Keep",
-        "moduleSha256": "76ed73c9f8549291aa8c6fe4eb8204675af25529395bff65c466675a1fdeb102",
+        "moduleSha256": "ae519de8d58911090267539fe69a1b99667f2f41b5fb031f48b7bce9ea81bd11",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "reviewer": "codex-doe-compiler-correctness/2026-09-01"
       },
       "src/compiler/wgsl/emit/toolchain.zig": {
         "decision": "Keep",

@@ -13,6 +13,7 @@ pub fn record_prepared_replay(
     if (!self.has_pipeline) return error.Unsupported;
     if (indirect_buffer == VK_NULL_U64) return error.InvalidArgument;
     const command_buffer = try self.begin_prepared_dispatch_replay();
+    vk_compute_sync.make_replay_compute_writes_visible(command_buffer);
     vk_compute_sync.make_prior_transfer_writes_visible_for_indirect_dispatch(self, command_buffer);
     vk_compute_sync.make_prior_compute_writes_visible_for_indirect_read(self, command_buffer, indirect_resource_handle, indirect_buffer);
     vk_compute_sync.make_prior_compute_writes_visible_for_current_bindings(self, command_buffer);

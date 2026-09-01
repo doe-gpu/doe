@@ -22,6 +22,7 @@ pub const Capability = struct {
     pub const GroupNonUniform: u32 = 61;
     pub const GroupNonUniformArithmetic: u32 = 63;
     pub const GroupNonUniformShuffle: u32 = 65;
+    pub const GroupNonUniformShuffleRelative: u32 = 66;
     pub const GroupNonUniformVote: u32 = 62;
     pub const GroupNonUniformBallot: u32 = 64;
     pub const StorageImageExtendedFormats: u32 = 49;
