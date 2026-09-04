@@ -33,10 +33,7 @@
       "marketRole": "runtime-adoption",
       "job": "Provide the owned source-preserving compiler, runtime, scheduling, resources, lifecycle, and native backends through the application's normal provider seam.",
       "promotionGate": "An external unchanged non-Doppler application voluntarily adopts D0 for a measured advantage over W0 and credible eligible P0, then retains it across another release or workload.",
-      "authorityPaths": [
-        "docs/runtime-ownership-decision.md",
-        "docs/doe-support-matrix.md"
-      ]
+      "authorityPaths": ["docs/runtime-ownership-decision.md", "docs/doe-support-matrix.md"]
     },
     {
       "id": "doeproof",
@@ -44,10 +41,7 @@
       "marketRole": "qualification-evidence",
       "job": "Qualify provider identity, correctness, fallback, replay, lifecycle, and release admissibility without requiring runtime replacement.",
       "promotionGate": "Qualify incumbent and DoeRuntime impartially with independent output validation, provider identity, explicit fallback, and replay; this feature does not itself prove runtime adoption.",
-      "authorityPaths": [
-        "docs/workload-system.md",
-        "docs/runtime-ownership-decision.md"
-      ]
+      "authorityPaths": ["docs/workload-system.md", "docs/runtime-ownership-decision.md"]
     },
     {
       "id": "fawn",
@@ -55,11 +49,7 @@
       "marketRole": "runtime-distribution",
       "job": "Distribute local-first persistent private browser state, semantic interaction, recovery, and qualified local compute through a real Chromium artifact.",
       "promotionGate": "A hash-bound Fawn release wins B versus A, remains valuable against the separately measured K0 external product comparator, and uses C versus B and D versus C only for their narrower fork decisions.",
-      "authorityPaths": [
-        "docs/browser-lane.md",
-        "config/browser-product-comparison-policy.json",
-        "browser/chromium/bench/workflows/browser-milestones.json"
-      ]
+      "authorityPaths": ["docs/browser-lane.md", "config/browser-product-comparison-policy.json", "browser/chromium/bench/workflows/browser-milestones.json"]
     },
     {
       "id": "doelab",
@@ -67,10 +57,7 @@
       "marketRole": "learning-loop",
       "job": "Turn retained physical failures into minimized reproductions, candidate corrections, and permanent regression gates.",
       "promotionGate": "A retained field failure produces a reusable qualified correction without weakening evidence or promotion rules.",
-      "authorityPaths": [
-        "pipeline/agent/fawn_matrix_learning_bridge.py",
-        "runtime/zig/src/contracts/promotion_receipt.zig"
-      ]
+      "authorityPaths": ["pipeline/agent/fawn_matrix_learning_bridge.py", "runtime/zig/src/contracts/promotion_receipt.zig"]
     }
   ],
   "commercialOffer": {
@@ -111,11 +98,7 @@
     ],
     "ciDecision": {
       "mode": "blocking",
-      "outcomes": [
-        "qualify",
-        "reject",
-        "requalify"
-      ],
+      "outcomes": ["qualify", "reject", "requalify"],
       "failureBehavior": "Missing, stale, conflicting, or failed evidence blocks release; it never silently downgrades the gate."
     },
     "requalificationTriggers": [
@@ -141,42 +124,13 @@
   "comparisonLaw": {
     "authorityPath": "docs/runtime-ownership-decision.md",
     "lanes": [
-      {
-        "id": "I0",
-        "executor": "ambient incumbent",
-        "governance": "ambient application behavior",
-        "conditional": false
-      },
-      {
-        "id": "I1",
-        "executor": "pinned incumbent",
-        "governance": "pinned reproducible control",
-        "conditional": false
-      },
-      {
-        "id": "W0",
-        "executor": "pinned incumbent",
-        "governance": "DoeProof policy, oracle, receipt, replay, and release gate",
-        "conditional": false
-      },
-      {
-        "id": "D0",
-        "executor": "DoeRuntime",
-        "governance": "the identical DoeProof contract used by W0",
-        "conditional": false
-      },
-      {
-        "id": "P0",
-        "executor": "smallest viable incumbent patch",
-        "governance": "the identical DoeProof contract used by W0",
-        "conditional": true
-      }
+      { "id": "I0", "executor": "ambient incumbent", "governance": "ambient application behavior", "conditional": false },
+      { "id": "I1", "executor": "pinned incumbent", "governance": "pinned reproducible control", "conditional": false },
+      { "id": "W0", "executor": "pinned incumbent", "governance": "DoeProof policy, oracle, receipt, replay, and release gate", "conditional": false },
+      { "id": "D0", "executor": "DoeRuntime", "governance": "the identical DoeProof contract used by W0", "conditional": false },
+      { "id": "P0", "executor": "smallest viable incumbent patch", "governance": "the identical DoeProof contract used by W0", "conditional": true }
     ],
-    "selectionOutcomes": [
-      "doe-runtime",
-      "incumbent",
-      "dual"
-    ]
+    "selectionOutcomes": ["doe-runtime", "incumbent", "dual"]
   },
   "externalProductComparison": {
     "authorityPath": "config/browser-product-comparison-policy.json",
@@ -230,79 +184,46 @@
     {
       "id": "workload-contract",
       "canonicalJob": "Freeze application work, inputs, executor, output, and comparison scope.",
-      "ownerPaths": [
-        "docs/workload-system.md",
-        "runtime/zig/src/contracts/workload_profile.zig"
-      ]
+      "ownerPaths": ["docs/workload-system.md", "runtime/zig/src/contracts/workload_profile.zig"]
     },
     {
       "id": "execution-policy",
       "canonicalJob": "Declare provider selection, fallback, backend, timing, and admissibility policy.",
-      "ownerPaths": [
-        "config/governed-lanes.json",
-        "docs/process.md"
-      ]
+      "ownerPaths": ["config/governed-lanes.json", "docs/process.md"]
     },
     {
       "id": "independent-oracle",
       "canonicalJob": "Judge application output independently of the executor under test.",
-      "ownerPaths": [
-        "docs/workload-system.md",
-        "runtime/zig/src/evidence/oracle.zig"
-      ]
+      "ownerPaths": ["docs/workload-system.md", "runtime/zig/src/evidence/oracle.zig"]
     },
     {
       "id": "program-identity",
       "canonicalJob": "Bind source, lowered program, backend artifact, command graph, and execution identity.",
-      "ownerPaths": [
-        "runtime/zig/src/contracts/identity.zig",
-        "docs/runtime-ownership-decision.md"
-      ]
+      "ownerPaths": ["runtime/zig/src/contracts/identity.zig", "docs/runtime-ownership-decision.md"]
     },
     {
       "id": "execution-receipt",
       "canonicalJob": "Record what executed, its outcome, identities, fallback, and evidence references.",
-      "ownerPaths": [
-        "runtime/zig/src/evidence/receipt.zig",
-        "config/doe-run-receipt-v1.schema.json"
-      ]
+      "ownerPaths": ["runtime/zig/src/evidence/receipt.zig", "config/doe-run-receipt-v1.schema.json"]
     },
     {
       "id": "replay-artifact",
       "canonicalJob": "Retain immutable inputs and hashes required to reproduce the declared execution.",
-      "ownerPaths": [
-        "runtime/zig/src/evidence/replay.zig",
-        "docs/operator-runbook.md"
-      ]
+      "ownerPaths": ["runtime/zig/src/evidence/replay.zig", "docs/operator-runbook.md"]
     },
     {
       "id": "qualification-decision",
       "canonicalJob": "Admit, reject, retain, revoke, or require requalification without mutating prior evidence.",
-      "ownerPaths": [
-        "runtime/zig/src/contracts/promotion_receipt.zig",
-        "reports/claim-index.json"
-      ]
+      "ownerPaths": ["runtime/zig/src/contracts/promotion_receipt.zig", "reports/claim-index.json"]
     }
   ],
   "customerEvidencePolicy": {
     "defaultRule": "Customer content and customer-specific knowledge remain isolated unless explicit authority permits a narrower transfer.",
     "classes": [
-      {
-        "id": "customer-content",
-        "crossProductRule": "never-by-default"
-      },
-      {
-        "id": "customer-derived",
-        "crossProductRule": "explicit-authorization"
-      },
-      {
-        "id": "sanitized-runtime-failure",
-        "crossProductRule": "sanitized-only"
-      },
-      {
-        "id": "reproducible-backend-defect",
-        "crossProductRule": "reproducible-evidence-only"
-      }
+      { "id": "customer-content", "crossProductRule": "never-by-default" },
+      { "id": "customer-derived", "crossProductRule": "explicit-authorization" },
+      { "id": "sanitized-runtime-failure", "crossProductRule": "sanitized-only" },
+      { "id": "reproducible-backend-defect", "crossProductRule": "reproducible-evidence-only" }
     ]
   },
   "platformSequence": [
@@ -345,27 +266,15 @@
         "non-Doppler first adopter"
       ],
       "currentAssessment": "unestablished",
-      "stateAuthorityPaths": [
-        "docs/runtime-ownership-decision.md",
-        "reports/claim-index.json"
-      ]
+      "stateAuthorityPaths": ["docs/runtime-ownership-decision.md", "reports/claim-index.json"]
     },
     {
       "order": 2,
       "id": "release-passport-v1",
       "outcome": "Supporting DoeProof qualification binds physical identities, independent oracle, replay, and release gates for incumbent and DoeRuntime without granting runtime adoption credit.",
-      "requiredEvidence": [
-        "unchanged application workload",
-        "physical hardware identity",
-        "independent oracle",
-        "blocking CI decision",
-        "repeat requalification"
-      ],
+      "requiredEvidence": ["unchanged application workload", "physical hardware identity", "independent oracle", "blocking CI decision", "repeat requalification"],
       "currentAssessment": "unestablished",
-      "stateAuthorityPaths": [
-        "config/ecosystem-registry.json",
-        "reports/claim-index.json"
-      ]
+      "stateAuthorityPaths": ["config/ecosystem-registry.json", "reports/claim-index.json"]
     },
     {
       "order": 3,
@@ -384,10 +293,7 @@
         "matched p50 p95 p99 when performance is claimed"
       ],
       "currentAssessment": "diagnostic",
-      "stateAuthorityPaths": [
-        "bench/fawn_matrix/config/matrix-workloads.json",
-        "browser/chromium/bench/workflows/browser-milestones.json"
-      ]
+      "stateAuthorityPaths": ["bench/fawn_matrix/config/matrix-workloads.json", "browser/chromium/bench/workflows/browser-milestones.json"]
     }
   ],
   "claimBoundary": {

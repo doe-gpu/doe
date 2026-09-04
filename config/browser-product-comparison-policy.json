@@ -19,30 +19,10 @@
     ]
   },
   "internalCausalLanes": [
-    {
-      "laneId": "A",
-      "browser": "stock Chromium with Playwright",
-      "runtime": "Dawn",
-      "isolates": "incumbent browser and runtime control"
-    },
-    {
-      "laneId": "B",
-      "browser": "Fawn with Playwright",
-      "runtime": "Dawn",
-      "isolates": "Fawn shell and agent-facing browser behavior"
-    },
-    {
-      "laneId": "C",
-      "browser": "Fawn with Playwright",
-      "runtime": "DoeRuntime",
-      "isolates": "DoeRuntime beneath the same Fawn surface"
-    },
-    {
-      "laneId": "D",
-      "browser": "Fawn Direct Protocol",
-      "runtime": "DoeRuntime",
-      "isolates": "Direct Protocol beyond the Fawn plus DoeRuntime control"
-    }
+    { "laneId": "A", "browser": "stock Chromium with Playwright", "runtime": "Dawn", "isolates": "incumbent browser and runtime control" },
+    { "laneId": "B", "browser": "Fawn with Playwright", "runtime": "Dawn", "isolates": "Fawn shell and agent-facing browser behavior" },
+    { "laneId": "C", "browser": "Fawn with Playwright", "runtime": "DoeRuntime", "isolates": "DoeRuntime beneath the same Fawn surface" },
+    { "laneId": "D", "browser": "Fawn Direct Protocol", "runtime": "DoeRuntime", "isolates": "Direct Protocol beyond the Fawn plus DoeRuntime control" }
   ],
   "externalComparators": [
     {
@@ -67,47 +47,14 @@
     {
       "suiteId": "shared-agent-browser-tasks",
       "purpose": "Compare substitutable product outcomes without treating K0 as an internal component lane.",
-      "tasks": [
-        "HTML extraction",
-        "screenshots",
-        "navigation",
-        "automation success"
-      ],
-      "requiredObservations": [
-        "task oracle",
-        "wall time",
-        "tokens",
-        "memory",
-        "cost",
-        "compatibility failures",
-        "unsupported features",
-        "retries",
-        "recovery behavior",
-        "total task outcome"
-      ]
+      "tasks": ["HTML extraction", "screenshots", "navigation", "automation success"],
+      "requiredObservations": ["task oracle", "wall time", "tokens", "memory", "cost", "compatibility failures", "unsupported features", "retries", "recovery behavior", "total task outcome"]
     },
     {
       "suiteId": "fawn-differentiation-tasks",
       "purpose": "Test whether persistent local browser operation creates customer value outside Kitesurf's documented fit.",
-      "tasks": [
-        "persistent authentication",
-        "restart recovery",
-        "offline local operation",
-        "WebGL",
-        "WebGPU",
-        "private state",
-        "long-running sessions"
-      ],
-      "requiredObservations": [
-        "task oracle",
-        "state continuity",
-        "privacy boundary",
-        "compatibility failures",
-        "unsupported features",
-        "retries",
-        "recovery behavior",
-        "total task outcome"
-      ]
+      "tasks": ["persistent authentication", "restart recovery", "offline local operation", "WebGL", "WebGPU", "private state", "long-running sessions"],
+      "requiredObservations": ["task oracle", "state continuity", "privacy boundary", "compatibility failures", "unsupported features", "retries", "recovery behavior", "total task outcome"]
     }
   ],
   "independenceTests": [

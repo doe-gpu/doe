@@ -23,99 +23,46 @@
     "claimBoundary"
   ],
   "properties": {
-    "$schema": {
-      "type": "string",
-      "const": "doe-product-strategy.schema.json"
-    },
-    "schemaVersion": {
-      "type": "integer",
-      "const": 3
-    },
-    "strategyVersion": {
-      "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
-    },
-    "artifactKind": {
-      "type": "string",
-      "const": "doe-product-strategy"
-    },
+    "$schema": { "type": "string", "const": "doe-product-strategy.schema.json" },
+    "schemaVersion": { "type": "integer", "const": 3 },
+    "strategyVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "artifactKind": { "type": "string", "const": "doe-product-strategy" },
     "authority": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "goals",
-        "strategy",
-        "runtimeOwnership",
-        "support",
-        "currentClaims"
-      ],
+      "required": ["goals", "strategy", "runtimeOwnership", "support", "currentClaims"],
       "properties": {
-        "goals": {
-          "$ref": "#/$defs/path"
-        },
-        "strategy": {
-          "$ref": "#/$defs/path"
-        },
-        "runtimeOwnership": {
-          "$ref": "#/$defs/path"
-        },
-        "support": {
-          "$ref": "#/$defs/path"
-        },
-        "currentClaims": {
-          "$ref": "#/$defs/path"
-        }
+        "goals": { "$ref": "#/$defs/path" },
+        "strategy": { "$ref": "#/$defs/path" },
+        "runtimeOwnership": { "$ref": "#/$defs/path" },
+        "support": { "$ref": "#/$defs/path" },
+        "currentClaims": { "$ref": "#/$defs/path" }
       }
     },
     "positioning": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "category",
-        "promise",
-        "governingQuestion",
-        "operatingLaw"
-      ],
+      "required": ["category", "promise", "governingQuestion", "operatingLaw"],
       "properties": {
-        "category": {
-          "type": "string",
-          "minLength": 1
-        },
-        "promise": {
-          "type": "string",
-          "minLength": 1
-        },
-        "governingQuestion": {
-          "type": "string",
-          "minLength": 1
-        },
-        "operatingLaw": {
-          "type": "string",
-          "minLength": 1
-        }
+        "category": { "type": "string", "minLength": 1 },
+        "promise": { "type": "string", "minLength": 1 },
+        "governingQuestion": { "type": "string", "minLength": 1 },
+        "operatingLaw": { "type": "string", "minLength": 1 }
       }
     },
-    "independenceBoundary": {
-      "$ref": "#/$defs/independenceBoundary"
-    },
+    "independenceBoundary": { "$ref": "#/$defs/independenceBoundary" },
     "surfaces": {
       "type": "array",
       "minItems": 4,
       "maxItems": 4,
-      "items": {
-        "$ref": "#/$defs/surface"
-      },
+      "items": { "$ref": "#/$defs/surface" },
       "allOf": [
         {
           "contains": {
             "properties": {
-              "id": {
-                "const": "doeruntime"
-              }
+              "id": { "const": "doeruntime" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "minContains": 1,
           "maxContains": 1
@@ -123,13 +70,9 @@
         {
           "contains": {
             "properties": {
-              "id": {
-                "const": "doeproof"
-              }
+              "id": { "const": "doeproof" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "minContains": 1,
           "maxContains": 1
@@ -137,13 +80,9 @@
         {
           "contains": {
             "properties": {
-              "id": {
-                "const": "fawn"
-              }
+              "id": { "const": "fawn" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "minContains": 1,
           "maxContains": 1
@@ -151,87 +90,54 @@
         {
           "contains": {
             "properties": {
-              "id": {
-                "const": "doelab"
-              }
+              "id": { "const": "doelab" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "minContains": 1,
           "maxContains": 1
         }
       ]
     },
-    "commercialOffer": {
-      "$ref": "#/$defs/commercialOffer"
-    },
+    "commercialOffer": { "$ref": "#/$defs/commercialOffer" },
     "comparisonLaw": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "authorityPath",
-        "lanes",
-        "selectionOutcomes"
-      ],
+      "required": ["authorityPath", "lanes", "selectionOutcomes"],
       "properties": {
-        "authorityPath": {
-          "$ref": "#/$defs/path"
-        },
+        "authorityPath": { "$ref": "#/$defs/path" },
         "lanes": {
           "type": "array",
           "minItems": 5,
           "maxItems": 5,
-          "items": {
-            "$ref": "#/$defs/comparisonLane"
-          }
+          "items": { "$ref": "#/$defs/comparisonLane" }
         },
         "selectionOutcomes": {
           "type": "array",
           "minItems": 3,
           "maxItems": 3,
           "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "enum": [
-              "doe-runtime",
-              "incumbent",
-              "dual"
-            ]
-          }
+          "items": { "type": "string", "enum": ["doe-runtime","incumbent","dual"] }
         }
       }
     },
-    "externalProductComparison": {
-      "$ref": "#/$defs/externalProductComparison"
-    },
+    "externalProductComparison": { "$ref": "#/$defs/externalProductComparison" },
     "evidenceSpine": {
       "type": "array",
       "minItems": 7,
-      "items": {
-        "$ref": "#/$defs/evidencePrimitive"
-      }
+      "items": { "$ref": "#/$defs/evidencePrimitive" }
     },
     "customerEvidencePolicy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "defaultRule",
-        "classes"
-      ],
+      "required": ["defaultRule", "classes"],
       "properties": {
-        "defaultRule": {
-          "type": "string",
-          "minLength": 1
-        },
+        "defaultRule": { "type": "string", "minLength": 1 },
         "classes": {
           "type": "array",
           "minItems": 4,
           "maxItems": 4,
-          "items": {
-            "$ref": "#/$defs/evidenceClass"
-          }
+          "items": { "$ref": "#/$defs/evidenceClass" }
         }
       }
     },
@@ -239,221 +145,119 @@
       "type": "array",
       "minItems": 3,
       "maxItems": 3,
-      "items": {
-        "$ref": "#/$defs/platformLane"
-      }
+      "items": { "$ref": "#/$defs/platformLane" }
     },
     "milestones": {
       "type": "array",
       "minItems": 3,
       "maxItems": 3,
-      "items": {
-        "$ref": "#/$defs/milestone"
-      }
+      "items": { "$ref": "#/$defs/milestone" }
     },
     "claimBoundary": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "forbiddenInferences",
-        "currentStateAuthority"
-      ],
+      "required": ["forbiddenInferences", "currentStateAuthority"],
       "properties": {
         "forbiddenInferences": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "items": { "type": "string", "minLength": 1 }
         },
-        "currentStateAuthority": {
-          "$ref": "#/$defs/path"
-        }
+        "currentStateAuthority": { "$ref": "#/$defs/path" }
       }
     }
   },
   "$defs": {
-    "id": {
-      "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*$"
-    },
-    "path": {
-      "type": "string",
-      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
-    },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
     "stringList": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "items": { "type": "string", "minLength": 1 }
     },
     "pathList": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/path"
-      }
+      "items": { "$ref": "#/$defs/path" }
     },
     "independenceBoundary": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "rule",
-        "requiredEvidence"
-      ],
+      "required": ["rule", "requiredEvidence"],
       "properties": {
-        "rule": {
-          "type": "string",
-          "minLength": 1
-        },
-        "requiredEvidence": {
-          "$ref": "#/$defs/stringList"
-        }
+        "rule": { "type": "string", "minLength": 1 },
+        "requiredEvidence": { "$ref": "#/$defs/stringList" }
       }
     },
     "surface": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "portfolioRole",
-        "marketRole",
-        "job",
-        "promotionGate",
-        "authorityPaths"
-      ],
+      "required": ["id", "portfolioRole", "marketRole", "job", "promotionGate", "authorityPaths"],
       "properties": {
-        "id": {
-          "type": "string",
-          "enum": [
-            "doeproof",
-            "doeruntime",
-            "fawn",
-            "doelab"
-          ]
-        },
-        "portfolioRole": {
-          "type": "string",
-          "enum": [
-            "primary-product",
-            "product-feature",
-            "secondary-product",
-            "operating-model"
-          ]
-        },
-        "marketRole": {
-          "type": "string",
-          "enum": [
-            "runtime-adoption",
-            "qualification-evidence",
-            "runtime-distribution",
-            "learning-loop"
-          ]
-        },
-        "job": {
-          "type": "string",
-          "minLength": 1
-        },
-        "promotionGate": {
-          "type": "string",
-          "minLength": 1
-        },
-        "authorityPaths": {
-          "$ref": "#/$defs/pathList"
-        }
+        "id": { "type": "string", "enum": ["doeproof","doeruntime","fawn","doelab"] },
+        "portfolioRole": { "type": "string", "enum": ["primary-product","product-feature","secondary-product","operating-model"] },
+        "marketRole": { "type": "string", "enum": ["runtime-adoption","qualification-evidence","runtime-distribution","learning-loop"] },
+        "job": { "type": "string", "minLength": 1 },
+        "promotionGate": { "type": "string", "minLength": 1 },
+        "authorityPaths": { "$ref": "#/$defs/pathList" }
       },
       "allOf": [
         {
           "if": {
             "properties": {
-              "id": {
-                "const": "doeruntime"
-              }
+              "id": { "const": "doeruntime" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "then": {
             "properties": {
-              "portfolioRole": {
-                "const": "primary-product"
-              },
-              "marketRole": {
-                "const": "runtime-adoption"
-              }
+              "portfolioRole": { "const": "primary-product" },
+              "marketRole": { "const": "runtime-adoption" }
             }
           }
         },
         {
           "if": {
             "properties": {
-              "id": {
-                "const": "doeproof"
-              }
+              "id": { "const": "doeproof" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "then": {
             "properties": {
-              "portfolioRole": {
-                "const": "product-feature"
-              },
-              "marketRole": {
-                "const": "qualification-evidence"
-              }
+              "portfolioRole": { "const": "product-feature" },
+              "marketRole": { "const": "qualification-evidence" }
             }
           }
         },
         {
           "if": {
             "properties": {
-              "id": {
-                "const": "fawn"
-              }
+              "id": { "const": "fawn" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "then": {
             "properties": {
-              "portfolioRole": {
-                "const": "secondary-product"
-              },
-              "marketRole": {
-                "const": "runtime-distribution"
-              }
+              "portfolioRole": { "const": "secondary-product" },
+              "marketRole": { "const": "runtime-distribution" }
             }
           }
         },
         {
           "if": {
             "properties": {
-              "id": {
-                "const": "doelab"
-              }
+              "id": { "const": "doelab" }
             },
-            "required": [
-              "id"
-            ]
+            "required": ["id"]
           },
           "then": {
             "properties": {
-              "portfolioRole": {
-                "const": "operating-model"
-              },
-              "marketRole": {
-                "const": "learning-loop"
-              }
+              "portfolioRole": { "const": "operating-model" },
+              "marketRole": { "const": "learning-loop" }
             }
           }
         }
@@ -462,100 +266,40 @@
     "commercialOffer": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "name",
-        "deliveryMode",
-        "promise",
-        "buyers",
-        "intake",
-        "deliverables",
-        "acceptance",
-        "ciDecision",
-        "requalificationTriggers",
-        "commercialPromotionGate"
-      ],
+      "required": ["id", "name", "deliveryMode", "promise", "buyers", "intake", "deliverables", "acceptance", "ciDecision", "requalificationTriggers", "commercialPromotionGate"],
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "deliveryMode": {
-          "type": "string",
-          "const": "unchanged-provider-substitution"
-        },
-        "promise": {
-          "type": "string",
-          "minLength": 1
-        },
-        "buyers": {
-          "$ref": "#/$defs/stringList"
-        },
-        "intake": {
-          "$ref": "#/$defs/stringList"
-        },
-        "deliverables": {
-          "$ref": "#/$defs/stringList"
-        },
-        "acceptance": {
-          "$ref": "#/$defs/stringList"
-        },
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "deliveryMode": { "type": "string", "const": "unchanged-provider-substitution" },
+        "promise": { "type": "string", "minLength": 1 },
+        "buyers": { "$ref": "#/$defs/stringList" },
+        "intake": { "$ref": "#/$defs/stringList" },
+        "deliverables": { "$ref": "#/$defs/stringList" },
+        "acceptance": { "$ref": "#/$defs/stringList" },
         "ciDecision": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "mode",
-            "outcomes",
-            "failureBehavior"
-          ],
+          "required": ["mode", "outcomes", "failureBehavior"],
           "properties": {
-            "mode": {
-              "type": "string",
-              "const": "blocking"
-            },
+            "mode": { "type": "string", "const": "blocking" },
             "outcomes": {
               "type": "array",
               "minItems": 3,
               "maxItems": 3,
               "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "enum": [
-                  "qualify",
-                  "reject",
-                  "requalify"
-                ]
-              }
+              "items": { "type": "string", "enum": ["qualify","reject","requalify"] }
             },
-            "failureBehavior": {
-              "type": "string",
-              "minLength": 1
-            }
+            "failureBehavior": { "type": "string", "minLength": 1 }
           }
         },
-        "requalificationTriggers": {
-          "$ref": "#/$defs/stringList"
-        },
+        "requalificationTriggers": { "$ref": "#/$defs/stringList" },
         "commercialPromotionGate": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "requiredOutcome",
-            "currentAssessment",
-            "requiredEvidence"
-          ],
+          "required": ["requiredOutcome", "currentAssessment", "requiredEvidence"],
           "properties": {
-            "requiredOutcome": {
-              "type": "string",
-              "minLength": 1
-            },
-            "currentAssessment": {
-              "type": "string",
-              "const": "unestablished"
-            },
+            "requiredOutcome": { "type": "string", "minLength": 1 },
+            "currentAssessment": { "type": "string", "const": "unestablished" },
             "requiredEvidence": {
               "const": [
                 "external-unchanged-application",
@@ -573,262 +317,100 @@
     "comparisonLane": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "executor",
-        "governance",
-        "conditional"
-      ],
+      "required": ["id", "executor", "governance", "conditional"],
       "properties": {
-        "id": {
-          "type": "string",
-          "enum": [
-            "I0",
-            "I1",
-            "W0",
-            "D0",
-            "P0"
-          ]
-        },
-        "executor": {
-          "type": "string",
-          "minLength": 1
-        },
-        "governance": {
-          "type": "string",
-          "minLength": 1
-        },
-        "conditional": {
-          "type": "boolean"
-        }
+        "id": { "type": "string", "enum": ["I0","I1","W0","D0","P0"] },
+        "executor": { "type": "string", "minLength": 1 },
+        "governance": { "type": "string", "minLength": 1 },
+        "conditional": { "type": "boolean" }
       }
     },
     "externalProductComparison": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "authorityPath",
-        "causalMatrixUnchanged",
-        "comparators",
-        "suites",
-        "decisionRules"
-      ],
+      "required": ["authorityPath", "causalMatrixUnchanged", "comparators", "suites", "decisionRules"],
       "properties": {
-        "authorityPath": {
-          "$ref": "#/$defs/path"
-        },
-        "causalMatrixUnchanged": {
-          "type": "boolean",
-          "const": true
-        },
+        "authorityPath": { "$ref": "#/$defs/path" },
+        "causalMatrixUnchanged": { "type": "boolean", "const": true },
         "comparators": {
           "type": "array",
           "minItems": 1,
           "maxItems": 1,
-          "items": {
-            "$ref": "#/$defs/externalProductComparator"
-          }
+          "items": { "$ref": "#/$defs/externalProductComparator" }
         },
         "suites": {
           "type": "array",
           "minItems": 2,
           "maxItems": 2,
-          "items": {
-            "$ref": "#/$defs/externalProductSuite"
-          }
+          "items": { "$ref": "#/$defs/externalProductSuite" }
         },
-        "decisionRules": {
-          "$ref": "#/$defs/stringList"
-        }
+        "decisionRules": { "$ref": "#/$defs/stringList" }
       }
     },
     "externalProductComparator": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "product",
-        "architecture",
-        "role",
-        "eligibilityRule"
-      ],
+      "required": ["id", "product", "architecture", "role", "eligibilityRule"],
       "properties": {
-        "id": {
-          "type": "string",
-          "const": "K0"
-        },
-        "product": {
-          "type": "string",
-          "const": "Cloudflare Browser Run + Kitesurf"
-        },
-        "architecture": {
-          "type": "string",
-          "const": "remote-stateless-workers-browser"
-        },
-        "role": {
-          "type": "string",
-          "const": "external-product-comparator"
-        },
-        "eligibilityRule": {
-          "type": "string",
-          "minLength": 1
-        }
+        "id": { "type": "string", "const": "K0" },
+        "product": { "type": "string", "const": "Cloudflare Browser Run + Kitesurf" },
+        "architecture": { "type": "string", "const": "remote-stateless-workers-browser" },
+        "role": { "type": "string", "const": "external-product-comparator" },
+        "eligibilityRule": { "type": "string", "minLength": 1 }
       }
     },
     "externalProductSuite": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "purpose",
-        "measurements"
-      ],
+      "required": ["id", "purpose", "measurements"],
       "properties": {
-        "id": {
-          "type": "string",
-          "enum": [
-            "shared-agent-browser-tasks",
-            "fawn-differentiation-tasks"
-          ]
-        },
-        "purpose": {
-          "type": "string",
-          "minLength": 1
-        },
-        "measurements": {
-          "$ref": "#/$defs/stringList"
-        }
+        "id": { "type": "string", "enum": ["shared-agent-browser-tasks","fawn-differentiation-tasks"] },
+        "purpose": { "type": "string", "minLength": 1 },
+        "measurements": { "$ref": "#/$defs/stringList" }
       }
     },
     "evidencePrimitive": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "canonicalJob",
-        "ownerPaths"
-      ],
+      "required": ["id", "canonicalJob", "ownerPaths"],
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "canonicalJob": {
-          "type": "string",
-          "minLength": 1
-        },
-        "ownerPaths": {
-          "$ref": "#/$defs/pathList"
-        }
+        "id": { "$ref": "#/$defs/id" },
+        "canonicalJob": { "type": "string", "minLength": 1 },
+        "ownerPaths": { "$ref": "#/$defs/pathList" }
       }
     },
     "evidenceClass": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "crossProductRule"
-      ],
+      "required": ["id", "crossProductRule"],
       "properties": {
-        "id": {
-          "type": "string",
-          "enum": [
-            "customer-content",
-            "customer-derived",
-            "sanitized-runtime-failure",
-            "reproducible-backend-defect"
-          ]
-        },
-        "crossProductRule": {
-          "type": "string",
-          "enum": [
-            "never-by-default",
-            "explicit-authorization",
-            "sanitized-only",
-            "reproducible-evidence-only"
-          ]
-        }
+        "id": { "type": "string", "enum": ["customer-content","customer-derived","sanitized-runtime-failure","reproducible-backend-defect"] },
+        "crossProductRule": { "type": "string", "enum": ["never-by-default","explicit-authorization","sanitized-only","reproducible-evidence-only"] }
       }
     },
     "platformLane": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "order",
-        "id",
-        "purpose",
-        "supportAuthorityPath",
-        "inheritsPromotion"
-      ],
+      "required": ["order", "id", "purpose", "supportAuthorityPath", "inheritsPromotion"],
       "properties": {
-        "order": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 3
-        },
-        "id": {
-          "type": "string",
-          "enum": [
-            "amd-vulkan",
-            "apple-metal",
-            "windows-d3d12"
-          ]
-        },
-        "purpose": {
-          "type": "string",
-          "minLength": 1
-        },
-        "supportAuthorityPath": {
-          "$ref": "#/$defs/path"
-        },
-        "inheritsPromotion": {
-          "type": "boolean",
-          "const": false
-        }
+        "order": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "id": { "type": "string", "enum": ["amd-vulkan","apple-metal","windows-d3d12"] },
+        "purpose": { "type": "string", "minLength": 1 },
+        "supportAuthorityPath": { "$ref": "#/$defs/path" },
+        "inheritsPromotion": { "type": "boolean", "const": false }
       }
     },
     "milestone": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "order",
-        "id",
-        "outcome",
-        "requiredEvidence",
-        "currentAssessment",
-        "stateAuthorityPaths"
-      ],
+      "required": ["order", "id", "outcome", "requiredEvidence", "currentAssessment", "stateAuthorityPaths"],
       "properties": {
-        "order": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 3
-        },
-        "id": {
-          "type": "string",
-          "enum": [
-            "release-passport-v1",
-            "owned-capability-v1",
-            "fawn-agent-compute-v1"
-          ]
-        },
-        "outcome": {
-          "type": "string",
-          "minLength": 1
-        },
-        "requiredEvidence": {
-          "$ref": "#/$defs/stringList"
-        },
-        "currentAssessment": {
-          "type": "string",
-          "enum": [
-            "unestablished",
-            "diagnostic",
-            "claimable"
-          ]
-        },
-        "stateAuthorityPaths": {
-          "$ref": "#/$defs/pathList"
-        }
+        "order": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "id": { "type": "string", "enum": ["release-passport-v1","owned-capability-v1","fawn-agent-compute-v1"] },
+        "outcome": { "type": "string", "minLength": 1 },
+        "requiredEvidence": { "$ref": "#/$defs/stringList" },
+        "currentAssessment": { "type": "string", "enum": ["unestablished","diagnostic","claimable"] },
+        "stateAuthorityPaths": { "$ref": "#/$defs/pathList" }
       }
     }
   }
