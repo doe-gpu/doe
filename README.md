@@ -1,17 +1,20 @@
 # Doe
 
-Doe is a source-preserving GPU execution and evidence system for applications
-that choose their provider. DoeProof governs an explicit incumbent or Doe
-provider; DoeRuntime supplies the owned compiler and execution backend where a
-matched application comparison proves that ownership is worthwhile.
+DoeRuntime is Doe's primary product: a source-preserving WGSL compiler and GPU
+runtime that applications can select through their normal provider seam.
+DoeProof is its supporting qualification and evidence feature, usable with both
+DoeRuntime and an incumbent. Fawn is a secondary browser product and potential
+DoeRuntime distribution surface. The `doe/` repository owns these components.
 
 ## Mission, goal, and value
 
 Doe’s mission is to make GPU execution inspectable and controllable at the
 runtime boundary.
 
-The current product goal has independently gated DoeProof, Node/Bun runtime,
-and Fawn/Chromium browser surfaces. Each must run a named unchanged workload
+The primary goal is voluntary adoption by an unchanged external non-Doppler
+application for a predeclared measured advantage, followed by retention across
+another release or workload. Node/Bun runtime and Fawn/Chromium browser surfaces
+retain independent evidence gates. Each must run a named unchanged workload
 correctly against a declared incumbent on a declared support matrix. The
 receipt, replay artifact, and runtime policy must identify the workload,
 provider, physical hardware, backend, and validation result. Browser evidence
@@ -21,7 +24,7 @@ runtime-ownership credit.
 Doe serves several audiences:
 
 - Application developers get governed provider selection, exact-output
-  evidence, and an optional owned runtime for explicit GPU execution.
+  evidence, and the owned runtime for explicit GPU execution.
 - Runtime and compiler engineers can inspect lowering, backend selection, and
   generated work.
 - Benchmark and release reviewers can trace a claim to its receipt and raw

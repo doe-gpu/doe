@@ -1,92 +1,56 @@
 # Doe product strategy contract
 
-`config/doe-product-strategy.json` is the validated, machine-readable projection
-of Doe's canonical strategy. [`thesis.md`](thesis.md) remains the narrative
-authority. This contract makes the commercial offer, internal product roles,
-comparison law, evidence custody, platform sequence, and milestone claim
-boundaries testable instead of leaving them scattered across prose.
-
-Schema version 2 adds DoeProof product independence without changing runtime
-behavior. Existing I0/I1/W0/D0/P0 and Fawn A/B/C/D lanes remain unchanged.
-
-The separately schema-backed
-[`browser-product-comparison-policy.json`](../config/browser-product-comparison-policy.json)
-owns A/B/C/D causal semantics, K0 external-comparator scope and freshness, the
-shared and differentiation suites, independence tests, fork authorities, and
-literal stop conditions. K0 is not a Doe strategy object or an internal runtime
-lane.
+`config/doe-product-strategy.json` is the schema-validated projection of
+[`thesis.md`](thesis.md). Schema version 3 and strategy 2.0.0 replace the
+qualification-first priority in version 2: DoeRuntime is primary, DoeProof is
+its supporting provider-neutral feature, and Fawn is secondary. This is an
+intent migration, not a runtime rename, package removal, or evidence promotion.
+Historical qualification receipts remain valid for their original claims.
 
 ## Product roles
 
-| Surface | Portfolio role | Market job |
+| Surface | Role | Acceptance |
 | --- | --- | --- |
-| DoeProof | Enabling capability | First sellable wedge: physical compute qualification under shadow governance |
-| DoeRuntime | Enabling capability | Selectively own execution where `D0` earns it |
-| Fawn | Product vector | Breakout distribution product tested through independent A/B/C/D lanes |
-| DoeLab | Operating model | Turn retained failures into minimized, qualified improvements |
+| DoeRuntime | Primary product | Unchanged external non-Doppler application adopts for a material advantage and retains across another release or workload |
+| DoeProof | Supporting feature | Independently qualifies incumbent and DoeRuntime without interfering with execution |
+| Fawn | Secondary browser product | Earns its own shell value and only distributes DoeRuntime where browser substitution is physically proved |
+| DoeLab | Operating model | Turns retained failures into minimized regressions and qualified corrections |
 
-“First sellable wedge” and “breakout distribution product” are deliberately
-different. A customer can buy DoeProof while retaining its incumbent. Fawn can
-beat stock Chromium without proving DoeRuntime. DoeRuntime can own one
-capability without becoming a universal runtime replacement.
+## Comparison and adoption law
 
-## Independent trunk and evidence-gated forks
+Freeze the strongest eligible incumbent, exact application/WGSL/inputs, independent
+oracle, hardware and driver, fallback policy, cache state, timing scope, reliability
+gates, and material threshold. Preserve I0, I1, W0, D0, and credible eligible P0
+controls. A W0 qualification alone is feature value, not runtime adoption. D0
+testing does not require a preceding paid DoeProof engagement.
 
-DoeProof must qualify a customer's strongest eligible incumbent without
-requiring Doppler, Fawn, or DoeRuntime. The first external product proof is a
-paid `I1` to `W0` qualification with an independently authorized signer,
-application oracle, replay, blocking release decision, and repeat
-requalification.
+Start with AMD/Vulkan unless a real customer supplies a stronger target.
+Each host and backend earns support independently. Require unchanged provider
+integration, parity, lifecycle and recovery, raw measurements, an external
+maintainer's adoption decision, and repeat retention. Payment, internal
+benchmarks, compiler breadth, receipts, and Doppler interoperability cannot
+substitute for these evidence fields; the schema enforces their presence.
 
-`D0` opens only when `W0` exposes a customer-relevant limitation. Fawn and the
-Direct Protocol remain independent forks. Collaboration with Doppler may add a
-workload or provider candidate, but cannot change provider preference or
-qualification law.
+The browser comparison policy preserves A/B/C/D causal meanings and separate
+K0 eligibility. Its version 2 changes product priority, not comparison semantics.
+Fawn's B-over-A result does not grant DoeRuntime C-over-B credit. D-over-C still
+isolates Direct Protocol. Ineligible K0 work never becomes a Fawn win.
+`doe-gpu/browser` is an incumbent wrapper until Doe occupies the Chromium seam.
 
-## Physical Compute Qualification
+## Evidence custody and current state
 
-The offer freezes one application workload, independent oracle, hardware tuple,
-and strongest eligible incumbent. Doe first supplies `W0`: the pinned incumbent
-under DoeProof. `D0` is proposed only when the governed incumbent cannot satisfy
-the frozen outcome. A conditional `P0` tests whether the smallest viable
-incumbent patch solves the problem at lower durable cost.
+Customer content never crosses products by default. Customer-derived knowledge
+requires explicit authorization; only sanitized failures or reproducible backend
+defects enter shared learning under the declared custody rules.
 
-The delivered decision is blocking and may qualify, reject, or require
-requalification. It binds exact application, shader, runtime, binary, adapter,
-driver, backend, fallback, output, lifecycle, comparison, and replay evidence.
-The offer's commercial promotion gate is not an internal certificate: an
-external customer must pay for a qualification and later depend on or pay for
-a repeat requalification.
+The strategy records intended admission rules, not achieved support or adoption.
+[`doe-support-matrix.md`](doe-support-matrix.md), `reports/claim-index.json`, and
+Fawn milestone artifacts remain the evidence authorities. Reordered milestones
+retain their unestablished or diagnostic assessments. No result is promoted by
+this intent change.
 
-## Evidence custody
-
-Customer content never crosses products by default. Customer-specific derived
-knowledge requires explicit authorization. Only sanitized generic runtime
-failures or independently reproducible backend defects may enter shared learning
-under the narrower rules declared in the contract. A receipt does not grant a
-license to reuse its inputs.
-
-## Current-state boundary
-
-The strategy contract records admission rules, not benchmark success. Current
-support remains in [`doe-support-matrix.md`](doe-support-matrix.md); current
-claims remain in `reports/claim-index.json`; browser promotion remains in the
-Fawn milestone artifacts. The three named milestones intentionally remain
-`unestablished`, `unestablished`, and `diagnostic` until their external or
-physical evidence exists.
-
-Implementation readiness, internal qualification, external evidence, paid use,
-repeat use, revenue, and product authority are separate states. A passing
-schema, harness, internal fixture, or diagnostic receipt advances only its
-named state and never establishes the others.
-
-Kitesurf is recorded as K0, a separate remote external-product comparator. It
-is not added to the A/B/C/D attribution matrix. The browser contract runs K0 on
-eligible shared tasks and retains unsupported rows as ineligible rather than
-converting them into Fawn wins.
-
-Validate the contract with:
+Validate with:
 
 ```bash
-python3 -m unittest bench.tests.test_config_schemas
+python3 -m unittest bench.tests.test_config_schemas bench.tests.test_browser_product_comparison_policy
 ```

@@ -9,7 +9,8 @@ Doe runtime. It is an implementation and promotion contract for the strategy in
 Runtime ownership is a hypothesis to prove, not a default source of product
 credit.
 
-Doe may provide value through two separable surfaces:
+DoeRuntime is primary and DoeProof is a supporting feature. Their contributions
+remain experimentally separable:
 
 - **DoeProof**: workload identity, execution policy, independent oracles,
   receipts, replay, comparison, and release admission;
@@ -19,8 +20,9 @@ Doe may provide value through two separable surfaces:
 An application should use DoeRuntime only when a controlled comparison proves
 that owning execution supplies durable application value unavailable from a
 pinned incumbent, DoeProof around that incumbent, or a bounded incumbent patch.
-If DoeProof supplies the value without DoeRuntime, that is a valid Doe product
-result and a rejection of runtime ownership for that application.
+If DoeProof supplies the value without DoeRuntime, retain that useful feature
+result and reject runtime ownership for that application. It does not satisfy
+the primary DoeRuntime adoption objective.
 
 ## What a governed incumbent can already provide
 
@@ -358,11 +360,12 @@ consumer and next admission gate remains quarantined research.
 
 ## Product validation boundary
 
-The first portfolio objective is a small set of promoted applications on the
-primary Apple Metal and AMD Vulkan tuples. Each must have clean installation,
+The first portfolio objective is one unchanged external non-Doppler application,
+beginning with AMD/Vulkan unless a real customer supplies a stronger tuple.
+Apple Metal and Windows D3D12 earn support separately. Each lane needs clean installation,
 effective provider identity, independent output validation, lifecycle coverage,
-the required comparison lanes, and one material DoeRuntime or DoeProof
-advantage.
+the required comparison lanes, and a material DoeRuntime advantage over W0
+and credible eligible P0, followed by voluntary adoption and repeat retention.
 
 Internal promotion proves a supported integration. External product validation
 requires at least one application owner to depend on the contract and treat its

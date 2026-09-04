@@ -7,6 +7,7 @@ import json
 import unittest
 from pathlib import Path
 from typing import Any
+from jsonschema import Draft202012Validator
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -28,12 +29,40 @@ def _load_policy() -> dict[str, Any]:
 class BrowserProductComparisonPolicyTests(unittest.TestCase):
     """Protect causal lanes, external comparison, and fork boundaries."""
 
-    def test_no_regret_trunk_is_incumbent_qualification_only(self) -> None:
+    def test_runtime_primary_and_feature_role_are_schema_enforced(self) -> None:
+        strategy = json.loads(STRATEGY_PATH.read_text(encoding="utf-8"))
+        schema_path = STRATEGY_PATH.with_suffix(".schema.json")
+        validator = Draft202012Validator(
+            json.loads(schema_path.read_text(encoding="utf-8"))
+        )
+        validator.validate(strategy)
+        surfaces = {row["id"]: row for row in strategy["surfaces"]}
+        self.assertEqual(surfaces["doeruntime"]["portfolioRole"], "primary-product")
+        self.assertEqual(surfaces["doeproof"]["portfolioRole"], "product-feature")
+        self.assertEqual(surfaces["fawn"]["portfolioRole"], "secondary-product")
+        surfaces["doeproof"]["portfolioRole"] = "primary-product"
+        self.assertFalse(validator.is_valid(strategy))
+
+    def test_qualification_cannot_replace_adoption_and_repeat_retention(self) -> None:
+        strategy = json.loads(STRATEGY_PATH.read_text(encoding="utf-8"))
+        schema = json.loads(
+            STRATEGY_PATH.with_suffix(".schema.json").read_text(encoding="utf-8")
+        )
+        validator = Draft202012Validator(schema)
+        gate = strategy["commercialOffer"]["commercialPromotionGate"]
+        original = gate["requiredEvidence"]
+        for field in original:
+            gate["requiredEvidence"] = [item for item in original if item != field]
+            self.assertFalse(validator.is_valid(strategy), field)
+        gate["requiredEvidence"] = ["paid-qualification"]
+        self.assertFalse(validator.is_valid(strategy))
+
+    def test_primary_outcome_is_runtime_application_adoption(self) -> None:
         policy = _load_policy()
 
         self.assertEqual(
             [item["id"] for item in policy["noRegretTrunk"]["workItems"]],
-            ["doeproof-incumbent-qualification"],
+            ["doeruntime-application-adoption"],
         )
 
     def test_internal_lanes_preserve_abcd_causal_order(self) -> None:
@@ -114,7 +143,7 @@ class BrowserProductComparisonPolicyTests(unittest.TestCase):
         self.assertEqual(
             [fork["forkId"] for fork in policy["forkAuthorities"]],
             [
-                "doeproof-commercial",
+                "doeproof-feature",
                 "fawn-product",
                 "doeruntime-browser",
                 "fawn-direct-protocol",

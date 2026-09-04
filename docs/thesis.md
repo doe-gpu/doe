@@ -13,7 +13,7 @@ Doe is a vertically integrated agent-compute company built from internally
 decoupled, contract-governed subsystems:
 
 ```text
-DoeProof qualification and Fawn adoption
+DoeRuntime application adoption and optional Fawn distribution
             ↓
 real applications, shaders, traces, failures
             ↓
@@ -23,7 +23,7 @@ candidate compiler/runtime optimizations
             ↓
 physical-device evaluation and promotion
             ↓
-better qualification, Fawn, and DoeRuntime releases
+better DoeRuntime releases with DoeProof qualification
             ↓
 more adoption
 ```
@@ -35,15 +35,17 @@ projects owning only a single layer.
 
 ## Ideal customer profiles and product sequence
 
-The first sellable wedge serves local-AI vendors, Electron application teams,
-developer platforms, OEM qualification teams, and GPU application teams that
-cannot safely own cross-device execution qualification themselves:
+The primary product is DoeRuntime. It serves an externally owned, unchanged
+WebGPU application that can substitute providers and has a measurable reason
+to choose Doe's compiler/runtime/backend. The first adopter must not depend on
+Doppler. DoeProof is the supporting qualification, observation, replay, and
+release-evidence feature, not the initial independent business.
 
-> **Freeze one consequential GPU workload and hardware lane, qualify the
-> incumbent under DoeProof, and receive a replayable release decision without
-> being forced to replace the runtime.**
+> Freeze one application outcome, qualify the strongest incumbent and DoeRuntime
+> under the same oracle, adopt only for a material advantage, and retain DoeRuntime
+> across another release or workload.
 
-The breakout distribution product serves teams building coding, research,
+Fawn, the secondary browser product and potential DoeRuntime distributor, serves teams building coding, research,
 support, or workflow agents that maintain persistent browser sessions and
 repeatedly pay for page serialization, screenshots, remote model calls, and
 generic browser-control latency:
@@ -52,18 +54,19 @@ generic browser-control latency:
 > lower-context page diffs, integrated local compute, and measurable end-to-end
 > task improvements.**
 
-These are independent gates. DoeProof may earn recurring qualification revenue
-while an incumbent keeps execution. Fawn may create browser-shell value while
-DoeRuntime remains unearned. DoeRuntime is promoted only for the capabilities
-whose frozen `D0` comparison proves a material application advantage.
+These gates remain independent. DoeProof may provide value while an incumbent
+keeps execution, but that does not satisfy the primary runtime adoption goal.
+Fawn may create browser-shell value without proving DoeRuntime. Runtime adoption
+requires a frozen D0 comparison and the maintainer's subsequent retention.
 
 ## No-regret trunks and evidence-gated forks
 
 “No-regret trunk” means work required under every plausible strategy. It does
-not imply assured commercial success. Doe's no-regret trunk is an independently
-purchased `I1` to `W0` DoeProof episode around the customer's incumbent,
-production signer authorization, an independent oracle, replay, lifecycle and
-failure evidence, a blocking decision, and a paid repeat requalification.
+not imply assured commercial success. The selected implementation path is one
+unchanged external application through I0, I1, W0, D0, and eligible P0 controls,
+independent oracle and replay, lifecycle and failure evidence, voluntary runtime
+adoption, and repeat retention. Qualification remains necessary experimental
+control; selling it independently is not a prerequisite for testing D0.
 
 DoeProof must qualify the strongest eligible incumbent without importing,
 requiring, or favoring Doppler. Doppler may supply a workload or provider
@@ -85,8 +88,8 @@ remain separate:
 - External product substitution is tested by `K0` beside A/B/C/D; it never
   changes their causal meaning.
 
-Doe may accept a Doppler workload, but DoeProof must remain purchasable and
-useful without Doppler. Doppler use does not establish Doe demand, and a Doe
+Doe may accept a Doppler workload as interoperability, but must earn its first
+runtime adoption from a non-Doppler application. Doppler use does not establish Doe demand, and a Doe
 receipt does not establish Doppler adoption.
 
 ## Objective
@@ -254,18 +257,19 @@ incompatible, incorrect, unstable, or slower runtime.
 
 ## Initial wedge
 
-The first commercial offer is **DoeProof Physical Compute Qualification**. A
+The initial offer is **DoeRuntime Application Integration**, with DoeProof as
+its impartial qualification feature. A
 customer supplies one pinned application workload, its expected result and
 independent oracle, the target hardware tuple, and the strongest eligible
 incumbent. Doe returns exact execution identity, fallback state, output and
 lifecycle evidence, clean-process replay, matched ownership comparisons, and a
 blocking qualification, rejection, or requalification decision.
 
-The land motion is shadow governance: begin with `I1`, the pinned incumbent,
-then apply the same DoeProof contract as `W0`. Do not require DoeRuntime to make
-the offer useful. Test `D0` only when the governed incumbent cannot satisfy the
-frozen application outcome, and test conditional `P0` when the smallest viable
-incumbent patch is an eligible lower-cost control.
+Capture the ambient I0 and pinned I1 incumbent, qualify I1 as W0, and evaluate
+D0 on the identical frozen application. Test P0 when a credible smallest viable
+incumbent patch is eligible. Runtime promotion must beat the governed incumbent
+and that patch; a successful W0 alone remains a negative runtime-ownership
+result for this application, not an obstacle to conducting the comparison.
 
 The initial provider-substitution surface remains `doe-gpu` for controlled
 Node, Bun, applicable Electron, and CI compute environments. The first likely
@@ -274,10 +278,9 @@ GPU compute through JavaScript runtimes. Doe deliberately supports a narrow,
 declared matrix of applications, workloads, runtimes, operating systems,
 architectures, backends, adapters, and drivers.
 
-The first adoption step must be small: retain the customer's incumbent, run one
-existing workload under DoeProof, validate the existing application result,
-and receive runtime identity plus an execution receipt. Provider substitution
-is a second decision. No local Zig build, hidden fallback, or undocumented
+Integrate through the application's normal provider seam without rewriting its
+product logic or shaders. Preserve the incumbent control, validate the existing
+application oracle, and record the maintainer's adoption and retention decisions. No local Zig build, hidden fallback, or undocumented
 environment setup belongs in the promoted path.
 
 Several deeply supported applications are more valuable than broad API-shaped
@@ -334,9 +337,9 @@ governed body of real-application behavior and evidence is harder to reproduce.
 The Doe-first commercial journey is:
 
 ```text
-frozen workload -> paid qualification -> blocking release passport
--> repeated requalification -> supported evidence relationship
--> optional DoeRuntime capability or Fawn distribution adoption
+frozen unchanged external application -> independent incumbent and DoeRuntime comparison
+-> predeclared material advantage -> voluntary maintainer adoption
+-> repeat retention and requalification -> supported runtime relationship
 ```
 
 This journey is not a registry state machine. Relationship hypotheses,
@@ -350,14 +353,12 @@ incident diagnosis, or measured performance. The first commercial buyer is
 likely a local-AI, browser-AI, developer-platform, or release-infrastructure
 team rather than an individual JavaScript developer.
 
-The scrappy land motion is to run one real application workload first through
-the pinned incumbent and then through the same DoeProof contract, make the
-output and execution receipt useful to the team, and turn the passing workload
-into a CI or release gate. Paid work begins with fixed-scope physical
-qualification and recurring requalification for application, browser, runtime,
-driver, adapter, hardware, or policy changes. It can expand into runtime
-integration, supported matrices, incident response, and performance work only
-after the corresponding lane earns ownership.
+Start with one application's normal provider substitution, compare complete
+startup, compilation, dispatch, memory, readback, recovery, package size, and
+lifecycle outcomes, and publish parity-qualified raw samples with p50/p95/p99.
+Turn accepted use into a maintained release gate. Repeat after an application,
+shader, runtime, driver, or workload change. Broader support and Fawn distribution
+follow earned adoption; receipts and internal benchmarks cannot replace it.
 
 Sibling products provide low-cost entry points, not strategic ownership:
 

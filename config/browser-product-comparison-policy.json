@@ -1,7 +1,7 @@
 {
   "$schema": "browser-product-comparison-policy.schema.json",
-  "schemaVersion": 1,
-  "policyId": "fawn-external-product-comparison-v1",
+  "schemaVersion": 2,
+  "policyId": "fawn-external-product-comparison-v2",
   "authority": {
     "strategyPath": "docs/thesis.md",
     "browserLanePath": "docs/browser-lane.md",
@@ -12,8 +12,8 @@
     "definition": "Work required under every plausible strategy; it is not an assurance of commercial success.",
     "workItems": [
       {
-        "id": "doeproof-incumbent-qualification",
-        "requiredOutcome": "An independently purchased I1-to-W0 episode qualifies the customer's incumbent before any runtime replacement proposal.",
+        "id": "doeruntime-application-adoption",
+        "requiredOutcome": "An unchanged external non-Doppler application compares I0, I1, W0, D0 and eligible P0, adopts DoeRuntime for a predeclared material advantage, and retains it across another release or workload.",
         "authorityPath": "docs/product-strategy-contract.md"
       }
     ]
@@ -114,7 +114,7 @@
     {
       "id": "doeproof-incumbent-value",
       "comparison": "I1 to W0",
-      "requiredInterpretation": "DoeProof can produce a paid blocking qualification while the incumbent retains execution.",
+      "requiredInterpretation": "DoeProof qualifies the incumbent independently as a supporting feature; W0 value alone does not establish primary-product adoption.",
       "forbiddenInference": "DoeProof value grants DoeRuntime ownership."
     },
     {
@@ -144,10 +144,10 @@
   ],
   "forkAuthorities": [
     {
-      "forkId": "doeproof-commercial",
+      "forkId": "doeproof-feature",
       "decisionAuthorityPath": "config/doe-product-strategy.json",
-      "fundWhen": "An external customer independently purchases W0 and later pays for or depends on repeat requalification.",
-      "stopWhen": "The evidence cannot block a real release decision or customers do not repeat qualification."
+      "fundWhen": "Independent qualification and replay make incumbent and DoeRuntime evidence comparable without changing execution.",
+      "stopWhen": "Observation interferes with execution, hides fallback, or is treated as a substitute for runtime adoption."
     },
     {
       "forkId": "fawn-product",
