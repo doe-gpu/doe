@@ -27,14 +27,16 @@ external-application portfolio or general WebGPU conformance requirements.
 
 Pass a device and select `gpu-recorded`, `native-recorded`, or `webgpu`. The recorded modes accept
 the registered Doe Node addon provider, also usable through Bun's Node addon
-support. It requires a matching native contract version, derived at build time
-from the descriptor schema; old addons or libraries fail before allocation.
+support. It requires a native contract version supporting the declaration, derived at
+build time from the descriptor schema. Native version 2 accepts descriptor
+versions 1 and 2; older libraries reject version 2 before allocation.
 `gpu-recorded` requires Vulkan support advertised by both the addon and library.
 It owns a compiled GPU command buffer, pipeline cache, and descriptor pools.
 Buffer identities and extents are checked before submission; mapping or changing
 an allocation invalidates the recording. Separate programs own separate native
 pipeline state, so ordinary cache replacement cannot invalidate their commands.
-Preparation does not submit the program. Native pipeline creation costs are
+Preparation does not dispatch the program; newly allocated resident state is
+zeroed once and drained before preparation returns. Native pipeline creation costs are
 included in preparation. Replacement currently recompiles GPU command state;
 unchanged public resources still share their declared lifetime.
 
@@ -45,7 +47,7 @@ readback in the existing output mapping. Vulkan GPU recordings retain and
 validate the query pool as well as their buffers. Destroying a query invalidates
 replay before submission. Updates preserve the selected timing mode.
 
-Receipt schema version 3 retains nullable `gpuTiming`: source, compute-pass scope,
+Receipt schema version 4 retains nullable `gpuTiming`: source, compute-pass scope,
 begin/end values, period, counter width, and elapsed nanoseconds. Doe Vulkan
 resolves queries to nanoseconds on the GPU, including when another GPU command
 consumes the destination. Query-owned scratch storage and cached conversion
@@ -61,7 +63,7 @@ Nanosecond support must be explicit in the loaded Doe addon and library;
 older libraries and other Doe backends fail timed preparation until supported.
 The additive `doeNativeComputeProgramTimestampNanoseconds` ABI reports resolved
 units; the historical calibration ABI continues to expose physical tick units.
-Receipt versions 1 and 2 remain readable. Version 2 Doe timings retain their
+Receipt versions 1, 2, and 3 remain readable. Version 2 Doe timings retain their
 historical raw-tick interpretation; they must not be relabeled as nanoseconds.
 Pass-end markers use bottom-of-pipeline completion. GPU duration excludes input
 upload, scratch clearing, query resolution, and readback. Complete invocation
@@ -73,15 +75,41 @@ it does not measure internal query scratch or peak device allocation.
 control keeps allocations, pipelines, and bindings resident and encodes each
 invocation. These are explicit modes, with no fallback between them.
 
-Every invocation uploads exact-size snapshots of all declared inputs, clears
-scratch and output buffers, executes the ordered compute passes, waits for
-completion, and performs map/copy/unmap readback. The program never exposes its
-GPU resources. Input bytes may change; shapes and source cannot change in place.
-Uniform buffers must be inputs. Only buffer bindings in bind group zero are
-admitted in this initial contract.
+Descriptor version 1 preserves invocation-local behavior: upload exact-size
+input snapshots, clear scratch and output buffers, execute the ordered passes,
+wait, then map/copy/unmap output. Version 2 adds buffer `lifetime`, defaulting to
+`invocation`. With `lifetime: 'program'`, inputs may be omitted after their first
+initialization, and scratch/output state persists across runs. Newly allocated
+resident state starts at zero. Shapes and source cannot change in place; uniform
+buffers must be inputs and bindings remain in group zero.
+
+Prepare with `readback: 'none'` to keep output on the GPU. This removes output
+copying, mapping, and readback allocation; optional timing still resolves and
+maps its own query bytes. `run()` returns `output: null` and `outputHash: null`
+when output bytes were not observed. The default remains `readback: 'output'`.
+`program.output()` returns an opaque, same-device reference after a successful
+run. Pass it as another program's input to copy on the GPU. The consumer holds
+a resource lease through completion. Producer runs and updates reject while
+leased; closing a producer drains its work and releases its ownership while
+an already accepted consumer retains its copy source. New uses reject after
+producer execution, update, close, or device loss. References never expose a
+raw GPU buffer and copied or forged reference objects are rejected.
+
+Receipt version 4 records program-instance identity, output generation,
+input origins, prior resident-state origins, copied bytes, and API submission
+count. A byte hash is present only when the bytes are known. Storage input roles
+do not imply read-only WGSL: after execution their resident contents carry
+program/generation provenance and a null input hash until uploaded again.
+Uniform inputs retain known initialization hashes. Provenance identifies the
+producing execution; it is not a numerical oracle or an output content hash.
+The recorded path uses a preceding input-copy submission when needed; ordinary
+WebGPU submits input-copy and compute command buffers together. Both wait for
+completion, and receipts expose this distinction.
 
 `update(descriptor)` validates and prepares a replacement. Identical resource
 keys share allocations and compiled state; changed keys acquire replacements.
+Resident contents survive only when their complete buffer declaration is
+unchanged. Changed dimensions, type, role, or lifetime allocate fresh state.
 Only successful preparation invalidates the prior program. Failed preparation
 releases temporary resources and leaves the prior program available. Device
 loss requires preparation on a new device. Programs reject overlapping runs,
@@ -90,7 +118,10 @@ Applications must keep unrelated device operations outside a program operation.
 
 Cancellation before submission prevents dispatch. Cancellation after submission
 drains already-submitted work and discards output; it does not preempt a running
-GPU kernel. Cancellation during mapping also discards output and unmaps the
+GPU kernel. A cancelled invocation that may have changed resident state
+invalidates that program; continuing from an unobserved partial state requires
+explicit preparation. Invocation-local programs remain reusable after drained
+cancellation. Cancellation during mapping also discards output and unmaps the
 readback buffer. Runs without a cancellation signal do not schedule a separate
 event-loop turn solely for cancellation. `close()` prevents further runs,
 drains the active invocation, and releases retained state. Use a process boundary for deadlines that must survive

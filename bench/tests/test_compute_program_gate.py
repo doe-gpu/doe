@@ -72,6 +72,30 @@ class ComputeProgramGateTests(unittest.TestCase):
         self.path.write_text(json.dumps(self.report))
         validate_run(self.path, ROOT, self.policy)
 
+    def test_current_receipts_bind_provenance_and_actual_submissions(self) -> None:
+        for sample in [self.report['cold'], *self.report['samples']]:
+            receipt = sample['receipt']
+            receipt.update(schemaVersion=4, gpuTiming=None,
+                           programInstance='6b9e2178-7a71-4671-afad-46a641a65413',
+                           inputOrigins={name: {'kind': 'host', 'hash': value}
+                                         for name, value in receipt['inputHashes'].items()},
+                           residentStateBefore={}, outputGeneration=receipt['run'],
+                           copiedInputBytes=0, submissionCount=1)
+        self.validate()
+        original = copy.deepcopy(self.report)
+        for mutate in [
+            lambda r: r.update(outputGeneration=1),
+            lambda r: r.update(programInstance='f40b3f10-690a-4c8e-bb4f-baf9427e58bf'),
+            lambda r: r.update(inputOrigins={'input': {'kind': 'zero'}}),
+            lambda r: r.update(residentStateBefore={'output': {'kind': 'zero'}}),
+            lambda r: r.update(copiedInputBytes=4),
+            lambda r: r.update(submissionCount=2),
+        ]:
+            self.report = copy.deepcopy(original)
+            mutate(self.report['samples'][0]['receipt'])
+            with self.assertRaisesRegex(ValueError, 'provenance or submission'):
+                self.validate()
+
     def test_timestamp_evidence_rejects_changed_units_scope_counts_and_statistics(self) -> None:
         self.policy['gpuTiming'] = 'timestamp-query'
         timing = {'source': 'webgpu-nanoseconds', 'scope': 'compute-pass',

@@ -9,7 +9,8 @@ const BUFFER_ALIGNMENT = Uint32Array.BYTES_PER_ELEMENT;
 
 function validateProgramOptions(options) {
   validateNode(options, PROGRAM_SCHEMA.$defs.options, 'options');
-  return { gpuTiming: PROGRAM_SCHEMA.$defs.options.properties.gpuTiming.default, ...options };
+  return { gpuTiming: PROGRAM_SCHEMA.$defs.options.properties.gpuTiming.default,
+    readback: PROGRAM_SCHEMA.$defs.options.properties.readback.default, ...options };
 }
 
 function programError(code, path, expected, received) {
@@ -76,6 +77,9 @@ function freezeTree(value) {
 
 function validateComputeProgram(descriptor) {
   validateNode(descriptor, PROGRAM_SCHEMA, 'program');
+  if (descriptor.schemaVersion === 1 && descriptor.buffers.some((buffer) => buffer.lifetime !== undefined)) {
+    throw programError('DOE_PROGRAM_INVALID', 'program.schemaVersion', 'version 2 for declared lifetimes', 1);
+  }
   const unique = (values, path) => {
     if (new Set(values).size !== values.length) {
       throw programError('DOE_PROGRAM_INVALID', path, 'unique identifiers', values.join(', '));

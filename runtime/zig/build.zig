@@ -275,10 +275,10 @@ fn addComputeProgramContract(options: *std.Build.Step.Options, allocator: std.me
     defer file.close();
     const bytes = file.readToEndAlloc(allocator, 64 * 1024) catch
         @panic("failed to read compute-program.schema.json");
-    const Schema = struct { properties: struct { schemaVersion: struct { @"const": u32 } } };
+    const Schema = struct { properties: struct { schemaVersion: struct { @"enum": []u32 } } };
     const schema = std.json.parseFromSlice(Schema, allocator, bytes, .{ .ignore_unknown_fields = true }) catch
         @panic("invalid compute program schema version");
-    options.addOption(u32, "compute_program_contract_version", schema.value.properties.schemaVersion.@"const");
+    options.addOption(u32, "compute_program_contract_version", std.mem.max(u32, schema.value.properties.schemaVersion.@"enum"));
     const memory_file = std.fs.cwd().openFile("../../config/vulkan-buffer-memory-policy.json", .{}) catch
         @panic("config/vulkan-buffer-memory-policy.json not found");
     defer memory_file.close();

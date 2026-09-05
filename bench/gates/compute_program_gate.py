@@ -145,6 +145,17 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
             raise ValueError(f"{path}: numerical oracle failed")
         if receipt["programHash"] != program_hash or receipt["inputHashes"] != input_hashes:
             raise ValueError(f"{path}: input or program receipt identity mismatch")
+        if receipt['schemaVersion'] >= 4:
+            expected_origins = {name: {'kind': 'host', 'hash': value}
+                                for name, value in input_hashes.items()}
+            if (receipt['inputOrigins'] != expected_origins
+                    or receipt['residentStateBefore'] != {}
+                    or receipt['outputGeneration'] != expected_run
+                    or receipt['programInstance'] != report['cold']['receipt']['programInstance']
+                    or receipt['copiedInputBytes'] != 0
+                    or receipt['submissionCount'] != 1
+                    or receipt['readbackPath'] != 'mapAsync-copy-unmap'):
+                raise ValueError(f'{path}: invocation provenance or submission work mismatch')
         if receipt["dispatchCount"] != len(program["steps"]):
             raise ValueError(f"{path}: declared dispatch count mismatch")
         buffers = program["buffers"]

@@ -4,15 +4,31 @@
   "title": "Native backend coverage matrix",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "artifactKind", "matrixId", "rows"],
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "matrixId",
+    "rows"
+  ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
-    "artifactKind": { "type": "string", "const": "native_backend_coverage_matrix" },
-    "matrixId": { "type": "string", "minLength": 1 },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 2
+    },
+    "artifactKind": {
+      "type": "string",
+      "const": "native_backend_coverage_matrix"
+    },
+    "matrixId": {
+      "type": "string",
+      "minLength": 1
+    },
     "rows": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/$defs/Row" }
+      "items": {
+        "$ref": "#/$defs/Row"
+      }
     }
   },
   "$defs": {
@@ -24,10 +40,17 @@
         "coverageClass",
         "status",
         "evidencePath",
-        "reasonCode"
+        "reasonCode",
+        "evidenceSha256"
       ],
       "properties": {
-        "backend": { "enum": ["doe_metal", "doe_vulkan", "doe_d3d12"] },
+        "backend": {
+          "enum": [
+            "doe_metal",
+            "doe_vulkan",
+            "doe_d3d12"
+          ]
+        },
         "coverageClass": {
           "enum": [
             "upload",
@@ -40,10 +63,55 @@
             "tails"
           ]
         },
-        "status": { "enum": ["covered", "diagnostic", "missing"] },
-        "evidencePath": { "type": "string" },
-        "reasonCode": { "type": "string" }
-      }
+        "status": {
+          "enum": [
+            "covered",
+            "diagnostic",
+            "missing"
+          ]
+        },
+        "evidencePath": {
+          "type": "string"
+        },
+        "reasonCode": {
+          "type": "string"
+        },
+        "evidenceSha256": {
+          "type": "string",
+          "pattern": "^$|^[a-f0-9]{64}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "covered"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidencePath": {
+                "minLength": 1
+              },
+              "evidenceSha256": {
+                "minLength": 64
+              },
+              "reasonCode": {
+                "const": ""
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "reasonCode": {
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

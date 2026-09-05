@@ -134,7 +134,7 @@ try {
       assert.deepEqual([...new Uint32Array(result.output.buffer)], words);
       assert.equal(result.receipt.dispatchCount, 1);
       if (timed) {
-        assert.equal(result.receipt.schemaVersion, 3);
+        assert.equal(result.receipt.schemaVersion, 4);
         assert.equal(result.receipt.gpuTiming.source, 'webgpu-nanoseconds');
         assert.equal(result.receipt.gpuTiming.periodNs, 1);
         assert.equal(result.receipt.gpuTiming.validBits, 64);
@@ -209,6 +209,119 @@ try {
     await assert.rejects(program.run({ input: new Uint32Array([1, 2, 3, 4]) }), /DOE_PROGRAM_INVALIDATED/);
     await program.close();
     console.log('ok: destroyed timestamp query invalidates GPU recording before submission');
+  }
+  for (const execution of modes) {
+    const resident = structuredClone(descriptor);
+    resident.schemaVersion = 2;
+    resident.buffers.forEach((buffer) => { buffer.lifetime = 'program'; });
+    const program = await prepareComputeProgram(device, resident, { execution, ...timingOptions });
+    assert.throws(() => program.output(), { code: 'DOE_PROGRAM_INPUT' });
+    assert.throws(() => program.run(), { code: 'DOE_PROGRAM_INPUT' });
+    const before = new AbortController();
+    before.abort();
+    await assert.rejects(program.run({ input: new Uint32Array([1, 2, 3, 4]) },
+      { signal: before.signal }), { code: 'DOE_PROGRAM_CANCELLED' });
+    assert.equal(program.state, 'ready');
+    assert.throws(() => program.run(), { code: 'DOE_PROGRAM_INPUT' });
+    const first = await program.run({ input: new Uint32Array([1, 2, 3, 4]) });
+    assert.deepEqual([...new Uint32Array(first.output.buffer)], [1, 2, 3, 4]);
+    assert.equal(first.receipt.uploadedBytes, 16);
+    assert.equal(first.receipt.clearedBytes, 0);
+    assert.deepEqual(first.receipt.residentStateBefore.output, { kind: 'zero' });
+    const oldOutput = program.output();
+    const second = await program.run();
+    assert.deepEqual([...new Uint32Array(second.output.buffer)], [2, 4, 6, 8]);
+    assert.equal(second.receipt.uploadedBytes, 0);
+    assert.equal(second.receipt.inputHashes.input, null);
+    assert.equal(second.receipt.inputOrigins.input.kind, 'program-state');
+    assert.equal(second.receipt.inputOrigins.input.generation, first.receipt.outputGeneration);
+    assert.equal(second.receipt.residentStateBefore.output.programInstance, first.receipt.programInstance);
+
+    const consumerDescriptor = structuredClone(resident);
+    consumerDescriptor.buffers[1].lifetime = 'invocation';
+    const consumer = await prepareComputeProgram(device, consumerDescriptor, { execution });
+    assert.throws(() => consumer.run({ input: oldOutput }), { code: 'DOE_PROGRAM_INPUT' });
+    assert.throws(() => consumer.run({ input: { ...program.output() } }), { code: 'DOE_PROGRAM_INPUT' });
+    const pending = consumer.run({ input: program.output() });
+    assert.throws(() => program.run(), { code: 'DOE_PROGRAM_BUSY' });
+    assert.throws(() => program.update(resident), { code: 'DOE_PROGRAM_BUSY' });
+    const copied = await pending;
+    assert.deepEqual([...new Uint32Array(copied.output.buffer)], [2, 4, 6, 8]);
+    assert.equal(copied.receipt.uploadedBytes, 0);
+    assert.equal(copied.receipt.copiedInputBytes, 16);
+    assert.equal(copied.receipt.inputHashes.input, null);
+    assert.equal(copied.receipt.inputOrigins.input.kind, 'program-output');
+    assert.equal(copied.receipt.inputOrigins.input.programInstance, second.receipt.programInstance);
+    assert.equal(copied.receipt.submissionCount, execution === 'webgpu' ? 1 : 2);
+    const reusedCopy = await consumer.run();
+    assert.deepEqual([...new Uint32Array(reusedCopy.output.buffer)], [2, 4, 6, 8]);
+    assert.equal(reusedCopy.receipt.copiedInputBytes, 0);
+    await consumer.close();
+
+    const changed = structuredClone(resident);
+    changed.shaders[0].code = changed.shaders[0].code.replace('b[id.x] + a[id.x]', 'b[id.x] + a[id.x] * 2u');
+    const updated = await program.update(changed);
+    assert.equal(program.state, 'closed');
+    const continued = await updated.run();
+    assert.deepEqual([...new Uint32Array(continued.output.buffer)], [4, 8, 12, 16]);
+    assert.equal(continued.receipt.uploadedBytes, 0);
+    const broken = structuredClone(changed);
+    broken.shaders[0].code = 'not WGSL';
+    await assert.rejects(updated.update(broken));
+    assert.equal(updated.state, 'ready');
+    const rollback = await updated.run();
+    assert.deepEqual([...new Uint32Array(rollback.output.buffer)], [6, 12, 18, 24]);
+    const smaller = structuredClone(changed);
+    smaller.buffers.forEach((buffer) => { buffer.size = 8; });
+    smaller.steps[0].workgroups[0] = 2;
+    const resized = await updated.update(smaller);
+    assert.throws(() => resized.run(), { code: 'DOE_PROGRAM_INPUT' });
+    const reset = await resized.run({ input: new Uint32Array([5, 7]) });
+    assert.deepEqual([...new Uint32Array(reset.output.buffer)], [10, 14]);
+    const cancelled = new AbortController();
+    const inFlight = resized.run({}, { signal: cancelled.signal });
+    cancelled.abort();
+    await assert.rejects(inFlight, { code: 'DOE_PROGRAM_CANCELLED' });
+    assert.equal(resized.state, 'invalid');
+    assert.throws(() => resized.output(), { code: 'DOE_PROGRAM_INVALIDATED' });
+    await resized.close();
+    await updated.close();
+    await program.close();
+
+    const mutating = structuredClone(resident);
+    mutating.shaders[0].code = mutating.shaders[0].code
+      .replace('var<storage, read> a', 'var<storage, read_write> a')
+      .replace('b[id.x] = b[id.x] + a[id.x];', 'b[id.x] = a[id.x]; a[id.x] += 1u;');
+    const mutableInput = await prepareComputeProgram(device, mutating, { execution });
+    await mutableInput.run({ input: new Uint32Array([1, 2, 3, 4]) });
+    const mutated = await mutableInput.run();
+    assert.deepEqual([...new Uint32Array(mutated.output.buffer)], [2, 3, 4, 5]);
+    assert.equal(mutated.receipt.inputHashes.input, null);
+    await mutableInput.close();
+
+    const producer = await prepareComputeProgram(device, resident, { execution, readback: 'none' });
+    const downstream = await prepareComputeProgram(device, descriptor, { execution });
+    const generated = await producer.run({ input: new Uint32Array([7, 11, 13, 17]) });
+    assert.equal(generated.output, null);
+    assert.equal(generated.receipt.outputHash, null);
+    assert.equal(generated.receipt.readbackPath, 'none');
+    assert.equal(generated.receipt.readbackBytes, 0);
+    assert.equal(generated.receipt.allocatedBufferBytes, 32);
+    const leased = downstream.run({ input: producer.output() });
+    await producer.close();
+    assert.deepEqual([...new Uint32Array((await leased).output.buffer)], [7, 11, 13, 17]);
+    await downstream.close();
+    if (timed) {
+      const timedProducer = await prepareComputeProgram(device, resident,
+        { execution, readback: 'none', ...timingOptions });
+      const measured = await timedProducer.run({ input: new Uint32Array([1, 2, 3, 4]) });
+      assert.equal(measured.output, null);
+      assert.equal(measured.receipt.outputHash, null);
+      assert.equal(measured.receipt.readbackBytes, 16);
+      assert(measured.receipt.gpuTiming.elapsedNs > 0);
+      await timedProducer.close();
+    }
+    console.log(`ok: ${execution} resident inputs/state, GPU output leases, stale references, cancellation and transactional update`);
   }
   const lost = [];
   for (const execution of modes) lost.push(await prepareComputeProgram(device, descriptor, { execution }));

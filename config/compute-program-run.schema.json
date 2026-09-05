@@ -35,7 +35,8 @@
           "enum": [
             1,
             2,
-            3
+            3,
+            4
           ]
         },
         "programHash": {
@@ -57,13 +58,19 @@
         "inputHashes": {
           "type": "object",
           "additionalProperties": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "pattern": "^[a-f0-9]{64}$"
           },
-          "description": "Input buffer identifiers map to full immutable byte hashes."
+          "description": "Hashes of bytes known at invocation start; null means GPU state is identified by inputOrigins rather than observed content."
         },
         "outputHash": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^[a-f0-9]{64}$"
         },
         "dispatchCount": {
@@ -84,7 +91,10 @@
         },
         "readbackPath": {
           "type": "string",
-          "const": "mapAsync-copy-unmap"
+          "enum": [
+            "mapAsync-copy-unmap",
+            "none"
+          ]
         },
         "allocatedBufferBytes": {
           "type": "integer",
@@ -132,6 +142,35 @@
               "$ref": "#/$defs/gpuTiming"
             }
           ]
+        },
+        "programInstance": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "inputOrigins": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/programOrigin"
+          }
+        },
+        "residentStateBefore": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/programOrigin"
+          }
+        },
+        "outputGeneration": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "copiedInputBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "submissionCount": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "allOf": [
@@ -153,6 +192,96 @@
               "required": [
                 "gpuTiming"
               ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "schemaVersion": {
+                "const": 4
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "programInstance",
+              "inputOrigins",
+              "residentStateBefore",
+              "outputGeneration",
+              "copiedInputBytes",
+              "submissionCount"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "programInstance"
+                  ]
+                },
+                {
+                  "required": [
+                    "inputOrigins"
+                  ]
+                },
+                {
+                  "required": [
+                    "residentStateBefore"
+                  ]
+                },
+                {
+                  "required": [
+                    "outputGeneration"
+                  ]
+                },
+                {
+                  "required": [
+                    "copiedInputBytes"
+                  ]
+                },
+                {
+                  "required": [
+                    "submissionCount"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "inputHashes": {
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "outputHash": {
+                "type": "string"
+              },
+              "readbackPath": {
+                "const": "mapAsync-copy-unmap"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "readbackPath": {
+                "const": "none"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "readbackBytes": {
+                "const": 0
+              },
+              "outputHash": {
+                "type": "null"
+              },
+              "gpuTiming": {
+                "type": "null"
+              }
             }
           }
         }
@@ -991,6 +1120,75 @@
           "maximum": 9007199254740991
         }
       }
+    },
+    "programOrigin": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hash"
+          ],
+          "properties": {
+            "kind": {
+              "const": "host"
+            },
+            "hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "zero"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "programHash",
+            "programInstance",
+            "buffer",
+            "generation"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "program-output",
+                "program-state"
+              ]
+            },
+            "programHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "programInstance": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "buffer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        }
+      ]
     }
   },
   "required": [
@@ -1054,6 +1252,12 @@
     "gpuTiming": {},
     "gpuStatsNs": {},
     "providerAddonArtifact": {},
-    "timestampCalibrationArtifact": {}
+    "timestampCalibrationArtifact": {},
+    "programInstance": {},
+    "inputOrigins": {},
+    "residentStateBefore": {},
+    "outputGeneration": {},
+    "copiedInputBytes": {},
+    "submissionCount": {}
   }
 }

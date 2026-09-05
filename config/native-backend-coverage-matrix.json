@@ -1,33 +1,199 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "native_backend_coverage_matrix",
   "matrixId": "native-backend-coverage-v0",
   "rows": [
-    { "backend": "doe_metal", "coverageClass": "upload", "status": "covered", "evidencePath": "examples/native-upload-path-receipts.sample.json", "reasonCode": "" },
-    { "backend": "doe_metal", "coverageClass": "pipeline_creation", "status": "covered", "evidencePath": "examples/native-pipeline-cache-receipts.sample.json", "reasonCode": "" },
-    { "backend": "doe_metal", "coverageClass": "compute", "status": "covered", "evidencePath": "examples/run-receipt.sample.json", "reasonCode": "" },
-    { "backend": "doe_metal", "coverageClass": "readback", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_fresh_release_artifact" },
-    { "backend": "doe_metal", "coverageClass": "small_command_stream", "status": "covered", "evidencePath": "examples/native-command-graph-receipt.sample.json", "reasonCode": "" },
-    { "backend": "doe_metal", "coverageClass": "cache_behavior", "status": "covered", "evidencePath": "examples/native-pipeline-cache-receipts.sample.json", "reasonCode": "" },
-    { "backend": "doe_metal", "coverageClass": "concurrency", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_concurrency_receipt" },
-    { "backend": "doe_metal", "coverageClass": "tails", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_tail_workload_receipt" },
-
-    { "backend": "doe_vulkan", "coverageClass": "upload", "status": "covered", "evidencePath": "examples/native-upload-path-receipts.sample.json", "reasonCode": "" },
-    { "backend": "doe_vulkan", "coverageClass": "pipeline_creation", "status": "covered", "evidencePath": "examples/native-pipeline-cache-receipts.sample.json", "reasonCode": "" },
-    { "backend": "doe_vulkan", "coverageClass": "compute", "status": "covered", "evidencePath": "examples/run-receipt.sample.json", "reasonCode": "" },
-    { "backend": "doe_vulkan", "coverageClass": "readback", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_fresh_release_artifact" },
-    { "backend": "doe_vulkan", "coverageClass": "small_command_stream", "status": "covered", "evidencePath": "examples/native-command-graph-receipt.sample.json", "reasonCode": "" },
-    { "backend": "doe_vulkan", "coverageClass": "cache_behavior", "status": "covered", "evidencePath": "examples/native-pipeline-cache-receipts.sample.json", "reasonCode": "" },
-    { "backend": "doe_vulkan", "coverageClass": "concurrency", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_concurrency_receipt" },
-    { "backend": "doe_vulkan", "coverageClass": "tails", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_tail_workload_receipt" },
-
-    { "backend": "doe_d3d12", "coverageClass": "upload", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" },
-    { "backend": "doe_d3d12", "coverageClass": "pipeline_creation", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" },
-    { "backend": "doe_d3d12", "coverageClass": "compute", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" },
-    { "backend": "doe_d3d12", "coverageClass": "readback", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" },
-    { "backend": "doe_d3d12", "coverageClass": "small_command_stream", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" },
-    { "backend": "doe_d3d12", "coverageClass": "cache_behavior", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" },
-    { "backend": "doe_d3d12", "coverageClass": "concurrency", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" },
-    { "backend": "doe_d3d12", "coverageClass": "tails", "status": "diagnostic", "evidencePath": "", "reasonCode": "needs_windows_artifact" }
+    {
+      "backend": "doe_metal",
+      "coverageClass": "upload",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_metal",
+      "coverageClass": "pipeline_creation",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_metal",
+      "coverageClass": "compute",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_metal",
+      "coverageClass": "readback",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_fresh_release_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_metal",
+      "coverageClass": "small_command_stream",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_metal",
+      "coverageClass": "cache_behavior",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_metal",
+      "coverageClass": "concurrency",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_concurrency_receipt",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_metal",
+      "coverageClass": "tails",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_tail_workload_receipt",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "upload",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "pipeline_creation",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "compute",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "readback",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_fresh_release_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "small_command_stream",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "cache_behavior",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "schema_example_is_not_execution_evidence",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "concurrency",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_concurrency_receipt",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_vulkan",
+      "coverageClass": "tails",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_tail_workload_receipt",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "upload",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "pipeline_creation",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "compute",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "readback",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "small_command_stream",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "cache_behavior",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "concurrency",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    },
+    {
+      "backend": "doe_d3d12",
+      "coverageClass": "tails",
+      "status": "diagnostic",
+      "evidencePath": "",
+      "reasonCode": "needs_windows_artifact",
+      "evidenceSha256": ""
+    }
   ]
 }

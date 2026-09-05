@@ -2,7 +2,8 @@
 
 ## System surfaces
 
-Doe has three user-facing/runtime-adjacent surfaces and two supporting layers.
+Doe exposes one execution product through packages and native embedding, with
+optional integrations and shared evidence tooling.
 
 1. `runtime/zig`
    The core Doe runtime: WGSL pipeline, backend execution, runtime artifacts,
@@ -11,7 +12,7 @@ Doe has three user-facing/runtime-adjacent surfaces and two supporting layers.
    The JavaScript package surface for Node.js, Bun, Deno, and browser-facing
    wrappers.
 3. `browser/chromium`
-   The active Fawn/Chromium product lane: integration contracts, release
+   The experimental Fawn/Chromium distribution lane: integration contracts, release
    packaging, clean-install verification, browser probes, and evidence gates.
 4. `bench`
    Compare harnesses, gates, and evidence workflows.
@@ -22,7 +23,7 @@ These surfaces are related, but they are not interchangeable.
 
 They also sit at different maturity levels. Dawn remains the WebGPU runtime
 used in Chromium and much of the browser ecosystem. Doe's native/package lane
-has physical evidence; Fawn is an active first-class product target whose
+has physical evidence; Fawn is an experimental distribution target whose
 current browser evidence remains diagnostic.
 
 ## Strategic decomposition
@@ -60,9 +61,9 @@ and binds specialized evidence through typed extensions; see
 1. **Inside the Zig Runtime:** Decoupled, contract-governed, and acyclic
    (`src/contracts/` -> `src/backend/ports/` -> `src/app/` -> leaf backends).
    No browser-specific globals, no direct cross-backend imports.
-2. **Outside the Zig Runtime:** Vertically integrated product composition
-   (`Fawn` browser shell + `DoeRuntime` compiler/executor + `DoeLab` learning
-   loop + `DoeProof` governance).
+2. **Outside the Zig Runtime:** Applications select `DoeRuntime` through the
+   package or native embedding. `DoeLab` supplies correction workflows and
+   `DoeProof` evaluates execution. Fawn is an optional distribution integration.
 3. **Cross-Layer Optimization:** Governed through explicit contracts
    (`WorkloadProfile`, `SpecializationPolicy`, `PromotionReceipt`), never
    through hidden runtime heuristics or implicit environment checks.
@@ -75,7 +76,7 @@ The important boundary distinctions are:
 - `runtime/bridge/onnxruntime-ep` is a repo-only integration seam for a future Doe-backed ONNX Runtime plugin EP
 - `doe-gpu` is the package surface over that runtime
 - `doe-gpu/browser` is a browser wrapper, not the Doe runtime running inside the browser
-- `browser/chromium` is the active Fawn browser-runtime lane, not the current package wrapper
+- `browser/chromium` owns the experimental Fawn browser-runtime integration
 - `bench` measures surfaces; it is not itself a product surface
 
 Current scope:
@@ -83,7 +84,7 @@ Current scope:
 - Dawn is the comparison baseline
 - Doe runs in Node.js, Bun, Deno, drop-in, and embedded/native lanes
 - a Doe-backed ONNX Runtime plugin EP is a repo-only experimental integration seam
-- browser `navigator.gpu` replacement is an explicit independently gated product lane, not the current package claim
+- browser `navigator.gpu` replacement is an optional independently gated distribution lane
 
 That separation is deliberate. It keeps package ergonomics, runtime behavior,
 and browser integration from getting blurred together in docs or benchmarks.

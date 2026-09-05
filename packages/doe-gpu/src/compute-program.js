@@ -1,9 +1,11 @@
 // Fixed-shape programs retain resources and explicitly choose their execution path.
 import { performance } from 'node:perf_hooks';
+import { randomUUID } from 'node:crypto';
 import { setImmediate } from 'node:timers/promises';
 import { globals } from './vendor/webgpu/webgpu-constants.js';
 import { nativeProgramProvider } from './compute-program-native.js';
 import { hashBytes, programError, validateComputeProgram, validateProgramOptions } from './compute-program-contract.js';
+import { lifetime, outputReference, releaseEntry, inputBatch } from './compute-program-residency.js';
 import { QUERY_COUNT, QUERY_BYTES, timestampInfo, timestampResult } from './compute-program-timing.js';
 
 const { GPUBufferUsage, GPUMapMode } = globals;
@@ -18,21 +20,6 @@ function deviceLoss(device) {
     device.lost.then((info) => { monitor.info = info; });
   }
   return monitor;
-}
-
-function bytesOf(value, path, size) {
-  if (!ArrayBuffer.isView(value) && !(value instanceof ArrayBuffer)) {
-    throw programError('DOE_PROGRAM_INPUT', path, 'ArrayBuffer or view', typeof value);
-  }
-  const bytes = ArrayBuffer.isView(value)
-    ? new Uint8Array(value.buffer, value.byteOffset, value.byteLength) : new Uint8Array(value);
-  if (bytes.byteLength !== size) {
-    throw programError('DOE_PROGRAM_INPUT', path, `${size} bytes`, bytes.byteLength);
-  }
-  if (typeof SharedArrayBuffer !== 'undefined' && bytes.buffer instanceof SharedArrayBuffer) {
-    throw programError('DOE_PROGRAM_INPUT', path, 'non-shared input snapshot', 'SharedArrayBuffer');
-  }
-  return bytes.slice();
 }
 
 async function captureGpuErrors(device, action) {
@@ -66,7 +53,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
   const started = performance.now();
   const identity = validateComputeProgram(descriptor);
   const plan = identity.descriptor;
-  const { execution, gpuTiming } = validateProgramOptions(options);
+  const { execution, gpuTiming, readback: readbackMode } = validateProgramOptions(options);
   const native = nativeProgramProvider(device);
   if (execution !== 'webgpu' && !native) {
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'device', 'Doe native recorded program provider', 'unregistered device');
@@ -75,12 +62,14 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'device.gpuRecording',
       'Vulkan GPU recording with a current addon and library', 'unavailable');
   }
-  if (native && native.contractVersion !== plan.schemaVersion) {
+  if (native && native.contractVersion < plan.schemaVersion) {
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'device.runtimeContract',
       `native compute program contract ${plan.schemaVersion}; rebuild the addon and native library`, native.contractVersion);
   }
   const clock = timestampInfo(device, native, gpuTiming);
   const buffers = new Map();
+  const bufferEntries = new Map();
+  const programInstance = randomUUID();
   const shaders = new Map();
   const pipelines = new Map();
   const steps = [];
@@ -89,7 +78,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
   function acquire(key, create) {
     if (resources.has(key)) return resources.get(key).value;
     const retained = previous?.get(key);
-    const entry = retained ?? { value: create(), refs: 0 };
+    const entry = retained ?? { value: create(), refs: 0, generation: 0, origin: Object.freeze({ kind: 'zero' }) };
     entry.refs += 1;
     resources.set(key, entry);
     if (retained) preparation.reusedResources += 1;
@@ -107,10 +96,19 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
   let closed = false;
   const loss = deviceLoss(device);
   const outputSize = plan.buffers.find((buffer) => buffer.id === plan.output).size;
-  const timestampOffset = Math.ceil(outputSize / BigUint64Array.BYTES_PER_ELEMENT) * BigUint64Array.BYTES_PER_ELEMENT;
-  const readbackSize = clock ? timestampOffset + QUERY_BYTES : outputSize;
+  const outputReadbackSize = readbackMode === 'output' ? outputSize : 0;
+  const timestampOffset = Math.ceil(outputReadbackSize / BigUint64Array.BYTES_PER_ELEMENT) * BigUint64Array.BYTES_PER_ELEMENT;
+  const readbackSize = clock ? timestampOffset + QUERY_BYTES : outputReadbackSize;
   const inputs = plan.buffers.filter((buffer) => buffer.role === 'input');
-  const cleared = plan.buffers.filter((buffer) => buffer.role !== 'input');
+  const cleared = plan.buffers.filter((buffer) => buffer.role !== 'input' && lifetime(buffer) === 'invocation');
+  const resident = plan.buffers.filter((buffer) => lifetime(buffer) === 'program');
+  let outputReady = false;
+  const owner = { device, outputSize, readers: 0, assertReadable() {
+    assertReady();
+    if (active || !outputReady) {
+      throw programError('DOE_PROGRAM_INPUT', 'program.output', 'completed idle producer', 'unavailable output');
+    }
+  } };
   const allocatedBytes = plan.buffers.reduce((sum, buffer) => sum + buffer.size,
     readbackSize + (clock ? QUERY_BYTES : 0));
 
@@ -122,6 +120,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
 
   function encode() {
     const encoder = device.createCommandEncoder({ label: plan.id });
+    if (execution !== 'webgpu') native.materializeEncoder(encoder);
     for (const buffer of cleared) encoder.clearBuffer(buffers.get(buffer.id));
     const pass = encoder.beginComputePass(clock ? { timestampWrites: {
       querySet: queries, beginningOfPassWriteIndex: 0, endOfPassWriteIndex: 1,
@@ -136,7 +135,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
       encoder.resolveQuerySet(queries, 0, QUERY_COUNT, queryResolve, 0);
       encoder.copyBufferToBuffer(queryResolve, 0, readback, timestampOffset, QUERY_BYTES);
     }
-    encoder.copyBufferToBuffer(buffers.get(plan.output), 0, readback, 0, outputSize);
+    if (outputReadbackSize) encoder.copyBufferToBuffer(buffers.get(plan.output), 0, readback, 0, outputReadbackSize);
     return encoder.finish();
   }
 
@@ -144,11 +143,11 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
     recording?.destroy();
     recording = null;
     for (const entry of [...resources.values()].reverse()) {
-      entry.refs -= 1;
-      if (entry.refs === 0) entry.value.destroy?.();
+      releaseEntry(entry);
     }
     resources.clear();
     buffers.clear();
+    bufferEntries.clear();
     pipelines.clear();
     shaders.clear();
     steps.length = 0;
@@ -161,12 +160,14 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
           throw programError('DOE_PROGRAM_LIMIT', `buffers.${declaration.id}`, 'size within device limits', declaration.size);
         }
         const bindingUsage = declaration.type === 'uniform' ? GPUBufferUsage.UNIFORM : GPUBufferUsage.STORAGE;
-        buffers.set(declaration.id, acquire(`buffer:${JSON.stringify(declaration)}`, () => device.createBuffer({
+        const key = `buffer:${JSON.stringify(declaration)}`;
+        buffers.set(declaration.id, acquire(key, () => device.createBuffer({
           label: declaration.id, size: declaration.size,
           usage: bindingUsage | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
         })));
+        bufferEntries.set(declaration.id, resources.get(key));
       }
-      readback = acquire(`readback:${readbackSize}`, () => device.createBuffer({
+      if (readbackSize) readback = acquire(`readback:${readbackSize}`, () => device.createBuffer({
         label: `${plan.id}:readback`, size: readbackSize,
         usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
       }));
@@ -210,6 +211,14 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
         steps.push({ pipeline, bindGroup, workgroups: step.workgroups });
       }
       if (execution !== 'webgpu') recording = native.prepare(encode(), execution);
+      const initialized = resident.filter((buffer) => buffer.role !== 'input'
+        && !previous?.has(`buffer:${JSON.stringify(buffer)}`));
+      if (initialized.length) {
+        const encoder = device.createCommandEncoder({ label: `${plan.id}:initialize` });
+        for (const buffer of initialized) encoder.clearBuffer(buffers.get(buffer.id));
+        device.queue.submit([encoder.finish()]);
+        await device.queue.onSubmittedWorkDone();
+      }
     });
     if (loss.info || native?.isLost()) {
       throw programError('DOE_PROGRAM_INVALIDATED', 'device', 'live device', 'lost during preparation');
@@ -228,67 +237,105 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
     }
   }
 
-  async function execute(inputSnapshots, signal) {
+  async function execute(batch, signal) {
     const start = performance.now();
     let submitted = false;
     try {
       return await captureGpuErrors(device, async () => {
         if (signal?.aborted) throw programError('DOE_PROGRAM_CANCELLED', 'signal', 'active run', 'aborted before upload');
+        outputReady = false;
+        const residentStateBefore = Object.fromEntries(resident.filter((buffer) => buffer.role !== 'input')
+          .map((buffer) => [buffer.id, bufferEntries.get(buffer.id).origin]));
+        for (const entry of bufferEntries.values()) {
+          if (!Number.isSafeInteger(entry.generation + 1)) {
+            throw programError('DOE_PROGRAM_INVALIDATED', 'program.generation', 'safe integer', 'exhausted');
+          }
+          entry.generation += 1;
+        }
         const uploadStart = performance.now();
-        for (const input of inputs) device.queue.writeBuffer(buffers.get(input.id), 0, inputSnapshots[input.id]);
+        for (const update of batch.updates) {
+          if (update.bytes) device.queue.writeBuffer(update.entry.value, 0, update.bytes);
+          update.entry.inputOrigin = update.origin;
+          update.entry.inputHash = update.hash;
+        }
         const uploadMs = performance.now() - uploadStart;
         const encodeStart = performance.now();
+        const copies = batch.updates.filter((update) => update.source);
+        let copyCommands;
+        if (copies.length) {
+          const encoder = device.createCommandEncoder({ label: `${plan.id}:inputs` });
+          for (const copy of copies) encoder.copyBufferToBuffer(copy.source, 0, copy.entry.value, 0, copy.size);
+          copyCommands = encoder.finish();
+        }
         const commands = execution === 'webgpu' ? encode() : null;
         const encodeMs = performance.now() - encodeStart;
         const submitStart = performance.now();
-        if (recording) recording.submit();
-        else device.queue.submit([commands]);
         submitted = true;
+        if (recording) {
+          if (copyCommands) device.queue.submit([copyCommands]);
+          recording.submit();
+        } else device.queue.submit(copyCommands ? [copyCommands, commands] : [commands]);
+        for (const declaration of plan.buffers) {
+          const entry = bufferEntries.get(declaration.id);
+          entry.origin = Object.freeze({ kind: 'program-state', programHash: identity.programHash,
+            programInstance, buffer: declaration.id, generation: entry.generation });
+          // A role describes data flow, not WGSL write access. Storage contents
+          // after execution carry provenance until actual bytes are observed.
+          if (declaration.role === 'input' && declaration.type === 'storage') {
+            entry.inputHash = null;
+            entry.inputOrigin = entry.origin;
+          }
+        }
         await device.queue.onSubmittedWorkDone();
         const submitWaitMs = performance.now() - submitStart;
-        // Let an attached cancellation source run after draining submitted work.
         if (signal) await setImmediate();
         assertExecutionActive(signal);
         const readStart = performance.now();
-        await readback.mapAsync(GPUMapMode.READ);
-        let output;
+        let output = null;
         let gpuTime = null;
-        try {
-          const bytes = readback.getMappedRange();
-          output = new Uint8Array(bytes, 0, outputSize).slice();
-          if (clock) gpuTime = timestampResult(bytes, timestampOffset, clock);
+        if (readback) {
+          await readback.mapAsync(GPUMapMode.READ);
+          try {
+            const bytes = readback.getMappedRange();
+            if (outputReadbackSize) output = new Uint8Array(bytes, 0, outputReadbackSize).slice();
+            if (clock) gpuTime = timestampResult(bytes, timestampOffset, clock);
+          } finally { readback.unmap(); }
         }
-        finally { readback.unmap(); }
         assertExecutionActive(signal);
-        const readbackMs = performance.now() - readStart;
+        const readbackMs = readback ? performance.now() - readStart : 0;
         runs += 1;
+        const outputGeneration = bufferEntries.get(plan.output).generation;
         return {
           output,
           receipt: {
-            schemaVersion: 3, programHash: identity.programHash, execution, run: runs,
-            inputHashes: Object.fromEntries(inputs.map((input) => [input.id, hashBytes(inputSnapshots[input.id])])),
-            outputHash: hashBytes(output), dispatchCount: plan.steps.length,
+            schemaVersion: 4, programHash: identity.programHash, programInstance, execution, run: runs,
+            inputHashes: batch.hashes, inputOrigins: batch.origins, residentStateBefore,
+            outputHash: output ? hashBytes(output) : null, outputGeneration,
+            dispatchCount: plan.steps.length,
             clearedBytes: cleared.reduce((sum, buffer) => sum + buffer.size, 0),
-            uploadedBytes: inputs.reduce((sum, buffer) => sum + buffer.size, 0),
-            readbackBytes: outputSize + (clock ? QUERY_BYTES : 0), readbackPath: 'mapAsync-copy-unmap',
+            uploadedBytes: batch.updates.reduce((sum, update) => sum + (update.bytes ? update.size : 0), 0),
+            copiedInputBytes: copies.reduce((sum, copy) => sum + copy.size, 0),
+            submissionCount: recording && copyCommands ? 2 : 1,
+            readbackBytes: outputReadbackSize + (clock ? QUERY_BYTES : 0),
+            readbackPath: readback ? 'mapAsync-copy-unmap' : 'none',
             allocatedBufferBytes: allocatedBytes,
             gpuTiming: gpuTime,
             timingMs: { upload: uploadMs, encode: encodeMs, submitWait: submitWaitMs,
               readback: readbackMs, total: performance.now() - start },
           },
         };
-      });
+      }).then((result) => { outputReady = true; return result; });
     } catch (error) {
       if (submitted) {
         try { await device.queue.onSubmittedWorkDone(); }
         catch { state = 'invalid'; reason = 'completion failed'; }
       }
-      if (error.code !== 'DOE_PROGRAM_CANCELLED' && error.code !== 'DOE_PROGRAM_BUSY') {
+      if ((submitted && resident.length) || (error.code !== 'DOE_PROGRAM_CANCELLED' && error.code !== 'DOE_PROGRAM_BUSY')) {
         state = 'invalid';
         reason = error.message;
       }
       throw error;
-    }
+    } finally { batch.release(); }
   }
 
   const api = Object.freeze({
@@ -298,27 +345,26 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
     allocatedBufferBytes: allocatedBytes,
     preparation: Object.freeze(preparation),
     get state() { return closed ? 'closed' : loss.info || native?.isLost() ? 'invalid' : state; },
-    run(values, { signal } = {}) {
+    output() {
+      owner.assertReadable();
+      const entry = bufferEntries.get(plan.output);
+      return outputReference(owner, entry, { programHash: identity.programHash,
+        programInstance, buffer: plan.output, generation: entry.generation });
+    },
+    run(values = {}, { signal } = {}) {
       assertReady();
-      if (active) throw programError('DOE_PROGRAM_BUSY', 'program.run', 'idle program', 'run in progress');
-      if (!values || typeof values !== 'object' || Array.isArray(values)
-          || Object.keys(values).length !== inputs.length
-          || inputs.some((input) => !Object.hasOwn(values, input.id))) {
-        throw programError('DOE_PROGRAM_INPUT', 'inputs', inputs.map((input) => input.id).join(', '), 'missing or extra inputs');
-      }
-      const snapshots = Object.fromEntries(inputs.map((input) => [
-        input.id, bytesOf(values[input.id], `inputs.${input.id}`, input.size),
-      ]));
-      active = execute(snapshots, signal).finally(() => { active = null; });
+      if (active || owner.readers) throw programError('DOE_PROGRAM_BUSY', 'program.run', 'idle unleased program', 'operation in progress');
+      const batch = inputBatch(owner, inputs, bufferEntries, values);
+      active = execute(batch, signal).finally(() => { active = null; });
       return active;
     },
     update(nextDescriptor) {
       assertReady();
-      if (active) throw programError('DOE_PROGRAM_BUSY', 'program.update', 'idle program', 'operation in progress');
+      if (active || owner.readers) throw programError('DOE_PROGRAM_BUSY', 'program.update', 'idle program', 'operation in progress');
       const next = validateComputeProgram(nextDescriptor);
       if (next.programHash === identity.programHash) return Promise.resolve(api);
       state = 'updating';
-      active = buildComputeProgram(device, next.descriptor, { execution, gpuTiming }, resources).then(async (replacement) => {
+      active = buildComputeProgram(device, next.descriptor, { execution, gpuTiming, readback: readbackMode }, resources).then(async (replacement) => {
         if (closed) {
           await replacement.close();
           throw programError('DOE_PROGRAM_INVALIDATED', 'program.update', 'open program', 'closed during update');

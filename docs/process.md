@@ -85,6 +85,15 @@ classified and cannot be promoted by benchmark results.
   an independent integer oracle, and physical query intervals are bounded by
   an independent host clock. Receipt version 3 distinguishes normalized Doe
   results from historical native-tick receipts; old evidence keeps its units.
+- Compute descriptor version 2 adds explicit invocation/program buffer lifetimes;
+  native contract version 2 also accepts historical version 1 declarations.
+  Receipt version 4 records GPU state provenance separately from known byte
+  hashes. The physical program regression must cover omitted-input initialization,
+  persistent state, writable inputs, same-device output leases, stale references,
+  transactional updates, cancellation, and no-output-readback execution. A
+  cancelled submitted resident computation cannot silently continue. These are
+  correctness checks; transfer and timing advantages require matched application
+  controls and separate evidence admission.
 - Program GPU timing is an explicit evaluation policy. Timestamp pass markers
   must bracket equivalent completion stages, and counter precision must be
   disclosed. The gate recomputes calibrated durations, percentile statistics,
@@ -100,6 +109,13 @@ classified and cannot be promoted by benchmark results.
   coherence and supported memory-type requirements remain mandatory. Validate
   the selection regression and physical ordinary/prepared application controls
   before interpreting an allocation-policy change as an improvement.
+- Native coverage matrix version 2 requires artifact hashes and real execution
+  provenance. Schema examples, renamed examples without an execution chain,
+  wrong backends, failed/skipped native work, changed binaries, and missing or
+  inconsistent traces cannot establish coverage. The matrix gate validates
+  native trace replay and execution counts; it does not confer performance or
+  package release admission. Regenerate version 1 sample-based rows from
+  physical receipts before marking them covered.
 - Claim-bearing workloads must emit every evidence extension declared by their
   policy. Missing evidence fails closed.
 - Focused module tests are valid executor mechanisms when they provide a
