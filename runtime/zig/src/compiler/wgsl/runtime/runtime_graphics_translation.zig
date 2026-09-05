@@ -62,10 +62,12 @@ pub fn translateToSpirvForGraphicsRuntime(
     for (module_ir.entry_points.items) |entry| {
         switch (entry.stage) {
             .vertex => {
+                if (result.has_vertex) continue;
                 result.has_vertex = true;
                 result.vertex_spirv = try emit_stage_spirv_words(allocator, &module_ir, .vertex);
             },
             .fragment => {
+                if (result.has_fragment) continue;
                 result.has_fragment = true;
                 result.fragment_spirv = try emit_stage_spirv_words(allocator, &module_ir, .fragment);
             },
@@ -88,14 +90,20 @@ fn emit_stage_spirv_words(
     var spirv_buf = allocator.alloc(u8, emit_spirv.MAX_OUTPUT) catch return analysis.TranslateError.OutOfMemory;
     defer allocator.free(spirv_buf);
 
-    const len = emit_spirv.emitForStage(module_ir, stage, spirv_buf) catch |err| return switch (err) {
-        error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
-        error.UnsupportedConstruct => analysis.TranslateError.UnsupportedConstruct,
-        error.InvalidIr => analysis.TranslateError.InvalidIr,
-        error.OutOfMemory => analysis.TranslateError.OutOfMemory,
+    const len = emit_spirv.emitForStage(module_ir, stage, spirv_buf) catch |err| {
+        const kind: analysis.TranslateError = switch (err) {
+            error.OutputTooLarge => error.OutputTooLarge,
+            error.UnsupportedConstruct => error.UnsupportedConstruct,
+            error.InvalidIr => error.InvalidIr,
+            error.OutOfMemory => error.OutOfMemory,
+        };
+        analysis.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
+        return kind;
     };
-
-    if (len == 0 or (len % 4) != 0) return analysis.TranslateError.InvalidIr;
+    if (len == 0 or (len % @sizeOf(u32)) != 0) {
+        analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
+        return error.InvalidIr;
+    }
 
     const word_count = len / 4;
     const words = allocator.alloc(u32, word_count) catch return analysis.TranslateError.OutOfMemory;

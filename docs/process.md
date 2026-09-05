@@ -74,12 +74,24 @@ classified and cannot be promoted by benchmark results.
 - Queue-ordering repairs require a regression with a separate asynchronous
   producer submission and readback submission, plus the original external
   reproduction. Host-visible memory does not waive GPU execution dependencies.
+- Shader compilation failures preserve the responsible compiler stage, cause,
+  and available WGSL source location through native wrappers and
+  `getCompilationInfo()`. Regression coverage checks that subsequent compilations
+  cannot overwrite a failed module's diagnostic. Graphics translation ownership
+  is checked with allocation accounting when a module has multiple entry points
+  for the same stage; stage output is emitted once and transferred to the native
+  shader module without leaking the original allocation.
 - Native addon pass descriptors are checked against the runtime's pinned WebGPU
   header by `packages/doe-gpu/scripts/build-addon.js`; an ABI layout mismatch
   fails the build. Retained-package qualification exercises timestamp pass
   boundaries, repeated query reset/readback, and exact shader output on each
   selected host. Ordered timestamps alone do not establish calibrated GPU time
   or a prepared-program performance claim.
+- Retained-package qualification runs the installed first-kernel examples as
+  well as governed candidate and lifecycle fixtures. Examples must validate
+  their output and release the device; their library identity must match the
+  lifecycle run. The qualifier source and host outputs are retained with the
+  package archives.
 - Vulkan query results must use the versioned nanosecond contract before any
   GPU consumer or readback. The production conversion shader is compared with
   an independent integer oracle, and physical query intervals are bounded by

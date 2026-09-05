@@ -42,6 +42,24 @@ device.createBuffer = (declaration) => {
   return buffer;
 };
 try {
+  for (const [code, kind] of [
+    ['// source line one\nnot valid WGSL', 'UnexpectedToken'],
+    ['@compute @workgroup_size(1) fn main() {\n let value: u32 = missing_value;\n}', 'UnknownIdentifier'],
+    ['@vertex fn main() -> @builtin(position) vec4f {\n return missing_value;\n}', 'UnknownIdentifier'],
+  ]) {
+    const bad = device.createShaderModule({ code });
+    const info = await bad.getCompilationInfo();
+    const diagnostic = info.messages.find((message) => message.type === 'error');
+    assert(diagnostic?.message.includes(kind));
+    assert.equal(diagnostic.lineNum, 2);
+    assert(diagnostic.linePos > 0);
+    const good = device.createShaderModule({ code: '@compute @workgroup_size(1) fn main() {}' });
+    assert.deepEqual((await bad.getCompilationInfo()).messages, info.messages);
+    assert.equal((await good.getCompilationInfo()).messages.length, 0);
+    bad.destroy?.();
+    good.destroy?.();
+  }
+  console.log('ok: compute/graphics compiler cause and source locations survive subsequent compilations');
   // Encoding a clear must not alter a buffer before submission. Copy/clear/copy
   // in one submission must observe both sides of the clear, including its range.
   const buffer = device.createBuffer({ size: 16, usage: U.COPY_SRC | U.COPY_DST });

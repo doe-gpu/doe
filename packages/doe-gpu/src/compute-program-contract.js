@@ -1,6 +1,7 @@
 // Schema validation and immutable identity for fixed-shape compute programs.
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { sortedJsonValue } from './json-canonical.js';
 
 const PROGRAM_SCHEMA = JSON.parse(readFileSync(
   new URL('../assets/compute-program.schema.json', import.meta.url), 'utf8',
@@ -55,14 +56,6 @@ function validateNode(value, schema, path) {
   }
 }
 
-function canonical(value) {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (value !== null && typeof value === 'object') {
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
-  }
-  return value;
-}
-
 function hashBytes(value) {
   return createHash('sha256').update(value).digest('hex');
 }
@@ -115,7 +108,7 @@ function validateComputeProgram(descriptor) {
       || descriptor.buffers.filter((buffer) => buffer.role === 'output').length !== 1) {
     throw programError('DOE_PROGRAM_INVALID', 'program.output', 'the sole output buffer', descriptor.output);
   }
-  const snapshot = freezeTree(canonical(descriptor));
+  const snapshot = freezeTree(sortedJsonValue(descriptor));
   return { descriptor: snapshot, programHash: hashBytes(JSON.stringify(snapshot)) };
 }
 

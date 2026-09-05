@@ -30,6 +30,7 @@ def main() -> int:
         parser.error('Require lifecycle-cycles >= 3 and timeout-ms > 0')
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
+    shutil.copyfile(Path(__file__), output / 'qualifier.py')
     report = {'schemaVersion': 1, 'kind': 'compute_program_package_qualification',
               'status': 'running', 'error': None, 'packages': [], 'hosts': [], 'artifacts': [],
               'lifecycleCycles': args.lifecycle_cycles, 'timeoutMs': args.timeout_ms,
@@ -65,6 +66,19 @@ def main() -> int:
                 (scratch / 'package.json').write_text(json.dumps({'name': 'doe-retained-program-qualification',
                                                                  'private': True, 'type': 'module', 'main': 'entry.mjs'}))
                 run(['npm', 'install', '--offline', '--omit=optional', '--no-audit', '--no-fund', *tarballs], scratch, f'{host}-install')
+                examples = scratch / 'node_modules/doe-gpu/examples'
+                example = examples / f'{host}-first-kernel.mjs'
+                shutil.copyfile(example, output / example.name)
+                shutil.copyfile(examples / 'first-kernel.js', output / 'first-kernel.js')
+                (scratch / 'entry.mjs').write_text(f"await import('./node_modules/doe-gpu/examples/{example.name}');\n")
+                first_launch = ['--headless', '--no-sandbox', '--disable-gpu', str(scratch)] if host == 'electron' else [str(example)]
+                first = json.loads(run([str(executable), *first_launch], scratch, f'{host}-first-kernel'))
+                first_library = Path(first['provider']['doeLibraryPath'])
+                if (first['runtimeHost'] != host or first['result']['output'] != list(range(2, 17, 2))
+                        or not first['provider']['doeNative'] or first['provider']['loaded'] is not True
+                        or not first_library.is_relative_to(scratch / 'node_modules' / args.platform_package)):
+                    raise ValueError(f'{host}: shipped first-kernel example failed identity or output validation')
+                first_library_hash = digest(first_library)
                 shutil.copyfile(fixtures / 'native-release-candidate.mjs', scratch / 'candidate.mjs')
                 shutil.copyfile(fixtures / 'native-clean-install-lifecycle.mjs', scratch / 'lifecycle.mjs')
                 replacements = {'../../src/native.js': 'doe-gpu/native',
@@ -118,6 +132,8 @@ def main() -> int:
                             raise ValueError(f'{host}: native library escaped clean install')
                         if not provider['doeNative'] or provider['buildMetadataSource'] != 'prebuild':
                             raise ValueError(f'{host}: native provider identity not established')
+                        if digest(library) != first_library_hash:
+                            raise ValueError(f'{host}: example and lifecycle loaded different native libraries')
                 report['hosts'].append({'host': host, 'executable': str(executable), 'executableHash': digest(executable),
                                         'libraryHash': digest(library), 'status': 'passed'})
                 print(f'qualified retained package: {host}', flush=True)

@@ -143,6 +143,7 @@ fn storeWgslShaderModuleCache(source_hash: [32]u8, lib: ?*anyopaque, info: *cons
 }
 
 fn clear_last_error() void {
+    wgsl_analysis.clearLastError();
     last_error_len = 0;
     last_error_stage_len = 0;
     last_error_kind_len = 0;
@@ -191,6 +192,19 @@ fn set_last_error_kind(kind: []const u8) void {
 fn capture_wgsl_error_location() void {
     last_error_line = wgsl_analysis.lastErrorLine();
     last_error_col = wgsl_analysis.lastErrorColumn();
+}
+
+fn capture_compile_error(err: anyerror, stage: []const u8, context: []const u8) void {
+    set_last_error_kind(@errorName(err));
+    const compiler_error = if (wgsl_analysis.lastErrorKind()) |kind| kind == err else false;
+    if (compiler_error and wgsl_analysis.lastErrorStage() != .none) {
+        set_last_error_stage(wgsl_analysis.lastErrorStage());
+        capture_wgsl_error_location();
+        set_last_error_fmt("{s}: {s}", .{ context, wgsl_analysis.lastErrorMessage() });
+    } else {
+        set_last_error_stage_name(stage);
+        set_last_error_fmt("{s}: {s}", .{ context, @errorName(err) });
+    }
 }
 
 pub export fn doeNativeCopyLastErrorMessage(out_ptr: ?[*]u8, out_len: usize) callconv(.c) usize {
@@ -499,10 +513,7 @@ fn createFromWGSLVulkan(dev: *DoeDevice, wgsl: []const u8) ?*anyopaque {
 
     if (has_graphics) {
         vk_render.vulkan_create_graphics_shader_module(sm, wgsl) catch |err| {
-            set_last_error_stage_name("native_shader_create");
-            set_last_error_kind(@errorName(err));
-            set_last_error_fmt("Vulkan WGSL→SPIR-V graphics compilation failed: {s}", .{@errorName(err)});
-            std.log.err("doe: createShaderModule (Vulkan graphics) failed: {s}", .{@errorName(err)});
+            capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V graphics compilation failed");
             if (sm.vertex_spirv_data) |s| alloc.free(s);
             if (sm.fragment_spirv_data) |s| alloc.free(s);
             alloc.destroy(sm);
@@ -511,11 +522,9 @@ fn createFromWGSLVulkan(dev: *DoeDevice, wgsl: []const u8) ?*anyopaque {
     } else {
         const vk_compute = @import("../vulkan/vulkan_compute_native.zig");
         vk_compute.vulkan_create_shader_module(sm, wgsl) catch |err| {
-            set_last_error_stage_name("native_shader_create");
-            set_last_error_kind(@errorName(err));
-            set_last_error_fmt("Vulkan WGSL→SPIR-V compilation failed: {s}", .{@errorName(err)});
-            std.log.err("doe: createShaderModule (Vulkan) failed: {s}", .{@errorName(err)});
+            capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V compilation failed");
             if (sm.dispatch_preconditions.len > 0) alloc.free(sm.dispatch_preconditions);
+            if (sm.texture_dispatch_preconditions.len > 0) alloc.free(sm.texture_dispatch_preconditions);
             alloc.destroy(sm);
             return null;
         };
@@ -749,14 +758,7 @@ fn createComputePipelineVulkan(
     else
         vk_compute.vulkan_copy_pipeline_spirv(cp, sm);
     compile_result catch |err| {
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind(@errorName(err));
-        const detail = wgsl_analysis.lastErrorMessage();
-        if (detail.len > 0) {
-            set_last_error_fmt("Vulkan compute pipeline creation failed: {s}", .{detail});
-        } else {
-            set_last_error_fmt("Vulkan compute pipeline creation failed: {s}", .{@errorName(err)});
-        }
+        capture_compile_error(err, "native_compile", "Vulkan compute pipeline creation failed");
         if (cp.dispatch_preconditions.len > 0) alloc.free(cp.dispatch_preconditions);
         if (cp.texture_dispatch_preconditions.len > 0) alloc.free(cp.texture_dispatch_preconditions);
         vk_compute.vulkan_release_compute_pipeline(cp);

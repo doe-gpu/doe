@@ -79,7 +79,8 @@ pub const LastErrorInfo = struct {
     context: []const u8,
 };
 
-fn clearLastError() void {
+/// Start a new diagnostic lifetime before a native compile or cache lookup.
+pub fn clearLastError() void {
     last_error_stage = .none;
     last_error_kind = null;
     last_error_len = 0;

@@ -1,31 +1,5 @@
 # doe-gpu
 
-For explicitly declared repeated buffer compute, import
-`prepareComputeProgram` from `doe-gpu/compute-program`. Supply a device, the
-shipped `assets/compute-program.schema.json` declaration, and an explicit
-execution mode (`gpu-recorded`, `native-recorded`, or `webgpu`). The program retains private
-buffers, shaders, pipelines, and bindings; every run snapshots exact-size
-inputs and clears scratch/output state. `update()` reuses identical resources
-and invalidates the prior recording only after replacement preparation succeeds.
-Always `await program.close()` before releasing its device.
-
-The recorded modes use the Node addon provider exported by `doe-gpu/native`,
-including Bun's Node addon support. `gpu-recorded` retains compiled Vulkan
-commands and their native pipeline/descriptor ownership. `native-recorded`
-replays host commands in Zig. Unsupported GPU recording fails explicitly.
-The standard WebGPU mode
-is an explicit persistent-resource control. See `examples/compute-program.js`
-and `examples/compute-programs.js` for grayscale image processing and heat
-diffusion. This additive API does not establish an application speed claim.
-
-Pass `gpuTiming: 'timestamp-query'` to opt into compute-pass GPU timing on a
-device with `timestamp-query` enabled. Current Doe calibration supports Vulkan
-with a matching addon and runtime. Vulkan query results are normalized on the
-GPU to nanoseconds. Receipts identify resolved units and compute-pass duration separately from complete invocation
-latency. Timing is off by default; enabled timing adds retained query resources
-and readback work. Requested allocation accounting includes public timing buffers;
-it does not measure internal scratch or peak GPU memory.
-
 `doe-gpu` is the public JavaScript package for Doe's native WebGPU runtime.
 Support is limited to the runtime, operating-system, architecture, backend,
 and workload tuples declared in the Doe support matrix.
@@ -46,20 +20,63 @@ select another GPU or CPU provider silently.
 ## Basic use
 
 ```js
-import { gpu } from "doe-gpu";
+import { gpu, requestAdapter } from "doe-gpu/native";
 
-const device = await gpu.requestDevice();
-const output = await device.compute({
-  code: `@group(0) @binding(0) var<storage, read_write> data: array<f32>;
-         @compute @workgroup_size(64)
-         fn main(@builtin(global_invocation_id) id: vec3u) {
-           data[id.x] = data[id.x] * 2.0;
-         }`,
-  inputs: [new Float32Array([1, 2, 3, 4])],
-  output: { type: Float32Array, size: 16 },
-  workgroups: 1,
-});
+const adapter = await requestAdapter();
+if (!adapter) throw new Error("Doe native provider returned no adapter");
+const device = await adapter.requestDevice();
+try {
+  const output = await gpu.bind(device).compute({
+    code: `@group(0) @binding(0) var<storage, read> input: array<f32>;
+           @group(0) @binding(1) var<storage, read_write> output: array<f32>;
+           @compute @workgroup_size(4)
+           fn main(@builtin(global_invocation_id) id: vec3u) {
+             if (id.x < 4u) { output[id.x] = input[id.x] * 2.0; }
+           }`,
+    inputs: [new Float32Array([1, 2, 3, 4])],
+    output: { type: Float32Array, size: 16 },
+    workgroups: 1,
+  });
+  console.log(output); // Float32Array [2, 4, 6, 8]
+} finally {
+  device.destroy();
+}
 ```
+
+## Repeated computation
+
+For explicitly declared repeated buffer compute, import
+`prepareComputeProgram` from `doe-gpu/compute-program`. Supply a device, the
+shipped `assets/compute-program.schema.json` declaration, and an explicit
+execution mode (`gpu-recorded`, `native-recorded`, or `webgpu`). The program
+retains private buffers, shaders, pipelines, and bindings. By default, each run
+uploads exact-size input snapshots and clears scratch/output buffers. Descriptor
+version 2 can declare `lifetime: 'program'` to retain buffer contents between
+runs; resident inputs may be omitted after initialization. Use `readback: 'none'`
+to keep output on the GPU and `program.output()` to pass an opaque, generation-checked
+reference to another program on the same device. A cancelled submitted run
+invalidates a program with resident buffers. `update()` reuses identical resources
+and invalidates the prior recording only after replacement preparation succeeds.
+Always `await program.close()` before releasing its device.
+
+The recorded modes use the Node addon provider exported by `doe-gpu/native`,
+including Bun's Node addon support. `gpu-recorded` retains compiled Vulkan
+commands and their native pipeline/descriptor ownership. `native-recorded`
+replays host commands in Zig. Unsupported GPU recording fails explicitly.
+The standard WebGPU mode
+is an explicit persistent-resource control. See `examples/compute-program.js`
+and `examples/compute-programs.js` for grayscale image processing and heat
+diffusion. This additive API does not establish an application speed claim.
+
+Pass `gpuTiming: 'timestamp-query'` to opt into compute-pass GPU timing on a
+device with `timestamp-query` enabled. Current Doe calibration supports Vulkan
+with a matching addon and runtime. Vulkan query results are normalized on the
+GPU to nanoseconds. Receipts identify resolved units and compute-pass duration separately from complete invocation
+latency. Timing is off by default; enabled timing adds retained query resources
+and readback work. Requested allocation accounting includes public timing buffers;
+it does not measure internal scratch or peak GPU memory.
+
+## Provider sessions and evaluation
 
 Use the strict provider-v1 API when the application owns provider selection and
 global installation:

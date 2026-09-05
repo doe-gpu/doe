@@ -4,6 +4,13 @@ import { prepareComputeProgram, validateComputeProgram } from '../../src/compute
 import { registerNativeProgramProvider } from '../../src/compute-program-native.js';
 import { timestampInfo, timestampResult } from '../../src/compute-program-timing.js';
 import { inputBatch, outputReference } from '../../src/compute-program-residency.js';
+import { sortedJsonValue } from '../../src/json-canonical.js';
+
+const hashInput = JSON.parse('{"z":[{"é":null,"a":2}],"2":2,"10":10,"__proto__":{"b":1,"a":0},"a":true}');
+const originalHashInput = JSON.stringify(hashInput);
+assert.equal(JSON.stringify(sortedJsonValue(hashInput)),
+  '{"2":2,"10":10,"__proto__":{"a":0,"b":1},"a":true,"z":[{"a":2,"é":null}]}');
+assert.equal(JSON.stringify(hashInput), originalHashInput);
 
 const descriptor = {
   schemaVersion: 1, id: 'copy',
@@ -13,6 +20,7 @@ const descriptor = {
   output: 'result',
 };
 const validated = validateComputeProgram(descriptor);
+assert.equal(validated.programHash, '320b12ba1aedf2dd30575d5fed05ed2b69d79dc0ef156d9d26f493a11b675f78');
 assert(Object.isFrozen(validated.descriptor.steps[0].bindings[0]));
 assert.equal(validated.programHash, validateComputeProgram({ ...descriptor }).programHash);
 for (const change of [

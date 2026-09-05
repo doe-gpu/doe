@@ -4,6 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { openNodeWebGPU } from './node-webgpu.js';
+import { sortedJsonValue } from './json-canonical.js';
 
 export const PROGRAM_BUNDLE_RUNNER_VERSION = 'doe.program-bundle-runner/v2';
 export const PROGRAM_BUNDLE_SCHEMA_ID = 'doppler.program-bundle/v1';
@@ -30,14 +31,6 @@ function valueTypeMatches(value, expected) {
 
 function deepEqual(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
-}
-
-function stableSortObject(value) {
-  if (Array.isArray(value)) return value.map((entry) => stableSortObject(entry));
-  if (!isObject(value)) return value;
-  return Object.fromEntries(
-    Object.keys(value).sort().map((key) => [key, stableSortObject(value[key])]),
-  );
 }
 
 function resolveSchemaRef(rootSchema, reference) {
@@ -147,7 +140,7 @@ export async function validateProgramBundle(bundle) {
   }
 
   const packageFiles = new Map(bundle.package.files.map((file) => [file.path, file]));
-  const expectedFileSetHash = digestBytes(JSON.stringify(stableSortObject(bundle.package.files)));
+  const expectedFileSetHash = digestBytes(JSON.stringify(sortedJsonValue(bundle.package.files)));
   if (bundle.package.fileSetHash !== expectedFileSetHash) {
     throw new Error('Program Bundle package.fileSetHash does not match package.files.');
   }

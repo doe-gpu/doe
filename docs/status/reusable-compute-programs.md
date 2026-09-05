@@ -1,5 +1,25 @@
 # Reusable compute programs
 
+## Compiler corrections and package entrypoints
+
+Vulkan shader wrappers now preserve parser/semantic causes and WGSL locations
+instead of flattening them to `ShaderCompileFailed`. The native ABI and
+compilation-info fields are unchanged; consumers need the rebuilt library.
+Earlier receipts keep their original diagnostics. The reproduction is retained
+under `bench/out/compute-program/20260905-compiler-diagnostics-failure/`.
+The repaired output and successful native/package test logs are retained under
+`bench/out/compute-program/20260905-compiler-diagnostics-correction/`.
+Graphics translation emits each stage once, transfers owned SPIR-V directly,
+and releases reflection allocations. The allocation-accounted failing case is
+under `bench/out/compute-program/20260905-graphics-translation-memory-failure/accounted-case/`.
+
+The package's first-kernel host entrypoints share WGSL, output validation, and
+guaranteed device teardown. Electron retains its mapped-range probe. Their
+receipt shape and workload hashes are unchanged. Compute declarations and
+closed bundles share recursive JSON key ordering with historical hashes pinned
+by the package contract tests. The public README starts with provider selection
+and documents opt-in resident execution separately.
+
 ## Current boundary
 
 `doe-gpu/compute-program` is the declared fixed-shape execution interface.
@@ -27,7 +47,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-resident-program-package/summary.json`.
+`bench/out/compute-program/20260905-shared-first-kernel-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -35,12 +55,14 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-resident-program-matrix/summary.json`.
+`bench/out/compute-program/20260905-compiler-diagnostics-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the new receipt contract. It does not measure a
 resident application sequence. Performance remains diagnostic; large Deno host
 ratios remain suspicious and require fairness review.
+Native replay and SPIR-V validation results are retained separately under
+`bench/out/compute-program/20260905-compiler-diagnostics-native/`.
 
 ## Active acceptance gaps
 

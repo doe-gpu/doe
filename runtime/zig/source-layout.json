@@ -2512,9 +2512,9 @@
       },
       "src/compiler/wgsl/pipeline/analysis.zig": {
         "decision": "Keep",
-        "moduleSha256": "1027ba90db4d0febb3d093e2377ae2bb27578d0954e78c9eae42c4267f7a4cad",
-        "reason": "Keep: reachable compiler implementation shared by 16 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-runtime-ownership/2026-08-15"
+        "moduleSha256": "6d9db24f6fcf4204174ff20ae73e730e503fb9cf169b95bd409a4c1ff75cb502",
+        "reason": "Keep: compiler diagnostic state has an explicit reset at the native compilation boundary; typed causes and source locations remain compiler-owned.",
+        "reviewer": "codex-compiler-diagnostics/2026-09-05"
       },
       "src/compiler/wgsl/pipeline/binding_reflection.zig": {
         "decision": "Keep",
@@ -2602,9 +2602,9 @@
       },
       "src/compiler/wgsl/runtime/runtime_graphics_translation.zig": {
         "decision": "Keep",
-        "moduleSha256": "2315cd8b8c8fef42902060ecabc8bb501181373387950181ae67a6d0cab7d642",
-        "reason": "Keep: graphics-stage SPIR-V emission and stage-interface reflection boundary.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "dc91210dfc57124f913aeabbf343403ce580e6687cafaf9a5fbae11e6131a877",
+        "reason": "Keep: graphics-stage SPIR-V is emitted once per stage with typed error metadata; stage and reflection allocations retain explicit ownership.",
+        "reviewer": "codex-compiler-diagnostics/2026-09-05"
       },
       "src/compiler/wgsl/runtime/runtime_translation_info.zig": {
         "decision": "Keep",
@@ -3694,9 +3694,9 @@
       },
       "src/native/shader/doe_shader_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "38ff2360bd5174f71a2bf0e8a685236d275b8c3314cdcf0423199aba81a80669",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "64ce3c4c36e56df68f834dc62fde6dabd470981b0e393b82e0ed87010910c639",
+        "reason": "Keep: native shader creation captures compiler causes and source locations into module-owned diagnostics; native allocation errors keep their own context.",
+        "reviewer": "codex-compiler-diagnostics/2026-09-05"
       },
       "src/native/shader/doe_shader_translation_cache.zig": {
         "decision": "Keep",
@@ -3784,9 +3784,9 @@
       },
       "src/native/vulkan/vulkan_compute_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "a59d5a451405735381000b981f49e0524c8fa93ec0ebd4204134c296fd5feada",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "11aa071c7ca39752395b2efc511625891f081e66fd54126b023998339dd8d96e",
+        "reason": "Keep: Vulkan translation preserves compiler error unions through module and override pipeline creation while retaining explicit execution resource ownership.",
+        "reviewer": "codex-compiler-diagnostics/2026-09-05"
       },
       "src/native/vulkan/vulkan_feature_cache.zig": {
         "decision": "Keep",
@@ -3820,9 +3820,9 @@
       },
       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "f53ad69d5e3bfbc0f1fb8cc962275e80cece22c30885026473021fb6bfeb54c3",
-        "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-render-identity/2026-08-16"
+        "moduleSha256": "5dcf00e4df7c50a94264b8580f4219b8f89bed16c240920d6e457eee5856cad6",
+        "reason": "Keep: Vulkan graphics shader creation transfers stage binaries once and frees translation reflection state; compiler errors propagate to native diagnostics.",
+        "reviewer": "codex-compiler-diagnostics/2026-09-05"
       },
       "src/native/vulkan/vulkan_render_shared.zig": {
         "decision": "Keep",

@@ -222,20 +222,12 @@ pub fn probe_has_graphics_entry_points(wgsl: []const u8) bool {
 pub fn vulkan_create_graphics_shader_module(
     sm: *shared.DoeShaderModule,
     wgsl: []const u8,
-) error{ OutOfMemory, ShaderCompileFailed }!void {
+) wgsl_analysis.TranslateError!void {
     const alloc = native_helpers.alloc;
-    var result = runtime_compile.translateToSpirvForGraphicsRuntime(alloc, wgsl) catch {
-        std.log.err("doe_vulkan_render: WGSL→SPIR-V graphics translation failed: {s}", .{wgsl_analysis.lastErrorMessage()});
-        return error.ShaderCompileFailed;
-    };
-    errdefer result.deinit(alloc);
-
-    if (result.vertex_spirv) |v| {
-        sm.vertex_spirv_data = alloc.dupe(u32, v) catch return error.OutOfMemory;
-    }
-    if (result.fragment_spirv) |f| {
-        sm.fragment_spirv_data = alloc.dupe(u32, f) catch return error.OutOfMemory;
-    }
+    var result = try runtime_compile.translateToSpirvForGraphicsRuntime(alloc, wgsl);
+    defer result.deinit(alloc);
+    sm.vertex_spirv_data = result.vertex_spirv;
+    sm.fragment_spirv_data = result.fragment_spirv;
 
     sm.wg_x = 0;
     sm.wg_y = 0;

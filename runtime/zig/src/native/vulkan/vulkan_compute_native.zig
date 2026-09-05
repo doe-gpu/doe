@@ -339,7 +339,7 @@ fn precompute_pipeline_static_hashes(pip: *DoeComputePipeline) void {
 pub fn vulkan_create_shader_module(
     shader: *DoeShaderModule,
     wgsl: []const u8,
-) error{ OutOfMemory, ShaderCompileFailed }!void {
+) wgsl_analysis.TranslateError!void {
     var cached_translation = shader_translation_cache.lookupComputeSpirvTranslation(alloc, wgsl);
     defer if (cached_translation) |*cached| cached.deinit(alloc);
 
@@ -352,19 +352,12 @@ pub fn vulkan_create_shader_module(
     var spirv_buf = alloc.alloc(u8, spirv_translation.MAX_OUTPUT) catch return error.OutOfMemory;
     defer alloc.free(spirv_buf);
 
-    var translation = runtime_compile.translateToSpirvForVulkanComputeRuntime(alloc, wgsl, spirv_buf) catch {
-        const head_len: usize = @min(wgsl.len, 120);
-        std.log.err(
-            "doe_vulkan_compute: WGSL→SPIR-V translation failed: {s} | wgsl[0..{d}]: {s}",
-            .{ wgsl_analysis.lastErrorMessage(), head_len, wgsl[0..head_len] },
-        );
-        return error.ShaderCompileFailed;
-    };
+    var translation = try runtime_compile.translateToSpirvForVulkanComputeRuntime(alloc, wgsl, spirv_buf);
     errdefer translation.info.deinit(alloc);
 
     if (translation.len == 0 or (translation.len % 4) != 0) {
-        std.log.err("doe_vulkan_compute: SPIR-V output length invalid: {}", .{translation.len});
-        return error.ShaderCompileFailed;
+        wgsl_analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
+        return error.InvalidIr;
     }
 
     shader_translation_cache.storeComputeSpirvTranslation(
@@ -400,20 +393,23 @@ pub fn vulkan_compile_pipeline_spirv_with_overrides(
     pip: *DoeComputePipeline,
     shader: *DoeShaderModule,
     overrides: []const wgsl_ir.OverrideEntry,
-) error{ OutOfMemory, ShaderCompileFailed, InvalidShaderModule }!void {
+) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
     const wgsl = shader.wgsl_source orelse return error.InvalidShaderModule;
     var spirv_buf = alloc.alloc(u8, spirv_translation.MAX_OUTPUT) catch return error.OutOfMemory;
     defer alloc.free(spirv_buf);
 
-    var translation = runtime_compile.translateToSpirvForVulkanComputeRuntimeWithOverrides(
+    var translation = try runtime_compile.translateToSpirvForVulkanComputeRuntimeWithOverrides(
         alloc,
         wgsl,
         spirv_buf,
         overrides.ptr,
         overrides.len,
-    ) catch return error.ShaderCompileFailed;
+    );
     defer translation.info.deinit(alloc);
-    if (translation.len == 0 or (translation.len % 4) != 0) return error.ShaderCompileFailed;
+    if (translation.len == 0 or (translation.len % @sizeOf(u32)) != 0) {
+        wgsl_analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
+        return error.InvalidIr;
+    }
 
     const word_count = translation.len / 4;
     const words = alloc.alloc(u32, word_count) catch return error.OutOfMemory;
@@ -1042,9 +1038,10 @@ fn moveTranslationInfoToShader(
 fn assignSpirvWords(
     shader: *DoeShaderModule,
     spirv_bytes: []const u8,
-) error{ OutOfMemory, ShaderCompileFailed }!void {
-    if (spirv_bytes.len == 0 or (spirv_bytes.len % 4) != 0) {
-        return error.ShaderCompileFailed;
+) wgsl_analysis.TranslateError!void {
+    if (spirv_bytes.len == 0 or (spirv_bytes.len % @sizeOf(u32)) != 0) {
+        wgsl_analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid cached SPIR-V word extent");
+        return error.InvalidIr;
     }
     const word_count = spirv_bytes.len / 4;
     const words = alloc.alloc(u32, word_count) catch return error.OutOfMemory;

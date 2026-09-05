@@ -437,3 +437,22 @@ test "compute runtime emits Metal max total threads from workgroup size" {
     const msl = out[0..result.len];
     try std.testing.expect(std.mem.indexOf(u8, msl, "[[max_total_threads_per_threadgroup(64)]]") != null);
 }
+
+test "graphics runtime emits shared stage once and releases all reflection allocations" {
+    const source =
+        \\@vertex fn vertex_first() -> @builtin(position) vec4f { return vec4f(0.0, 0.0, 0.0, 1.0); }
+        \\@vertex fn vertex_second() -> @builtin(position) vec4f { return vec4f(1.0, 0.0, 0.0, 1.0); }
+        \\@fragment fn fragment_main() -> @location(0) vec4f { return vec4f(1.0); }
+    ;
+    var tracking: std.heap.DebugAllocator(.{ .safety = true, .enable_memory_limit = true }) = .init;
+    defer _ = tracking.deinit();
+    {
+        var result = try runtime_compile.translateToSpirvForGraphicsRuntime(tracking.allocator(), source);
+        defer result.deinit(tracking.allocator());
+        const vertex_bytes = std.mem.sliceAsBytes(result.vertex_spirv.?);
+        try std.testing.expect(std.mem.indexOf(u8, vertex_bytes, "vertex_first") != null);
+        try std.testing.expect(std.mem.indexOf(u8, vertex_bytes, "vertex_second") != null);
+        try std.testing.expect(result.fragment_spirv.?.len > 0);
+    }
+    try std.testing.expectEqual(@as(usize, 0), tracking.total_requested_bytes);
+}

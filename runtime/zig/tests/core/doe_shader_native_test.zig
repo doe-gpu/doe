@@ -720,3 +720,34 @@ test "createShaderModule: WGSL with WGPU_STRLEN length and null-terminated code"
         shader.doeNativeShaderModuleRelease(r);
     }
 }
+
+test "Vulkan module failures preserve compiler cause and location across later compilations" {
+    if (@import("builtin").os.tag != .linux) return error.SkipZigTest;
+    const Case = struct { source: []const u8, stage: []const u8, kind: []const u8 };
+    const cases = [_]Case{
+        .{ .source = "// source line one\nnot valid WGSL", .stage = "parser", .kind = "UnexpectedToken" },
+        .{ .source = "@compute @workgroup_size(1) fn main() {\n let value: u32 = missing_value;\n}", .stage = "sema", .kind = "UnknownIdentifier" },
+        .{ .source = "@vertex fn main() -> @builtin(position) vec4f {\n return missing_value;\n}", .stage = "sema", .kind = "UnknownIdentifier" },
+    };
+    var device = native.DoeDevice{ .backend = .vulkan };
+    for (cases) |case| {
+        const raw = shader.doeNativeDeviceCreateShaderModuleWgsl(@ptrCast(&device), case.source.ptr, case.source.len) orelse return error.TestUnexpectedResult;
+        defer shader.doeNativeShaderModuleRelease(raw);
+        const module: *native.DoeShaderModule = @ptrCast(@alignCast(raw));
+        var stage_buf: [64]u8 = undefined;
+        var kind_buf: [64]u8 = undefined;
+        try std.testing.expectEqualStrings(case.stage, readErrorStage(&stage_buf));
+        try std.testing.expectEqualStrings(case.kind, readErrorKind(&kind_buf));
+        try std.testing.expectEqual(@as(u32, 2), shader.doeNativeGetLastErrorLine());
+        try std.testing.expect(shader.doeNativeGetLastErrorColumn() > 0);
+        try std.testing.expectEqual(native.CompilationMessageKind.@"error", module.compilation_message_kind);
+        try std.testing.expectEqual(@as(u32, 2), module.compilation_message_line);
+        try std.testing.expect(std.mem.indexOf(u8, module.compilation_message.?, case.kind) != null);
+        const valid = "@compute @workgroup_size(1) fn main() {}";
+        const good = shader.doeNativeDeviceCreateShaderModuleWgsl(@ptrCast(&device), valid.ptr, valid.len) orelse return error.TestUnexpectedResult;
+        defer shader.doeNativeShaderModuleRelease(good);
+        try std.testing.expectEqual(@as(usize, 0), shader.doeNativeCopyLastErrorMessage(null, 0));
+        try std.testing.expectEqual(@as(u32, 2), module.compilation_message_line);
+        try std.testing.expect(std.mem.indexOf(u8, module.compilation_message.?, case.kind) != null);
+    }
+}
