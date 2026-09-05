@@ -21,6 +21,9 @@ evidence boundaries are clear.
   DoeProof offer, product-independence boundary, quad roles, comparison law,
   K0 external-product comparison, evidence custody, platform sequence,
   milestones, and claim boundaries
+- [`runtime-adoption-plan.md`](runtime-adoption-plan.md): independent DoeRuntime
+  proof from unchanged-application substitution through repeatable material
+  advantage, voluntary adoption, and retained requalification
 - Cross-project documentation authority is maintained in the program registry
   outside this repository; Doe remains canonical for Doe behavior and
   measurements
