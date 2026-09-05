@@ -34,7 +34,8 @@
           "type": "integer",
           "enum": [
             1,
-            2
+            2,
+            3
           ]
         },
         "programHash": {
@@ -138,7 +139,7 @@
           "if": {
             "properties": {
               "schemaVersion": {
-                "const": 2
+                "minimum": 2
               }
             }
           },

@@ -68,6 +68,7 @@ const test_tests_dropin_dropin_behavior_policy_test_zig_2611dfb1 = @import("test
 const test_tests_dropin_dropin_proc_manifest_test_zig_86347837 = @import("tests/dropin/dropin_proc_manifest_test.zig");
 const test_tests_dropin_dropin_router_test_zig_0064399f = @import("tests/dropin/dropin_router_test.zig");
 const test_tests_dropin_dropin_symbol_ownership_test_zig_35113036 = @import("tests/dropin/dropin_symbol_ownership_test.zig");
+const test_src_backend_vulkan_vk_timestamp_zig_23d04f12 = if (builtin.os.tag == .linux) @import("src/backend/vulkan/vk_timestamp.zig") else struct {};
 
 comptime {
     _ = test_tests_metal_metal_mod_integration_test_zig_6f53b3ec;
@@ -137,4 +138,5 @@ comptime {
     _ = test_tests_dropin_dropin_proc_manifest_test_zig_86347837;
     _ = test_tests_dropin_dropin_router_test_zig_0064399f;
     _ = test_tests_dropin_dropin_symbol_ownership_test_zig_35113036;
+    _ = test_src_backend_vulkan_vk_timestamp_zig_23d04f12;
 }

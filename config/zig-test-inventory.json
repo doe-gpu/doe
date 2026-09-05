@@ -289,6 +289,13 @@
         {
           "path": "tests/dropin/dropin_symbol_ownership_test.zig",
           "kind": "abi"
+        },
+        {
+          "path": "src/backend/vulkan/vk_timestamp.zig",
+          "platforms": [
+            "linux"
+          ],
+          "kind": "inline"
         }
       ]
     },

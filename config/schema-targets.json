@@ -1344,6 +1344,10 @@
     {
       "schema": "config/compute-program-evaluation.schema.json",
       "data": "config/compute-program-external-evaluation.json"
+    },
+    {
+      "schema": "config/vulkan-timestamp-policy.schema.json",
+      "data": "config/vulkan-timestamp-policy.json"
     }
   ],
   "globTargets": [

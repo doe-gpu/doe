@@ -163,6 +163,8 @@ def main() -> int:
                     ROOT / 'bench/lib/compute_program_fixture.py', original_policy,
                     ROOT / 'config/benchmark-methodology-thresholds.json',
                     ROOT / 'config/vulkan-buffer-memory-policy.json',
+                    ROOT / 'config/vulkan-timestamp-policy.json',
+                    ROOT / 'runtime/zig/src/backend/vulkan/vk_timestamp_normalize.wgsl',
                     ROOT / 'runtime/zig/build.zig',
                     ROOT / 'packages/doe-gpu/examples/compute-programs.js']
     source_paths += list((ROOT / 'packages/doe-gpu/src').rglob('*.js'))

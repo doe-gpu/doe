@@ -45,21 +45,29 @@ readback in the existing output mapping. Vulkan GPU recordings retain and
 validate the query pool as well as their buffers. Destroying a query invalidates
 replay before submission. Updates preserve the selected timing mode.
 
-Receipt schema version 2 adds nullable `gpuTiming`: source, compute-pass scope,
-raw begin/end values, device period, valid counter bits, and elapsed nanoseconds.
-Subtraction occurs before conversion to preserve precision at large counter
-epochs and handle wraparound. Doe Vulkan exposes calibrated native ticks;
-Dawn timestamps use their nanosecond contract. The evaluation harness declares
+Receipt schema version 3 retains nullable `gpuTiming`: source, compute-pass scope,
+begin/end values, period, counter width, and elapsed nanoseconds. Doe Vulkan
+resolves queries to nanoseconds on the GPU, including when another GPU command
+consumes the destination. Query-owned scratch storage and cached conversion
+pipelines avoid per-resolve CPU retrieval or a queue wait. The conversion uses
+the exact physical f32 period, floors the product, and retains its low u64 bits;
+the versioned contract is `config/vulkan-timestamp-policy.json`.
+Subtraction of normalized integer values preserves precision at large epochs.
+Unrepresentable intervals, including a hardware counter wrap that cannot be
+reconstructed from normalized values, fail explicitly. The evaluation harness declares
 the pinned Deno/wgpu Vulkan tick behavior explicitly and binds its calibration
 to a retained physical Vulkan profile and upstream implementation sources.
-Calibration support
-must be explicit in the loaded Doe addon and library; other Doe backends fail
-timed preparation until implemented. This does not establish standard Vulkan
-query-resolve unit normalization on devices with a non-unit timestamp period.
+Nanosecond support must be explicit in the loaded Doe addon and library;
+older libraries and other Doe backends fail timed preparation until supported.
+The additive `doeNativeComputeProgramTimestampNanoseconds` ABI reports resolved
+units; the historical calibration ABI continues to expose physical tick units.
+Receipt versions 1 and 2 remain readable. Version 2 Doe timings retain their
+historical raw-tick interpretation; they must not be relabeled as nanoseconds.
 Pass-end markers use bottom-of-pipeline completion. GPU duration excludes input
 upload, scratch clearing, query resolution, and readback. Complete invocation
 wall time continues to include those operations and their instrumentation cost.
-Requested buffer accounting includes timing buffers and alignment padding.
+Requested buffer accounting includes public timing buffers and alignment padding;
+it does not measure internal query scratch or peak device allocation.
 
 `native-recorded` records host commands and replays them in Zig. The WebGPU
 control keeps allocations, pipelines, and bindings resident and encodes each
@@ -126,7 +134,7 @@ Evaluation policy schema version 4 declares `gpuTiming` and
 `dawnTimestampQuantization` (`default` or `disabled`); historical policies leave
 timing off. Run schema version 3 records GPU duration statistics. The gate
 recomputes durations from raw counter values and calibration, validates timing
-buffer work, and recomputes GPU percentiles. Receipt schema version 1 and older
+buffer work, and recomputes GPU percentiles. Historical receipts and older
 run schemas remain readable. Quantized timestamps and different resolve paths
 must be accounted for before comparing GPU timing or instrumentation costs.
 Timed Vulkan policies also select `vulkanDeviceIndex`, `wgpuTimestampUnits`,

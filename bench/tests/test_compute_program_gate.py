@@ -112,6 +112,18 @@ class ComputeProgramGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'physical Vulkan profile'):
             validate_gpu_timing({'gpuTiming': timing}, 'doe-recorded', policy, clock)
 
+    def test_normalized_native_queries_require_new_receipt_and_nanosecond_units(self) -> None:
+        policy = {'gpuTiming': 'timestamp-query'}
+        timing = {'source': 'webgpu-nanoseconds', 'scope': 'compute-pass', 'beginTicks': '100',
+                  'endTicks': '200', 'periodNs': 1, 'validBits': 64, 'elapsedNs': 100}
+        receipt = {'schemaVersion': 3, 'gpuTiming': timing}
+        self.assertTrue(validate_gpu_timing(receipt, 'doe-recorded', policy))
+        for field, value in [('periodNs', 10), ('validBits', 48), ('source', 'vulkan-query-ticks')]:
+            changed = copy.deepcopy(receipt)
+            changed['gpuTiming'][field] = value
+            with self.assertRaises(ValueError):
+                validate_gpu_timing(changed, 'doe-recorded', policy)
+
     def test_valid_artifact_and_fail_closed_mutations(self) -> None:
         self.validate()
         original = copy.deepcopy(self.report)

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Vulkan WebGPU timestamp resolution policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "resolveUnits", "conversion", "workgroupSize"],
+  "properties": {
+    "schemaVersion": {"type": "integer", "const": 1},
+    "resolveUnits": {"const": "nanoseconds"},
+    "conversion": {"const": "exact-f32-period-floor-modulo-u64"},
+    "workgroupSize": {"type": "integer", "minimum": 1, "maximum": 128}
+  }
+}

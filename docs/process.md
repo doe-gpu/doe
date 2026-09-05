@@ -80,6 +80,11 @@ classified and cannot be promoted by benchmark results.
   boundaries, repeated query reset/readback, and exact shader output on each
   selected host. Ordered timestamps alone do not establish calibrated GPU time
   or a prepared-program performance claim.
+- Vulkan query results must use the versioned nanosecond contract before any
+  GPU consumer or readback. The production conversion shader is compared with
+  an independent integer oracle, and physical query intervals are bounded by
+  an independent host clock. Receipt version 3 distinguishes normalized Doe
+  results from historical native-tick receipts; old evidence keeps its units.
 - Program GPU timing is an explicit evaluation policy. Timestamp pass markers
   must bracket equivalent completion stages, and counter precision must be
   disclosed. The gate recomputes calibrated durations, percentile statistics,

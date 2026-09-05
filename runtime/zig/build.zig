@@ -307,6 +307,22 @@ fn addComputeProgramContract(options: *std.Build.Step.Options, allocator: std.me
     if ((flags[0] & required) != required) @panic("readback requires host-visible coherent memory");
     options.addOption(u32, "vulkan_readback_required_properties", flags[0]);
     options.addOption(u32, "vulkan_readback_preferred_properties", flags[1]);
+    const timestamp_file = std.fs.cwd().openFile("../../config/vulkan-timestamp-policy.json", .{}) catch
+        @panic("config/vulkan-timestamp-policy.json not found");
+    defer timestamp_file.close();
+    const timestamp_bytes = timestamp_file.readToEndAlloc(allocator, 64 * 1024) catch
+        @panic("failed to read vulkan-timestamp-policy.json");
+    const TimestampPolicy = struct {
+        schemaVersion: u32,
+        resolveUnits: enum { nanoseconds },
+        conversion: enum { @"exact-f32-period-floor-modulo-u64" },
+        workgroupSize: u32,
+    };
+    const timestamp = std.json.parseFromSlice(TimestampPolicy, allocator, timestamp_bytes, .{}) catch
+        @panic("invalid Vulkan timestamp policy");
+    if (timestamp.value.schemaVersion != 1 or timestamp.value.workgroupSize == 0 or timestamp.value.workgroupSize > 128)
+        @panic("unsupported Vulkan timestamp policy");
+    options.addOption(u32, "vulkan_timestamp_workgroup_size", timestamp.value.workgroupSize);
 }
 
 pub fn build(b: *std.Build) void {

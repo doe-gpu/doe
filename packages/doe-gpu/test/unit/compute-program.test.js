@@ -57,6 +57,9 @@ assert.equal(timestampResult(largeEpoch.buffer, 0, { periodNs: 0.5, validBits: 6
 assert.throws(() => timestampResult(new BigUint64Array([0n, 1n << 54n]).buffer, 0,
   { periodNs: 1, validBits: 64 }), { code: 'DOE_PROGRAM_GPU' });
 assert.equal(timestampInfo({}, {}, 'off'), null);
+assert.deepEqual(timestampInfo({ features: new Set(['timestamp-query']) }, {
+  timestampInfo: () => ({ periodNs: 1, validBits: 64, source: 'webgpu-nanoseconds' }),
+}, 'timestamp-query'), { periodNs: 1, validBits: 64, source: 'webgpu-nanoseconds' });
 assert.throws(() => timestampInfo({ features: new Set(['timestamp-query']) }, {}, 'timestamp-query'),
   { code: 'DOE_PROGRAM_UNSUPPORTED' });
 console.log('ok: timestamp calibration preserves large epochs, fractional periods, wraparound and explicit support');

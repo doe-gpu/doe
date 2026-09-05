@@ -10,6 +10,9 @@ const RUNS = 4;
 const WORD_BYTES = Uint32Array.BYTES_PER_ELEMENT;
 const QUERY_BYTES = BigUint64Array.BYTES_PER_ELEMENT;
 const QUERY_COUNT = 4;
+const RESOLVE_ALIGNMENT = 256;
+const CLOCK_GAP_MS = 20;
+const CLOCK_MARGIN = 0.1;
 const { GPUBufferUsage: U, GPUMapMode: M } = globals;
 const adapter = await requestAdapter({ backend: process.platform === 'darwin' ? 'metal' : 'vulkan' });
 assert(adapter.features.has('timestamp-query'), 'selected adapter must support timestamp-query');
@@ -30,8 +33,8 @@ try {
   resources.push(query);
   const input = buffer(WORD_BYTES, U.STORAGE | U.COPY_DST);
   const output = buffer(WORD_BYTES, U.STORAGE | U.COPY_SRC);
-  const resolved = buffer(QUERY_COUNT * QUERY_BYTES, U.QUERY_RESOLVE | U.COPY_SRC | U.COPY_DST);
-  const readback = buffer(QUERY_COUNT * QUERY_BYTES + WORD_BYTES, U.MAP_READ | U.COPY_DST);
+  const resolved = buffer(RESOLVE_ALIGNMENT + QUERY_COUNT * QUERY_BYTES, U.QUERY_RESOLVE | U.COPY_SRC | U.COPY_DST);
+  const readback = buffer(2 * QUERY_COUNT * QUERY_BYTES + WORD_BYTES, U.MAP_READ | U.COPY_DST);
   const shader = device.createShaderModule({ code: `
     @group(0) @binding(0) var<storage, read> input: array<u32>;
     @group(0) @binding(1) var<storage, read_write> output: array<u32>;
@@ -61,8 +64,11 @@ try {
       pass.end();
     }
     encoder.resolveQuerySet(query, 0, QUERY_COUNT, resolved, 0);
+    encoder.resolveQuerySet(query, 2, 2, resolved, RESOLVE_ALIGNMENT);
     encoder.copyBufferToBuffer(resolved, 0, readback, 0, QUERY_COUNT * QUERY_BYTES);
     encoder.copyBufferToBuffer(output, 0, readback, QUERY_COUNT * QUERY_BYTES, WORD_BYTES);
+    encoder.copyBufferToBuffer(resolved, RESOLVE_ALIGNMENT, readback,
+      (QUERY_COUNT + 1) * QUERY_BYTES, 2 * QUERY_BYTES);
     // A later host upload cannot make the recorded query destination's shadow authoritative.
     device.queue.writeBuffer(resolved, 0, new BigUint64Array(QUERY_COUNT));
     device.queue.submit([encoder.finish()]);
@@ -73,11 +79,36 @@ try {
     assert(stamps[0] > previousEnd, 'query reset must produce fresh timestamps');
     assert(stamps[1] > stamps[0], 'compute pass must consume GPU time');
     assert(stamps[2] >= stamps[1] && stamps[3] > stamps[2], 'one-sided pass boundaries must stay ordered');
+    assert.deepEqual([...new BigUint64Array(bytes, (QUERY_COUNT + 1) * QUERY_BYTES, 2)],
+      stamps.slice(2), 'repeated partial resolutions must preserve source indices and destination offsets');
     previousEnd = stamps[3];
     readback.unmap();
     assert.equal(await device.popErrorScope(), null);
     console.log(`ok: timestamp run ${run}, fresh ordered queries and exact shader output`);
   }
+
+  const start = device.createCommandEncoder();
+  start.beginComputePass({ timestampWrites: { querySet: query, beginningOfPassWriteIndex: 0 } }).end();
+  const outerStart = performance.now();
+  device.queue.submit([start.finish()]);
+  await device.queue.onSubmittedWorkDone();
+  const innerStart = performance.now();
+  await new Promise((resolve) => setTimeout(resolve, CLOCK_GAP_MS));
+  const finish = device.createCommandEncoder();
+  finish.beginComputePass({ timestampWrites: { querySet: query, endOfPassWriteIndex: 1 } }).end();
+  finish.resolveQuerySet(query, 0, 2, resolved, 0);
+  finish.copyBufferToBuffer(resolved, 0, readback, 0, 2 * QUERY_BYTES);
+  const innerEnd = performance.now();
+  device.queue.submit([finish.finish()]);
+  await readback.mapAsync(M.READ);
+  const outerEnd = performance.now();
+  const [begin, end] = new BigUint64Array(readback.getMappedRange(), 0, 2);
+  const milliseconds = Number(end - begin) / 1e6;
+  assert(milliseconds >= (innerEnd - innerStart) * (1 - CLOCK_MARGIN)
+    && milliseconds <= (outerEnd - outerStart) * (1 + CLOCK_MARGIN),
+  `query results must be nanoseconds within CPU completion bounds: ${milliseconds} ms`);
+  readback.unmap();
+  console.log('ok: native query nanoseconds agree with independent CPU completion bounds');
 } finally {
   for (const resource of resources.reverse()) resource.destroy();
   device.destroy();

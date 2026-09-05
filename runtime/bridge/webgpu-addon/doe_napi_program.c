@@ -4,6 +4,9 @@ napi_value doe_compute_program_timestamp_info(napi_env env, napi_callback_info i
     NAPI_ASSERT_ARGC(env, info, 1);
     CHECK_LIB_LOADED(env);
     uint32_t (*read_info)(void*, double*, uint32_t*) =
+        (uint32_t (*)(void*, double*, uint32_t*))LIB_SYM(g_lib, "doeNativeComputeProgramTimestampNanoseconds");
+    const char* source = read_info ? "webgpu-nanoseconds" : "vulkan-query-ticks";
+    if (!read_info) read_info =
         (uint32_t (*)(void*, double*, uint32_t*))LIB_SYM(g_lib, "doeNativeComputeProgramTimestampInfo");
     void* device = unwrap_ptr(env, _args[0]);
     double period_ns = 0;
@@ -18,6 +21,8 @@ napi_value doe_compute_program_timestamp_info(napi_env env, napi_callback_info i
     napi_set_named_property(env, result, "periodNs", value);
     napi_create_uint32(env, valid_bits, &value);
     napi_set_named_property(env, result, "validBits", value);
+    napi_create_string_utf8(env, source, NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, "source", value);
     return result;
 }
 

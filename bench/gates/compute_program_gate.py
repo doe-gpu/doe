@@ -29,7 +29,7 @@ def validate_gpu_timing(receipt: dict[str, Any], provider: str, policy: dict[str
         raise ValueError('GPU timing does not match the frozen policy')
     if not enabled:
         return False
-    expected_source = 'vulkan-query-ticks' if provider.startswith('doe-') else 'webgpu-nanoseconds'
+    expected_source = 'vulkan-query-ticks' if provider.startswith('doe-') and receipt.get('schemaVersion', 2) < 3 else 'webgpu-nanoseconds'
     if provider == 'wgpu' and policy.get('wgpuTimestampUnits') == 'vulkan-ticks':
         expected_source = 'wgpu-vulkan-query-ticks'
     if timing['source'] != expected_source or timing['scope'] != 'compute-pass':

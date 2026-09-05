@@ -277,23 +277,7 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                         );
                     };
                     recorded_replay_work = true;
-                    if (flushRecordedReplay(q, rt, &recorded_replay_work, "after resolve_query_set")) {
-                        resetPreparedDispatchState(&prepared_dispatch);
-                        query_native.vulkanCopyQueryResultsToMappedBuffer(
-                            rt,
-                            resolve_cmd.query_set,
-                            resolve_cmd.first_query,
-                            resolve_cmd.query_count,
-                            resolve_cmd.dst_buffer,
-                            resolve_cmd.dst_offset,
-                        ) catch |err| {
-                            shared.deliverInternalError(
-                                q.dev,
-                                "doe_queue_submit: vulkan copy query results to mapped buffer: {s}",
-                                .{@errorName(err)},
-                            );
-                        };
-                    }
+                    resetPreparedDispatchState(&prepared_dispatch);
                 },
             }
         }

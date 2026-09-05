@@ -134,6 +134,10 @@ try {
       assert.deepEqual([...new Uint32Array(result.output.buffer)], words);
       assert.equal(result.receipt.dispatchCount, 1);
       if (timed) {
+        assert.equal(result.receipt.schemaVersion, 3);
+        assert.equal(result.receipt.gpuTiming.source, 'webgpu-nanoseconds');
+        assert.equal(result.receipt.gpuTiming.periodNs, 1);
+        assert.equal(result.receipt.gpuTiming.validBits, 64);
         assert(result.receipt.gpuTiming.elapsedNs > 0);
         assert(BigInt(result.receipt.gpuTiming.endTicks) > BigInt(result.receipt.gpuTiming.beginTicks));
       } else assert.equal(result.receipt.gpuTiming, null);

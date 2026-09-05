@@ -20,10 +20,11 @@ diffusion. This additive API does not establish an application speed claim.
 
 Pass `gpuTiming: 'timestamp-query'` to opt into compute-pass GPU timing on a
 device with `timestamp-query` enabled. Current Doe calibration supports Vulkan
-with a matching addon and runtime. Receipts include raw counters, period,
-counter width, and elapsed nanoseconds separately from complete invocation
+with a matching addon and runtime. Vulkan query results are normalized on the
+GPU to nanoseconds. Receipts identify resolved units and compute-pass duration separately from complete invocation
 latency. Timing is off by default; enabled timing adds retained query resources
-and readback work, reflected in allocation and transfer accounting.
+and readback work. Requested allocation accounting includes public timing buffers;
+it does not measure internal scratch or peak GPU memory.
 
 `doe-gpu` is the public JavaScript package for Doe's native WebGPU runtime.
 Support is limited to the runtime, operating-system, architecture, backend,

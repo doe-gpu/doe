@@ -14,12 +14,13 @@ function timestampInfo(device, native, mode) {
   const info = native ? native.timestampInfo?.()
     : EXTERNAL_TIMESTAMP_SOURCES.get(device) ?? { periodNs: 1, validBits: 64, source: 'webgpu-nanoseconds' };
   if (!device.features?.has('timestamp-query') || !info
+      || (native && info.source !== 'webgpu-nanoseconds')
       || !Number.isFinite(info.periodNs) || info.periodNs <= 0
       || !Number.isInteger(info.validBits) || info.validBits < 1 || info.validBits > 64) {
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'options.gpuTiming',
       'enabled timestamp-query and calibrated provider; rebuild Doe addon/runtime if needed', 'unavailable');
   }
-  return Object.freeze({ ...info, source: native ? 'vulkan-query-ticks' : info.source });
+  return Object.freeze({ ...info, source: info.source ?? 'vulkan-query-ticks' });
 }
 
 function timestampResult(bytes, offset, info) {

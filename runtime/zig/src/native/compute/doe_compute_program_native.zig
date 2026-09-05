@@ -30,6 +30,13 @@ pub export fn doeNativeComputeProgramTimestampInfo(device_raw: ?*anyopaque, peri
     return 1;
 }
 
+pub export fn doeNativeComputeProgramTimestampNanoseconds(device_raw: ?*anyopaque, period_ns: *f64, valid_bits: *u32) callconv(.c) u32 {
+    if (doeNativeComputeProgramTimestampInfo(device_raw, period_ns, valid_bits) == 0) return 0;
+    period_ns.* = 1;
+    valid_bits.* = @bitSizeOf(u64);
+    return 1;
+}
+
 const BufferReference = struct {
     object: *objects.DoeBuffer,
     resource_id: u64,

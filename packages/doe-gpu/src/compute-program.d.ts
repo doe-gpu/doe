@@ -19,7 +19,7 @@ export interface ComputeProgramDescriptor {
 export type ComputeProgramExecution = 'gpu-recorded' | 'native-recorded' | 'webgpu';
 
 export interface ComputeProgramReceipt {
-  schemaVersion: 2;
+  schemaVersion: 3;
   programHash: string;
   execution: ComputeProgramExecution;
   run: number;

@@ -71,12 +71,18 @@ def main() -> int:
                                 '../../src/bun.js': 'doe-gpu',
                                 '../../src/compute-program.js': 'doe-gpu/compute-program',
                                 '../../src/vendor/webgpu/webgpu-constants.js': 'doe-gpu/native'}
-                for fixture, name in [('plans', 'compute-program'), ('timestamps', 'timestamp-query')]:
+                for source in ['runtime/zig/src/backend/vulkan/vk_timestamp_normalize.wgsl',
+                               'config/vulkan-timestamp-policy.json']:
+                    shutil.copyfile(ROOT / source, scratch / Path(source).name)
+                    shutil.copyfile(ROOT / source, output / Path(source).name)
+                    replacements[f'../../../../{source}'] = f'./{Path(source).name}'
+                for fixture, name in [('plans', 'compute-program'), ('timestamps', 'timestamp-query'),
+                                      ('normalization', 'timestamp-normalization')]:
                     regression = (ROOT / f'packages/doe-gpu/test/integration/test-integration-{name}.js').read_text()
                     for before, after in replacements.items():
                         regression = regression.replace(before, after)
                     (scratch / f'{fixture}.mjs').write_text(regression)
-                for fixture in ['candidate', 'lifecycle', 'plans', 'timestamps']:
+                for fixture in ['candidate', 'lifecycle', 'plans', 'timestamps', 'normalization']:
                     entry = f"await import('./{fixture}.mjs');\n"
                     if host == 'electron':
                         entry = "try {\n" + entry + "(await import('electron')).app.exit(0);\n} catch (error) { console.error(error); (await import('electron')).app.exit(1); }\n"

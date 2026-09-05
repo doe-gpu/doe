@@ -964,8 +964,8 @@
       },
       "src/backend/dropin_resource_ops.zig": {
         "decision": "Keep",
-        "moduleSha256": "5825dc6dd5cc696f0d1194f5a33cd7eb9502e56cad20495c0b213d05c5f4fede",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "moduleSha256": "8a01ee713a71432ec54065371209b9d1e4e6a3a8a9c65ef050094fb49079748a",
+        "reason": "Keep: typed resource seam exposes Vulkan timestamp normalization while retaining platform import boundaries.",
         "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/dropin_surface_ops.zig": {
@@ -3610,8 +3610,8 @@
       },
       "src/native/queue/doe_queue_submit_vulkan.zig": {
         "decision": "Keep",
-        "moduleSha256": "8618736104d18c71b14ad3f7106559e80df7a8432abddc7b652a4cfd1ec2ade2",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "moduleSha256": "1816938e79d7e54cb3f6088d335b6e6ca35f823f0881d9302019a3d7388eb9eb",
+        "reason": "Keep: query resolution remains in recorded GPU work; normalize, copy, and later consumers share submission order without a CPU query round trip.",
         "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/render/doe_bundle_native.zig": {
@@ -3670,8 +3670,8 @@
       },
       "src/native/resource/doe_query_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "0df70a03ab24ab95bf72730f2116bb1eda4c1c0659c83226ce7b78e139ad2213",
-        "reason": "Keep: native query ownership and recording remain shared; pass-end timestamps now wait for bottom-of-pipeline completion, matching the declared full pass scope.",
+        "moduleSha256": "37952fa624daf1b469b04e3d7c9da8be6aa3d6c176431f230f6e403fb3c981a5",
+        "reason": "Keep: native query sets own normalization scratch and release it with the retained pool; resolve uses the common backend conversion and validates device/ranges.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/native/resource/doe_texture_sampler_native.zig": {
@@ -4228,8 +4228,8 @@
       },
       "src/native/compute/doe_compute_program_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "92c74c24760d0752e64e4b7837bd2d0f7c53dc402be396886cd767b59f2b2a65",
-        "reason": "Keep: prepared commands retain buffer, pipeline, and timestamp-query identities; query destruction invalidates replay before submission and timing uses physical device calibration.",
+        "moduleSha256": "b6556017fdb2461e1ca39cbfca6122eba28a96030f579f67213829841f616f90",
+        "reason": "Keep: prepared query lifetimes remain invalidation inputs; the additive timing ABI distinguishes normalized nanoseconds from historical hardware ticks.",
         "reviewer": "codex-gpu-program/2026-09-05"
       }
     },

@@ -265,7 +265,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
         return {
           output,
           receipt: {
-            schemaVersion: 2, programHash: identity.programHash, execution, run: runs,
+            schemaVersion: 3, programHash: identity.programHash, execution, run: runs,
             inputHashes: Object.fromEntries(inputs.map((input) => [input.id, hashBytes(inputSnapshots[input.id])])),
             outputHash: hashBytes(output), dispatchCount: plan.steps.length,
             clearedBytes: cleared.reduce((sum, buffer) => sum + buffer.size, 0),
