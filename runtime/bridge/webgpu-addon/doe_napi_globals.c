@@ -139,6 +139,7 @@ PFN_doeNativeDeviceCreateQuerySet pfn_doeNativeDeviceCreateQuerySet = NULL;
 PFN_doeNativeCommandEncoderWriteTimestamp pfn_doeNativeCommandEncoderWriteTimestamp = NULL;
 PFN_doeNativeCommandEncoderResolveQuerySet pfn_doeNativeCommandEncoderResolveQuerySet = NULL;
 PFN_doeNativeQuerySetDestroy pfn_doeNativeQuerySetDestroy = NULL;
+PFN_doeNativeQuerySetRelease pfn_doeNativeQuerySetRelease = NULL;
 PFN_doeNativeBufferMapAsync pfn_doeNativeBufferMapAsync = NULL;
 PFN_doeBufferMapReadCopyUnmapFlat pfn_doeBufferMapReadCopyUnmapFlat = NULL;
 
@@ -422,6 +423,7 @@ napi_value doe_load_library(napi_env env, napi_callback_info info) {
     pfn_doeNativeCommandEncoderWriteTimestamp = (PFN_doeNativeCommandEncoderWriteTimestamp)LIB_SYM(g_lib, "doeNativeCommandEncoderWriteTimestamp");
     pfn_doeNativeCommandEncoderResolveQuerySet = (PFN_doeNativeCommandEncoderResolveQuerySet)LIB_SYM(g_lib, "doeNativeCommandEncoderResolveQuerySet");
     pfn_doeNativeQuerySetDestroy = (PFN_doeNativeQuerySetDestroy)LIB_SYM(g_lib, "doeNativeQuerySetDestroy");
+    pfn_doeNativeQuerySetRelease = (PFN_doeNativeQuerySetRelease)LIB_SYM(g_lib, "doeNativeQuerySetRelease");
 
     /* Optional symbols for 14-binding expansion — absent until delivered. */
     pfn_doeNativeAdapterGetPreferredCanvasFormat = (FnAdapterGetPreferredCanvasFormat)LIB_SYM(g_lib, "doeNativeAdapterGetPreferredCanvasFormat");

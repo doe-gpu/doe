@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import process from 'node:process';
 import { prepareComputeProgram } from '../../packages/doe-gpu/src/compute-program.js';
+import { registerTimestampSource } from '../../packages/doe-gpu/src/compute-program-timing.js';
 import { imageEdgesProgram, heatDiffusionProgram } from '../../packages/doe-gpu/examples/compute-programs.js';
 import { imageEdgesOracle, heatDiffusionOracle, compareNumerical } from '../oracles/compute-programs.mjs';
 import { stats } from '../shared/lib/stats.js';
@@ -15,11 +16,13 @@ const args = Object.fromEntries(process.argv.slice(2).map((arg) => {
   return [arg.slice(2, split), arg.slice(split + 1)];
 }));
 const allowed = new Set(['provider', 'application', 'policy', 'output', 'phase', 'backend']);
-if (Object.keys(args).some((key) => !allowed.has(key)) || Object.keys(args).length !== allowed.size) {
+if (Object.keys(args).some((key) => !allowed.has(key) && key !== 'hardware') || [...allowed].some((key) => !(key in args))) {
   throw new Error('Required: --provider= --application= --policy= --output= --phase=audit|measure --backend=vulkan|metal');
 }
 const policyBytes = readFileSync(args.policy);
 const policy = JSON.parse(policyBytes);
+const gpuTiming = policy.gpuTiming ?? 'off';
+const deviceDescriptor = { requiredFeatures: gpuTiming === 'timestamp-query' ? ['timestamp-query'] : [] };
 if (policy.percentileMethod !== 'nearest-rank') throw new Error('This runner requires the nearest-rank percentile policy');
 if (!policy.providers.includes(args.provider) || !policy.applications.includes(args.application)
     || !['audit', 'measure'].includes(args.phase) || !['vulkan', 'metal'].includes(args.backend)) {
@@ -68,7 +71,7 @@ const inputPaths = Object.fromEntries(Object.entries(inputs).map(([id, value]) =
 }));
 writeFileSync(`${args.output}.expected.f64`, new Uint8Array(Float64Array.from(expected).buffer));
 const report = {
-  schemaVersion: 2, kind: 'compute_program_evaluation', claimStatus: 'diagnostic',
+  schemaVersion: 3, kind: 'compute_program_evaluation', claimStatus: 'diagnostic',
   provider: args.provider, application: args.application, phase: args.phase, backend: args.backend,
   policyHash: hash(policyBytes), programPath: `${args.output}.program.json`, inputPaths,
   fixturePath: fixtureReference?.path ?? null,
@@ -76,10 +79,14 @@ const report = {
     : { name: 'deno', version: Deno.version.deno },
   status: 'running', error: null, samples: [], cold: null, preparationMs: null, deviceStartupMs: null,
   adapter: null, providerArtifact: null, allocatedBufferBytes: null, peakProcessRssBytes: null,
+  providerAddonArtifact: null,
+  timestampCalibrationArtifact: null,
   lifecycle: null, observed: { dispatchesEncoded: 0, submissions: 0, maps: 0 },
   latencyStatsMs: null, cpuStatsMs: null, programHash: null, teardownMs: null,
+  gpuStatsNs: null,
   expectedPath: `${args.output}.expected.f64`, preparation: null,
-  measurementLimits: ['GPU timestamps unavailable in this contract', 'Peak device memory unavailable; requested buffers and process RSS reported',
+  measurementLimits: [gpuTiming === 'off' ? 'GPU timestamps disabled by policy' : 'GPU timestamps bracket compute only; useful-operation wall includes all runtime and readback work',
+    'Peak device memory unavailable; requested buffers and process RSS reported',
     'Forced device loss is not an observed driver-loss recovery', 'Dawn and wgpu adapter APIs do not expose a numeric driver version'],
 };
 let program;
@@ -89,14 +96,24 @@ try {
   const startup = performance.now();
   if (args.provider.startsWith('doe-')) {
     const native = await import('../../packages/doe-gpu/src/native.js');
-    device = await native.requestDevice({ backend: args.backend });
+    const adapter = await native.requestAdapter({ backend: args.backend });
+    device = await adapter.requestDevice(deviceDescriptor);
     const provider = native.providerInfo();
     report.providerArtifact = { path: provider.doeLibraryPath, hash: hash(readFileSync(provider.doeLibraryPath)) };
+    const addonPath = process.report?.getReport().sharedObjects.find((path) => path.endsWith('/doe_napi.node'));
+    if (!addonPath) throw new Error('Loaded Doe addon identity is unavailable from this host');
+    const addonHash = hash(readFileSync(addonPath));
+    const retainedAddon = resolve(dirname(args.output), `doe.${addonHash}.addon.node`);
+    if (!existsSync(retainedAddon)) writeFileSync(retainedAddon, readFileSync(addonPath), { flag: 'wx' });
+    if (hash(readFileSync(retainedAddon)) !== addonHash) throw new Error('Retained addon bytes changed');
+    report.providerAddonArtifact = { path: retainedAddon, hash: addonHash };
   } else if (args.provider === 'dawn') {
     const dawn = await import('webgpu');
-    providerOwner = dawn.create([`backend=${args.backend}`]);
+    const features = policy.dawnTimestampQuantization === 'disabled'
+      ? ['disable-dawn-features=timestamp_quantization'] : [];
+    providerOwner = dawn.create([`backend=${args.backend}`, ...features]);
     const adapter = await providerOwner.requestAdapter({ powerPreference: 'high-performance' });
-    device = await adapter.requestDevice();
+    device = await adapter.requestDevice(deviceDescriptor);
     report.adapter = adapter.info;
     const filename = process.platform === 'darwin' ? 'darwin-universal' : `${process.platform}-${process.arch}`;
     const artifactPath = resolve(`bench/node_modules/webgpu/dist/${filename}.dawn.node`);
@@ -107,7 +124,7 @@ try {
     }
     const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
     if (!adapter) throw new Error('wgpu physical adapter unavailable');
-    device = await adapter.requestDevice();
+    device = await adapter.requestDevice(deviceDescriptor);
     report.adapter = adapter.info;
     report.providerArtifact = { path: Deno.execPath(), hash: hash(readFileSync(Deno.execPath())) };
   }
@@ -125,6 +142,23 @@ try {
   if (report.adapter.isFallbackAdapter === true || /llvmpipe|swiftshader|software/i.test(name)
       || !(args.backend === 'vulkan' ? /AMD|Radeon/i : /Apple/i).test(`${report.adapter.vendor} ${name}`)) {
     throw new Error(`Required physical ${args.backend} adapter; received ${JSON.stringify(report.adapter)}`);
+  }
+  if (gpuTiming !== 'off' && args.backend === 'vulkan') {
+    if (!args.hardware) throw new Error('Timed Vulkan evaluation requires a retained vulkaninfo JSON profile');
+    const profileBytes = readFileSync(args.hardware);
+    report.timestampCalibrationArtifact = { path: resolve(args.hardware), hash: hash(profileBytes) };
+    const physical = JSON.parse(profileBytes).capabilities.device;
+    const properties = physical.properties.VkPhysicalDeviceProperties;
+    if (args.provider === 'wgpu' && policy.wgpuTimestampUnits === 'vulkan-ticks') {
+      if (Number(report.adapter.vendor) !== properties.vendorID || Number(report.adapter.device) !== properties.deviceID) {
+        throw new Error('wgpu timestamp calibration belongs to a different physical adapter');
+      }
+      const bits = new Set(physical.queueFamiliesProperties.map((family) => family.VkQueueFamilyProperties)
+        .filter((family) => family.queueFlags.includes('VK_QUEUE_COMPUTE_BIT')).map((family) => family.timestampValidBits));
+      if (bits.size !== 1 || bits.has(0)) throw new Error('wgpu timestamp counter width requires an unambiguous compute queue contract');
+      registerTimestampSource(device, { periodNs: properties.limits.timestampPeriod,
+        validBits: [...bits][0], source: 'wgpu-vulkan-query-ticks' });
+    }
   }
   if (args.phase === 'audit') {
     const createEncoder = device.createCommandEncoder.bind(device);
@@ -150,7 +184,7 @@ try {
     };
   }
   const execution = args.provider === 'doe-recorded' ? policy.preparedExecution : 'webgpu';
-  program = await prepareComputeProgram(device, descriptor, { execution });
+  program = await prepareComputeProgram(device, descriptor, { execution, gpuTiming });
   report.programHash = program.programHash;
   report.preparationMs = program.preparationMs;
   report.preparation = program.preparation;
@@ -175,6 +209,7 @@ try {
   for (let i = 0; i < sampleCount; i += 1) report.samples.push(await runOne());
   report.latencyStatsMs = stats(report.samples.map((sample) => sample.wallMs));
   report.cpuStatsMs = stats(report.samples.map((sample) => sample.cpuMs));
+  if (gpuTiming !== 'off') report.gpuStatsNs = stats(report.samples.map((sample) => sample.receipt.gpuTiming.elapsedNs));
   // Audits include cancellation with a subsequent successful reuse, kept out of timing samples.
   if (args.phase === 'audit') {
     const cancel = new AbortController();

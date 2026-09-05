@@ -1,6 +1,6 @@
 // Physical-device regressions for command ordering, reset, and program lifetime.
 import assert from 'node:assert/strict';
-import { requestDevice } from '../../src/native.js';
+import { requestAdapter } from '../../src/native.js';
 import { prepareComputeProgram } from '../../src/compute-program.js';
 import { globals } from '../../src/vendor/webgpu/webgpu-constants.js';
 
@@ -23,7 +23,10 @@ const descriptor = {
   output: 'output',
 };
 
-const device = await requestDevice({ backend: process.platform === 'darwin' ? 'metal' : 'vulkan' });
+const timed = process.argv.includes('--timestamps');
+const adapter = await requestAdapter({ backend: process.platform === 'darwin' ? 'metal' : 'vulkan' });
+const device = await adapter.requestDevice({ requiredFeatures: timed ? ['timestamp-query'] : [] });
+const timingOptions = { gpuTiming: timed ? 'timestamp-query' : 'off' };
 const createBuffer = device.createBuffer.bind(device);
 let abortDuringReadback = null;
 device.createBuffer = (declaration) => {
@@ -116,7 +119,7 @@ try {
   if (process.platform === 'linux') modes.push('gpu-recorded');
   for (const execution of modes) {
     const source = structuredClone(descriptor);
-    const program = await prepareComputeProgram(device, source, { execution });
+    const program = await prepareComputeProgram(device, source, { execution, ...timingOptions });
     source.steps[0].workgroups[0] = 1;
     source.shaders[0].code = 'invalid';
     assert.equal(program.descriptor.steps[0].workgroups[0], 4);
@@ -130,6 +133,10 @@ try {
       const result = await pending;
       assert.deepEqual([...new Uint32Array(result.output.buffer)], words);
       assert.equal(result.receipt.dispatchCount, 1);
+      if (timed) {
+        assert(result.receipt.gpuTiming.elapsedNs > 0);
+        assert(BigInt(result.receipt.gpuTiming.endTicks) > BigInt(result.receipt.gpuTiming.beginTicks));
+      } else assert.equal(result.receipt.gpuTiming, null);
     }
     const abort = new AbortController();
     abort.abort();
@@ -151,6 +158,7 @@ try {
     assert.equal(program.state, 'closed');
     assert(replacement.preparation.reusedResources > 0);
     const changedOutput = await replacement.run({ input: new Uint32Array([19, 23]) });
+    assert.equal(changedOutput.receipt.gpuTiming !== null, timed);
     assert.deepEqual([...new Uint32Array(changedOutput.output.buffer)], [19, 23]);
     const changedSource = structuredClone(smaller);
     changedSource.shaders[0].code = changedSource.shaders[0].code.replace('b[id.x] + a[id.x]', 'a[id.x] * 2u');
@@ -185,6 +193,18 @@ try {
     await second.close();
     await ordinary.close();
     console.log('ok: GPU recordings survive interleaved programs, ordinary cache changes, and independent close');
+  }
+  if (timed && process.platform === 'linux') {
+    const createQuery = device.createQuerySet.bind(device);
+    let retainedQuery;
+    device.createQuerySet = (...args) => { retainedQuery = createQuery(...args); return retainedQuery; };
+    const program = await prepareComputeProgram(device, descriptor,
+      { execution: 'gpu-recorded', ...timingOptions });
+    device.createQuerySet = createQuery;
+    retainedQuery.destroy();
+    await assert.rejects(program.run({ input: new Uint32Array([1, 2, 3, 4]) }), /DOE_PROGRAM_INVALIDATED/);
+    await program.close();
+    console.log('ok: destroyed timestamp query invalidates GPU recording before submission');
   }
   const lost = [];
   for (const execution of modes) lost.push(await prepareComputeProgram(device, descriptor, { execution }));

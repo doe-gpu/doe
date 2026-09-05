@@ -18,6 +18,13 @@ is an explicit persistent-resource control. See `examples/compute-program.js`
 and `examples/compute-programs.js` for grayscale image processing and heat
 diffusion. This additive API does not establish an application speed claim.
 
+Pass `gpuTiming: 'timestamp-query'` to opt into compute-pass GPU timing on a
+device with `timestamp-query` enabled. Current Doe calibration supports Vulkan
+with a matching addon and runtime. Receipts include raw counters, period,
+counter width, and elapsed nanoseconds separately from complete invocation
+latency. Timing is off by default; enabled timing adds retained query resources
+and readback work, reflected in allocation and transfer accounting.
+
 `doe-gpu` is the public JavaScript package for Doe's native WebGPU runtime.
 Support is limited to the runtime, operating-system, architecture, backend,
 and workload tuples declared in the Doe support matrix.

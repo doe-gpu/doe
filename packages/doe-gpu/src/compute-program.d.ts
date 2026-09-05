@@ -19,7 +19,7 @@ export interface ComputeProgramDescriptor {
 export type ComputeProgramExecution = 'gpu-recorded' | 'native-recorded' | 'webgpu';
 
 export interface ComputeProgramReceipt {
-  schemaVersion: 1;
+  schemaVersion: 2;
   programHash: string;
   execution: ComputeProgramExecution;
   run: number;
@@ -31,6 +31,12 @@ export interface ComputeProgramReceipt {
   readbackBytes: number;
   readbackPath: 'mapAsync-copy-unmap';
   allocatedBufferBytes: number;
+  gpuTiming: null | {
+    source: 'vulkan-query-ticks' | 'webgpu-nanoseconds' | 'wgpu-vulkan-query-ticks';
+    scope: 'compute-pass';
+    beginTicks: string; endTicks: string;
+    periodNs: number; validBits: number; elapsedNs: number;
+  };
   timingMs: {
     upload: number; encode: number; submitWait: number; readback: number; total: number;
   };
@@ -54,7 +60,7 @@ export interface ComputeProgram {
 export function prepareComputeProgram(
   device: any,
   descriptor: ComputeProgramDescriptor,
-  options: { execution: ComputeProgramExecution },
+  options: { execution: ComputeProgramExecution; gpuTiming?: 'off' | 'timestamp-query' },
 ): Promise<ComputeProgram>;
 export function validateComputeProgram(descriptor: unknown): {
   descriptor: Readonly<ComputeProgramDescriptor>; programHash: string;

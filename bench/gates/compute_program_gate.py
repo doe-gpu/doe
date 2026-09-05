@@ -14,6 +14,48 @@ import jsonschema
 from bench.lib.hash_utils import file_sha256 as digest
 from bench.lib.native_program_replay import validate_gpu_replays
 from bench.lib.compute_program_fixture import load_fixture, accepts
+from bench.native_compare_modules.reporting import format_stats
+
+TIMESTAMP_BYTES = struct.calcsize('<Q')
+TIMESTAMP_QUERY_COUNT = 2
+MAX_SAFE_TIMESTAMP_INTERVAL = (1 << 53) - 1
+
+
+def validate_gpu_timing(receipt: dict[str, Any], provider: str, policy: dict[str, Any],
+                        calibration: dict[str, Any] | None = None) -> bool:
+    timing = receipt.get('gpuTiming')
+    enabled = policy.get('gpuTiming', 'off') == 'timestamp-query'
+    if (timing is not None) != enabled:
+        raise ValueError('GPU timing does not match the frozen policy')
+    if not enabled:
+        return False
+    expected_source = 'vulkan-query-ticks' if provider.startswith('doe-') else 'webgpu-nanoseconds'
+    if provider == 'wgpu' and policy.get('wgpuTimestampUnits') == 'vulkan-ticks':
+        expected_source = 'wgpu-vulkan-query-ticks'
+    if timing['source'] != expected_source or timing['scope'] != 'compute-pass':
+        raise ValueError('GPU timestamp source or scope mismatch')
+    if expected_source == 'webgpu-nanoseconds' and (timing['periodNs'] != 1 or timing['validBits'] != 64):
+        raise ValueError('Standard WebGPU timestamps must use nanoseconds')
+    if expected_source != 'webgpu-nanoseconds':
+        if calibration is None:
+            raise ValueError('Native GPU ticks require independent physical calibration')
+        properties = calibration['properties']['VkPhysicalDeviceProperties']
+        bits = {family['VkQueueFamilyProperties']['timestampValidBits']
+                for family in calibration['queueFamiliesProperties']
+                if 'VK_QUEUE_COMPUTE_BIT' in family['VkQueueFamilyProperties']['queueFlags']}
+        if (bits != {timing['validBits']} or not math.isclose(
+                timing['periodNs'], properties['limits']['timestampPeriod'],
+                rel_tol=policy['timestampPeriodRelativeTolerance'], abs_tol=0)):
+            raise ValueError('GPU timestamp calibration differs from the physical Vulkan profile')
+    begin, end = int(timing['beginTicks']), int(timing['endTicks'])
+    if not (0 <= begin < 1 << 64 and 0 <= end < 1 << 64):
+        raise ValueError('GPU timestamps exceed the native result width')
+    ticks = (end - begin) % (1 << timing['validBits'])
+    elapsed = ticks * timing['periodNs']
+    if ticks > MAX_SAFE_TIMESTAMP_INTERVAL or elapsed > MAX_SAFE_TIMESTAMP_INTERVAL or not math.isclose(
+            elapsed, timing['elapsedNs'], rel_tol=1e-12, abs_tol=0):
+        raise ValueError('GPU timestamp interval or calibration mismatch')
+    return True
 
 
 def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, Any]:
@@ -26,6 +68,19 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
         raise ValueError(f'{path}: run is outside the frozen evaluation policy')
     if report['adapter']['isFallbackAdapter'] is not False:
         raise ValueError(f'{path}: fallback state is not explicitly physical')
+    calibration = None
+    if report['schemaVersion'] >= 3 and report['backend'] == 'vulkan' and policy.get('gpuTiming', 'off') != 'off':
+        reference = report.get('timestampCalibrationArtifact')
+        if not reference or digest(Path(reference['path'])) != reference['hash']:
+            raise ValueError(f'{path}: independent timestamp calibration is missing or changed')
+        calibration = json.loads(Path(reference['path']).read_text())['capabilities']['device']
+        physical = calibration['properties']['VkPhysicalDeviceProperties']
+        if report['provider'] != 'dawn':
+            adapter = report['adapter']
+            vendor = adapter['vendorID'] if adapter['vendorID'] is not None else int(adapter['vendor'])
+            device = adapter['deviceID'] if adapter['deviceID'] is not None else int(adapter['device'])
+            if (vendor, device) != (physical['vendorID'], physical['deviceID']):
+                raise ValueError(f'{path}: timestamp calibration belongs to a different physical adapter')
     program_path = root / report["programPath"]
     program = json.loads(program_path.read_text(encoding="utf-8"))
     program_schema = json.loads((root / "config/compute-program.schema.json").read_text())
@@ -37,6 +92,10 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
     artifact = report["providerArtifact"]
     if digest(Path(artifact["path"])) != artifact["hash"]:
         raise ValueError(f"{path}: provider bytes changed")
+    if report['schemaVersion'] >= 3 and report['provider'].startswith('doe-'):
+        addon = report.get('providerAddonArtifact')
+        if not addon or digest(Path(addon['path'])) != addon['hash']:
+            raise ValueError(f'{path}: loaded addon identity is missing or changed')
     expected_samples = policy["timedRuns"] if report["phase"] == "measure" else 1
     if len(report["samples"]) != expected_samples:
         raise ValueError(f"{path}: timed-sample count mismatch")
@@ -90,11 +149,14 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
             raise ValueError(f"{path}: declared dispatch count mismatch")
         buffers = program["buffers"]
         output = next(item for item in buffers if item["id"] == program["output"])
+        has_timing = validate_gpu_timing(receipt, report['provider'], policy, calibration)
+        query_bytes = TIMESTAMP_QUERY_COUNT * TIMESTAMP_BYTES if has_timing else 0
+        padding = (-output['size']) % TIMESTAMP_BYTES if has_timing else 0
         expected_counts = {
             "uploadedBytes": sum(item["size"] for item in buffers if item["role"] == "input"),
             "clearedBytes": sum(item["size"] for item in buffers if item["role"] != "input"),
-            "readbackBytes": output["size"],
-            "allocatedBufferBytes": sum(item['size'] for item in buffers) + output['size'],
+            "readbackBytes": output["size"] + query_bytes,
+            "allocatedBufferBytes": sum(item['size'] for item in buffers) + output['size'] + padding + 2 * query_bytes,
         }
         if any(receipt[key] != value for key, value in expected_counts.items()):
             raise ValueError(f"{path}: resource work mismatch")
@@ -121,6 +183,17 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
         if report["provider"].startswith("doe-") and report["backend"] == "vulkan":
             validate_native_audit(path, program, successful_runs,
                                   gpu_recorded=report["provider"] == "doe-recorded" and policy["preparedExecution"] == "gpu-recorded")
+    if policy.get('gpuTiming', 'off') == 'timestamp-query':
+        expected = format_stats([sample['receipt']['gpuTiming']['elapsedNs'] / 1_000_000 for sample in report['samples']],
+                                percentile_method=policy['percentileMethod'])
+        observed = report.get('gpuStatsNs')
+        fields = {'mean': 'meanMs', 'min': 'minMs', 'max': 'maxMs', 'median': 'p50Ms', 'p95': 'p95Ms', 'p99': 'p99Ms'}
+        if (not observed or observed['count'] != expected['count']
+                or any(not math.isclose(observed[key], expected[field] * 1_000_000, rel_tol=1e-12, abs_tol=0)
+                       for key, field in fields.items())):
+            raise ValueError(f'{path}: GPU timestamp statistics mismatch')
+    elif report.get('gpuStatsNs') is not None:
+        raise ValueError(f'{path}: GPU timing statistics present with timing disabled')
     return report
 
 

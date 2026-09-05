@@ -80,6 +80,16 @@ classified and cannot be promoted by benchmark results.
   boundaries, repeated query reset/readback, and exact shader output on each
   selected host. Ordered timestamps alone do not establish calibrated GPU time
   or a prepared-program performance claim.
+- Program GPU timing is an explicit evaluation policy. Timestamp pass markers
+  must bracket equivalent completion stages, and counter precision must be
+  disclosed. The gate recomputes calibrated durations, percentile statistics,
+  query readback bytes, and requested allocations. Useful-operation timing
+  includes instrumentation; GPU-only intervals cannot replace it.
+  Vulkan clock calibration must agree with an independently captured physical
+  profile, including adapter identity and compute-queue counter width. The
+  policy bounds decimal rounding; an uninitialized nanosecond assumption is
+  never a fallback. Pinned incumbent implementation sources must substantiate
+  raw-tick versus nanosecond interpretation.
 - Readback allocation policy is versioned in
   `config/vulkan-buffer-memory-policy.json`. Cached memory is a preference;
   coherence and supported memory-type requirements remain mandatory. Validate

@@ -1,5 +1,26 @@
 #include "doe_napi_internal.h"
 
+napi_value doe_compute_program_timestamp_info(napi_env env, napi_callback_info info) {
+    NAPI_ASSERT_ARGC(env, info, 1);
+    CHECK_LIB_LOADED(env);
+    uint32_t (*read_info)(void*, double*, uint32_t*) =
+        (uint32_t (*)(void*, double*, uint32_t*))LIB_SYM(g_lib, "doeNativeComputeProgramTimestampInfo");
+    void* device = unwrap_ptr(env, _args[0]);
+    double period_ns = 0;
+    uint32_t valid_bits = 0;
+    napi_value result, value;
+    if (!read_info || !device || !read_info(device, &period_ns, &valid_bits)) {
+        napi_get_null(env, &result);
+        return result;
+    }
+    napi_create_object(env, &result);
+    napi_create_double(env, period_ns, &value);
+    napi_set_named_property(env, result, "periodNs", value);
+    napi_create_uint32(env, valid_bits, &value);
+    napi_set_named_property(env, result, "validBits", value);
+    return result;
+}
+
 napi_value doe_compute_program_supported(napi_env env, napi_callback_info info) {
     (void)info;
     CHECK_LIB_LOADED(env);

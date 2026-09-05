@@ -102,6 +102,13 @@ pub fn select_physical_device(self: anytype) !void {
     self.queue_family_supports_graphics_value_cache = selection.queue.supports_graphics;
     self.present_capable_value = selection.queue.supports_graphics;
     self.timestamp_query_supported_value = selection.queue.timestamp_valid_bits > 0;
+    var properties2 = std.mem.zeroes(c.VkPhysicalDeviceProperties2);
+    properties2.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    c.vkGetPhysicalDeviceProperties2(self.physical_device, &properties2);
+    self.timestamp_period = properties2.properties.limits.timestampPeriod;
+    if (self.timestamp_query_supported_value and (!std.math.isFinite(self.timestamp_period) or self.timestamp_period <= 0)) {
+        return error.UnsupportedFeature;
+    }
 }
 
 pub fn create_device_and_queue(self: anytype) !void {
@@ -320,11 +327,6 @@ pub fn create_timeline_semaphore(self: anytype) void {
 
 pub fn create_timestamp_query_pool(self: anytype) !void {
     if (!self.timestamp_query_supported_value) return;
-    // Query timestampPeriod from physical device properties.
-    var properties2 = std.mem.zeroes(c.VkPhysicalDeviceProperties2);
-    properties2.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    c.vkGetPhysicalDeviceProperties2(self.physical_device, &properties2);
-    self.timestamp_period = properties2.properties.limits.timestampPeriod;
     // Create a persistent 2-slot timestamp query pool.
     var create_info = c.VkQueryPoolCreateInfo{
         .sType = c.VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO,

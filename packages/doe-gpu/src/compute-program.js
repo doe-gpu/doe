@@ -3,9 +3,9 @@ import { performance } from 'node:perf_hooks';
 import { setImmediate } from 'node:timers/promises';
 import { globals } from './vendor/webgpu/webgpu-constants.js';
 import { nativeProgramProvider } from './compute-program-native.js';
-import { hashBytes, programError, validateComputeProgram } from './compute-program-contract.js';
+import { hashBytes, programError, validateComputeProgram, validateProgramOptions } from './compute-program-contract.js';
+import { QUERY_COUNT, QUERY_BYTES, timestampInfo, timestampResult } from './compute-program-timing.js';
 
-const EXECUTION_MODES = Object.freeze(['gpu-recorded', 'native-recorded', 'webgpu']);
 const { GPUBufferUsage, GPUMapMode } = globals;
 const DEVICE_OPERATIONS = new WeakSet();
 const DEVICE_LOSS = new WeakMap();
@@ -62,13 +62,11 @@ async function captureGpuErrors(device, action) {
 }
 
 /** Prepare an immutable program on an explicitly supplied device and execution path. */
-async function buildComputeProgram(device, descriptor, { execution } = {}, previous = null) {
+async function buildComputeProgram(device, descriptor, options, previous = null) {
   const started = performance.now();
   const identity = validateComputeProgram(descriptor);
   const plan = identity.descriptor;
-  if (!EXECUTION_MODES.includes(execution)) {
-    throw programError('DOE_PROGRAM_UNSUPPORTED', 'options.execution', EXECUTION_MODES.join(' | '), execution);
-  }
+  const { execution, gpuTiming } = validateProgramOptions(options);
   const native = nativeProgramProvider(device);
   if (execution !== 'webgpu' && !native) {
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'device', 'Doe native recorded program provider', 'unregistered device');
@@ -81,6 +79,7 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'device.runtimeContract',
       `native compute program contract ${plan.schemaVersion}; rebuild the addon and native library`, native.contractVersion);
   }
+  const clock = timestampInfo(device, native, gpuTiming);
   const buffers = new Map();
   const shaders = new Map();
   const pipelines = new Map();
@@ -99,6 +98,8 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
   }
   let readback;
   let recording;
+  let queries;
+  let queryResolve;
   let state = 'preparing';
   let reason = null;
   let runs = 0;
@@ -106,9 +107,12 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
   let closed = false;
   const loss = deviceLoss(device);
   const outputSize = plan.buffers.find((buffer) => buffer.id === plan.output).size;
+  const timestampOffset = Math.ceil(outputSize / BigUint64Array.BYTES_PER_ELEMENT) * BigUint64Array.BYTES_PER_ELEMENT;
+  const readbackSize = clock ? timestampOffset + QUERY_BYTES : outputSize;
   const inputs = plan.buffers.filter((buffer) => buffer.role === 'input');
   const cleared = plan.buffers.filter((buffer) => buffer.role !== 'input');
-  const allocatedBytes = plan.buffers.reduce((sum, buffer) => sum + buffer.size, outputSize);
+  const allocatedBytes = plan.buffers.reduce((sum, buffer) => sum + buffer.size,
+    readbackSize + (clock ? QUERY_BYTES : 0));
 
   function assertReady() {
     if (closed || state !== 'ready' || loss.info || native?.isLost()) {
@@ -119,13 +123,19 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
   function encode() {
     const encoder = device.createCommandEncoder({ label: plan.id });
     for (const buffer of cleared) encoder.clearBuffer(buffers.get(buffer.id));
-    const pass = encoder.beginComputePass();
+    const pass = encoder.beginComputePass(clock ? { timestampWrites: {
+      querySet: queries, beginningOfPassWriteIndex: 0, endOfPassWriteIndex: 1,
+    } } : undefined);
     for (const step of steps) {
       pass.setPipeline(step.pipeline);
       pass.setBindGroup(0, step.bindGroup);
       pass.dispatchWorkgroups(...step.workgroups);
     }
     pass.end();
+    if (clock) {
+      encoder.resolveQuerySet(queries, 0, QUERY_COUNT, queryResolve, 0);
+      encoder.copyBufferToBuffer(queryResolve, 0, readback, timestampOffset, QUERY_BYTES);
+    }
     encoder.copyBufferToBuffer(buffers.get(plan.output), 0, readback, 0, outputSize);
     return encoder.finish();
   }
@@ -156,10 +166,16 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
           usage: bindingUsage | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
         })));
       }
-      readback = acquire(`readback:${outputSize}`, () => device.createBuffer({
-        label: `${plan.id}:readback`, size: outputSize,
+      readback = acquire(`readback:${readbackSize}`, () => device.createBuffer({
+        label: `${plan.id}:readback`, size: readbackSize,
         usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
       }));
+      if (clock) {
+        queries = acquire('timestamp:queries', () => device.createQuerySet({ type: 'timestamp', count: QUERY_COUNT }));
+        queryResolve = acquire('timestamp:resolve', () => device.createBuffer({
+          size: QUERY_BYTES, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
+        }));
+      }
       for (const declaration of plan.shaders) {
         const shaderKey = `shader:${declaration.id}:${hashBytes(declaration.code)}`;
         const shader = acquire(shaderKey, () => device.createShaderModule({
@@ -236,7 +252,12 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
         const readStart = performance.now();
         await readback.mapAsync(GPUMapMode.READ);
         let output;
-        try { output = new Uint8Array(readback.getMappedRange()).slice(); }
+        let gpuTime = null;
+        try {
+          const bytes = readback.getMappedRange();
+          output = new Uint8Array(bytes, 0, outputSize).slice();
+          if (clock) gpuTime = timestampResult(bytes, timestampOffset, clock);
+        }
         finally { readback.unmap(); }
         assertExecutionActive(signal);
         const readbackMs = performance.now() - readStart;
@@ -244,13 +265,14 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
         return {
           output,
           receipt: {
-            schemaVersion: 1, programHash: identity.programHash, execution, run: runs,
+            schemaVersion: 2, programHash: identity.programHash, execution, run: runs,
             inputHashes: Object.fromEntries(inputs.map((input) => [input.id, hashBytes(inputSnapshots[input.id])])),
             outputHash: hashBytes(output), dispatchCount: plan.steps.length,
             clearedBytes: cleared.reduce((sum, buffer) => sum + buffer.size, 0),
             uploadedBytes: inputs.reduce((sum, buffer) => sum + buffer.size, 0),
-            readbackBytes: outputSize, readbackPath: 'mapAsync-copy-unmap',
+            readbackBytes: outputSize + (clock ? QUERY_BYTES : 0), readbackPath: 'mapAsync-copy-unmap',
             allocatedBufferBytes: allocatedBytes,
+            gpuTiming: gpuTime,
             timingMs: { upload: uploadMs, encode: encodeMs, submitWait: submitWaitMs,
               readback: readbackMs, total: performance.now() - start },
           },
@@ -296,7 +318,7 @@ async function buildComputeProgram(device, descriptor, { execution } = {}, previ
       const next = validateComputeProgram(nextDescriptor);
       if (next.programHash === identity.programHash) return Promise.resolve(api);
       state = 'updating';
-      active = buildComputeProgram(device, next.descriptor, { execution }, resources).then(async (replacement) => {
+      active = buildComputeProgram(device, next.descriptor, { execution, gpuTiming }, resources).then(async (replacement) => {
         if (closed) {
           await replacement.close();
           throw programError('DOE_PROGRAM_INVALIDATED', 'program.update', 'open program', 'closed during update');

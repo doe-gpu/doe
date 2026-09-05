@@ -161,6 +161,31 @@
           "maxItems": 3
         }
       }
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution"
+      ],
+      "properties": {
+        "execution": {
+          "type": "string",
+          "enum": [
+            "gpu-recorded",
+            "native-recorded",
+            "webgpu"
+          ]
+        },
+        "gpuTiming": {
+          "type": "string",
+          "enum": [
+            "off",
+            "timestamp-query"
+          ],
+          "default": "off"
+        }
+      }
     }
   }
 }

@@ -602,6 +602,7 @@ DECL_PFN(WGPUQuerySet, doeNativeDeviceCreateQuerySet, (WGPUDevice, uint32_t, uin
 DECL_PFN(void, doeNativeCommandEncoderWriteTimestamp, (WGPUCommandEncoder, WGPUQuerySet, uint32_t));
 DECL_PFN(void, doeNativeCommandEncoderResolveQuerySet, (WGPUCommandEncoder, WGPUQuerySet, uint32_t, uint32_t, WGPUBuffer, uint64_t));
 DECL_PFN(void, doeNativeQuerySetDestroy, (WGPUQuerySet));
+DECL_PFN(void, doeNativeQuerySetRelease, (WGPUQuerySet));
 DECL_PFN(WGPUFuture, doeNativeBufferMapAsync, (WGPUBuffer, uint64_t, size_t, size_t, WGPUBufferMapCallbackInfo));
 DECL_PFN(uint32_t, doeBufferMapReadCopyUnmapFlat, (WGPUQueue, WGPUBuffer, uint64_t, size_t, size_t, uint32_t, void*, uint64_t*));
 

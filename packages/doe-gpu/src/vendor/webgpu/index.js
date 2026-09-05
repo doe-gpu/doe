@@ -3589,6 +3589,7 @@ const fullSurfaceBackend = {
     registerNativeProgramProvider(device, {
       contractVersion: addon.nativeComputeProgramContractVersion?.() ?? 0,
       gpuRecorded: addon.computeProgramSupported?.() ?? false,
+      timestampInfo: () => addon.computeProgramTimestampInfo?.(device._native) ?? null,
       isLost: () => device._destroyed || device._lostInfo !== null,
       prepare(commandBuffer, execution = 'native-recorded') {
         if (commandBuffer._native == null || commandBuffer._batched) {

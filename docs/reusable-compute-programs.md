@@ -38,6 +38,29 @@ Preparation does not submit the program. Native pipeline creation costs are
 included in preparation. Replacement currently recompiles GPU command state;
 unchanged public resources still share their declared lifetime.
 
+Optional `gpuTiming: 'timestamp-query'` requires a device created with the
+`timestamp-query` feature. The default is `off`, declared in the options schema.
+Timed programs retain a query set and resolve buffer, and include timestamp
+readback in the existing output mapping. Vulkan GPU recordings retain and
+validate the query pool as well as their buffers. Destroying a query invalidates
+replay before submission. Updates preserve the selected timing mode.
+
+Receipt schema version 2 adds nullable `gpuTiming`: source, compute-pass scope,
+raw begin/end values, device period, valid counter bits, and elapsed nanoseconds.
+Subtraction occurs before conversion to preserve precision at large counter
+epochs and handle wraparound. Doe Vulkan exposes calibrated native ticks;
+Dawn timestamps use their nanosecond contract. The evaluation harness declares
+the pinned Deno/wgpu Vulkan tick behavior explicitly and binds its calibration
+to a retained physical Vulkan profile and upstream implementation sources.
+Calibration support
+must be explicit in the loaded Doe addon and library; other Doe backends fail
+timed preparation until implemented. This does not establish standard Vulkan
+query-resolve unit normalization on devices with a non-unit timestamp period.
+Pass-end markers use bottom-of-pipeline completion. GPU duration excludes input
+upload, scratch clearing, query resolution, and readback. Complete invocation
+wall time continues to include those operations and their instrumentation cost.
+Requested buffer accounting includes timing buffers and alignment padding.
+
 `native-recorded` records host commands and replays them in Zig. The WebGPU
 control keeps allocations, pipelines, and bindings resident and encodes each
 invocation. These are explicit modes, with no fallback between them.
@@ -99,6 +122,20 @@ policy with `program verify --policy` when the repository policy has changed.
 New matrices retain their resolved `policy.json`, including copied external
 fixtures. Pass that policy to verification so the matrix remains independent of
 the original fixture location.
+Evaluation policy schema version 4 declares `gpuTiming` and
+`dawnTimestampQuantization` (`default` or `disabled`); historical policies leave
+timing off. Run schema version 3 records GPU duration statistics. The gate
+recomputes durations from raw counter values and calibration, validates timing
+buffer work, and recomputes GPU percentiles. Receipt schema version 1 and older
+run schemas remain readable. Quantized timestamps and different resolve paths
+must be accounted for before comparing GPU timing or instrumentation costs.
+Timed Vulkan policies also select `vulkanDeviceIndex`, `wgpuTimestampUnits`,
+`timestampSources`, and `timestampPeriodRelativeTolerance`. The tolerance only
+accounts for decimal rounding in `vulkaninfo` JSON. Physical device selection
+initializes Doe's timestamp period even when the runtime's separate diagnostic
+query pool has never been created. Missing calibration, a different adapter,
+an ambiguous compute-queue counter width, or a period mismatch fails the gate.
+New run artifacts retain the loaded native addon and physical clock profile.
 Preparation break-even uses mean preparation cost and median
 invocation savings; no break-even is asserted when invocation does not improve.
 
@@ -190,7 +227,7 @@ checks still execute. The performance effect depends on physical memory types;
 see the [Vulkan property contract](https://docs.vulkan.org/refpages/latest/refpages/source/VkMemoryPropertyFlagBits.html).
 
 Remaining strategy acceptance includes a meaningful application advantage over
-the strongest controls, actual peak GPU memory and GPU time, independently
+the strongest controls, actual peak GPU memory, independently
 reproduced Metal results, a frozen external application portfolio, and external
 repeat use. Repository example programs are not externally owned applications.
 A reusable

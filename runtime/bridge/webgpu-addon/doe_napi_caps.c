@@ -696,9 +696,13 @@ napi_value doe_command_encoder_resolve_query_set(napi_env env, napi_callback_inf
 
 napi_value doe_query_set_destroy(napi_env env, napi_callback_info info) {
     NAPI_ASSERT_ARGC(env, info, 1);
-    if (!pfn_doeNativeQuerySetDestroy) return NULL;
+    if (!pfn_doeNativeQuerySetDestroy || !pfn_doeNativeQuerySetRelease)
+        NAPI_THROW(env, "querySet.destroy: native query lifecycle unavailable; rebuild the native library");
     WGPUQuerySet qs = unwrap_ptr(env, _args[0]);
-    if (qs) pfn_doeNativeQuerySetDestroy(qs);
+    if (qs) {
+        pfn_doeNativeQuerySetDestroy(qs);
+        pfn_doeNativeQuerySetRelease(qs);
+    }
     return NULL;
 }
 

@@ -17,6 +17,7 @@ napi_value doe_load_library(napi_env env, napi_callback_info info);
 napi_value doe_compute_program_contract_version(napi_env env, napi_callback_info info);
 napi_value doe_compute_program_prepare(napi_env env, napi_callback_info info);
 napi_value doe_compute_program_supported(napi_env env, napi_callback_info info);
+napi_value doe_compute_program_timestamp_info(napi_env env, napi_callback_info info);
 napi_value doe_compute_program_submit(napi_env env, napi_callback_info info);
 napi_value doe_compute_program_release(napi_env env, napi_callback_info info);
 
@@ -346,6 +347,7 @@ napi_value doe_module_init(napi_env env, napi_value exports) {
         EXPORT_FN("nativeComputeProgramContractVersion",       doe_compute_program_contract_version),
         EXPORT_FN("computeProgramPrepare",                    doe_compute_program_prepare),
         EXPORT_FN("computeProgramSupported",                  doe_compute_program_supported),
+        EXPORT_FN("computeProgramTimestampInfo",              doe_compute_program_timestamp_info),
         EXPORT_FN("computeProgramSubmit",                     doe_compute_program_submit),
         EXPORT_FN("computeProgramRelease",                    doe_compute_program_release),
         EXPORT_FN("deviceHasFeature",                         doe_device_has_feature),

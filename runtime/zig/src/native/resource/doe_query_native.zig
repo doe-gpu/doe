@@ -52,8 +52,7 @@ pub const DoeQuerySet = struct {
 fn vulkanTimestampStage(position: native_cmds.TimestampWritePosition) u32 {
     return switch (position) {
         .pass_begin => c.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-        .pass_end => c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        .command => c.VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+        .pass_end, .command => c.VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
     };
 }
 

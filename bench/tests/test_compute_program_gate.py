@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from bench.gates.compute_program_gate import digest, validate_run, validate_native_audit
+from bench.gates.compute_program_gate import digest, validate_run, validate_native_audit, validate_gpu_timing
 from bench.runners.run_compute_program_evidence import same_adapter
 from bench.native_compare_modules.reporting import format_stats
 from bench.lib.compute_program_fixture import load_fixture
@@ -71,6 +71,46 @@ class ComputeProgramGateTests(unittest.TestCase):
     def validate(self) -> None:
         self.path.write_text(json.dumps(self.report))
         validate_run(self.path, ROOT, self.policy)
+
+    def test_timestamp_evidence_rejects_changed_units_scope_counts_and_statistics(self) -> None:
+        self.policy['gpuTiming'] = 'timestamp-query'
+        timing = {'source': 'webgpu-nanoseconds', 'scope': 'compute-pass',
+                  'beginTicks': '1000', 'endTicks': '1400', 'periodNs': 1, 'validBits': 64, 'elapsedNs': 400}
+        for sample in [self.report['cold'], *self.report['samples']]:
+            sample['receipt'].update(schemaVersion=2, gpuTiming=copy.deepcopy(timing),
+                                     readbackBytes=20, allocatedBufferBytes=48)
+        self.report['allocatedBufferBytes'] = 48
+        self.report['gpuStatsNs'] = dict.fromkeys(['mean', 'min', 'max', 'median', 'p95', 'p99'], 400)
+        self.report['gpuStatsNs']['count'] = 1
+        self.validate()
+        original = copy.deepcopy(self.report)
+        for mutate in [
+            lambda r: r['samples'][0]['receipt']['gpuTiming'].update(periodNs=2),
+            lambda r: r['samples'][0]['receipt']['gpuTiming'].update(elapsedNs=401),
+            lambda r: r['samples'][0]['receipt']['gpuTiming'].update(source='vulkan-query-ticks'),
+            lambda r: r['samples'][0]['receipt']['gpuTiming'].update(beginTicks=str(1 << 64)),
+            lambda r: r['samples'][0]['receipt'].update(gpuTiming=None),
+            lambda r: r['samples'][0]['receipt'].update(readbackBytes=4),
+            lambda r: r['gpuStatsNs'].update(p95=401),
+            lambda r: r['gpuStatsNs'].update(count=2),
+        ]:
+            self.report = copy.deepcopy(original)
+            mutate(self.report)
+            with self.assertRaises(ValueError):
+                self.validate()
+
+    def test_gpu_tick_calibration_rejects_default_nanosecond_period(self) -> None:
+        policy = {'gpuTiming': 'timestamp-query', 'timestampPeriodRelativeTolerance': 0.00001}
+        clock = {'properties': {'VkPhysicalDeviceProperties': {'limits': {'timestampPeriod': 10.019}}},
+                 'queueFamiliesProperties': [{'VkQueueFamilyProperties': {
+                     'queueFlags': ['VK_QUEUE_COMPUTE_BIT'], 'timestampValidBits': 64}}]}
+        timing = {'source': 'vulkan-query-ticks', 'scope': 'compute-pass', 'beginTicks': '100',
+                  'endTicks': '200', 'periodNs': 10.019036293029785, 'validBits': 64,
+                  'elapsedNs': 1001.9036293029785}
+        self.assertTrue(validate_gpu_timing({'gpuTiming': timing}, 'doe-recorded', policy, clock))
+        timing.update(periodNs=1, elapsedNs=100)
+        with self.assertRaisesRegex(ValueError, 'physical Vulkan profile'):
+            validate_gpu_timing({'gpuTiming': timing}, 'doe-recorded', policy, clock)
 
     def test_valid_artifact_and_fail_closed_mutations(self) -> None:
         self.validate()

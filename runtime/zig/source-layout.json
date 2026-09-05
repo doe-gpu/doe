@@ -1228,8 +1228,8 @@
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "023cb1a10ebea63addd04defeeac907152a818c8f149c05df28872bad5d4fdc4",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "moduleSha256": "d35ff9232768eb178d47871fda3fe4e64cca338ef50f79c0c5dad4ffc2a4ed97",
+        "reason": "Keep: physical device selection owns timestamp calibration; uninitialized runtime state cannot imply a nanosecond clock.",
         "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_adapter_probe.zig": {
@@ -1276,8 +1276,8 @@
       },
       "src/backend/vulkan/vk_device.zig": {
         "decision": "Keep",
-        "moduleSha256": "d0412983703da11c6bc52b04ce38b57d6c466e5296d2d8d31edcd0138e225aeb",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "moduleSha256": "8dfbaa6a473dc53d0a5c6f03b4d04be5f67b84068f1dcd833586ff053fccf561",
+        "reason": "Keep: physical device selection owns timestamp calibration; uninitialized runtime state cannot imply a nanosecond clock.",
         "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_device_caps.zig": {
@@ -3670,8 +3670,8 @@
       },
       "src/native/resource/doe_query_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "a5f7c7484724ed2d8cfc3b7ebae04c714c33451d38527282413ae2e74cc71e7a",
-        "reason": "Keep: reachable native implementation shared by 7 production consumers with no conflicting ownership signal.",
+        "moduleSha256": "0df70a03ab24ab95bf72730f2116bb1eda4c1c0659c83226ce7b78e139ad2213",
+        "reason": "Keep: native query ownership and recording remain shared; pass-end timestamps now wait for bottom-of-pipeline completion, matching the declared full pass scope.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/native/resource/doe_texture_sampler_native.zig": {
@@ -4228,8 +4228,8 @@
       },
       "src/native/compute/doe_compute_program_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "7301014603ca9753bd4dde410753e67e75640a84e5edde7afd28292a22393408",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "moduleSha256": "92c74c24760d0752e64e4b7837bd2d0f7c53dc402be396886cd767b59f2b2a65",
+        "reason": "Keep: prepared commands retain buffer, pipeline, and timestamp-query identities; query destruction invalidates replay before submission and timing uses physical device calibration.",
         "reviewer": "codex-gpu-program/2026-09-05"
       }
     },

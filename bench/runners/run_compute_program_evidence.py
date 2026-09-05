@@ -54,6 +54,8 @@ def run_child(
         f"--application={application}", f"--phase={phase}",
         f"--output={output}", f"--policy={policy_path}", f"--backend={backend}",
     ]
+    if policy.get('gpuTiming', 'off') != 'off' and backend == 'vulkan':
+        command.append(f'--hardware={output.parent / "hardware-profile.json"}')
     result = subprocess.run(command, cwd=ROOT, env=environment, capture_output=True,
                             text=True, timeout=policy["processTimeoutMs"] / 1000, check=False)
     Path(f"{output}.stdout").write_text(result.stdout, encoding="utf-8")
@@ -129,6 +131,9 @@ def main() -> int:
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     original_policy = args.policy.resolve()
+    for reference in policy.get('timestampSources', []):
+        if digest(ROOT / reference['path']) != reference['hash']:
+            raise ValueError(f'Timestamp implementation source changed: {reference["path"]}')
     for application, reference in policy.get('fixtures', {}).items():
         if application not in policy['applications']:
             raise ValueError(f'Unused fixture {application}')
@@ -165,6 +170,7 @@ def main() -> int:
     source_paths += list((ROOT / 'runtime/bridge/webgpu-addon').glob('*.c'))
     source_paths += list((ROOT / 'runtime/bridge/webgpu-addon').glob('*.h'))
     source_paths += list((ROOT / 'config').glob('compute-program*.schema.json'))
+    source_paths += [ROOT / reference['path'] for reference in policy.get('timestampSources', [])]
     original_sources = []
     for path in sorted(set(source_paths)):
         source = path.resolve()
@@ -179,6 +185,10 @@ def main() -> int:
         inventory_command = ['vulkaninfo', '--summary'] if args.backend == 'vulkan' else ['system_profiler', 'SPDisplaysDataType', '-json']
         inventory = subprocess.run(inventory_command, capture_output=True, text=True, check=True, timeout=policy['processTimeoutMs'] / 1000)
         (output / 'hardware.txt').write_text(inventory.stdout + inventory.stderr)
+        if policy.get('gpuTiming', 'off') != 'off' and args.backend == 'vulkan':
+            subprocess.run(['vulkaninfo', f'--json={policy["vulkanDeviceIndex"]}',
+                            '-o', str(output / 'hardware-profile.json')],
+                           capture_output=True, check=True, timeout=policy['processTimeoutMs'] / 1000)
         # Audit all providers before interpreting any measurements.
         for application in policy["applications"]:
             for provider in policy["providers"]:

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { prepareComputeProgram, validateComputeProgram } from '../../src/compute-program.js';
 import { registerNativeProgramProvider } from '../../src/compute-program-native.js';
+import { timestampInfo, timestampResult } from '../../src/compute-program-timing.js';
 
 const descriptor = {
   schemaVersion: 1, id: 'copy',
@@ -48,3 +49,14 @@ for (const execution of ['native-recorded', 'webgpu']) {
   });
 }
 console.log('ok: compute program identity, invalidation keys, strict schema, shipped schema parity');
+
+const tickBytes = new BigUint64Array([(1n << 48n) - 4n, 12n]);
+assert.equal(timestampResult(tickBytes.buffer, 0, { periodNs: 2.5, validBits: 48 }).elapsedNs, 40);
+const largeEpoch = new BigUint64Array([(1n << 60n), (1n << 60n) + 7n]);
+assert.equal(timestampResult(largeEpoch.buffer, 0, { periodNs: 0.5, validBits: 64 }).elapsedNs, 3.5);
+assert.throws(() => timestampResult(new BigUint64Array([0n, 1n << 54n]).buffer, 0,
+  { periodNs: 1, validBits: 64 }), { code: 'DOE_PROGRAM_GPU' });
+assert.equal(timestampInfo({}, {}, 'off'), null);
+assert.throws(() => timestampInfo({ features: new Set(['timestamp-query']) }, {}, 'timestamp-query'),
+  { code: 'DOE_PROGRAM_UNSUPPORTED' });
+console.log('ok: timestamp calibration preserves large epochs, fractional periods, wraparound and explicit support');

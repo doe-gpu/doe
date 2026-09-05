@@ -514,6 +514,10 @@ function openLibrary(path) {
             args: [FFIType.ptr],
             returns: FFIType.void,
         };
+        symbols.doeNativeQuerySetRelease = {
+            args: [FFIType.ptr],
+            returns: FFIType.void,
+        };
         symbols.doeNativeQueueFlush = {
             args: [FFIType.ptr],
             returns: FFIType.void,
@@ -4330,6 +4334,7 @@ const fullSurfaceBackend = {
     querySetDestroy(native) {
         if (typeof wgpu.symbols.doeNativeQuerySetDestroy === "function") {
             wgpu.symbols.doeNativeQuerySetDestroy(native);
+            wgpu.symbols.doeNativeQuerySetRelease(native);
         }
     },
     commandEncoderPushDebugGroup(encoder, label) {

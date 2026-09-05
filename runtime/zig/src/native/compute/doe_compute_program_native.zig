@@ -9,17 +9,37 @@ const backend = @import("../../backend/dropin_queue_submit.zig");
 const compute = @import("../vulkan/vulkan_compute_native.zig");
 const errors = @import("../queue/doe_queue_submit_shared.zig");
 const trace = @import("../diagnostics/doe_program_identity_trace.zig");
+const query = @import("../resource/doe_query_native.zig");
+const abi = @import("../../core/abi/wgpu_core_base_types.zig");
 
 const alloc = helpers.alloc;
 
 pub export fn doeNativeComputeProgramSupported() callconv(.c) u32 {
     return @intFromBool(builtin.os.tag == .linux);
 }
+
+pub export fn doeNativeComputeProgramTimestampInfo(device_raw: ?*anyopaque, period_ns: *f64, valid_bits: *u32) callconv(.c) u32 {
+    if (comptime builtin.os.tag != .linux) return 0;
+    const device = helpers.cast(objects.DoeDevice, device_raw) orelse return 0;
+    if (device.backend != .vulkan) return 0;
+    const rt = runtime_helpers.device_vk_runtime(device) orelse return 0;
+    const bits = rt.queue_family_timestamp_valid_bits_value_cache orelse return 0;
+    if (bits == 0 or bits > @bitSizeOf(u64) or !std.math.isFinite(rt.timestamp_period) or rt.timestamp_period <= 0) return 0;
+    period_ns.* = rt.timestamp_period;
+    valid_bits.* = bits;
+    return 1;
+}
+
 const BufferReference = struct {
     object: *objects.DoeBuffer,
     resource_id: u64,
     buffer: u64 = 0,
     size: u64 = 0,
+};
+const QueryReference = struct {
+    object: *query.DoeQuerySet,
+    pool: u64,
+    count: u32,
 };
 
 const Program = struct {
@@ -29,6 +49,7 @@ const Program = struct {
     gpu: backend.vulkan_compute_program.ComputeProgram = .{},
     buffers: std.ArrayListUnmanaged(BufferReference) = .{},
     pipelines: std.ArrayListUnmanaged(*objects.DoeComputePipeline) = .{},
+    queries: std.ArrayListUnmanaged(QueryReference) = .{},
     dispatch_count: u64 = 0,
     submissions: u64 = 0,
 
@@ -47,6 +68,16 @@ const Program = struct {
         pipeline.ref_count += 1;
     }
 
+    fn retainQuery(self: *Program, raw: ?*anyopaque, first: u32, count: u32) !void {
+        const object = helpers.cast(query.DoeQuerySet, raw) orelse return error.InvalidQuery;
+        if (object.destroyed or object.query_type != abi.WGPUQueryType_Timestamp or
+            object.backend != .vulkan or object.vk_runtime_ref != @as(?*anyopaque, @ptrCast(self.runtime)) or
+            object.vk_query_pool == 0 or try std.math.add(u32, first, count) > object.count) return error.InvalidQuery;
+        for (self.queries.items) |reference| if (reference.object == object) return;
+        try self.queries.append(alloc, .{ .object = object, .pool = object.vk_query_pool, .count = object.count });
+        object.ref_count += 1;
+    }
+
     fn prepare(self: *Program) !void {
         for (self.commands.cmds.items) |command| switch (command) {
             .dispatch => |dispatch| {
@@ -62,6 +93,11 @@ const Program = struct {
             .copy_buf => |copy| {
                 try self.retainBuffer(copy.src);
                 try self.retainBuffer(copy.dst);
+            },
+            .write_timestamp => |timestamp| try self.retainQuery(timestamp.query_set, timestamp.query_index, 1),
+            .resolve_query_set => |resolve| {
+                try self.retainQuery(resolve.query_set, resolve.first_query, resolve.query_count);
+                try self.retainBuffer(resolve.dst_buffer);
             },
             else => return error.UnsupportedCommand,
         };
@@ -96,6 +132,20 @@ const Program = struct {
                     try std.math.add(u64, copy.dst_off, copy.size) > dst.size) return error.InvalidRange;
                 try backend.vulkan_upload.record_replay_buffer_copy(self.runtime, src, copy.src_off, dst, copy.dst_off, copy.size);
             },
+            .write_timestamp => |timestamp| try query.vulkanRecordWriteTimestamp(
+                self.runtime,
+                timestamp.query_set,
+                timestamp.query_index,
+                timestamp.position,
+            ),
+            .resolve_query_set => |resolve| try query.vulkanRecordResolveQuerySet(
+                self.runtime,
+                resolve.query_set,
+                resolve.first_query,
+                resolve.query_count,
+                resolve.dst_buffer,
+                resolve.dst_offset,
+            ),
             else => unreachable,
         };
         try self.validate();
@@ -104,6 +154,10 @@ const Program = struct {
     }
 
     fn validate(self: *const Program) !void {
+        for (self.queries.items) |reference| {
+            if (reference.object.destroyed or reference.object.vk_query_pool != reference.pool or
+                reference.object.count != reference.count) return error.InvalidatedQuery;
+        }
         for (self.buffers.items) |reference| {
             if (reference.object.mapped or reference.object.vk_id != reference.resource_id) return error.InvalidatedBuffer;
             const buffer = self.runtime.compute_buffers.get(reference.resource_id) orelse return error.InvalidatedBuffer;
@@ -113,6 +167,8 @@ const Program = struct {
 
     fn destroy(self: *Program) void {
         self.gpu.deinit(self.runtime);
+        for (self.queries.items) |reference| query.doeNativeQuerySetRelease(helpers.toOpaque(reference.object));
+        self.queries.deinit(alloc);
         for (self.pipelines.items) |pipeline| exports.doeNativeComputePipelineRelease(helpers.toOpaque(pipeline));
         self.pipelines.deinit(alloc);
         for (self.buffers.items) |reference| exports.doeNativeBufferRelease(helpers.toOpaque(reference.object));

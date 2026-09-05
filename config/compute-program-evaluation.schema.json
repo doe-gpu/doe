@@ -32,6 +32,9 @@
         },
         {
           "const": 3
+        },
+        {
+          "const": 4
         }
       ]
     },
@@ -143,6 +146,44 @@
           }
         }
       }
+    },
+    "gpuTiming": {
+      "type": "string",
+      "enum": [
+        "off",
+        "timestamp-query"
+      ]
+    },
+    "dawnTimestampQuantization": {
+      "type": "string",
+      "enum": [
+        "default",
+        "disabled"
+      ]
+    },
+    "wgpuTimestampUnits": {
+      "type": "string",
+      "enum": [
+        "webgpu-nanoseconds",
+        "vulkan-ticks"
+      ]
+    },
+    "vulkanDeviceIndex": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "timestampPeriodRelativeTolerance": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1e-05,
+      "description": "Bound for decimal rounding in the independent vulkaninfo JSON timestamp period."
+    },
+    "timestampSources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/properties/fixtures/additionalProperties"
+      }
     }
   },
   "allOf": [
@@ -150,7 +191,7 @@
       "if": {
         "properties": {
           "schemaVersion": {
-            "const": 3
+            "minimum": 3
           }
         }
       },
@@ -158,6 +199,61 @@
         "required": [
           "fixtures"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 4
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "gpuTiming",
+          "dawnTimestampQuantization",
+          "wgpuTimestampUnits",
+          "vulkanDeviceIndex",
+          "timestampPeriodRelativeTolerance",
+          "timestampSources"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "gpuTiming"
+              ]
+            },
+            {
+              "required": [
+                "dawnTimestampQuantization"
+              ]
+            },
+            {
+              "required": [
+                "wgpuTimestampUnits"
+              ]
+            },
+            {
+              "required": [
+                "vulkanDeviceIndex"
+              ]
+            },
+            {
+              "required": [
+                "timestampPeriodRelativeTolerance"
+              ]
+            },
+            {
+              "required": [
+                "timestampSources"
+              ]
+            }
+          ]
+        }
       }
     }
   ]

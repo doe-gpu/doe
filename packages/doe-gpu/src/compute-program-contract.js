@@ -7,6 +7,11 @@ const PROGRAM_SCHEMA = JSON.parse(readFileSync(
 ));
 const BUFFER_ALIGNMENT = Uint32Array.BYTES_PER_ELEMENT;
 
+function validateProgramOptions(options) {
+  validateNode(options, PROGRAM_SCHEMA.$defs.options, 'options');
+  return { gpuTiming: PROGRAM_SCHEMA.$defs.options.properties.gpuTiming.default, ...options };
+}
+
 function programError(code, path, expected, received) {
   return Object.assign(new Error(`${path}: expected ${expected}; received ${String(received)}`), {
     code, path, expected, received,
@@ -110,4 +115,4 @@ function validateComputeProgram(descriptor) {
   return { descriptor: snapshot, programHash: hashBytes(JSON.stringify(snapshot)) };
 }
 
-export { BUFFER_ALIGNMENT, PROGRAM_SCHEMA, programError, hashBytes, validateComputeProgram };
+export { validateProgramOptions, BUFFER_ALIGNMENT, PROGRAM_SCHEMA, programError, hashBytes, validateComputeProgram };

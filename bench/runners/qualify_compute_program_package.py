@@ -87,6 +87,10 @@ def main() -> int:
                     text = run([str(executable), *launch], scratch, f'{host}-{fixture}',
                                {'DOE_NATIVE_RELEASE_CANDIDATE_RUNTIME': host, 'DOE_NATIVE_LIFECYCLE_RUNTIME': host,
                                 'DOE_NATIVE_LIFECYCLE_CYCLES': str(args.lifecycle_cycles)})
+                    if fixture == 'plans' and args.platform_package == 'doe-gpu-linux-x64':
+                        (scratch / 'entry.mjs').write_text("process.argv.push('--timestamps');\n" + entry)
+                        shutil.copyfile(scratch / 'entry.mjs', output / f'{host}-plans-timed-entry.mjs')
+                        run([str(executable), *launch], scratch, f'{host}-plans-timed')
                     if host == 'bun' and fixture == 'timestamps':
                         ffi_entry = scratch / 'timestamps-ffi-entry.mjs'
                         ffi_entry.write_text("process.argv.push('--bun-ffi');\n" + entry)
