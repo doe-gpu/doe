@@ -121,6 +121,7 @@ const DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_PREPARE = 9;
 const DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_RECORD = 10;
 const DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_COPY = 11;
 const STYPE_SHADER_SOURCE_WGSL = 0x00000002;
+const STYPE_RENDER_PASS_MAX_DRAW_COUNT = 0x00000003;
 const PROCESS_EVENTS_TIMEOUT_NS = 5_000_000_000;
 const NS_PER_MS = 1_000_000;
 let processEventsTimeoutNs = PROCESS_EVENTS_TIMEOUT_NS;
@@ -236,7 +237,9 @@ const WGPU_RENDER_PIPELINE_DESCRIPTOR_SIZE = 168;
 const WGPU_BIND_GROUP_LAYOUT_DESCRIPTOR_SIZE = 40;
 const WGPU_BIND_GROUP_DESCRIPTOR_SIZE = 48;
 const WGPU_PIPELINE_LAYOUT_DESCRIPTOR_SIZE = 48;
-const WGPU_RENDER_PASS_DESCRIPTOR_SIZE = 72;
+const WGPU_RENDER_PASS_DESCRIPTOR_SIZE = 64;
+const WGPU_RENDER_PASS_MAX_DRAW_COUNT_SIZE = 24;
+const WGPU_COMPUTE_PASS_DESCRIPTOR_SIZE = 32;
 const WGPU_LIMITS_SIZE = 152;
 const WGPU_QUEUE_DESCRIPTOR_SIZE = 24;
 const WGPU_DEVICE_DESCRIPTOR_SIZE = 144;
@@ -2204,6 +2207,20 @@ function buildPassTimestampWrites(timestampWrites) {
     return new Uint8Array(buf);
 }
 
+function buildComputePassDescriptor(descriptor) {
+    const desc = new Uint8Array(WGPU_COMPUTE_PASS_DESCRIPTOR_SIZE);
+    const view = new DataView(desc.buffer);
+    const label = descriptor.label ? encoder.encode(String(descriptor.label)) : null;
+    writeStringView(view, 8, label);
+    let timestamps = null;
+    if (descriptor.timestampWrites) {
+        assertLiveResource(descriptor.timestampWrites.querySet, "GPUCommandEncoder.beginComputePass", "GPUQuerySet");
+        timestamps = buildPassTimestampWrites(descriptor.timestampWrites);
+        writePtr(view, 24, bunPtr(timestamps));
+    }
+    return { desc, _refs: [label, timestamps].filter(Boolean) };
+}
+
 // WGPURenderPassColorAttachment:
 // { nextInChain:ptr@0, view:ptr@8, depthSlice:u32@16, pad@20, resolveTarget:ptr@24,
 //   loadOp:u32@32, storeOp:u32@36, clearValue:{r:f64@40, g:f64@48, b:f64@56, a:f64@64} } = 72
@@ -2216,8 +2233,7 @@ const DEFAULT_MAX_DRAW_COUNT = 50_000_000;
 
 // WGPURenderPassDescriptor:
 // { nextInChain:ptr@0, label:sv@8, colorAttachmentCount:size_t@24, colorAttachments:ptr@32,
-//   depthStencilAttachment:ptr@40, occlusionQuerySet:ptr@48, timestampWrites:ptr@56,
-//   maxDrawCount:u64@64 } = 72
+//   depthStencilAttachment:ptr@40, occlusionQuerySet:ptr@48, timestampWrites:ptr@56 } = 64
 function buildRenderPassDescriptor(descriptor) {
     const colorAttachments = descriptor.colorAttachments || [];
     const attBuf = new Uint8Array(colorAttachments.length * RENDER_PASS_COLOR_ATTACHMENT_SIZE);
@@ -2244,15 +2260,16 @@ function buildRenderPassDescriptor(descriptor) {
     if (descriptor.depthStencilAttachment?.view) {
         const depthBuf = new ArrayBuffer(WGPU_RENDER_PASS_DEPTH_STENCIL_ATTACHMENT_SIZE);
         const depthView = new DataView(depthBuf);
-        writePtr(depthView, 0, descriptor.depthStencilAttachment.view._native);
-        depthView.setUint32(8, 1, true); // clear
-        depthView.setUint32(12, 1, true); // store
-        depthView.setFloat32(16, descriptor.depthStencilAttachment.depthClearValue ?? 1.0, true);
-        depthView.setUint32(20, descriptor.depthStencilAttachment.depthReadOnly ? 1 : 0, true);
-        depthView.setUint32(24, 1, true); // clear
-        depthView.setUint32(28, 1, true); // store
-        depthView.setUint32(32, descriptor.depthStencilAttachment.stencilClearValue ?? 0, true);
-        depthView.setUint32(36, descriptor.depthStencilAttachment.stencilReadOnly ? 1 : 0, true);
+        writePtr(depthView, 0, null);
+        writePtr(depthView, 8, descriptor.depthStencilAttachment.view._native);
+        depthView.setUint32(16, 1, true); // clear
+        depthView.setUint32(20, 1, true); // store
+        depthView.setFloat32(24, descriptor.depthStencilAttachment.depthClearValue ?? 1.0, true);
+        depthView.setUint32(28, descriptor.depthStencilAttachment.depthReadOnly ? 1 : 0, true);
+        depthView.setUint32(32, 1, true); // clear
+        depthView.setUint32(36, 1, true); // store
+        depthView.setUint32(40, descriptor.depthStencilAttachment.stencilClearValue ?? 0, true);
+        depthView.setUint32(44, descriptor.depthStencilAttachment.stencilReadOnly ? 1 : 0, true);
         depthStencilAttachmentArr = new Uint8Array(depthBuf);
     }
     if (descriptor.timestampWrites?.querySet) {
@@ -2261,16 +2278,19 @@ function buildRenderPassDescriptor(descriptor) {
 
     const descBuf = new ArrayBuffer(WGPU_RENDER_PASS_DESCRIPTOR_SIZE);
     const descView = new DataView(descBuf);
-    writePtr(descView, 0, null);
+    const drawCount = new Uint8Array(WGPU_RENDER_PASS_MAX_DRAW_COUNT_SIZE);
+    const drawCountView = new DataView(drawCount.buffer);
+    drawCountView.setUint32(8, STYPE_RENDER_PASS_MAX_DRAW_COUNT, true);
+    drawCountView.setBigUint64(16, BigInt(descriptor.maxDrawCount ?? DEFAULT_MAX_DRAW_COUNT), true);
+    writePtr(descView, 0, bunPtr(drawCount));
     writeStringView(descView, 8, null);
     descView.setBigUint64(24, BigInt(colorAttachments.length), true);
     writePtr(descView, 32, colorAttachments.length > 0 ? bunPtr(attBuf) : null);
     writePtr(descView, 40, depthStencilAttachmentArr ? bunPtr(depthStencilAttachmentArr) : null);
     writePtr(descView, 48, descriptor.occlusionQuerySet?._native ?? null);
     writePtr(descView, 56, timestampWritesArr ? bunPtr(timestampWritesArr) : null);
-    descView.setBigUint64(64, BigInt(descriptor.maxDrawCount ?? DEFAULT_MAX_DRAW_COUNT), true);
 
-    return { desc: new Uint8Array(descBuf), _refs: [attBuf, depthStencilAttachmentArr, timestampWritesArr].filter(Boolean) };
+    return { desc: new Uint8Array(descBuf), _refs: [attBuf, depthStencilAttachmentArr, timestampWritesArr, drawCount].filter(Boolean) };
 }
 
 function buildTexelCopyTextureInfo(source) {
@@ -3296,8 +3316,12 @@ const bunEncoderBackend = {
             return pass;
         }
         ensureBunCommandEncoderNative(encoder);
-        const native = wgpu.symbols.wgpuCommandEncoderBeginComputePass(encoder._native, null);
+        const descriptor = _descriptor ?? {};
+        const { desc, _refs } = buildComputePassDescriptor(descriptor);
+        const native = wgpu.symbols.wgpuCommandEncoderBeginComputePass(encoder._native, desc);
+        void _refs;
         const pass = new classes.DoeGPUComputePassEncoder(native, encoder);
+        pass.label = String(descriptor.label ?? "");
         encoder._activePass = pass;
         return pass;
     },

@@ -2467,6 +2467,7 @@ const nodeEncoderBackend = {
   commandEncoderResolveQuerySet(encoder, querySetNative, firstQuery, queryCount, destinationNative, destinationOffset) {
     ensureNodeCommandEncoderNative(encoder);
     addon.commandEncoderResolveQuerySet(encoder._native, querySetNative, firstQuery, queryCount, destinationNative, destinationOffset);
+    recordBufferWrite(encoder, destinationNative);
   },
   commandEncoderCopyBufferToTexture(encoder, source, destination, copySize) {
     copyBufferToTextureHostShadow(source, destination, copySize);

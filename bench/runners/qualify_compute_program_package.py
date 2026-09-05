@@ -67,23 +67,32 @@ def main() -> int:
                 run(['npm', 'install', '--offline', '--omit=optional', '--no-audit', '--no-fund', *tarballs], scratch, f'{host}-install')
                 shutil.copyfile(fixtures / 'native-release-candidate.mjs', scratch / 'candidate.mjs')
                 shutil.copyfile(fixtures / 'native-clean-install-lifecycle.mjs', scratch / 'lifecycle.mjs')
-                regression = (ROOT / 'packages/doe-gpu/test/integration/test-integration-compute-program.js').read_text()
                 replacements = {'../../src/native.js': 'doe-gpu/native',
+                                '../../src/bun.js': 'doe-gpu',
                                 '../../src/compute-program.js': 'doe-gpu/compute-program',
                                 '../../src/vendor/webgpu/webgpu-constants.js': 'doe-gpu/native'}
-                for before, after in replacements.items():
-                    regression = regression.replace(before, after)
-                (scratch / 'plans.mjs').write_text(regression)
-                for fixture in ['candidate', 'lifecycle', 'plans']:
+                for fixture, name in [('plans', 'compute-program'), ('timestamps', 'timestamp-query')]:
+                    regression = (ROOT / f'packages/doe-gpu/test/integration/test-integration-{name}.js').read_text()
+                    for before, after in replacements.items():
+                        regression = regression.replace(before, after)
+                    (scratch / f'{fixture}.mjs').write_text(regression)
+                for fixture in ['candidate', 'lifecycle', 'plans', 'timestamps']:
                     entry = f"await import('./{fixture}.mjs');\n"
                     if host == 'electron':
                         entry = "try {\n" + entry + "(await import('electron')).app.exit(0);\n} catch (error) { console.error(error); (await import('electron')).app.exit(1); }\n"
                     (scratch / 'entry.mjs').write_text(entry)
+                    shutil.copyfile(scratch / f'{fixture}.mjs', output / f'{host}-{fixture}.mjs')
+                    shutil.copyfile(scratch / 'entry.mjs', output / f'{host}-{fixture}-entry.mjs')
                     launch = ['--headless', '--no-sandbox', '--disable-gpu', str(scratch)] if host == 'electron' else [str(scratch / 'entry.mjs')]
                     text = run([str(executable), *launch], scratch, f'{host}-{fixture}',
                                {'DOE_NATIVE_RELEASE_CANDIDATE_RUNTIME': host, 'DOE_NATIVE_LIFECYCLE_RUNTIME': host,
                                 'DOE_NATIVE_LIFECYCLE_CYCLES': str(args.lifecycle_cycles)})
-                    shutil.copyfile(scratch / f'{fixture}.mjs', output / f'{host}-{fixture}.mjs')
+                    if host == 'bun' and fixture == 'timestamps':
+                        ffi_entry = scratch / 'timestamps-ffi-entry.mjs'
+                        ffi_entry.write_text("process.argv.push('--bun-ffi');\n" + entry)
+                        shutil.copyfile(ffi_entry, output / 'bun-timestamps-ffi-entry.mjs')
+                        run([str(executable), str(ffi_entry)], scratch, 'bun-timestamps-ffi',
+                            {'DOE_BUN_WEBGPU_BACKEND': 'ffi'})
                     if fixture == 'candidate':
                         candidate = json.loads(text)
                         receipt = candidate['receipt']

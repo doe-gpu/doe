@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkNativeAbiLayouts } from './native-abi-layout.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ROOT = resolve(__dirname, '..');
@@ -13,27 +14,9 @@ const OUTPUT_DIR = resolve(PACKAGE_ROOT, 'build', 'Release');
 const OUTPUT_PATH = resolve(OUTPUT_DIR, 'doe_napi.node');
 const NAPI_VERSION = '8';
 
-const sourceFiles = [
-  'doe_napi_globals.c',
-  'doe_napi_helpers.c',
-  'doe_napi_instance.c',
-  'doe_napi_buffer.c',
-  'doe_napi_shader.c',
-  'doe_napi_pipeline.c',
-  'doe_napi_queue.c',
-  'doe_napi_formats.c',
-  'doe_napi_render.c',
-  'doe_napi_caps.c',
-  'doe_napi_program.c',
-  'doe_napi_nd_infra.c',
-  'doe_napi_nd_stubs.c',
-  'doe_napi_nd_immediates.c',
-  'doe_napi_nd_device.c',
-  'doe_napi_nd_encoder.c',
-  'doe_napi_nd_creators.c',
-  'doe_napi_surface.c',
-  'doe_napi_init.c',
-].map((name) => resolve(BRIDGE_ROOT, name));
+const addonTarget = JSON.parse(readFileSync(resolve(PACKAGE_ROOT, 'binding.gyp'), 'utf8'))
+  .targets.find((target) => target.target_name === 'doe_napi');
+const sourceFiles = addonTarget.sources.map((name) => resolve(PACKAGE_ROOT, name));
 
 function resolveNodeIncludeDir() {
   const candidates = [
@@ -95,6 +78,11 @@ function compilerCommand(includeDir) {
 function main() {
   const includeDir = resolveNodeIncludeDir();
   const { compiler, args } = compilerCommand(includeDir);
+  checkNativeAbiLayouts({
+    compiler, includeDir,
+    bridgeHeader: resolve(BRIDGE_ROOT, 'doe_napi_internal.h'),
+    upstreamHeader: resolve(WORKSPACE_ROOT, 'runtime/zig/vendor/webgpu-headers/webgpu.h'),
+  });
   mkdirSync(OUTPUT_DIR, { recursive: true });
   execFileSync(compiler, args, {
     cwd: PACKAGE_ROOT,

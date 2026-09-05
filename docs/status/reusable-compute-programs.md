@@ -2,6 +2,25 @@
 
 ## Current boundary
 
+Timestamp pass creation now uses the pinned WebGPU C layout in the addon.
+The original crashing binary and reproduction remain in
+`bench/out/compute-program/20260905-timestamp-abi-failure/`, with `SHA256SUMS`.
+The repair shares the compute/render timestamp structure, sends render draw
+limits through the canonical chained extension, and fixes the corresponding
+Bun FFI render layouts. Bun FFI also preserves compute pass timestamp
+descriptors and labels. Query resolves invalidate host buffer shadows.
+`build:addon` compares pass layouts against the pinned header before linking;
+its source list now comes from `binding.gyp`, including the program bridge.
+This is an ABI correction with unchanged public descriptors and receipt schema.
+Rebuild the addon before using timestamps with the pinned runtime.
+The physical timestamp regression checks repeated pass boundaries and exact
+shader output. Fresh retained-package qualification is recorded in
+`bench/out/compute-program/20260905-timestamp-provider-qualified/summary.json`.
+The retained harness exercises explicit native selection on each host and
+Bun's root FFI entry. The earlier all-host attempt retains its invalid
+harness import under `20260905-timestamp-all-hosts-retained-package`.
+Prepared GPU-time instrumentation and timestamp-period calibration remain open.
+
 The declared HoloScript LIF simulation now runs through the same program matrix
 as the image and heat examples. Its pinned shader, upstream CPU twin, strict
 membrane tolerances, and exact spike observables are retained in
@@ -44,7 +63,7 @@ they do not establish prepared-plan performance or external adoption.
 
 Provider qualification uses the same retained wrapper and platform package
 archives across Node, Bun, and Electron main processes. The local artifact is
-`bench/out/compute-program/20260905-external-reuse-retained-package/summary.json`.
+`bench/out/compute-program/20260905-timestamp-provider-qualified/summary.json`.
 This is physical AMD Vulkan qualification of a local candidate; registry
 publication, native embedding, Metal, and D3D12 do not inherit it.
 
@@ -67,7 +86,7 @@ loss and recovery, and Apple Metal transfer remain unevidenced in this lane.
   `config/compute-program-external-evaluation.json`.
 - Application evidence: `bench/out/compute-program/20260905-external-reuse-final/summary.json`.
   Verification uses its retained `policy.json`.
-- Package evidence: `bench/out/compute-program/20260905-external-reuse-retained-package/summary.json`.
+- Package evidence: `bench/out/compute-program/20260905-timestamp-provider-qualified/summary.json`.
 - Native trace and SPIR-V validation:
   `bench/out/compute-program/20260905-external-reuse-native-validation/image_edges.json`,
   `bench/out/compute-program/20260905-external-reuse-native-validation/heat_diffusion.json`,

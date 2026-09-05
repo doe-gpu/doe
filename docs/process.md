@@ -74,6 +74,12 @@ classified and cannot be promoted by benchmark results.
 - Queue-ordering repairs require a regression with a separate asynchronous
   producer submission and readback submission, plus the original external
   reproduction. Host-visible memory does not waive GPU execution dependencies.
+- Native addon pass descriptors are checked against the runtime's pinned WebGPU
+  header by `packages/doe-gpu/scripts/build-addon.js`; an ABI layout mismatch
+  fails the build. Retained-package qualification exercises timestamp pass
+  boundaries, repeated query reset/readback, and exact shader output on each
+  selected host. Ordered timestamps alone do not establish calibrated GPU time
+  or a prepared-program performance claim.
 - Readback allocation policy is versioned in
   `config/vulkan-buffer-memory-policy.json`. Cached memory is a preference;
   coherence and supported memory-type requirements remain mandatory. Validate

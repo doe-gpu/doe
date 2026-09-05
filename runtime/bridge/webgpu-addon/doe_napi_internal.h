@@ -63,6 +63,8 @@ typedef uint32_t WGPUBool;
 #define WGPU_STRLEN SIZE_MAX
 #define WGPU_WHOLE_SIZE UINT64_MAX
 #define WGPU_STYPE_SHADER_SOURCE_WGSL 0x00000002
+#define WGPU_STYPE_RENDER_PASS_MAX_DRAW_COUNT 0x00000003
+#define DOE_DEFAULT_MAX_DRAW_COUNT 50000000ULL
 #define WGPU_WAIT_STATUS_SUCCESS 1
 #define WGPU_WAIT_STATUS_TIMED_OUT 2
 #define WGPU_WAIT_STATUS_ERROR 3
@@ -239,16 +241,14 @@ typedef struct {
     const WGPUCompilationMessage* messages;
 } WGPUCompilationInfo;
 typedef struct {
+    const WGPUChainedStruct* nextInChain;
     WGPUQuerySet querySet;
     uint32_t beginningOfPassWriteIndex;
     uint32_t endOfPassWriteIndex;
-} WGPUComputePassTimestampWrites;
+} WGPUPassTimestampWrites;
 
-typedef struct {
-    WGPUQuerySet querySet;
-    uint32_t beginningOfPassWriteIndex;
-    uint32_t endOfPassWriteIndex;
-} WGPURenderPassTimestampWrites;
+typedef WGPUPassTimestampWrites WGPUComputePassTimestampWrites;
+typedef WGPUPassTimestampWrites WGPURenderPassTimestampWrites;
 
 typedef struct { void* nextInChain; WGPUStringView label; const WGPUComputePassTimestampWrites* timestampWrites; } WGPUComputePassDescriptor;
 typedef struct { uint32_t width; uint32_t height; uint32_t depthOrArrayLayers; } WGPUExtent3D;
@@ -295,8 +295,12 @@ typedef struct {
     void* nextInChain; WGPUStringView label;
     size_t colorAttachmentCount; const WGPURenderPassColorAttachment* colorAttachments;
     void* depthStencilAttachment; WGPUQuerySet occlusionQuerySet; const WGPURenderPassTimestampWrites* timestampWrites;
-    uint64_t maxDrawCount;
 } WGPURenderPassDescriptor;
+
+typedef struct {
+    WGPUChainedStruct chain;
+    uint64_t maxDrawCount;
+} WGPURenderPassMaxDrawCount;
 
 typedef struct { void* nextInChain; WGPUStringView key; double value; } WGPUConstantEntry;
 

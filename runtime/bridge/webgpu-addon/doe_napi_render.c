@@ -491,8 +491,12 @@ napi_value doe_begin_render_pass(napi_env env, napi_callback_info info) {
     if (has_prop(env, _args[1], "occlusionQuerySet") && prop_type(env, _args[1], "occlusionQuerySet") == napi_external)
         desc.occlusionQuerySet = unwrap_ptr(env, get_prop(env, _args[1], "occlusionQuerySet"));
     desc.timestampWrites = ts_writes_ptr;
-    desc.maxDrawCount = has_prop(env, _args[1], "maxDrawCount")
-        ? (uint64_t)get_uint32_prop(env, _args[1], "maxDrawCount") : 50000000;
+    WGPURenderPassMaxDrawCount max_draw_count = {
+        .chain = { .next = NULL, .sType = WGPU_STYPE_RENDER_PASS_MAX_DRAW_COUNT },
+        .maxDrawCount = has_prop(env, _args[1], "maxDrawCount")
+            ? (uint64_t)get_double_prop(env, _args[1], "maxDrawCount") : DOE_DEFAULT_MAX_DRAW_COUNT,
+    };
+    desc.nextInChain = &max_draw_count.chain;
     WGPURenderPassEncoder pass = pfn_wgpuCommandEncoderBeginRenderPass(enc, &desc);
     free(atts);
     free(label_str);
