@@ -194,6 +194,7 @@ pub fn stash_active_compute_state(self: anytype) !void {
     if (cache_key == 0) return;
     const cached = capture_active_compute_state(self);
     clear_active_compute_state(self);
+    errdefer restore_active_compute_state(self, cached);
     if (self.cached_compute_states.fetchRemove(cache_key)) |removed| {
         destroy_cached_compute_state(self, removed.value);
     }
@@ -251,6 +252,42 @@ test "hot compute state cache activates before hash map fallback" {
     try std.testing.expectEqual(@as(u64, 0), rt.hot_compute_state_hashes[0]);
     try std.testing.expectEqual(@as(u64, 42), rt.current_pipeline_hash);
     try std.testing.expectEqual(@as(c.VkPipeline, 100), rt.pipeline);
+
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 0 });
+    rt.allocator = failing.allocator();
+    for (&rt.hot_compute_state_hashes, &rt.hot_compute_states, 0..) |*hash, *state, index| {
+        hash.* = index + 1;
+        state.* = .{};
+    }
+    try std.testing.expectError(error.OutOfMemory, stash_active_compute_state(&rt));
+    try std.testing.expectEqual(@as(u64, 42), rt.current_pipeline_hash);
+    try std.testing.expectEqual(@as(c.VkPipeline, 100), rt.pipeline);
+    try std.testing.expectEqual(@as(usize, 0), rt.cached_compute_states.count());
+
+    rt.descriptor_pool = 200;
+    rt.has_descriptor_pool = true;
+    rt.current_descriptor_bindings_hash = 43;
+    rt.has_current_descriptor_bindings_hash = true;
+    for (&rt.hot_descriptor_state_hashes, &rt.hot_descriptor_states, 0..) |*hash, *state, index| {
+        hash.* = index + 1;
+        state.* = .{};
+    }
+    try std.testing.expectError(error.OutOfMemory, stash_active_descriptor_state(&rt));
+    try std.testing.expectEqual(@as(c.VkDescriptorPool, 200), rt.descriptor_pool);
+    try std.testing.expect(rt.has_descriptor_pool);
+    try std.testing.expectEqual(@as(u64, 43), rt.current_descriptor_bindings_hash);
+    try std.testing.expectEqual(@as(usize, 0), rt.current_descriptor_state_cache.count());
+
+    rt.allocator = std.testing.allocator;
+    try stash_active_compute_state(&rt);
+    try std.testing.expect(activate_cached_compute_state(&rt, 42));
+    try std.testing.expectEqual(@as(c.VkPipeline, 100), rt.pipeline);
+    try std.testing.expectEqual(@as(c.VkDescriptorPool, 200), rt.descriptor_pool);
+    try stash_active_descriptor_state(&rt);
+    try std.testing.expect(activate_cached_descriptor_state(&rt, 43));
+    try std.testing.expectEqual(@as(c.VkDescriptorPool, 200), rt.descriptor_pool);
+    rt.cached_compute_states.deinit(rt.allocator);
+    rt.current_descriptor_state_cache.deinit(rt.allocator);
 }
 
 pub fn capture_active_descriptor_state(self: anytype) CachedDescriptorState {
@@ -311,6 +348,7 @@ pub fn stash_active_descriptor_state(self: anytype) !void {
     if (cache_key == 0) return;
     const cached = capture_active_descriptor_state(self);
     clear_active_descriptor_state(self);
+    errdefer restore_active_descriptor_state(self, cached);
     if (put_hot_descriptor_state(self, cache_key, cached)) return;
     if (self.current_descriptor_state_cache.fetchRemove(cache_key)) |removed| {
         destroy_cached_descriptor_state(self, removed.value);

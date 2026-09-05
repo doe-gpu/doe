@@ -96,6 +96,78 @@ class ComputeProgramGateTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'provenance or submission'):
                 self.validate()
 
+    def test_resident_sequence_binds_every_state_and_rejects_reset_work(self) -> None:
+        self.program['schemaVersion'] = 2
+        for buffer in self.program['buffers']:
+            buffer['lifetime'] = 'program'
+        program_path = Path(self.report['programPath'])
+        program_path.write_text(json.dumps(self.program))
+        identity = hashlib.sha256(json.dumps(self.program, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        self.report.update(schemaVersion=4, programHash=identity, gpuStatsNs=None,
+                           providerAddonArtifact=None, timestampCalibrationArtifact=None,
+                           warmups=[], lifecycleRuns=[], failedRun=None,
+                           inputPaths={'input': self.report.pop('inputPath')})
+        expected_refs = []
+        samples = []
+        instance = '6b9e2178-7a71-4671-afad-46a641a65413'
+        for run in range(1, 4):
+            sample = copy.deepcopy(self.report['cold'])
+            output = self.path.with_name(f'output-{run}.f32')
+            expected = self.path.with_name(f'expected-{run}.f64')
+            output.write_bytes(struct.pack('<f', run))
+            expected.write_bytes(struct.pack('<d', run))
+            expected_refs.append({'path': expected.name, 'hash': digest(expected)})
+            sample['outputPath'] = str(output)
+            receipt = sample['receipt']
+            def state(buffer: str) -> dict:
+                return {'kind': 'program-state', 'programHash': identity, 'programInstance': instance,
+                        'buffer': buffer, 'generation': run - 1}
+            input_hash = receipt['inputHashes']['input']
+            receipt.update(schemaVersion=4, programHash=identity, run=run, programInstance=instance,
+                           gpuTiming=None, outputHash=digest(output), outputGeneration=run,
+                           inputHashes={'input': input_hash if run == 1 else None},
+                           inputOrigins={'input': {'kind': 'host', 'hash': input_hash} if run == 1 else state('input')},
+                           residentStateBefore={'output': {'kind': 'zero'} if run == 1 else state('output')},
+                           uploadedBytes=4 if run == 1 else 0, clearedBytes=0,
+                           copiedInputBytes=0, submissionCount=1)
+            samples.append(sample)
+        self.report.update(cold=samples[0], samples=[samples[1]], lifecycleRuns=[samples[2]],
+                           expectedPath=str(self.path.parent / expected_refs[0]['path']))
+        self.report['observed']['submissions'] = 4
+        fixture = {
+            'schemaVersion': 2, 'kind': 'compute_program_fixture', 'application': 'image_edges',
+            'sourceRepo': 'https://example.com/unit-fixture', 'sourceCommit': '0' * 40,
+            'caseId': 'resident', 'generatorRuntime': 'test', 'adaptation': 'adversarial resident fixture',
+            'program': {'path': program_path.name, 'hash': digest(program_path)},
+            'inputs': {'input': {'path': Path(self.report['inputPaths']['input']).name,
+                                 'hash': digest(Path(self.report['inputPaths']['input']))}},
+            'expected': expected_refs[0], 'sequence': {'inputs': 'initialize-once', 'expected': expected_refs},
+            'sources': [{'path': program_path.name, 'hash': digest(program_path)}],
+            'checks': [{'offset': 0, 'count': 1, 'mode': 'exact', 'absoluteTolerance': 0,
+                        'relativeTolerance': 0, 'relativeEpsilon': 0}],
+        }
+        fixture_path = self.path.with_name('fixture.json')
+        fixture_path.write_text(json.dumps(fixture))
+        self.policy['fixtures'] = {'image_edges': {'path': str(fixture_path), 'hash': digest(fixture_path)}}
+        self.report['fixturePath'] = str(fixture_path)
+        self.validate()
+        original = copy.deepcopy(self.report)
+        for mutate in [
+            lambda r: r.update(lifecycleRuns=[]),
+            lambda r: r.update(warmups=[r['cold']]),
+            lambda r: r.update(failedRun=r['cold']),
+            lambda r: r['samples'][0]['receipt'].update(uploadedBytes=4),
+            lambda r: r['samples'][0]['receipt'].update(clearedBytes=4),
+            lambda r: r['samples'][0]['receipt']['residentStateBefore']['output'].update(generation=99),
+            lambda r: r['lifecycleRuns'][0]['receipt']['inputOrigins']['input'].update(generation=1),
+            lambda r: r['samples'][0].update(outputPath=r['cold']['outputPath'],
+                                            receipt={**r['samples'][0]['receipt'], 'outputHash': r['cold']['receipt']['outputHash']}),
+        ]:
+            self.report = copy.deepcopy(original)
+            mutate(self.report)
+            with self.assertRaises(ValueError):
+                self.validate()
+
     def test_timestamp_evidence_rejects_changed_units_scope_counts_and_statistics(self) -> None:
         self.policy['gpuTiming'] = 'timestamp-query'
         timing = {'source': 'webgpu-nanoseconds', 'scope': 'compute-pass',

@@ -44,6 +44,7 @@ let expected = args.application === 'image_edges'
   ? imageEdgesOracle(input, width, height) : heatDiffusionOracle(input, width, height, heatIterations);
 let inputs = { input };
 let checks = [];
+let expectedSequence = null;
 const fixtureReference = policy.fixtures?.[args.application];
 if (fixtureReference) {
   const fixtureBytes = readFileSync(fixtureReference.path);
@@ -60,6 +61,18 @@ if (fixtureReference) {
   const expectedBytes = bytes(fixture.expected);
   expected = new Float64Array(expectedBytes.buffer.slice(expectedBytes.byteOffset, expectedBytes.byteOffset + expectedBytes.byteLength));
   checks = fixture.checks;
+  if (fixture.sequence) {
+    if (fixture.schemaVersion !== 2 || fixture.sequence.inputs !== 'initialize-once'
+        || descriptor.buffers.some((buffer) => buffer.lifetime !== 'program')) {
+      throw new Error('Resident sequence requires initialize-once inputs and program-lifetime buffers');
+    }
+    expectedSequence = fixture.sequence.expected.map((reference) => {
+      const value = bytes(reference);
+      return new Float64Array(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength));
+    });
+    const requiredRuns = args.phase === 'audit' ? 3 : 1 + policy.warmupRuns + policy.timedRuns;
+    if (expectedSequence.length < requiredRuns) throw new Error('Frozen sequence is shorter than the declared execution');
+  }
 } else if (!['image_edges', 'heat_diffusion'].includes(args.application)) {
   throw new Error(`Application requires a frozen fixture: ${args.application}`);
 }
@@ -71,13 +84,14 @@ const inputPaths = Object.fromEntries(Object.entries(inputs).map(([id, value]) =
 }));
 writeFileSync(`${args.output}.expected.f64`, new Uint8Array(Float64Array.from(expected).buffer));
 const report = {
-  schemaVersion: 3, kind: 'compute_program_evaluation', claimStatus: 'diagnostic',
+  schemaVersion: 4, kind: 'compute_program_evaluation', claimStatus: 'diagnostic',
   provider: args.provider, application: args.application, phase: args.phase, backend: args.backend,
   policyHash: hash(policyBytes), programPath: `${args.output}.program.json`, inputPaths,
   fixturePath: fixtureReference?.path ?? null,
   runtime: typeof Deno === 'undefined' ? { name: process.versions.bun ? 'bun' : 'node', version: process.versions.bun ?? process.version }
     : { name: 'deno', version: Deno.version.deno },
-  status: 'running', error: null, samples: [], cold: null, preparationMs: null, deviceStartupMs: null,
+  status: 'running', error: null, samples: [], warmups: [], lifecycleRuns: [], cold: null, failedRun: null,
+  preparationMs: null, deviceStartupMs: null,
   adapter: null, providerArtifact: null, allocatedBufferBytes: null, peakProcessRssBytes: null,
   providerAddonArtifact: null,
   timestampCalibrationArtifact: null,
@@ -189,22 +203,30 @@ try {
   report.preparationMs = program.preparationMs;
   report.preparation = program.preparation;
   report.allocatedBufferBytes = program.allocatedBufferBytes;
+  let completedRuns = 0;
   async function runOne() {
+    const expectedForRun = expectedSequence ? expectedSequence[completedRuns] : expected;
+    if (!expectedForRun) throw new Error('Frozen sequence has no oracle for the next invocation');
     const start = performance.now();
     const cpuStart = process.cpuUsage();
-    const result = await program.run(inputs);
+    const result = await program.run(expectedSequence && completedRuns > 0 ? {} : inputs);
     const cpu = process.cpuUsage(cpuStart);
     const wallMs = performance.now() - start;
-    const oracle = compareNumerical(new Float32Array(result.output.buffer), expected,
+    const oracle = compareNumerical(new Float32Array(result.output.buffer), expectedForRun,
       policy.absoluteTolerance, policy.relativeTolerance, checks);
-    if (!oracle.passed) throw new Error(`Numerical oracle failed: ${JSON.stringify(oracle)}`);
     const outputPath = `${args.output}.run-${result.receipt.run}.output.f32`;
     writeFileSync(outputPath, result.output);
-    return { wallMs, cpuMs: (cpu.user + cpu.system) / 1000, oracle, receipt: result.receipt, outputPath };
+    const sample = { wallMs, cpuMs: (cpu.user + cpu.system) / 1000, oracle, receipt: result.receipt, outputPath };
+    if (!oracle.passed) {
+      report.failedRun = sample;
+      throw new Error(`Numerical oracle failed: ${JSON.stringify(oracle)}`);
+    }
+    completedRuns += 1;
+    return sample;
   }
   report.cold = await runOne();
   const warmups = args.phase === 'audit' ? 0 : policy.warmupRuns;
-  for (let i = 0; i < warmups; i += 1) await runOne();
+  for (let i = 0; i < warmups; i += 1) report.warmups.push(await runOne());
   const sampleCount = args.phase === 'audit' ? 1 : policy.timedRuns;
   for (let i = 0; i < sampleCount; i += 1) report.samples.push(await runOne());
   report.latencyStatsMs = stats(report.samples.map((sample) => sample.wallMs));
@@ -215,9 +237,9 @@ try {
     const cancel = new AbortController();
     cancel.abort();
     let cancelled = false;
-    try { await program.run(inputs, { signal: cancel.signal }); }
+    try { await program.run(expectedSequence ? {} : inputs, { signal: cancel.signal }); }
     catch (error) { if (error.code !== 'DOE_PROGRAM_CANCELLED') throw error; cancelled = true; }
-    await runOne();
+    report.lifecycleRuns.push(await runOne());
     report.lifecycle = { cancellationRejected: cancelled, reuseAfterCancellation: true };
   }
   report.peakProcessRssBytes = process.resourceUsage().maxRSS * 1024;

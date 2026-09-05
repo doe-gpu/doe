@@ -21,7 +21,10 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 1
+      "enum": [
+        1,
+        2
+      ]
     },
     "kind": {
       "type": "string",
@@ -138,6 +141,26 @@
           }
         ]
       }
+    },
+    "sequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputs",
+        "expected"
+      ],
+      "properties": {
+        "inputs": {
+          "const": "initialize-once"
+        },
+        "expected": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -159,5 +182,28 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 2
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "sequence"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "sequence"
+          ]
+        }
+      }
+    }
+  ]
 }

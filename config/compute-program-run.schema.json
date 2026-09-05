@@ -324,16 +324,11 @@
       "properties": {
         "schemaVersion": {
           "type": "integer",
-          "oneOf": [
-            {
-              "const": 1
-            },
-            {
-              "const": 2
-            },
-            {
-              "const": 3
-            }
+          "enum": [
+            1,
+            2,
+            3,
+            4
           ]
         },
         "kind": {
@@ -423,121 +418,13 @@
         "samples": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "wallMs",
-              "cpuMs",
-              "oracle",
-              "receipt",
-              "outputPath"
-            ],
-            "properties": {
-              "wallMs": {
-                "type": "number",
-                "minimum": 0
-              },
-              "cpuMs": {
-                "type": "number",
-                "minimum": 0
-              },
-              "oracle": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "passed",
-                  "maxAbsoluteError",
-                  "firstFailure"
-                ],
-                "properties": {
-                  "passed": {
-                    "type": "boolean"
-                  },
-                  "maxAbsoluteError": {
-                    "type": "number",
-                    "minimum": 0
-                  },
-                  "firstFailure": {
-                    "anyOf": [
-                      {
-                        "type": "integer",
-                        "minimum": 0
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                }
-              },
-              "receipt": {
-                "$ref": "#/$defs/receipt"
-              },
-              "outputPath": {
-                "type": "string",
-                "minLength": 1
-              }
-            }
+            "$ref": "#/$defs/sample"
           }
         },
         "cold": {
           "anyOf": [
             {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "wallMs",
-                "cpuMs",
-                "oracle",
-                "receipt",
-                "outputPath"
-              ],
-              "properties": {
-                "wallMs": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "cpuMs": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "oracle": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "passed",
-                    "maxAbsoluteError",
-                    "firstFailure"
-                  ],
-                  "properties": {
-                    "passed": {
-                      "type": "boolean"
-                    },
-                    "maxAbsoluteError": {
-                      "type": "number",
-                      "minimum": 0
-                    },
-                    "firstFailure": {
-                      "anyOf": [
-                        {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    }
-                  }
-                },
-                "receipt": {
-                  "$ref": "#/$defs/receipt"
-                },
-                "outputPath": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              }
+              "$ref": "#/$defs/sample"
             },
             {
               "type": "null"
@@ -1031,6 +918,28 @@
               "type": "null"
             }
           ]
+        },
+        "warmups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sample"
+          }
+        },
+        "lifecycleRuns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sample"
+          }
+        },
+        "failedRun": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sample"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "allOf": [
@@ -1058,7 +967,7 @@
           "if": {
             "properties": {
               "schemaVersion": {
-                "const": 3
+                "minimum": 3
               }
             }
           },
@@ -1068,6 +977,43 @@
               "providerAddonArtifact",
               "timestampCalibrationArtifact"
             ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "schemaVersion": {
+                "const": 4
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "warmups",
+              "lifecycleRuns",
+              "failedRun"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "warmups"
+                  ]
+                },
+                {
+                  "required": [
+                    "lifecycleRuns"
+                  ]
+                },
+                {
+                  "required": [
+                    "failedRun"
+                  ]
+                }
+              ]
+            }
           }
         }
       ]
@@ -1189,6 +1135,63 @@
           }
         }
       ]
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wallMs",
+        "cpuMs",
+        "oracle",
+        "receipt",
+        "outputPath"
+      ],
+      "properties": {
+        "wallMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpuMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "oracle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "passed",
+            "maxAbsoluteError",
+            "firstFailure"
+          ],
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "maxAbsoluteError": {
+              "type": "number",
+              "minimum": 0
+            },
+            "firstFailure": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "receipt": {
+          "$ref": "#/$defs/receipt"
+        },
+        "outputPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     }
   },
   "required": [
@@ -1258,6 +1261,9 @@
     "residentStateBefore": {},
     "outputGeneration": {},
     "copiedInputBytes": {},
-    "submissionCount": {}
+    "submissionCount": {},
+    "warmups": {},
+    "lifecycleRuns": {},
+    "failedRun": {}
   }
 }

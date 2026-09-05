@@ -1336,9 +1336,9 @@
       },
       "src/backend/vulkan/vk_pipeline_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "c9655389f757c6a3caaf717dc339cf041864ca23c2c87960caa1b8dc9c1d0b49",
-        "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "2f3bb87f1560097b69f2cc71f5584caeadebaf6c26dcf912bd8dbb14f845742c",
+        "reason": "Keep: Vulkan compute and descriptor cache ownership, including transactional allocation-failure regressions.",
+        "reviewer": "codex-cache-ownership/2026-09-05"
       },
       "src/backend/vulkan/vk_pipeline_cache_persistent.zig": {
         "decision": "Keep",

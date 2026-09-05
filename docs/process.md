@@ -106,6 +106,17 @@ classified and cannot be promoted by benchmark results.
   cancelled submitted resident computation cannot silently continue. These are
   correctness checks; transfer and timing advantages require matched application
   controls and separate evidence admission.
+- Resident application comparisons require a separately frozen sequence oracle.
+  Fixture version 2 declares initialize-once inputs and program-lifetime buffers;
+  every provider uses the same schedule. Evaluation version 4 retains warmup and
+  lifecycle invocations so their state generations and numerical results can be
+  checked before admitting later samples. Reuploading, clearing, resetting state,
+  skipping a generation, or replacing a sequence oracle with its initial result
+  fails the evidence gate. Failed numerical outputs and receipts remain retained.
+- Vulkan compute and descriptor cache transitions retain the active owner if a
+  cache allocation fails. An allocation-fault regression must preserve the old
+  handles and allow a later successful insertion and activation. This changes
+  failure-path ownership without changing the cache key or execution contract.
 - Program GPU timing is an explicit evaluation policy. Timestamp pass markers
   must bracket equivalent completion stages, and counter precision must be
   disclosed. The gate recomputes calibrated durations, percentile statistics,

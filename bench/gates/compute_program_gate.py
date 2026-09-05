@@ -106,6 +106,8 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
         raise ValueError(f'{path}: input identities or extents do not match declared resources')
     input_hashes = {name: digest(root / filename) for name, filename in input_paths.items()}
     checks = []
+    sequence = None
+    fixture_path = None
     fixture_reference = policy.get('fixtures', {}).get(report['application'])
     if fixture_reference:
         if not report.get('fixturePath'):
@@ -118,12 +120,31 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
                 or {name: reference['hash'] for name, reference in fixture['inputs'].items()} != input_hashes):
             raise ValueError(f'{path}: external source, input or oracle differs from the frozen fixture')
         checks = fixture['checks']
+        sequence = fixture.get('sequence')
     elif report.get('fixturePath'):
         raise ValueError(f'{path}: external fixture is not declared in the policy')
     expected = [value[0] for value in struct.iter_unpack('<d', (root / report['expectedPath']).read_bytes())]
-    for index, sample in enumerate([report["cold"], *report["samples"]]):
+    resident = [buffer for buffer in program['buffers'] if buffer.get('lifetime') == 'program']
+    if resident and (sequence is None or report['schemaVersion'] < 4):
+        raise ValueError(f'{path}: resident evaluation requires a frozen sequence and complete invocation records')
+    all_samples = [report['cold'], *report['samples']]
+    if report['schemaVersion'] >= 4:
+        warmup_count = policy['warmupRuns'] if report['phase'] == 'measure' else 0
+        lifecycle_count = 1 if report['phase'] == 'audit' else 0
+        if (len(report['warmups']) != warmup_count or len(report['lifecycleRuns']) != lifecycle_count
+                or report['failedRun'] is not None):
+            raise ValueError(f'{path}: incomplete warmup or lifecycle invocation records')
+        all_samples = [report['cold'], *report['warmups'], *report['samples'], *report['lifecycleRuns']]
+        if sequence and len(sequence['expected']) < len(all_samples):
+            raise ValueError(f'{path}: frozen sequence is shorter than the declared execution')
+    for index, sample in enumerate(all_samples):
         receipt = sample["receipt"]
         expected_run = 1 if index == 0 else index + 1 + (policy['warmupRuns'] if report['phase'] == 'measure' else 0)
+        if report['schemaVersion'] >= 4:
+            expected_run = index + 1
+        if sequence:
+            expected_file = fixture_path.parent / sequence['expected'][index]['path']
+            expected = [value[0] for value in struct.iter_unpack('<d', expected_file.read_bytes())]
         expected_execution = policy['preparedExecution'] if report['provider'] == 'doe-recorded' else 'webgpu'
         if receipt['run'] != expected_run or receipt['execution'] != expected_execution:
             raise ValueError(f'{path}: repeat accounting or execution treatment mismatch')
@@ -143,13 +164,26 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
                     raise ValueError(f'{path}: retained external oracle failed at {position}')
         if not sample["oracle"]["passed"] or sample["oracle"]["firstFailure"] is not None:
             raise ValueError(f"{path}: numerical oracle failed")
-        if receipt["programHash"] != program_hash or receipt["inputHashes"] != input_hashes:
+        expected_hashes = dict(input_hashes)
+        expected_origins = {name: {'kind': 'host', 'hash': value} for name, value in input_hashes.items()}
+        expected_state = {}
+        if sequence:
+            if receipt['schemaVersion'] < 4:
+                raise ValueError(f'{path}: sequence requires generation-bound receipts')
+            instance = report['cold']['receipt']['programInstance']
+            for buffer in program['buffers']:
+                origin = {'kind': 'program-state', 'programHash': program_hash,
+                          'programInstance': instance, 'buffer': buffer['id'], 'generation': expected_run - 1}
+                if buffer['role'] != 'input':
+                    expected_state[buffer['id']] = origin if index else {'kind': 'zero'}
+                elif index and buffer['type'] == 'storage':
+                    expected_hashes[buffer['id']] = None
+                    expected_origins[buffer['id']] = origin
+        if receipt["programHash"] != program_hash or receipt["inputHashes"] != expected_hashes:
             raise ValueError(f"{path}: input or program receipt identity mismatch")
         if receipt['schemaVersion'] >= 4:
-            expected_origins = {name: {'kind': 'host', 'hash': value}
-                                for name, value in input_hashes.items()}
             if (receipt['inputOrigins'] != expected_origins
-                    or receipt['residentStateBefore'] != {}
+                    or receipt['residentStateBefore'] != expected_state
                     or receipt['outputGeneration'] != expected_run
                     or receipt['programInstance'] != report['cold']['receipt']['programInstance']
                     or receipt['copiedInputBytes'] != 0
@@ -164,8 +198,8 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
         query_bytes = TIMESTAMP_QUERY_COUNT * TIMESTAMP_BYTES if has_timing else 0
         padding = (-output['size']) % TIMESTAMP_BYTES if has_timing else 0
         expected_counts = {
-            "uploadedBytes": sum(item["size"] for item in buffers if item["role"] == "input"),
-            "clearedBytes": sum(item["size"] for item in buffers if item["role"] != "input"),
+            "uploadedBytes": 0 if sequence and index else sum(item["size"] for item in buffers if item["role"] == "input"),
+            "clearedBytes": sum(item["size"] for item in buffers if item["role"] != "input" and item.get('lifetime') != 'program'),
             "readbackBytes": output["size"] + query_bytes,
             "allocatedBufferBytes": sum(item['size'] for item in buffers) + output['size'] + padding + 2 * query_bytes,
         }
@@ -187,7 +221,8 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
             expected_encoded = len(program["steps"])
         else:
             expected_encoded = len(program["steps"]) * successful_runs
-            if report["observed"]["submissions"] != successful_runs:
+            initialization_submissions = int(any(buffer['role'] != 'input' for buffer in resident))
+            if report["observed"]["submissions"] != successful_runs + initialization_submissions:
                 raise ValueError(f"{path}: submission work missing")
         if report["observed"]["dispatchesEncoded"] != expected_encoded:
             raise ValueError(f"{path}: public command observation mismatch")

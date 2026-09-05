@@ -203,8 +203,20 @@ Use `program evaluate --policy config/compute-program-external-evaluation.json`
 with the usual physical backend and executable arguments. That policy binds the
 fixture hash. Alternative frozen cases require an explicit policy referencing
 their generated fixture and hash. Unknown applications without a fixture fail.
+The profile includes resident simulation acceptance; inspect its current
+[numerical qualification state](status/reusable-compute-programs.md) before
+interpreting a failed run. A failed oracle stops the matrix before timing claims.
 The generic fixture loader and existing matrix handle multiple inputs and
 strict external observables without a separate performance harness.
+
+For a continuously advancing simulation, pass `--sequence-runs` to the same
+`program prepare-lif` command. Freeze enough oracle states for cold execution,
+every warmup, and every timed run; audits also require the post-cancellation
+invocation. The sequence fixture uses program-lifetime buffers and uploads
+inputs only on its first invocation. Its unchanged upstream CPU twin advances
+through the same batches of ticks before any GPU run. Ordinary Doe, Dawn, and
+wgpu receive the same resident declarations and input schedule as prepared Doe.
+This is a distinct workload from repeatedly resetting the simulation.
 
 ## Retained package qualification
 
@@ -239,6 +251,21 @@ the optional retained fixture. Historical policy and run versions remain
 readable. Public compute-program descriptors and run receipts keep their
 existing versions. Fixture schema, provenance, complete oracle coverage, and
 input extents are blocking validation requirements.
+
+Fixture schema version 2 adds an explicit `sequence` with `inputs:
+'initialize-once'` and ordered, hash-bound expected states. This version requires
+program-lifetime buffers; mixed lifetimes and varying inputs require a future
+sequence contract. Evaluation run schema version 4 retains `warmups`,
+`lifecycleRuns`, and `failedRun` alongside cold and timed samples. Numerical
+failures retain the actual output and receipt. The gate checks every successful
+invocation's oracle, resource work, and preceding state generation, including
+warmups and cancellation recovery. Timed percentiles still exclude those
+untimed records. Earlier fixture and evaluation versions keep their reset
+semantics and remain readable; public receipt version 4 is unchanged.
+
+Vulkan cache insertion failures now restore active compute and descriptor
+ownership. Rebuild the native library to receive the correction; cache keys,
+public descriptors, and receipt fields are unchanged.
 
 Vulkan `clearBuffer` now records a GPU fill at submission, with transfer
 dependencies, instead of performing a mapped host clear during encoding.

@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 import { hashBytes, validateComputeProgram } from '../../../packages/doe-gpu/src/compute-program-contract.js';
 
 if (process.argv.includes('--help')) {
-  console.log('Prepare a pinned LIF program before evaluation. Required: --upstream=<prepared HoloScript checkout> --output=<new directory> --case=<lif-determinism.inputs.json case ID>');
+  console.log('Prepare a pinned LIF program before evaluation. Required: --upstream=<prepared HoloScript checkout> --output=<new directory> --case=<lif-determinism.inputs.json case ID>. Optional: --sequence-runs=<oracle states for initialize-once resident execution>');
   process.exit(0);
 }
 const args = Object.fromEntries(process.argv.slice(2).map((arg) => {
@@ -15,8 +15,13 @@ const args = Object.fromEntries(process.argv.slice(2).map((arg) => {
   if (!arg.startsWith('--') || split < 0) throw new Error('Expected --upstream= --output= --case=');
   return [arg.slice(2, split), arg.slice(split + 1)];
 }));
-if (Object.keys(args).length !== 3 || !args.upstream || !args.output || !args.case) {
+if (Object.keys(args).some((key) => !['upstream', 'output', 'case', 'sequence-runs'].includes(key))
+    || !args.upstream || !args.output || !args.case) {
   throw new Error('Required: --upstream=<pinned checkout> --output=<new directory> --case=<frozen LIF case>');
+}
+const sequenceRuns = args['sequence-runs'] === undefined ? null : Number(args['sequence-runs']);
+if (sequenceRuns !== null && (!Number.isSafeInteger(sequenceRuns) || sequenceRuns < 1)) {
+  throw new Error('--sequence-runs must be a positive safe integer');
 }
 const here = dirname(fileURLToPath(import.meta.url));
 const harness = JSON.parse(readFileSync(resolve(here, 'lif-determinism.harness.json')));
@@ -78,6 +83,14 @@ cpu.stepN(testCase.tickCount, stimulus);
 const expected = new Float64Array(count * 2);
 expected.set(cpu.getMembraneV());
 expected.set(cpu.getSpikes(), count);
+const expectedReference = retain('expected.f64', new Uint8Array(expected.buffer));
+const expectedSequence = [expectedReference];
+for (let run = 1; run < (sequenceRuns ?? 1); run += 1) {
+  cpu.stepN(testCase.tickCount, stimulus);
+  expected.set(cpu.getMembraneV());
+  expected.set(cpu.getSpikes(), count);
+  expectedSequence.push(retain(`sequence/run-${run + 1}.expected.f64`, new Uint8Array(expected.buffer)));
+}
 const uniform = new ArrayBuffer(32);
 new Float32Array(uniform).set([params.tau, params.vThreshold, params.vReset, params.vRest, params.dt]);
 new Uint32Array(uniform)[5] = count;
@@ -118,19 +131,28 @@ const descriptor = {
       { binding: 2, buffer: 'output' }], workgroups: step.workgroups,
   }], output: 'output',
 };
+if (sequenceRuns !== null) {
+  descriptor.schemaVersion = 2;
+  descriptor.id = 'holoscript_lif_resident';
+  for (const buffer of descriptor.buffers) buffer.lifetime = 'program';
+}
 validateComputeProgram(descriptor);
 const fixture = {
-  schemaVersion: 1, kind: 'compute_program_fixture', application: descriptor.id,
+  schemaVersion: sequenceRuns === null ? 1 : 2, kind: 'compute_program_fixture', application: descriptor.id,
   sourceRepo: harness.upstream.repositoryUrl, sourceCommit: harness.upstream.commit,
   caseId: testCase.id, generatorRuntime: `${process.version}; TypeScript ${typescript.version}`,
   adaptation: 'Unchanged lif_step WGSL and upstream CPU twin; declared ticks are batched, with an added packing pass preserving both membrane and spike readbacks on every provider.',
   program: retain('program.json', `${JSON.stringify(descriptor, null, 2)}\n`), inputs,
-  expected: retain('expected.f64', new Uint8Array(expected.buffer)), sources,
+  expected: expectedReference, sources,
   checks: [
     { offset: 0, count, mode: 'both', absoluteTolerance: cases.absoluteTolerance,
       relativeTolerance: cases.relativeTolerance, relativeEpsilon: 1e-6 },
     { offset: count, count, mode: 'exact', absoluteTolerance: 0, relativeTolerance: 0, relativeEpsilon: 0 },
   ],
 };
+if (sequenceRuns !== null) {
+  fixture.sequence = { inputs: 'initialize-once', expected: expectedSequence };
+  fixture.adaptation += ' All buffers persist across invocations; inputs are uploaded only at initialization. The upstream CPU twin advances continuously and freezes every invocation oracle before GPU execution.';
+}
 const reference = retain('fixture.json', `${JSON.stringify(fixture, null, 2)}\n`);
 console.log(JSON.stringify({ path: resolve(output, reference.path), hash: reference.hash }));

@@ -1,5 +1,27 @@
 # Reusable compute programs
 
+## Resident sequence and cache ownership
+
+The external fixture generator now freezes continuous simulation oracles before
+GPU execution. Evaluation records warmups and lifecycle runs as part of the
+state history; the gate rejects reuploads, clears, stale generations, missing
+invocations, and reset outputs. The declared sequence is in
+`bench/out/compute-program/20260905-holoscript-resident-sequence-fixture/fixture.json`.
+The matrix under `bench/out/compute-program/20260905-resident-sequence-matrix/`
+failed its original upstream numerical tolerance on repeated resident work.
+Prepared Doe, ordinary Doe, Dawn, and wgpu produced identical failing output
+bytes; controls are retained under
+`bench/out/compute-program/20260905-resident-sequence-numerical-controls/`.
+This is an open continuous-simulation numerical acceptance issue, not a
+prepared-command speed result. The frozen oracle and tolerances remain intact.
+
+Vulkan compute and descriptor cache insertion now restores the active owner if
+allocation fails. The regression also retries the insertion successfully.
+The original ownership-loss reproduction is retained under
+`bench/out/compute-program/20260905-vulkan-cache-ownership-failure/`.
+The repaired source and successful native test log are retained under
+`bench/out/compute-program/20260905-vulkan-cache-ownership-correction/`.
+
 ## Compiler corrections and package entrypoints
 
 Vulkan shader wrappers now preserve parser/semantic causes and WGSL locations
@@ -47,7 +69,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-shared-first-kernel-package/summary.json`.
+`bench/out/compute-program/20260905-cache-ownership-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -55,13 +77,13 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-compiler-diagnostics-matrix/summary.json`.
+`bench/out/compute-program/20260905-cache-ownership-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the new receipt contract. It does not measure a
 resident application sequence. Performance remains diagnostic; large Deno host
 ratios remain suspicious and require fairness review.
-Native replay and SPIR-V validation results are retained separately under
+Earlier native replay and SPIR-V validation results are retained separately under
 `bench/out/compute-program/20260905-compiler-diagnostics-native/`.
 
 ## Active acceptance gaps
@@ -72,7 +94,7 @@ physical D3D12 lane. Changed plans still rebuild native recordings and private
 pipelines while retaining unchanged public resources.
 
 The external portfolio, a measured application boundary crossing, resident
-application sequence controls, and independent repeat use remain open.
+sequence numerical qualification, and independent repeat use remain open.
 Requested allocation accounting excludes internal query scratch and is not a
 measurement of peak GPU memory. Physical driver loss and recovery remain
 unevidenced; explicit device destruction is a separate lifecycle test.

@@ -14,7 +14,8 @@
   "applications": [
     "image_edges",
     "heat_diffusion",
-    "holoscript_lif"
+    "holoscript_lif",
+    "holoscript_lif_resident"
   ],
   "providers": [
     "doe-recorded",
@@ -30,6 +31,10 @@
     "holoscript_lif": {
       "path": "bench/out/compute-program/20260905-holoscript-lif-final-fixture/fixture.json",
       "hash": "6ff6a64583720ce2ccc7bb35be728ad2ba2a92c19a9bb140cb9159e3323c2e98"
+    },
+    "holoscript_lif_resident": {
+      "path": "bench/out/compute-program/20260905-holoscript-resident-sequence-fixture/fixture.json",
+      "hash": "9bae4395f9fcc58ae2832e8f42586ec8dbb661e31d2fbc42087e5d17ec7d68b9"
     }
   }
 }

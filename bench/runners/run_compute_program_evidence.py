@@ -15,7 +15,7 @@ import jsonschema
 
 from bench.gates.compute_program_gate import digest, validate_run
 from bench.native_compare_modules.reporting import format_stats
-from bench.lib.compute_program_fixture import load_fixture
+from bench.lib.compute_program_fixture import load_fixture, fixture_references
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -143,7 +143,11 @@ def main() -> int:
             raise ValueError(f'Fixture application mismatch for {application}')
         destination = output / 'fixtures' / application
         destination.mkdir(parents=True)
-        references = [fixture['program'], fixture['expected'], *fixture['inputs'].values(), *fixture['sources']]
+        if sequence := fixture.get('sequence'):
+            required_runs = max(3, 1 + policy['warmupRuns'] + policy['timedRuns'])
+            if len(sequence['expected']) < required_runs:
+                raise ValueError(f'Fixture sequence {application} requires {required_runs} frozen oracle states')
+        references = fixture_references(fixture)
         for artifact in references:
             retained = destination / artifact['path']
             retained.parent.mkdir(parents=True, exist_ok=True)
