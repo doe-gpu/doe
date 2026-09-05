@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "id": "image_edges",
+  "buffers": [
+    {
+      "id": "input",
+      "size": 256,
+      "role": "input",
+      "type": "storage"
+    },
+    {
+      "id": "horizontal",
+      "size": 256,
+      "role": "scratch",
+      "type": "storage"
+    },
+    {
+      "id": "vertical",
+      "size": 256,
+      "role": "scratch",
+      "type": "storage"
+    },
+    {
+      "id": "output",
+      "size": 256,
+      "role": "output",
+      "type": "storage"
+    }
+  ],
+  "shaders": [
+    {
+      "id": "horizontal",
+      "entryPoint": "main",
+      "code": "\n@group(0) @binding(0) var<storage, read> input: array<f32>;\n@group(0) @binding(1) var<storage, read_write> output: array<f32>;\nconst width: u32 = 8u;\nconst height: u32 = 8u;\nfn sample(x: i32, y: i32) -> f32 {\n  let xx = u32(clamp(x, 0, i32(width) - 1));\n  let yy = u32(clamp(y, 0, i32(height) - 1));\n  return input[yy * width + xx];\n}\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let index = gid.x;\n  if (index >= width * height) { return; }\n  let x = i32(index % width);\n  let y = i32(index / width);\n  output[index] = (sample(x - 1, y) + 2.0 * sample(x, y) + sample(x + 1, y)) * 0.25;\n}"
+    },
+    {
+      "id": "vertical",
+      "entryPoint": "main",
+      "code": "\n@group(0) @binding(0) var<storage, read> input: array<f32>;\n@group(0) @binding(1) var<storage, read_write> output: array<f32>;\nconst width: u32 = 8u;\nconst height: u32 = 8u;\nfn sample(x: i32, y: i32) -> f32 {\n  let xx = u32(clamp(x, 0, i32(width) - 1));\n  let yy = u32(clamp(y, 0, i32(height) - 1));\n  return input[yy * width + xx];\n}\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let index = gid.x;\n  if (index >= width * height) { return; }\n  let x = i32(index % width);\n  let y = i32(index / width);\n  output[index] = (sample(x, y - 1) + 2.0 * sample(x, y) + sample(x, y + 1)) * 0.25;\n}"
+    },
+    {
+      "id": "edges",
+      "entryPoint": "main",
+      "code": "\n@group(0) @binding(0) var<storage, read> input: array<f32>;\n@group(0) @binding(1) var<storage, read_write> output: array<f32>;\nconst width: u32 = 8u;\nconst height: u32 = 8u;\nfn sample(x: i32, y: i32) -> f32 {\n  let xx = u32(clamp(x, 0, i32(width) - 1));\n  let yy = u32(clamp(y, 0, i32(height) - 1));\n  return input[yy * width + xx];\n}\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let index = gid.x;\n  if (index >= width * height) { return; }\n  let x = i32(index % width);\n  let y = i32(index / width);\n  let gx = sample(x + 1, y - 1) + 2.0 * sample(x + 1, y) + sample(x + 1, y + 1)\n      - sample(x - 1, y - 1) - 2.0 * sample(x - 1, y) - sample(x - 1, y + 1);\n    let gy = sample(x - 1, y + 1) + 2.0 * sample(x, y + 1) + sample(x + 1, y + 1)\n      - sample(x - 1, y - 1) - 2.0 * sample(x, y - 1) - sample(x + 1, y - 1);\n    output[index] = sqrt(gx * gx + gy * gy);\n}"
+    }
+  ],
+  "steps": [
+    {
+      "shader": "horizontal",
+      "bindings": [
+        {
+          "binding": 0,
+          "buffer": "input"
+        },
+        {
+          "binding": 1,
+          "buffer": "horizontal"
+        }
+      ],
+      "workgroups": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "shader": "vertical",
+      "bindings": [
+        {
+          "binding": 0,
+          "buffer": "horizontal"
+        },
+        {
+          "binding": 1,
+          "buffer": "vertical"
+        }
+      ],
+      "workgroups": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "shader": "edges",
+      "bindings": [
+        {
+          "binding": 0,
+          "buffer": "vertical"
+        },
+        {
+          "binding": 1,
+          "buffer": "output"
+        }
+      ],
+      "workgroups": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "output": "output"
+}

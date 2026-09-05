@@ -61,6 +61,13 @@ field or measurement that adjudicates it.
 
 ## Required comparison lanes
 
+The optional reusable-program interface is a separate declared application
+treatment. Freeze its shaders, inputs, outputs, and integration diff before
+comparison and give controls persistent pipelines, bindings, batching, and
+caches. A program integration does not establish unchanged-provider substitution;
+an internal mechanism demonstration does not establish voluntary adoption.
+The same ownership lanes below apply to the frozen treatment.
+
 Every ownership candidate uses the same versioned workload, inputs, semantic
 oracle, hardware tuple, process policy, synchronization, readback, cache state,
 sample policy, and user-visible timing scope across four required lanes:

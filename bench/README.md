@@ -12,6 +12,7 @@ python3 bench/cli.py workload --help
 python3 bench/cli.py compare --help
 python3 bench/cli.py claim --help
 python3 bench/cli.py external --help
+python3 bench/cli.py program --help
 ```
 
 Use [`docs/operator-runbook.md`](../docs/operator-runbook.md) for platform
@@ -23,6 +24,10 @@ External application reproduction starts at
 `external reproduce` command owns source preparation, host admission, Doe
 build identity, policy gates, workload execution, and receipt routing; a
 passing command is still not a public claim.
+
+Declared compute programs use `program prepare-lif`, `program evaluate`, `program qualify-package`,
+`program verify`, and `program verify-native`. Their policy and evidence boundaries are documented in
+[`reusable-compute-programs.md`](../docs/reusable-compute-programs.md).
 
 ## First benchmark matrix
 

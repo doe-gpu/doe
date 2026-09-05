@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "separate-submission-copy-order",
+  "actorId": "umap-gpu",
+  "harnessId": "sgd-output-correctness",
+  "upstreamCommit": "7884b287f49bc057df7e0856c5539f130a20e0ad",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "A copy-only Vulkan submission could copy mapped memory on the CPU while the preceding GPU producer was still running. Both native copy entry points now record GPU copies with dependencies covering preceding reads and writes; the unchanged UMAP oracle and the independent integer recurrence regression pass.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/umap-gpu/execution-ownership-20260905/raw-suite.json",
+      "sha256": "ce71103b52e368b757be3125b24092c43fd23e2480773c0b504e12edf30fa16f"
+    },
+    {
+      "path": "bench/out/external-projects/umap-gpu/execution-ownership-20260905/minimized-copy-failure.stderr",
+      "sha256": "48dd3ea4f812c684133ae80d41f536cdf4e43ebd79c1c6720f2c37f680af625e"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-compute-program.js"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig",
+    "runtime/zig/src/native/compute/doe_compute_fast_vulkan.zig",
+    "runtime/zig/src/backend/vulkan/vk_upload.zig"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-compute-program.js"
+  ],
+  "verifiedAt": "2026-09-05T18:30:46.310240Z"
+}

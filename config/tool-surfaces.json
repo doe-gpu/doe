@@ -23,6 +23,7 @@
         "packages/doe-gpu/bin/doe-proof-node.js",
         "packages/doe-gpu/src/program-bundle-runner.js",
         "packages/doe-gpu/src/plan.js",
+        "packages/doe-gpu/src/compute-program.js",
         "packages/doe-gpu/src/capture.js",
         "packages/doe-gpu/src/observe.js",
         "packages/doe-gpu/src/compute.js",

@@ -3,6 +3,7 @@ const builtin = @import("builtin");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const native_rt_helpers = @import("../support/doe_native_runtime_helpers.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
+const shared = @import("../queue/doe_queue_submit_shared.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const compute_preconditions = @import("doe_compute_preconditions_native.zig");
 const vulkan_compute = @import("../vulkan/vulkan_compute_native.zig");
@@ -143,7 +144,7 @@ fn collectBindGroups(bg_ptrs: [*]const ?*anyopaque, bg_count: u32) BindGroupArra
     return bind_groups;
 }
 
-fn recordOrExecuteCopy(
+fn recordCopy(
     rt: anytype,
     q: *DoeQueue,
     copy_src: ?*anyopaque,
@@ -162,50 +163,11 @@ fn recordOrExecuteCopy(
     const copy_end_src = std.math.add(u64, copy_src_off, copy_size) catch return;
     const copy_end_dst = std.math.add(u64, copy_dst_off, copy_size) catch return;
     if (copy_end_src > scb.size or copy_end_dst > dcb.size) return;
-    const src_has_pending_compute_write =
-        rt.has_pending_compute_writes and
-        rt.has_pending_compute_write_for_buffer(src_buf.vk_id);
-    if (rt.replay_recording_active and (scb.mapped == null or src_has_pending_compute_write)) {
-        vk_upload.record_replay_buffer_copy(
-            rt,
-            src_buf.vk_id,
-            scb,
-            copy_src_off,
-            dst_buf.vk_id,
-            dcb,
-            copy_dst_off,
-            copy_size,
-        ) catch |err| {
-            std.log.err("doe_compute_fast_vulkan: record copy_buf failed: {s}", .{@errorName(err)});
-        };
+    vk_upload.record_replay_buffer_copy(rt, scb, copy_src_off, dcb, copy_dst_off, copy_size) catch |err| {
+        shared.deliverInternalError(q.dev, "doe_compute_fast_vulkan: record copy_buf: {s}", .{@errorName(err)});
         return;
-    }
-    if (executed_any_dispatch.*) {
-        _ = rt.flush_queue() catch |err| {
-            std.log.err("doe_compute_fast_vulkan: flush before copy_buf failed: {s}", .{@errorName(err)});
-        };
-        executed_any_dispatch.* = false;
-    }
-    if (scb.mapped != null and dcb.mapped != null) {
-        const n: usize = @intCast(copy_size);
-        const so: usize = @intCast(copy_src_off);
-        const doff: usize = @intCast(copy_dst_off);
-        const src: [*]const u8 = @ptrCast(scb.mapped.?);
-        const dst: [*]u8 = @ptrCast(dcb.mapped.?);
-        @memcpy(dst[doff .. doff + n], src[so .. so + n]);
-        return;
-    }
-    vk_upload.copy_buffer_region_and_wait(
-        rt,
-        scb.buffer,
-        copy_src_off,
-        dcb.buffer,
-        copy_dst_off,
-        copy_size,
-    ) catch |err| {
-        std.log.err("doe_compute_fast_vulkan: copy_buf failed: {s}", .{@errorName(err)});
     };
-    _ = q;
+    executed_any_dispatch.* = true;
 }
 
 pub fn prewarmPreparedDispatchBindings(
@@ -406,7 +368,7 @@ pub fn dispatchBatchCopyFlush(
     }
 
     const copy_started_ns = if (collect_timings) monotonicNowNs() else 0;
-    recordOrExecuteCopy(
+    recordCopy(
         rt,
         q,
         copy_src,

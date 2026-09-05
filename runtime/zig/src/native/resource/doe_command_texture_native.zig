@@ -36,11 +36,8 @@ pub export fn doeNativeCommandEncoderClearBuffer(
     else
         size;
     if (fill_size == 0) return;
-    if (resource_ops.handleVulkanClearBuffer(enc, buf, offset, fill_size)) {
-        return;
-    }
     enc.cmds.append(alloc, .{ .clear_buffer = .{
-        .buffer = buf.mtl,
+        .buffer = if (enc.dev.backend == .vulkan) toOpaque(buf) else buf.mtl,
         .offset = offset,
         .size = fill_size,
     } }) catch std.debug.panic("doe_command_texture_native: OOM recording clearBuffer command", .{});

@@ -1,19 +1,24 @@
 # Doe product strategy contract
 
 `config/doe-product-strategy.json` is the schema-validated projection of
-[`thesis.md`](thesis.md). Schema version 3 and strategy 2.0.0 replace the
-qualification-first priority in version 2: DoeRuntime is primary, DoeProof is
-its supporting provider-neutral feature, and Fawn is secondary. This is an
-intent migration, not a runtime rename, package removal, or evidence promotion.
-Historical qualification receipts remain valid for their original claims.
+[`thesis.md`](thesis.md). The current intent migration adds an explicitly
+declared reusable-program entry alongside provider substitution. DoeRuntime
+executes, DoeProof evaluates impartially, and browser construction is outside
+the first demonstration. Schema history remains readable through its original
+receipts; the current schema requires the reusable-program contract and
+demonstration gate. Milestones now follow provider qualification, declared plans,
+external applications, transferable corrections, and subsequent embedding
+expansion. The execution-ownership allocation is configuration, not independent
+browser, compiler, proof, and accelerator roadmaps. This change grants no
+evidence promotion.
 
 ## Product roles
 
 | Surface | Role | Acceptance |
 | --- | --- | --- |
-| DoeRuntime | Primary product | Unchanged external non-Doppler application adopts for a material advantage and retains across another release or workload |
+| DoeRuntime | Primary product | Safe reuse transfers between non-Doppler applications and hardware; separately evidenced external adoption follows measured advantage |
 | DoeProof | Supporting feature | Independently qualifies incumbent and DoeRuntime without interfering with execution |
-| Fawn | Secondary browser product | Earns its own shell value and only distributes DoeRuntime where browser substitution is physically proved |
+| Fawn | Experimental distribution channel | Enters the main milestone only after transferred runtime wins and separately proved browser substitution |
 | DoeLab | Operating model | Turns retained failures into minimized regressions and qualified corrections |
 
 ## Comparison and adoption law
@@ -25,8 +30,9 @@ controls. A W0 qualification alone is feature value, not runtime adoption. D0
 testing does not require a preceding paid DoeProof engagement.
 
 Start with AMD/Vulkan unless a real customer supplies a stronger target.
-Each host and backend earns support independently. Require unchanged provider
-integration, parity, lifecycle and recovery, raw measurements, an external
+Each host and backend earns support independently. Distinguish unchanged provider
+integration from a frozen declared-program treatment. Require parity, lifecycle
+and recovery, raw measurements, an external
 maintainer's adoption decision, and repeat retention. Payment, internal
 benchmarks, compiler breadth, receipts, and Doppler interoperability cannot
 substitute for these evidence fields; the schema enforces their presence.

@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe fixed-shape compute program",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "buffers",
+    "shaders",
+    "steps",
+    "output"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+    },
+    "buffers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/buffer"
+      }
+    },
+    "shaders": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/shader"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "output": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+    }
+  },
+  "$defs": {
+    "buffer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "size",
+        "role",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 9007199254740991,
+          "multipleOf": 4
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "input",
+            "scratch",
+            "output"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "storage",
+            "uniform"
+          ]
+        }
+      }
+    },
+    "shader": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "code",
+        "entryPoint"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entryPoint": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shader",
+        "bindings",
+        "workgroups"
+      ],
+      "properties": {
+        "shader": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+        },
+        "bindings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "binding",
+              "buffer"
+            ],
+            "properties": {
+              "binding": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "buffer": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+              }
+            }
+          }
+        },
+        "workgroups": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "maxItems": 3
+        }
+      }
+    }
+  }
+}

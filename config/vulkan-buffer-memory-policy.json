@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "readbackRequiredProperties": [
+    "host-visible",
+    "host-coherent"
+  ],
+  "readbackPreferredProperties": [
+    "host-cached"
+  ],
+  "unavailablePreference": "use-required-properties"
+}

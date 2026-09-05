@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -13,21 +14,25 @@ from typing import Any
 
 import jsonschema
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
+if __name__ == "__main__" and not __package__:
+    environment = os.environ.copy()
+    environment['PYTHONPATH'] = os.pathsep.join(
+        [str(REPO_ROOT), *([environment['PYTHONPATH']] if environment.get('PYTHONPATH') else [])]
+    )
+    os.execve(sys.executable,
+              [sys.executable, '-m', 'bench.tools.validate_native_program_identity_trace', *sys.argv[1:]],
+              environment)
+
+from bench.lib.hash_utils import file_sha256
+from bench.lib.native_program_replay import validate_gpu_replays
+
+
 DEFAULT_SCHEMA = REPO_ROOT / "config/native-program-identity-trace-row.schema.json"
 DEFAULT_SPIRV_VAL = Path("/usr/bin/spirv-val")
 ARTIFACT_PREFIX = "doe-native-vulkan-"
 ARTIFACT_SUFFIX = ".spv"
 RENDER_COMPLETION = "internal_submit_and_wait_succeeded"
-
-
-def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def stable_sha256(value: Any) -> str:
@@ -126,8 +131,17 @@ def build_validation(
     dispatch_rows = [row for row in rows if row.get("event") == "dispatch_encoded"]
     render_rows = [row for row in rows if row.get("event") == "render_draw_executed"]
     submission_rows = [row for row in rows if row.get("event") == "submission_succeeded"]
-    compute_submission_valid = all(
-        any(
+    replay_valid = True
+    replay_dispatches: set[tuple[int, int]] = set()
+    try:
+        for recording in validate_gpu_replays(rows):
+            if recording['submissions']:
+                replay_dispatches.update((row['processId'], row['sequence']) for row in recording['dispatches'])
+    except (ValueError, KeyError) as error:
+        replay_valid = False
+        failures.append(f"compute_program_replay_invalid:{error}")
+    compute_submission_valid = replay_valid and all(
+        (dispatch.get('processId'), dispatch.get('sequence')) in replay_dispatches or any(
             submission.get("processId") == dispatch.get("processId")
             and isinstance(submission.get("sequence"), int)
             and isinstance(dispatch.get("sequence"), int)
@@ -138,6 +152,7 @@ def build_validation(
     )
     if not compute_submission_valid:
         failures.append("compute_dispatch_lacks_later_submission")
+    submission_rows += [row for row in rows if row.get('event') == 'compute_program_submitted']
 
     render_completion_valid = (
         not require_render_completion

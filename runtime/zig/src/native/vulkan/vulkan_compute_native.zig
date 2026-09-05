@@ -937,23 +937,18 @@ pub fn vulkan_prepare_recorded_dispatch(rt: *NativeVulkanRuntime, dispatch: anyt
 }
 
 pub fn vulkan_run_prepared_dispatch(rt: *NativeVulkanRuntime, dispatch: anytype) void {
-    if (comptime !has_vulkan) return;
-    const repeat_count = if (dispatch.repeat_count == 0) 1 else dispatch.repeat_count;
-    const command_buffer = rt.begin_prepared_dispatch_replay() catch |err| {
-        std.log.err("doe_vulkan_compute: recorded dispatch replay begin failed: {s}", .{@errorName(err)});
-        return;
+    vulkan_record_prepared_dispatch(rt, dispatch) catch |err| {
+        std.log.err("doe_vulkan_compute: recorded dispatch failed: {s}", .{@errorName(err)});
     };
+}
+
+pub fn vulkan_record_prepared_dispatch(rt: *NativeVulkanRuntime, dispatch: anytype) !void {
+    if (comptime !has_vulkan) return error.Unsupported;
+    const repeat_count = if (dispatch.repeat_count == 0) 1 else dispatch.repeat_count;
+    const command_buffer = try rt.begin_prepared_dispatch_replay();
     var repeat_index: u32 = 0;
     while (repeat_index < repeat_count) : (repeat_index += 1) {
-        rt.record_prepared_dispatch_replay_on(command_buffer, dispatch.x, dispatch.y, dispatch.z) catch |err| {
-            std.log.err("doe_vulkan_compute: recorded run_dispatch({},{},{}) failed: {s}", .{
-                dispatch.x,
-                dispatch.y,
-                dispatch.z,
-                @errorName(err),
-            });
-            return;
-        };
+        try rt.record_prepared_dispatch_replay_on(command_buffer, dispatch.x, dispatch.y, dispatch.z);
         const pipeline = cast(DoeComputePipeline, dispatch.compute_pipeline) orelse continue;
         const binding_state = dispatch.vulkan_binding_state;
         var resource_hasher = std.hash.Wyhash.init(0);

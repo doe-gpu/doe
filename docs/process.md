@@ -53,6 +53,32 @@ classified and cannot be promoted by benchmark results.
 - A workload declares immutable input identity, oracle, executor, policy,
   required artifacts, and evidence extensions.
 - Correctness precedes performance interpretation.
+- Declared reusable-program evaluations freeze numerical oracles before tuning,
+  measure preparation separately, include persistent/batched incumbent controls,
+  and test reset, source/shape updates, cancellation, and recovery. Package
+  receipts describe submitted work; native journals and independent output
+  oracles must substantiate execution. Host command recording does not establish
+  reusable GPU command buffers, external adoption, or a performance advantage.
+- GPU-recorded program evidence must bind a native preparation event to every
+  replay submission, preserve source/backend identities, and validate output
+  independently. Interleaved programs, ordinary execution, updates, and device
+  destruction exercise retained resource ownership. Evaluation policy selects
+  the percentile estimator; changing it cannot reinterpret historical results.
+- External declared-program fixtures retain pinned shader and oracle source,
+  toolchain, input bytes, and expected outputs before provider audits. The gate
+  checks every reference, declared input extent, and complete oracle coverage.
+  Exact observables and independent absolute/relative tolerances cannot be
+  weakened to a generic numerical comparison. Batched ordinary controls execute
+  every adaptation pass used by the prepared program. Fixture execution alone
+  does not promote an external application or establish adoption.
+- Queue-ordering repairs require a regression with a separate asynchronous
+  producer submission and readback submission, plus the original external
+  reproduction. Host-visible memory does not waive GPU execution dependencies.
+- Readback allocation policy is versioned in
+  `config/vulkan-buffer-memory-policy.json`. Cached memory is a preference;
+  coherence and supported memory-type requirements remain mandatory. Validate
+  the selection regression and physical ordinary/prepared application controls
+  before interpreting an allocation-policy change as an improvement.
 - Claim-bearing workloads must emit every evidence extension declared by their
   policy. Missing evidence fails closed.
 - Focused module tests are valid executor mechanisms when they provide a

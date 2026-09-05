@@ -1,0 +1,852 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Compute program execution and evaluation artifacts",
+  "type": "object",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/receipt"
+    },
+    {
+      "$ref": "#/$defs/evaluation"
+    }
+  ],
+  "$defs": {
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "programHash",
+        "execution",
+        "run",
+        "inputHashes",
+        "outputHash",
+        "dispatchCount",
+        "clearedBytes",
+        "uploadedBytes",
+        "readbackBytes",
+        "readbackPath",
+        "allocatedBufferBytes",
+        "timingMs"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "programHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "execution": {
+          "type": "string",
+          "enum": [
+            "gpu-recorded",
+            "native-recorded",
+            "webgpu"
+          ]
+        },
+        "run": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inputHashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "description": "Input buffer identifiers map to full immutable byte hashes."
+        },
+        "outputHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "dispatchCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "clearedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uploadedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readbackBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readbackPath": {
+          "type": "string",
+          "const": "mapAsync-copy-unmap"
+        },
+        "allocatedBufferBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timingMs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "upload",
+            "encode",
+            "submitWait",
+            "readback",
+            "total"
+          ],
+          "properties": {
+            "upload": {
+              "type": "number",
+              "minimum": 0
+            },
+            "encode": {
+              "type": "number",
+              "minimum": 0
+            },
+            "submitWait": {
+              "type": "number",
+              "minimum": 0
+            },
+            "readback": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "claimStatus",
+        "provider",
+        "application",
+        "phase",
+        "backend",
+        "policyHash",
+        "programPath",
+        "runtime",
+        "status",
+        "error",
+        "samples",
+        "cold",
+        "preparationMs",
+        "deviceStartupMs",
+        "adapter",
+        "providerArtifact",
+        "allocatedBufferBytes",
+        "peakProcessRssBytes",
+        "lifecycle",
+        "observed",
+        "latencyStatsMs",
+        "cpuStatsMs",
+        "programHash",
+        "expectedPath",
+        "teardownMs",
+        "preparation",
+        "measurementLimits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "oneOf": [
+            {
+              "const": 1
+            },
+            {
+              "const": 2
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "const": "compute_program_evaluation"
+        },
+        "claimStatus": {
+          "type": "string",
+          "const": "diagnostic"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "doe-recorded",
+            "doe-webgpu",
+            "dawn",
+            "wgpu"
+          ]
+        },
+        "application": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "audit",
+            "measure"
+          ]
+        },
+        "backend": {
+          "type": "string",
+          "enum": [
+            "vulkan",
+            "metal"
+          ]
+        },
+        "policyHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "programPath": {
+          "type": "string"
+        },
+        "inputPath": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "node",
+                "bun",
+                "deno"
+              ]
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "running",
+            "passed",
+            "failed"
+          ]
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "wallMs",
+              "cpuMs",
+              "oracle",
+              "receipt",
+              "outputPath"
+            ],
+            "properties": {
+              "wallMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "cpuMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "oracle": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "passed",
+                  "maxAbsoluteError",
+                  "firstFailure"
+                ],
+                "properties": {
+                  "passed": {
+                    "type": "boolean"
+                  },
+                  "maxAbsoluteError": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "firstFailure": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "receipt": {
+                "$ref": "#/$defs/receipt"
+              },
+              "outputPath": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "cold": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "wallMs",
+                "cpuMs",
+                "oracle",
+                "receipt",
+                "outputPath"
+              ],
+              "properties": {
+                "wallMs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "cpuMs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "oracle": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "passed",
+                    "maxAbsoluteError",
+                    "firstFailure"
+                  ],
+                  "properties": {
+                    "passed": {
+                      "type": "boolean"
+                    },
+                    "maxAbsoluteError": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "firstFailure": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "receipt": {
+                  "$ref": "#/$defs/receipt"
+                },
+                "outputPath": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preparationMs": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deviceStartupMs": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "adapter": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "vendor",
+                "architecture",
+                "device",
+                "description",
+                "isFallbackAdapter",
+                "vendorID",
+                "deviceID",
+                "driverVersion"
+              ],
+              "properties": {
+                "vendor": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "device": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "description": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "isFallbackAdapter": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "vendorID": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "deviceID": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "driverVersion": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerArtifact": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "path",
+                "hash"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "allocatedBufferBytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "peakProcessRssBytes": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lifecycle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cancellationRejected",
+                "reuseAfterCancellation"
+              ],
+              "properties": {
+                "cancellationRejected": {
+                  "type": "boolean"
+                },
+                "reuseAfterCancellation": {
+                  "type": "boolean"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "dispatchesEncoded",
+            "submissions",
+            "maps"
+          ],
+          "properties": {
+            "dispatchesEncoded": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "submissions": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maps": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "latencyStatsMs": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "count",
+                "mean",
+                "min",
+                "max",
+                "median",
+                "p95",
+                "p99"
+              ],
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "median": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cpuStatsMs": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "count",
+                "mean",
+                "min",
+                "max",
+                "median",
+                "p95",
+                "p99"
+              ],
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "median": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "programHash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "teardownMs": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "preparation": {
+          "anyOf": [
+            {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "title": "Compute program preparation resource accounting",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reusedResources",
+                "createdResources"
+              ],
+              "properties": {
+                "reusedResources": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "createdResources": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "measurementLimits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "inputPaths": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "fixturePath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "inputPath"
+            ]
+          },
+          "else": {
+            "required": [
+              "inputPaths",
+              "fixturePath"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "adapter": {},
+    "allocatedBufferBytes": {},
+    "application": {},
+    "backend": {},
+    "claimStatus": {},
+    "clearedBytes": {},
+    "cold": {},
+    "cpuStatsMs": {},
+    "deviceStartupMs": {},
+    "dispatchCount": {},
+    "error": {},
+    "execution": {},
+    "expectedPath": {},
+    "inputHashes": {},
+    "inputPath": {},
+    "kind": {},
+    "latencyStatsMs": {},
+    "lifecycle": {},
+    "measurementLimits": {},
+    "observed": {},
+    "outputHash": {},
+    "peakProcessRssBytes": {},
+    "phase": {},
+    "policyHash": {},
+    "preparation": {},
+    "preparationMs": {},
+    "programHash": {},
+    "programPath": {},
+    "provider": {},
+    "providerArtifact": {},
+    "readbackBytes": {},
+    "readbackPath": {},
+    "run": {},
+    "runtime": {},
+    "samples": {},
+    "schemaVersion": {},
+    "status": {},
+    "teardownMs": {},
+    "timingMs": {},
+    "uploadedBytes": {},
+    "inputPaths": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "fixturePath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

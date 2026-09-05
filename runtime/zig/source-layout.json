@@ -952,9 +952,9 @@
       },
       "src/backend/dropin_queue_submit.zig": {
         "decision": "Keep",
-        "moduleSha256": "a7bf3d2a7c2841e9087737c9fa98c5e972fe9d60a87108e0340b6d2ea296b7f5",
-        "reason": "Keep: reachable backend implementation shared by 10 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "5b55a113b36c798a71d6788229a058143eaa4303398ad5fa0b6ee35693b283c6",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/dropin_render_state.zig": {
         "decision": "Keep",
@@ -964,9 +964,9 @@
       },
       "src/backend/dropin_resource_ops.zig": {
         "decision": "Keep",
-        "moduleSha256": "d0ca51e19d8fa089155560f910d571ef54687cac65c9bbe7d33fa5572fefa6a0",
-        "reason": "Keep: reachable backend implementation shared by 14 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "5825dc6dd5cc696f0d1194f5a33cd7eb9502e56cad20495c0b213d05c5f4fede",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/dropin_surface_ops.zig": {
         "decision": "Keep",
@@ -1216,9 +1216,9 @@
       },
       "src/backend/vulkan/backend_execute.zig": {
         "decision": "Keep",
-        "moduleSha256": "9dfb871476c2b22ee12c45cc1cb83407eb3ced64c0c42875c40c26dfe17d14e5",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-hexagonal-migration/2026-08-22"
+        "moduleSha256": "30c51be60eee5a11df1a1b73897c80cf25a8b273875414c2823b737b0b05dc0c",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/mod.zig": {
         "decision": "Keep",
@@ -1228,9 +1228,9 @@
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "6f03b3f21f8c3c5dbe2cf08bff18237cb9c1974d2e746824733e21d038b61d2a",
-        "reason": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
-        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
+        "moduleSha256": "023cb1a10ebea63addd04defeeac907152a818c8f149c05df28872bad5d4fdc4",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_adapter_probe.zig": {
         "decision": "Keep",
@@ -1264,21 +1264,21 @@
       },
       "src/backend/vulkan/vk_compute_sync.zig": {
         "decision": "Keep",
-        "moduleSha256": "8fa7df3ee586379270ff15bdb54022d6048313e69870474f34ac03d0bcde5ef5",
-        "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
+        "moduleSha256": "e225bc095a0443f401651b99359a6dc6f32782dc0d05807687967af60f65ff2b",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_constants.zig": {
         "decision": "Keep",
-        "moduleSha256": "5bd0981093c3485ca1d7b4350bbf2f35c5c9bed02601fa54de086a4c0f159064",
-        "reason": "Keep: reachable backend implementation shared by 22 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
+        "moduleSha256": "6b8d5a13a36b9fbb48d7b9bbce929499be880b15c7d794fca0fe7942b14c2cc6",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_device.zig": {
         "decision": "Keep",
-        "moduleSha256": "756fd4a51fe347b360427783a6084b79e5d3ed1708bcfacc6246d7a150e0db4b",
-        "reason": "Keep: reachable backend implementation shared by 11 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-doe-wgsl-vulkan-capabilities/2026-09-01"
+        "moduleSha256": "d0412983703da11c6bc52b04ce38b57d6c466e5296d2d8d31edcd0138e225aeb",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_device_caps.zig": {
         "decision": "Keep",
@@ -1288,9 +1288,9 @@
       },
       "src/backend/vulkan/vk_dispatch_indirect.zig": {
         "decision": "Keep",
-        "moduleSha256": "dd55953ae80ba32080a0d19441b87a1da4a0a3b2bf666593a08584e018a06020",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
+        "moduleSha256": "8fdd969b3816f2853ac3a54849b01b83f28678ae33eb582ef413634169e428a4",
+        "reason": "Keep: indirect argument visibility precedes the shared conservative compute dependency; avoids duplicate shader barriers while preserving indirect-read synchronization.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_dispatch_repeat.zig": {
         "decision": "Keep",
@@ -1360,9 +1360,9 @@
       },
       "src/backend/vulkan/vk_resources.zig": {
         "decision": "Keep",
-        "moduleSha256": "cdb2818ef5b05966211cc6412979fdac8aec6010d413e56b9abc43413b4540e1",
-        "reason": "Keep: cohesive Vulkan resource allocation, lookup, and lifetime capsule used across backend command domains.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "88428b9016429b329abaed4170f8aba65eb7b164c84e85c07241ea918c8cec29",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vk_runtime_probe_ops.zig": {
         "decision": "Keep",
@@ -1414,9 +1414,9 @@
       },
       "src/backend/vulkan/vk_upload.zig": {
         "decision": "Keep",
-        "moduleSha256": "c64cbafc0d16edf78baae8de42a72df8d6c329a7453bc406fe3f2487c3c46fd4",
-        "reason": "Keep: cohesive Vulkan upload staging and submission policy with backend-native synchronization semantics.",
-        "reviewer": "codex-hexagonal-migration/2026-08-22"
+        "moduleSha256": "c33cb5eb3e84f4da4a04a8f03c16cdf91a9e21fdc8ff0a8aba16ccc8b56b743e",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/backend/vulkan/vulkan_errors.zig": {
         "decision": "Keep",
@@ -3520,9 +3520,9 @@
       },
       "src/native/compute/doe_compute_fast_vulkan.zig": {
         "decision": "Keep",
-        "moduleSha256": "850717feb79a2d40b1e1df6c6319c3591edc120cac32c685ceebdf83158cf3ac",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-doe-vulkan-correctness/2026-09-01"
+        "moduleSha256": "b31ccb53f1513093348045ce904c388e8ab4936d0482a212032e28898e1c10c4",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/compute/doe_compute_preconditions_native.zig": {
         "decision": "Keep",
@@ -3544,9 +3544,9 @@
       },
       "src/native/diagnostics/doe_program_identity_trace.zig": {
         "decision": "Keep",
-        "moduleSha256": "c3cc6ea8bbb0417eed44e56d534ae3ab4185c5b0d58422459e3ed44d13548d86",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "b72b907233b7da4c1ebf88fcdbb645c9bd01b3d250680b60cb361ccf23655c19",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/lifecycle/doe_canvas_event_native.zig": {
         "decision": "Keep",
@@ -3598,9 +3598,9 @@
       },
       "src/native/queue/doe_queue_submit_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "d28f564fabd00a9ced5685f35735b1a92b9e86212193dc9b092639653a8d44a4",
-        "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "10f3dc2fa4e148c88ff76aac752c0d7aee081da2668bde74e35c1c4ec4fd357c",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/queue/doe_queue_submit_shared.zig": {
         "decision": "Keep",
@@ -3610,9 +3610,9 @@
       },
       "src/native/queue/doe_queue_submit_vulkan.zig": {
         "decision": "Keep",
-        "moduleSha256": "6981c87f8b05693d2bed33c4a2c21a9fab30922a747b7d111285bcf29710eabb",
-        "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-runtime-identity/2026-08-16"
+        "moduleSha256": "8618736104d18c71b14ad3f7106559e80df7a8432abddc7b652a4cfd1ec2ade2",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/render/doe_bundle_native.zig": {
         "decision": "Keep",
@@ -3652,15 +3652,15 @@
       },
       "src/native/resource/doe_buffer_ops_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "7b4696462c0fa60f356c0e977668dee2fea3e1f7b9622705aa741ac59fb5fca4",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "589936a3b0e6d0e7691b6306eb807a86ecfd7c901144ed3e3e4de72831b1c762",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/resource/doe_command_texture_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "62446e52b94555ab20208d2e5fdac4ad066356f9b2c1701c43994329511dfbc4",
-        "reason": "Keep: reachable native implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "86f0373c4d342c5763f7fb980f9733b206e4b2f4188f6608252c5c514fc7dc0d",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/resource/doe_external_texture_native.zig": {
         "decision": "Keep",
@@ -3694,9 +3694,9 @@
       },
       "src/native/shader/doe_shader_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "797644dc65789325bfd5cc2980e4f942e3baed8aa91b733f76a4972d547f8474",
-        "reason": "Keep: native shader-module creation, translation, cache, diagnostics, and object-lifetime boundary.",
-        "reviewer": "codex-runtime-ownership/2026-08-15"
+        "moduleSha256": "38ff2360bd5174f71a2bf0e8a685236d275b8c3314cdcf0423199aba81a80669",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/shader/doe_shader_translation_cache.zig": {
         "decision": "Keep",
@@ -3742,9 +3742,9 @@
       },
       "src/native/support/doe_native_exports.zig": {
         "decision": "Keep",
-        "moduleSha256": "bb85415068b788197b10b5f8c8a3e8e8610a84fa946bd46e436b6ed3a3aa87ae",
-        "reason": "Keep: reachable native implementation shared by 5 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "2d3102905953b35d96208dafdffc087bf491aa372abd0791edcd6f151c5b1dc1",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/support/doe_native_object_helpers.zig": {
         "decision": "Keep",
@@ -3784,9 +3784,9 @@
       },
       "src/native/vulkan/vulkan_compute_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "6d2d67a19b5b1d643a5083bd5876be9f190d914c3d086bd2a8665197ad3b3208",
-        "reason": "Keep: native WebGPU-to-Vulkan compute command orchestration and lifetime boundary.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "a59d5a451405735381000b981f49e0524c8fa93ec0ebd4204134c296fd5feada",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       },
       "src/native/vulkan/vulkan_feature_cache.zig": {
         "decision": "Keep",
@@ -4213,6 +4213,24 @@
         "moduleSha256": "85953f9caefc24562aad0ad2b3b2ab3bdd6f27b1ffc8dbc11aa49b56b28a5597",
         "reason": "Keep: reachable verification implementation shared by 7 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/vulkan/vk_memory_policy.zig": {
+        "decision": "Keep",
+        "moduleSha256": "2ebf081a0b184820b763a328effb5dee77aa23da81e4cededafba7bf0fb3aa1f",
+        "reason": "Keep: deterministic Vulkan memory-type selection owns required flags, ranked preferences, explicit fallback, and selection tests.",
+        "reviewer": "codex-compute-program/2026-09-05"
+      },
+      "src/backend/vulkan/vk_compute_program.zig": {
+        "decision": "Keep",
+        "moduleSha256": "3ea960e69884b8b449b000fdd9ac60181bff91bf23f33ce43052358fe612673e",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
+      },
+      "src/native/compute/doe_compute_program_native.zig": {
+        "decision": "Keep",
+        "moduleSha256": "7301014603ca9753bd4dde410753e67e75640a84e5edde7afd28292a22393408",
+        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+        "reviewer": "codex-gpu-program/2026-09-05"
       }
     },
     "linePolicy": {

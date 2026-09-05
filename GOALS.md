@@ -5,13 +5,13 @@
 DoeRuntime is the primary product in the `doe/` repository: the owned WGSL
 compiler, GPU runtime, resources, synchronization, lifecycle, and native
 backends. DoeProof is its provider-neutral qualification and evidence feature,
-not a separate primary product. Fawn is a secondary browser product and
-potential distribution surface for DoeRuntime.
+not a separate primary product. Fawn is an experimental distribution surface
+for the same runtime, sequenced after demonstrated application wins.
 
-Doe makes local GPU execution explicit, controllable, reproducible, and
-reviewable. It accepts a declared workload and policy, executes through an
-identified provider and backend, validates the result, and retains evidence of
-what actually happened.
+Build the independent GPU compiler and runtime that makes useful computation
+easy to create, cheap to repeat, and portable across supported hardware.
+Doe makes GPU programs ordinary software: executable, inspectable, reusable,
+and reproducible without requiring their authors to become GPU systems engineers.
 
 ## Value
 
@@ -42,31 +42,37 @@ or application value.
 7. **Bounded expansion.** Extend into browsers, accelerators, and formal
    verification only through separately admitted workloads and evidence.
 
-## Immediate operating objective: independent customer proof
+## Immediate operating objective: safe reuse and application transfer
 
-Development serves one externally owned, unchanged, non-Doppler WebGPU
-application that voluntarily adopts DoeRuntime because a predeclared
-application outcome improves, then retains it across another release or workload.
-Begin with AMD/Vulkan unless a real customer supplies a stronger target; every
-other platform earns support separately.
+Run one execution-ownership program. Qualify the same retained package across
+controlled hosts, build declared DoePlan execution, qualify frozen external
+applications, turn failures into permanent corrections, and expand distribution
+only after transferred wins. The operating allocation and external portfolio
+bounds live in `config/doe-product-strategy.json`.
 
-Freeze the application, strongest incumbent, WGSL, input, independent oracle,
-hardware, driver, fallback policy, lifecycle gates, and material threshold.
-Measure I0, I1, W0, D0, and every credible eligible P0 under equivalent work.
-DoeProof qualifies both providers impartially; it cannot choose a favorable
-provider or alter execution. Preserve negative results. A paid qualification,
-receipt, internal benchmark, or Doppler integration is not runtime adoption.
-Stop expansion if applications need rewrites or the advantage does not survive
-independent repetition.
+Demonstrate explicitly declared, fixed-shape multistage computation in a
+non-Doppler scientific or image-processing application on AMD Vulkan, then
+reproduce the mechanism on Apple Metal and in another application. Freeze the
+independent numerical oracle, inputs, strongest persistent Dawn and wgpu
+controls, preparation accounting, memory, lifecycle, and material application
+outcome before optimization. A passing internal demonstration is not adoption.
 
-Fawn remains a separate evidence-gated product experiment. Its repository-owned
-work is a complete Linux release archive, isolated forced-Dawn and forced-Doe
-verification, one unchanged exact-oracle application, A/B/C/D execution, and K0
-execution through Cloudflare Browser Run plus Kitesurf. Unsupported K0 workloads
-remain explicit `ineligible` rows and never become synthetic Fawn wins. Fawn is
-promotable only when customers value local-private persistent workflows; DoeRuntime
-earns browser ownership only when C beats B; Direct Protocol survives only when D
-beats C.
+Compatibility through controlled Node, Bun, Electron, and native provider seams
+remains the entry point. An optional reusable-program interface may replace
+declared application orchestration. Provider substitution alone cannot remove
+arbitrary JavaScript that the application continues executing. Keep these
+integration modes separate in comparisons and adoption evidence.
+
+Earn externally owned voluntary adoption and retention after the mechanism
+transfers. Preserve I0, I1, W0, D0, and credible eligible P0 ownership controls;
+freeze and disclose any declared-program integration. DoeProof qualifies
+providers impartially. Preserve negative results and stop expansion when the
+advantage does not survive independent repetition.
+
+Browser construction, Flutter replacement, peer networks, distributed training,
+and universal accelerator support are outside the first demonstration. Fawn
+remains a separately gated possible distribution surface; its existing A/B/C/D
+and K0 laws do not become prerequisites for independent runtime progress.
 
 The independence test is binding: DoeRuntime must earn its first adoption
 without Doppler. DoeProof remains usable around the strongest eligible incumbent

@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { globals } from './webgpu-constants.js';
+import { registerNativeProgramProvider } from '../../compute-program-native.js';
 import {
   createDoeRuntime as createDoeRuntimeCli,
   runDawnVsDoeCompare as runDawnVsDoeCompareCli,
@@ -1130,7 +1131,7 @@ function writeBufferHostShadow(buffer, offset, view) {
     return false;
   }
   shadow.set(bytes, offset);
-  buffer._hostShadowValid = true;
+  buffer._hostShadowValid = buffer._hostShadowValid || (offset === 0 && bytes.byteLength === buffer.size);
   return true;
 }
 
@@ -1151,14 +1152,32 @@ function invalidateBufferHostShadowByNative(native) {
   }
 }
 
-function invalidateBindGroupHostShadows(bindGroup) {
+const encodedBufferWrites = new WeakMap();
+const recordedBufferWrites = new WeakMap();
+
+function recordBufferWrite(encoder, native) {
+  let writes = encodedBufferWrites.get(encoder);
+  if (!writes) { writes = new Set(); encodedBufferWrites.set(encoder, writes); }
+  writes.add(native);
+  invalidateBufferHostShadowByNative(native);
+}
+
+function invalidateSubmittedBufferWrites(commandBuffer) {
+  for (const native of recordedBufferWrites.get(commandBuffer._native) ?? []) {
+    invalidateBufferHostShadowByNative(native);
+  }
+  invalidateLazyDispatchCommandBufferShadows(commandBuffer._commands);
+}
+
+function invalidateBindGroupHostShadows(bindGroup, encoder = null) {
   const entries = bindGroup == null ? null : nodeBindGroupEntries.get(bindGroup);
   if (!Array.isArray(entries)) {
     return;
   }
   for (const entry of entries) {
     if (entry?.buffer != null) {
-      invalidateBufferHostShadowByNative(entry.buffer);
+      if (encoder) recordBufferWrite(encoder, entry.buffer);
+      else invalidateBufferHostShadowByNative(entry.buffer);
     }
     if (entry?.textureView != null) {
       const viewInfo = nodeTextureViewDescriptors.get(entry.textureView);
@@ -1171,16 +1190,12 @@ function invalidateBindGroupHostShadows(bindGroup) {
 
 function invalidateComputePassHostShadows(pass) {
   for (const bindGroup of pass._bindGroups) {
-    invalidateBindGroupHostShadows(bindGroup);
+    invalidateBindGroupHostShadows(bindGroup, pass._encoder);
   }
 }
 
 function invalidateLazyDispatchCommandBufferShadows(commands) {
   if (!Array.isArray(commands)) {
-    return;
-  }
-  const hasDispatch = commands.some(command => command?.t === 0);
-  if (!hasDispatch) {
     return;
   }
   for (const cmd of commands) {
@@ -1194,20 +1209,6 @@ function invalidateLazyDispatchCommandBufferShadows(commands) {
     const bindGroup = bindGroupForLazyCommand(cmd);
     invalidateBindGroupHostShadows(bindGroup);
   }
-}
-
-function copyBufferHostShadow(srcNative, srcOffset, dstNative, dstOffset, size) {
-  const src = bufferWrapperForNative(srcNative);
-  const dst = bufferWrapperForNative(dstNative);
-  if (dst == null) {
-    return;
-  }
-  const srcView = src == null ? null : bufferHostShadowView(src, srcOffset, size);
-  if (srcView == null) {
-    dst._hostShadowValid = false;
-    return;
-  }
-  writeBufferHostShadow(dst, dstOffset, srcView);
 }
 
 function lazyCopyBufferValidationMessage(srcNative, srcOffset, dstNative, dstOffset, size) {
@@ -2450,14 +2451,14 @@ const nodeEncoderBackend = {
         return;
       }
       encoder._commands.push({ t: 1, s: srcNative, so: srcOffset, d: dstNative, do: dstOffset, sz: size });
-      copyBufferHostShadow(srcNative, srcOffset, dstNative, dstOffset, size);
+      recordBufferWrite(encoder, dstNative);
       return;
     }
     if (validationMessage) {
       failValidation('GPUCommandEncoder.copyBufferToBuffer', validationMessage);
     }
     addon.commandEncoderCopyBufferToBuffer(encoder._native, srcNative, srcOffset, dstNative, dstOffset, size);
-    copyBufferHostShadow(srcNative, srcOffset, dstNative, dstOffset, size);
+    recordBufferWrite(encoder, dstNative);
   },
   commandEncoderWriteTimestamp(encoder, querySetNative, queryIndex) {
     ensureNodeCommandEncoderNative(encoder);
@@ -2508,6 +2509,7 @@ const nodeEncoderBackend = {
     );
   },
   commandEncoderClearBuffer(encoder, bufferNative, offset, size) {
+    recordBufferWrite(encoder, bufferNative);
     ensureNodeCommandEncoderNative(encoder);
     addon.commandEncoderClearBuffer(
       encoder._native,
@@ -2576,6 +2578,7 @@ const nodeEncoderBackend = {
       return { _commands: commands, _batched: true };
     }
     const cmd = addon.commandEncoderFinish(encoder._native);
+    if (encodedBufferWrites.has(encoder)) recordedBufferWrites.set(cmd, encodedBufferWrites.get(encoder));
     encoder._native = null;
     return { _native: cmd, _batched: false };
   },
@@ -2841,6 +2844,7 @@ const fullSurfaceBackend = {
     providerDiagnosticStats.queueSubmitCalls += 1;
     providerDiagnosticStats.submittedCommandBuffers += buffers.length;
     for (const commandBuffer of buffers) {
+      invalidateSubmittedBufferWrites(commandBuffer);
       if (commandBuffer?._batched && Array.isArray(commandBuffer._commands)) {
         providerDiagnosticStats.submittedBatchedCommands += commandBuffer._commands.length;
       }
@@ -3581,6 +3585,40 @@ const fullSurfaceBackend = {
     device._adapter = adapter;
     device._adapterInfo = adapter.info;
     installNodeDeviceCallbacks(device);
+    registerNativeProgramProvider(device, {
+      contractVersion: addon.nativeComputeProgramContractVersion?.() ?? 0,
+      gpuRecorded: addon.computeProgramSupported?.() ?? false,
+      isLost: () => device._destroyed || device._lostInfo !== null,
+      prepare(commandBuffer, execution = 'native-recorded') {
+        if (commandBuffer._native == null || commandBuffer._batched) {
+          commandBuffer.destroy();
+          throw new Error('DOE_PROGRAM_UNSUPPORTED: program requires a native command recording');
+        }
+        let gpuProgram = null;
+        try {
+          if (execution === 'gpu-recorded') gpuProgram = addon.computeProgramPrepare(device.queue._native, commandBuffer._native);
+        } catch (error) {
+          commandBuffer.destroy();
+          throw error;
+        }
+        return {
+          submit() {
+            assertLiveResource(device, 'compute program submit', 'GPUDevice');
+            assertLiveResource(commandBuffer, 'compute program submit', 'GPUCommandBuffer');
+            invalidateSubmittedBufferWrites(commandBuffer);
+            device.queue._submittedSerial += 1;
+            providerDiagnosticStats.queueSubmitCalls += 1;
+            providerDiagnosticStats.submittedCommandBuffers += 1;
+            if (gpuProgram) addon.computeProgramSubmit(gpuProgram);
+            else addon.queueSubmitOne(device.queue._native, commandBuffer._native);
+          },
+          destroy() {
+            if (gpuProgram) { addon.computeProgramRelease(gpuProgram); gpuProgram = null; }
+            commandBuffer.destroy();
+          },
+        };
+      },
+    });
     return device;
   },
   adapterDestroy(native) {

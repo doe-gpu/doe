@@ -44,6 +44,10 @@
       "types": "./src/plan.d.ts",
       "default": "./src/plan.js"
     },
+    "./compute-program": {
+      "types": "./src/compute-program.d.ts",
+      "default": "./src/compute-program.js"
+    },
     "./capture": {
       "types": "./src/capture.d.ts",
       "default": "./src/capture.js"

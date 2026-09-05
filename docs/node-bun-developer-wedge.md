@@ -23,6 +23,11 @@ and `reports/claim-index.json`; Electron requires its own promoted evidence.
 
 ## First-kernel contract
 
+After provider compatibility, applications may opt into
+[`doe-gpu/compute-program`](reusable-compute-programs.md) for declared repeated
+work. It has separate preparation, invalidation, and invocation contracts.
+Provider substitution alone cannot eliminate application JavaScript orchestration.
+
 ```bash
 npm install doe-gpu
 node node_modules/doe-gpu/examples/node-first-kernel.mjs

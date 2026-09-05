@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Same retained package qualification across controlled hosts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "status",
+    "error",
+    "packages",
+    "artifacts",
+    "hosts",
+    "lifecycleCycles",
+    "timeoutMs",
+    "claimStatus",
+    "installation",
+    "limits"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "compute_program_package_qualification"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "passed",
+        "failed"
+      ]
+    },
+    "error": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "hash"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "hash"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "hosts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "host",
+          "executable",
+          "executableHash",
+          "libraryHash",
+          "status"
+        ],
+        "properties": {
+          "host": {
+            "enum": [
+              "node",
+              "bun",
+              "electron"
+            ]
+          },
+          "executable": {
+            "type": "string",
+            "minLength": 1
+          },
+          "executableHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "libraryHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "status": {
+            "const": "passed"
+          }
+        }
+      }
+    },
+    "lifecycleCycles": {
+      "type": "integer",
+      "minimum": 3
+    },
+    "timeoutMs": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "claimStatus": {
+      "const": "diagnostic"
+    },
+    "installation": {
+      "const": "retained-local-tarballs-with-install-scripts"
+    },
+    "limits": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    }
+  }
+}

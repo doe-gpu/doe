@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Compute program preparation resource accounting",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reusedResources",
+    "createdResources"
+  ],
+  "properties": {
+    "reusedResources": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "createdResources": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

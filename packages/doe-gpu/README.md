@@ -1,5 +1,23 @@
 # doe-gpu
 
+For explicitly declared repeated buffer compute, import
+`prepareComputeProgram` from `doe-gpu/compute-program`. Supply a device, the
+shipped `assets/compute-program.schema.json` declaration, and an explicit
+execution mode (`gpu-recorded`, `native-recorded`, or `webgpu`). The program retains private
+buffers, shaders, pipelines, and bindings; every run snapshots exact-size
+inputs and clears scratch/output state. `update()` reuses identical resources
+and invalidates the prior recording only after replacement preparation succeeds.
+Always `await program.close()` before releasing its device.
+
+The recorded modes use the Node addon provider exported by `doe-gpu/native`,
+including Bun's Node addon support. `gpu-recorded` retains compiled Vulkan
+commands and their native pipeline/descriptor ownership. `native-recorded`
+replays host commands in Zig. Unsupported GPU recording fails explicitly.
+The standard WebGPU mode
+is an explicit persistent-resource control. See `examples/compute-program.js`
+and `examples/compute-programs.js` for grayscale image processing and heat
+diffusion. This additive API does not establish an application speed claim.
+
 `doe-gpu` is the public JavaScript package for Doe's native WebGPU runtime.
 Support is limited to the runtime, operating-system, architecture, backend,
 and workload tuples declared in the Doe support matrix.

@@ -584,9 +584,8 @@ pub const NativeVulkanRuntime = struct {
         if (x == 0 or y == 0 or z == 0) return error.InvalidArgument;
         if (!self.has_pipeline) return error.Unsupported;
         if (command_buffer == null) return error.InvalidState;
-        vk_compute_sync.make_replay_compute_writes_visible(command_buffer);
+        vk_compute_sync.make_replay_compute_writes_visible(self, command_buffer);
         vk_compute_sync.make_prior_transfer_writes_visible(self, command_buffer);
-        vk_compute_sync.make_prior_compute_writes_visible_for_current_bindings(self, command_buffer);
         vk_pipeline.bind_compute_pipeline_if_needed(self, command_buffer);
         vk_pipeline.bind_descriptor_sets_if_needed(self, command_buffer);
         c.vkCmdDispatch(command_buffer, x, y, z);
@@ -768,11 +767,11 @@ pub const NativeVulkanRuntime = struct {
         try c.check_vk(c.vkBeginCommandBuffer(self.primary_command_buffer, &begin_info));
 
         const dst_access_mask: u32 = switch (memory_kind) {
-            .host_visible => c.VK_ACCESS_HOST_READ_BIT,
+            .host_visible, .readback => c.VK_ACCESS_HOST_READ_BIT,
             .device_local => c.VK_ACCESS_TRANSFER_READ_BIT,
         };
         const dst_stage_mask: u32 = switch (memory_kind) {
-            .host_visible => c.VK_PIPELINE_STAGE_HOST_BIT,
+            .host_visible, .readback => c.VK_PIPELINE_STAGE_HOST_BIT,
             .device_local => c.VK_PIPELINE_STAGE_TRANSFER_BIT,
         };
         const visibility_barrier = c.VkMemoryBarrier{

@@ -121,7 +121,7 @@ fn execute_buffer_write_bytes(self: anytype, setup_ns: u64, handle: u64, offset:
 
     const write_ns = common_timing.ns_delta(common_timing.now_ns(), write_start);
     const status_message = switch (compute_buffer.memory_kind) {
-        .host_visible => "buffer seeded via host-visible memcpy",
+        .host_visible, .readback => "buffer seeded via host-visible memcpy",
         .device_local => "buffer uploaded via staged copy",
     };
 

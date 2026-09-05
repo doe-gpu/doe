@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import statistics
 from typing import Any
 
@@ -46,7 +47,9 @@ def valid_sync_mode(value: Any) -> bool:
     return isinstance(value, str) and value in {"per-command", "deferred"}
 
 
-def format_stats(values: list[float]) -> dict[str, float]:
+def format_stats(values: list[float], *, percentile_method: str = "lower-index") -> dict[str, float]:
+    if percentile_method not in ("lower-index", "nearest-rank"):
+        raise ValueError(f"Unknown percentile method: {percentile_method}")
     if not values:
         return {
             "count": 0,
@@ -65,7 +68,8 @@ def format_stats(values: list[float]) -> dict[str, float]:
     def percentile(p: float) -> float:
         if not sorted_values:
             return 0.0
-        index = int((len(sorted_values) - 1) * p)
+        index = (max(0, math.ceil(len(sorted_values) * p) - 1) if percentile_method == "nearest-rank"
+                 else int((len(sorted_values) - 1) * p))
         return sorted_values[index]
 
     return {

@@ -24,6 +24,7 @@ const sourceFiles = [
   'doe_napi_formats.c',
   'doe_napi_render.c',
   'doe_napi_caps.c',
+  'doe_napi_program.c',
   'doe_napi_nd_infra.c',
   'doe_napi_nd_stubs.c',
   'doe_napi_nd_immediates.c',

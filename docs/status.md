@@ -6,6 +6,7 @@ verdicts. Historical narrative lives under [`status/archive/`](status/archive/).
 | Area | Live status | Ground truth |
 | --- | --- | --- |
 | Runtime and benchmarks | [`status/runtime-backends-and-bench.md`](status/runtime-backends-and-bench.md) | `reports/claim-index.json`, `bench/out/` |
+| Execution ownership and reusable programs | [`status/reusable-compute-programs.md`](status/reusable-compute-programs.md) | `config/doe-product-strategy.json`, `bench/out/compute-program/` |
 | Runtime architecture | [`status/runtime-architecture-audit.md`](status/runtime-architecture-audit.md) | `runtime/zig/source-layout.json`, import-fence and source-layout gates |
 | Compiler and WebGPU | [`status/compiler-and-webgpu.md`](status/compiler-and-webgpu.md) | `zig build test-wgsl`, schema-registered evidence |
 | TSIR | [`status/tsir.md`](status/tsir.md) | `reports/parity/`, manifest lowering entries |

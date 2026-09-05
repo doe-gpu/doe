@@ -3,9 +3,24 @@
   "$id": "doe://config/native-program-identity-trace-row.schema.json",
   "title": "Doe native program identity trace row",
   "oneOf": [
-    { "$ref": "#/$defs/Dispatch" },
-    { "$ref": "#/$defs/RenderDraw" },
-    { "$ref": "#/$defs/Submission" }
+    {
+      "$ref": "#/$defs/Dispatch"
+    },
+    {
+      "$ref": "#/$defs/RenderDraw"
+    },
+    {
+      "$ref": "#/$defs/Submission"
+    },
+    {
+      "$ref": "#/$defs/ComputeProgramPrepared"
+    },
+    {
+      "$ref": "#/$defs/ComputeProgramSubmitted"
+    },
+    {
+      "$ref": "#/$defs/NativeObject"
+    }
   ],
   "$defs": {
     "Hash": {
@@ -23,23 +38,39 @@
         "backend"
       ],
       "properties": {
-        "schemaVersion": { "const": 1 },
-        "traceKind": { "const": "doe_native_program_identity_v1" },
+        "schemaVersion": {
+          "const": 1
+        },
+        "traceKind": {
+          "const": "doe_native_program_identity_v1"
+        },
         "event": {
           "enum": [
             "dispatch_encoded",
             "render_draw_executed",
-            "submission_succeeded"
+            "submission_succeeded",
+            "compute_program_prepared",
+            "compute_program_submitted"
           ]
         },
-        "processId": { "type": "integer", "minimum": 1 },
-        "sequence": { "type": "integer", "minimum": 1 },
-        "backend": { "const": "doe_vulkan" }
+        "processId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "backend": {
+          "const": "doe_vulkan"
+        }
       }
     },
     "Dispatch": {
       "allOf": [
-        { "$ref": "#/$defs/Common" },
+        {
+          "$ref": "#/$defs/Common"
+        },
         {
           "type": "object",
           "additionalProperties": false,
@@ -58,38 +89,85 @@
             "repeatIndex"
           ],
           "properties": {
-            "schemaVersion": { "const": 1 },
-            "traceKind": { "const": "doe_native_program_identity_v1" },
-            "event": { "const": "dispatch_encoded" },
-            "processId": { "type": "integer", "minimum": 1 },
-            "sequence": { "type": "integer", "minimum": 1 },
-            "backend": { "const": "doe_vulkan" },
-            "wgslSha256": { "$ref": "#/$defs/Hash" },
-            "backendArtifactSha256": { "$ref": "#/$defs/Hash" },
+            "schemaVersion": {
+              "const": 1
+            },
+            "traceKind": {
+              "const": "doe_native_program_identity_v1"
+            },
+            "event": {
+              "const": "dispatch_encoded"
+            },
+            "processId": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "backend": {
+              "const": "doe_vulkan"
+            },
+            "wgslSha256": {
+              "$ref": "#/$defs/Hash"
+            },
+            "backendArtifactSha256": {
+              "$ref": "#/$defs/Hash"
+            },
             "backendArtifactFile": {
               "type": "string",
               "pattern": "^doe-native-vulkan-[a-f0-9]{64}\\.spv$"
             },
-            "entryPoint": { "type": "string", "minLength": 1 },
+            "entryPoint": {
+              "type": "string",
+              "minLength": 1
+            },
             "workgroups": {
               "type": "array",
               "prefixItems": [
-                { "type": "integer", "minimum": 1 },
-                { "type": "integer", "minimum": 1 },
-                { "type": "integer", "minimum": 1 }
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "integer",
+                  "minimum": 1
+                }
               ],
               "items": false,
               "minItems": 3,
               "maxItems": 3
             },
-            "repeatIndex": { "type": "integer", "minimum": 0 }
+            "repeatIndex": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "descriptorHash": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "bindingCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "bindingResourceHash": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         }
       ]
     },
     "RenderDraw": {
       "allOf": [
-        { "$ref": "#/$defs/Common" },
+        {
+          "$ref": "#/$defs/Common"
+        },
         {
           "type": "object",
           "additionalProperties": false,
@@ -112,35 +190,79 @@
             "args"
           ],
           "properties": {
-            "schemaVersion": { "const": 1 },
-            "traceKind": { "const": "doe_native_program_identity_v1" },
-            "event": { "const": "render_draw_executed" },
-            "processId": { "type": "integer", "minimum": 1 },
-            "sequence": { "type": "integer", "minimum": 1 },
-            "backend": { "const": "doe_vulkan" },
-            "completion": { "const": "internal_submit_and_wait_succeeded" },
-            "vertexWgslSha256": { "$ref": "#/$defs/Hash" },
-            "fragmentWgslSha256": { "$ref": "#/$defs/Hash" },
-            "vertexBackendArtifactSha256": { "$ref": "#/$defs/Hash" },
+            "schemaVersion": {
+              "const": 1
+            },
+            "traceKind": {
+              "const": "doe_native_program_identity_v1"
+            },
+            "event": {
+              "const": "render_draw_executed"
+            },
+            "processId": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "backend": {
+              "const": "doe_vulkan"
+            },
+            "completion": {
+              "const": "internal_submit_and_wait_succeeded"
+            },
+            "vertexWgslSha256": {
+              "$ref": "#/$defs/Hash"
+            },
+            "fragmentWgslSha256": {
+              "$ref": "#/$defs/Hash"
+            },
+            "vertexBackendArtifactSha256": {
+              "$ref": "#/$defs/Hash"
+            },
             "vertexBackendArtifactFile": {
               "type": "string",
               "pattern": "^doe-native-vulkan-[a-f0-9]{64}\\.spv$"
             },
-            "fragmentBackendArtifactSha256": { "$ref": "#/$defs/Hash" },
+            "fragmentBackendArtifactSha256": {
+              "$ref": "#/$defs/Hash"
+            },
             "fragmentBackendArtifactFile": {
               "type": "string",
               "pattern": "^doe-native-vulkan-[a-f0-9]{64}\\.spv$"
             },
-            "vertexEntryPoint": { "type": "string", "minLength": 1 },
-            "fragmentEntryPoint": { "type": "string", "minLength": 1 },
-            "drawKind": { "const": "draw" },
+            "vertexEntryPoint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fragmentEntryPoint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "drawKind": {
+              "const": "draw"
+            },
             "args": {
               "type": "array",
               "prefixItems": [
-                { "type": "integer", "minimum": 0 },
-                { "type": "integer", "minimum": 0 },
-                { "type": "integer", "minimum": 0 },
-                { "type": "integer", "minimum": 0 }
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0
+                }
               ],
               "items": false,
               "minItems": 4,
@@ -152,7 +274,9 @@
     },
     "Submission": {
       "allOf": [
-        { "$ref": "#/$defs/Common" },
+        {
+          "$ref": "#/$defs/Common"
+        },
         {
           "type": "object",
           "additionalProperties": false,
@@ -165,15 +289,171 @@
             "backend"
           ],
           "properties": {
-            "schemaVersion": { "const": 1 },
-            "traceKind": { "const": "doe_native_program_identity_v1" },
-            "event": { "const": "submission_succeeded" },
-            "processId": { "type": "integer", "minimum": 1 },
-            "sequence": { "type": "integer", "minimum": 1 },
-            "backend": { "const": "doe_vulkan" }
+            "schemaVersion": {
+              "const": 1
+            },
+            "traceKind": {
+              "const": "doe_native_program_identity_v1"
+            },
+            "event": {
+              "const": "submission_succeeded"
+            },
+            "processId": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "backend": {
+              "const": "doe_vulkan"
+            }
           }
         }
       ]
+    },
+    "ComputeProgramPrepared": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "traceKind",
+        "event",
+        "processId",
+        "sequence",
+        "backend",
+        "programId",
+        "dispatchCount",
+        "submissionIndex"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "traceKind": {
+          "const": "doe_native_program_identity_v1"
+        },
+        "event": {
+          "const": "compute_program_prepared"
+        },
+        "processId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "backend": {
+          "const": "doe_vulkan"
+        },
+        "programId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "submissionIndex": {
+          "const": 0
+        }
+      }
+    },
+    "ComputeProgramSubmitted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "traceKind",
+        "event",
+        "processId",
+        "sequence",
+        "backend",
+        "programId",
+        "dispatchCount",
+        "submissionIndex"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "traceKind": {
+          "const": "doe_native_program_identity_v1"
+        },
+        "event": {
+          "const": "compute_program_submitted"
+        },
+        "processId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "backend": {
+          "const": "doe_vulkan"
+        },
+        "programId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "submissionIndex": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "NativeObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "traceKind",
+        "event",
+        "processId",
+        "sequence",
+        "objectType",
+        "objectSize",
+        "objectAddress"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "traceKind": {
+          "const": "doe_native_program_identity_v1"
+        },
+        "event": {
+          "const": "native_object_created"
+        },
+        "processId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "objectType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objectSize": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "objectAddress": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
     }
   }
 }

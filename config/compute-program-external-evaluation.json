@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 3,
+  "width": 256,
+  "height": 256,
+  "heatIterations": 32,
+  "warmupRuns": 5,
+  "timedRuns": 32,
+  "processRuns": 3,
+  "absoluteTolerance": 1e-05,
+  "relativeTolerance": 1e-05,
+  "interactiveDeadlineMs": 16.666667,
+  "minimumCpuReductionRatio": 1.2,
+  "denoVersion": "2.9.6",
+  "applications": [
+    "image_edges",
+    "heat_diffusion",
+    "holoscript_lif"
+  ],
+  "providers": [
+    "doe-recorded",
+    "doe-webgpu",
+    "dawn",
+    "wgpu"
+  ],
+  "claimStatus": "diagnostic",
+  "processTimeoutMs": 120000,
+  "preparedExecution": "gpu-recorded",
+  "percentileMethod": "nearest-rank",
+  "fixtures": {
+    "holoscript_lif": {
+      "path": "bench/out/compute-program/20260905-holoscript-lif-final-fixture/fixture.json",
+      "hash": "6ff6a64583720ce2ccc7bb35be728ad2ba2a92c19a9bb140cb9159e3323c2e98"
+    }
+  }
+}

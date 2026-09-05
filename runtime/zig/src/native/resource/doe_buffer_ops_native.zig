@@ -126,7 +126,11 @@ pub export fn doeNativeDeviceCreateBuffer(dev_raw: ?*anyopaque, desc: ?*const ab
             // zero. Leaving Vulkan allocations uninitialized makes partially
             // written tensors depend on allocator history and diagnostic buffer
             // creation order.
-            const cb = vk_resources.create_compute_buffer(rt, d.size, true) catch {
+            const created = if ((d.usage & abi_core.WGPUBufferUsage_MapRead) != 0)
+                vk_resources.create_readback_buffer(rt, d.size, true)
+            else
+                vk_resources.create_compute_buffer(rt, d.size, true);
+            const cb = created catch {
                 alloc.destroy(buf);
                 return null;
             };

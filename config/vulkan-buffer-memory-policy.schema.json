@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Vulkan readback memory selection policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "readbackRequiredProperties",
+    "readbackPreferredProperties",
+    "unavailablePreference"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "readbackRequiredProperties": {
+      "const": [
+        "host-visible",
+        "host-coherent"
+      ]
+    },
+    "readbackPreferredProperties": {
+      "const": [
+        "host-cached"
+      ]
+    },
+    "unavailablePreference": {
+      "const": "use-required-properties"
+    }
+  }
+}

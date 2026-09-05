@@ -59,104 +59,9 @@ pub fn make_prior_transfer_writes_visible_for_indirect_dispatch(self: anytype, c
     self.has_pending_transfer_writes = false;
 }
 
-pub fn make_prior_transfer_writes_visible_for_transfer_read(self: anytype, command_buffer: c.VkCommandBuffer) void {
-    if (!self.has_pending_transfer_writes) return;
-    const barrier = c.VkMemoryBarrier{
-        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
-        .pNext = null,
-        .srcAccessMask = c.VK_ACCESS_TRANSFER_WRITE_BIT,
-        .dstAccessMask = c.VK_ACCESS_TRANSFER_READ_BIT,
-    };
-    c.vkCmdPipelineBarrier(
-        command_buffer,
-        c.VK_PIPELINE_STAGE_TRANSFER_BIT,
-        c.VK_PIPELINE_STAGE_TRANSFER_BIT,
-        0,
-        1,
-        @ptrCast(&barrier),
-        0,
-        null,
-        0,
-        null,
-    );
-    self.has_pending_transfer_writes = false;
-}
-
 pub fn make_prior_compute_writes_visible(self: anytype, command_buffer: c.VkCommandBuffer) void {
     if (!self.has_pending_compute_writes) return;
     emit_compute_write_visibility_barrier(self, command_buffer);
-}
-
-pub fn make_prior_compute_writes_visible_for_transfer_read(self: anytype, command_buffer: c.VkCommandBuffer) void {
-    const barrier = c.VkMemoryBarrier{
-        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
-        .pNext = null,
-        .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT,
-        .dstAccessMask = c.VK_ACCESS_TRANSFER_READ_BIT,
-    };
-    c.vkCmdPipelineBarrier(
-        command_buffer,
-        c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        c.VK_PIPELINE_STAGE_TRANSFER_BIT,
-        0,
-        1,
-        @ptrCast(&barrier),
-        0,
-        null,
-        0,
-        null,
-    );
-    clear_pending_compute_writes(self);
-}
-
-pub fn make_prior_compute_writes_visible_for_buffer_copy(
-    self: anytype,
-    command_buffer: c.VkCommandBuffer,
-    src_handle: u64,
-    src_buffer: c.VkBuffer,
-    dst_handle: u64,
-    dst_buffer: c.VkBuffer,
-) void {
-    if (!self.has_pending_compute_writes) return;
-    if (!self.pending_compute_write_tracking_complete or self.pending_compute_write_buffer_count == 0) {
-        make_prior_compute_writes_visible_for_transfer_read(self, command_buffer);
-        return;
-    }
-
-    var barriers = [_]c.VkBufferMemoryBarrier{
-        buffer_memory_barrier(src_buffer, c.VK_ACCESS_TRANSFER_READ_BIT),
-        buffer_memory_barrier(dst_buffer, c.VK_ACCESS_TRANSFER_WRITE_BIT),
-    };
-    var barrier_count: u32 = 0;
-    if (src_handle != 0 and pending_compute_write_buffer_contains(self, src_handle)) {
-        barrier_count = 1;
-    }
-    if (dst_handle != 0 and pending_compute_write_buffer_contains(self, dst_handle)) {
-        if (barrier_count == 1 and src_handle == dst_handle) {
-            barriers[0].dstAccessMask |= c.VK_ACCESS_TRANSFER_WRITE_BIT;
-        } else {
-            barriers[barrier_count] = buffer_memory_barrier(dst_buffer, c.VK_ACCESS_TRANSFER_WRITE_BIT);
-            barrier_count += 1;
-        }
-    }
-    if (barrier_count == 0) return;
-
-    c.vkCmdPipelineBarrier(
-        command_buffer,
-        c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        c.VK_PIPELINE_STAGE_TRANSFER_BIT,
-        0,
-        0,
-        null,
-        barrier_count,
-        @ptrCast(&barriers),
-        0,
-        null,
-    );
-
-    if (src_handle != 0) remove_pending_compute_write_buffer(self, src_handle);
-    if (dst_handle != 0 and dst_handle != src_handle) remove_pending_compute_write_buffer(self, dst_handle);
-    self.has_pending_compute_writes = self.pending_compute_write_buffer_count != 0;
 }
 
 pub fn make_prior_compute_writes_visible_for_indirect_read(
@@ -284,28 +189,11 @@ pub fn make_prior_compute_writes_visible_for_current_bindings(
     }
 }
 
-pub fn make_replay_compute_writes_visible(command_buffer: c.VkCommandBuffer) void {
+pub fn make_replay_compute_writes_visible(self: anytype, command_buffer: c.VkCommandBuffer) void {
     // Replay submissions can outlive the WebGPU resources tracked above. A later
     // resource may reuse the same Vulkan allocation under a different handle, so
     // handle-intersection alone cannot prove that the memory is independent.
-    const barrier = c.VkMemoryBarrier{
-        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
-        .pNext = null,
-        .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT,
-        .dstAccessMask = c.VK_ACCESS_SHADER_READ_BIT | c.VK_ACCESS_SHADER_WRITE_BIT,
-    };
-    c.vkCmdPipelineBarrier(
-        command_buffer,
-        c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        0,
-        1,
-        @ptrCast(&barrier),
-        0,
-        null,
-        0,
-        null,
-    );
+    emit_compute_write_visibility_barrier(self, command_buffer);
 }
 
 pub fn remember_current_compute_writes(self: anytype) void {

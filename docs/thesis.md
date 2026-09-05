@@ -1,505 +1,186 @@
-# Doe strategy
+# Doe strategy: make GPU programs ordinary software
 
-This is Doe's single product-strategy document. It owns the product objective,
-priority order, adoption wedge, downstream-application flywheel, commercial
-journey, and expansion boundaries. Supporting documents define implementation
-contracts and evidence formats; they do not define a separate strategy.
+Build the independent GPU compiler and runtime that makes useful computation
+easy to create, cheap to repeat, and portable across supported hardware.
 
-## Strategic framework
+Agents and human developers should be able to create a simulation or image
+analysis, accelerate it, inspect failures, and publish the working computation
+without becoming GPU systems engineers. DoeRuntime supplies execution. DoeProof
+supplies impartial evaluation. Neither Doppler adoption nor a new browser is a
+prerequisite. This document owns strategy; component charters constrain
+implementation and artifacts establish current results.
 
-> **Fawn distributes. DoeRuntime executes. DoeLab learns. DoeProof records and governs the evidence.**
+Run this as one execution-ownership program. First qualify the same retained
+`doe-gpu` artifact in Node, Bun, and Electron, with explicit provider selection,
+shader and output identity, physical adapter and driver identity, fallback state,
+and lifecycle. Native embedding uses the same runtime and earns its own host
+evidence. Next grow declared DoePlan execution, then qualify frozen external
+applications, promote transferable corrections, and expand embedding channels
+only after application wins. Resource allocation and portfolio bounds live in
+[`doe-product-strategy.json`](../config/doe-product-strategy.json).
 
-Doe is a vertically integrated agent-compute company built from internally
-decoupled, contract-governed subsystems:
+## Own the executable program
 
-```text
-DoeRuntime application adoption and optional Fawn distribution
-            ↓
-real applications, shaders, traces, failures
-            ↓
-DoeLab differential testing and minimization
-            ↓
-candidate compiler/runtime optimizations
-            ↓
-physical-device evaluation and promotion
-            ↓
-better DoeRuntime releases with DoeProof qualification
-            ↓
-more adoption
-```
+The proposed primitive is a reusable GPU program: shaders, dependencies,
+resource requirements, permitted input variations, and executable plans.
+Optimize allocations, pipeline preparation, transfers, command construction,
+synchronization, and repeated submission as well as kernels. Retain useful
+state and rebuild only affected assumptions.
 
-The long-term advantage is not that Doe independently replaces every incumbent
-runtime; it is that Doe integrates the browser distribution seam, compiler,
-runtime, local compute, workload corpus, and improvement loop more tightly than
-projects owning only a single layer.
+Safe reuse is the central invention to earn. Shape, binding, shader, driver, or
+device changes must invalidate affected state. Removing a check without proving
+its precondition is a correctness bug. Begin with explicitly declared fixed-shape
+compute, retain deterministic Zig guards, and eliminate work through Lean only
+when current proof artifacts discharge the actual preconditions. Keep ordinary
+execution available where reuse is unsuitable.
 
-## Ideal customer profiles and product sequence
+The WGSL compiler, native backends, resource contracts, and declarative plan
+executor are foundations. Their existence does not establish a complete program
+compiler. The initial additive API and its limits live in
+[reusable compute programs](reusable-compute-programs.md).
 
-The primary product is DoeRuntime. It serves an externally owned, unchanged
-WebGPU application that can substitute providers and has a measurable reason
-to choose Doe's compiler/runtime/backend. The first adopter must not depend on
-Doppler. DoeProof is the supporting qualification, observation, replay, and
-release-evidence feature, not the initial independent business.
+## Enter through compatibility and earn reuse
 
-> Freeze one application outcome, qualify the strongest incumbent and DoeRuntime
-> under the same oracle, adopt only for a material advantage, and retain DoeRuntime
-> across another release or workload.
+Make `doe-gpu` straightforward to try in controlled Node, Bun, Electron, and
+native applications. Preserve familiar WebGPU operations and existing WGSL.
+Offer repeated computation through an optional declared-program interface.
+Replacing a provider cannot eliminate arbitrary JavaScript orchestration that
+an application continues to execute.
 
-Fawn, the secondary browser product and potential DoeRuntime distributor, serves teams building coding, research,
-support, or workflow agents that maintain persistent browser sessions and
-repeatedly pay for page serialization, screenshots, remote model calls, and
-generic browser-control latency:
+Each external application compares the strongest incumbent, ordinary Doe, and
+prepared DoePlan. Complete useful-operation latency owns the application result;
+kernel timing helps diagnose it. Retain cold initialization, preparation, first
+execution, repeated tails, CPU and GPU work, memory, allocations, submissions,
+teardown, and recovery. Missing measurements remain missing acceptance evidence.
 
-> **A Playwright-compatible agent browser binary with persistent state,
-> lower-context page diffs, integrated local compute, and measurable end-to-end
-> task improvements.**
+The promise is the same useful computation with less repeated work, smaller
+resource demands, and clearer failures. Compatibility substitution and explicit
+program integration are different treatments: freeze and disclose each one,
+and give incumbent controls equivalent persistent pipelines, bindings, batching,
+and caches. An interface alone is not an ownership win if the same optimization
+works equally well above an incumbent.
 
-These gates remain independent. DoeProof may provide value while an incumbent
-keeps execution, but that does not satisfy the primary runtime adoption goal.
-Fawn may create browser-shell value without proving DoeRuntime. Runtime adoption
-requires a frozen D0 comparison and the maintainer's subsequent retention.
+Prepared workflows already exist in
+[CUDA Graphs](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/cuda-graphs.html),
+and IREE combines scheduling with execution compilation. Doe must differentiate
+through WebGPU integration, deployment simplicity, safe reuse, and measured
+application outcomes; graph execution is not a Doe invention.
 
-## No-regret trunks and evidence-gated forks
+Ordinary browser imports still use browser-owned WebGPU. Browser replacement
+requires its own integration, artifact, and acceptance evidence.
 
-“No-regret trunk” means work required under every plausible strategy. It does
-not imply assured commercial success. The selected implementation path is one
-unchanged external application through I0, I1, W0, D0, and eligible P0 controls,
-independent oracle and replay, lifecycle and failure evidence, voluntary runtime
-adoption, and repeat retention. Qualification remains necessary experimental
-control; selling it independently is not a prerequisite for testing D0.
+## Make corrections transferable
 
-DoeProof must qualify the strongest eligible incumbent without importing,
-requiring, or favoring Doppler. Doppler may supply a workload or provider
-candidate, but it never receives qualification preference.
-
-Fawn is an evidence-gated fork targeting local-first persistent private
-workflows: endpoint-owned state, local files and models, restart and offline
-recovery, qualified local GPU execution, and replayable evidence. Its
-evaluation begins with a clean-install candidate, frozen task suites, explicit
-provider identity, retained failures, and replayable receipts before any
-product outcome is claimed. Kitesurf is the separate `K0` external product in
-[`browser-lane.md`](browser-lane.md), not a fifth causal lane. The funded forks
-remain separate:
-
-- Fawn shell authority comes only from `B` versus `A`.
-- DoeRuntime browser authority comes only from `C` versus `B`, and remains
-  bounded by the application-level `D0` versus `W0` and authorized `P0` law.
-- Direct Protocol authority comes only from `D` versus `C`.
-- External product substitution is tested by `K0` beside A/B/C/D; it never
-  changes their causal meaning.
-
-Doe may accept a Doppler workload as interoperability, but must earn its first
-runtime adoption from a non-Doppler application. Doppler use does not establish Doe demand, and a Doe
-receipt does not establish Doppler adoption.
-
-## Objective
-
-Doe should become the receipt-backed local compute plane for autonomous
-software and the applications it operates. An agent or application submits a
-versioned workload; Doe executes it under an explicit policy, validates the
-result, and returns a receipt that explains what actually ran.
-
-The first technical adoption surface is deliberately narrower: governed WebGPU
-execution for controlled Node, Bun, Electron, and CI workloads. DoeProof can
-wrap a pinned incumbent there before `doe-gpu` proposes provider substitution.
-Those surfaces are the entry point because the application or operator can
-select and observe the provider. The long-term identity is verifiable
-execution, not a general agent framework, browser automation framework, or
-universal Dawn replacement.
-
-The defensible claim is bounded:
-
-> Doe executed this named workload correctly and reliably under the declared
-> policy, on the declared runtime, hardware, and backend, with a replayable
-> receipt; where measured, its end-to-end result is better than the declared
-> baseline.
-
-The product promise is equally concrete:
-
-> Give an agent or application a supported local GPU workload and get the same
-> correct result, explicit execution identity, visible fallback state, and a
-> replayable receipt. On selected tuples, get fewer operational failures or
-> materially better end-to-end performance.
-
-Doe expands only after real applications depend on that passing surface.
-
-## Product object
-
-The durable Doe product object is a verifiable execution:
+Preserve relationships from original WGSL through IR and backend programs to
+execution. Make failures reproducible and effects inspectable. A contributor
+should supply a small reproduction and comparison without understanding the
+entire runtime.
 
 ```text
-agent or application intent
--> versioned workload and inputs
--> explicit execution policy
--> selected Doe/provider/backend
--> independent output oracle
--> receipt and replay material
+application failure or measured repeated work
+-> minimized source and frozen independent oracle
+-> general compiler transformation, resource policy, or backend correction
+-> permanent regression and physical evaluation
+-> transfer to an unrelated program
+-> maintained release gate
 ```
 
-The workload contract, not an agent protocol, is the stable interface. It
-binds the program or model, inputs, executor, policy, output, runtime,
-hardware, fallback state, and timing. Node, Bun, Electron, native processes,
-headless Chromium, and later controlled GPU workers can be different executor
-surfaces beneath the same workload and receipt law.
-
-Doe does not own planning, browser navigation, model selection, prompts, or
-general agent orchestration. It makes local compute observable and admissible
-for the software that performs those jobs.
-
-## Doe-first operating model
-
-Doe is the product driver. Other projects and external systems are useful when
-they make Doe more useful, more provable, or easier to adopt; they do not
-silently become Doe's product roadmap.
-
-| Surface | Role in a Doe-first strategy |
-| --- | --- |
-| Doe runtime/compiler | Product, execution contract, provider, receipt, and release authority |
-| Doppler | Collaborator and workload source for local inference, model artifacts, and hybrid-routing examples |
-| Dream | Composition and workflow reference application that exercises Doe as a compute tool |
-| Columbo/Valera | Design-partner workflow and buyer proof; a Doe customer/use case, not Doe's identity |
-| Reploid/Poolday | Browser-agent and receipt-backed distributed-compute proof surface; separate product ownership |
-| Chromium/Fawn | Browser host and integration target; Doe first owns the GPU execution seam |
-| Cerebras/CSL | Accelerator retargeting proof and specialized execution target |
-| Dawn, wgpu, browser WebGPU, MLX, llama.cpp, ONNX Runtime | Incumbents, compatibility baselines, collaborators, or competitors depending on the test |
-| External applications | Design partners, workload examples, regression sources, and prospective customers |
-
-The rule is simple: a sibling product may demonstrate a Doe capability, supply
-a workload, or become a customer. Its roadmap does not replace Doe's roadmap.
-An external project may be a baseline or competitor without becoming a Doe
-dependency. Every promoted result must still identify what Doe itself executed.
-
-## Doe-first tracks
-
-The strategy has one driver and several bounded tracks:
-
-1. **Core runtime:** source-preserving WGSL lowering, native execution,
-   explicit Metal/Vulkan/D3D12 selection, typed failure, and receipts.
-2. **Physical proof:** real applications and named workloads validate output,
-   reliability, dispatch structure, fallback state, and end-to-end value.
-3. **AI and agent workloads:** inference, embeddings, ranking, image/audio/
-   document processing, vector operations, scientific kernels, and agent tool
-   calls all use the same workload, oracle, policy, and receipt contract.
-4. **Browser substrate:** integrate Doe beneath Chromium's WebGPU seam first;
-   later test canvas, effects, media, compositor-adjacent, and other GPU-heavy
-   pieces only when a real contract proves Doe adds value. Browser policy,
-   layout, networking, security, accessibility, and navigation remain browser
-   responsibilities.
-5. **Accelerator retargeting:** use TSIR, HostPlan, CSL, and Cerebras as a
-   Doe-led portability and proof track, with separate hardware claims.
-6. **Execution control plane:** expose inspect, run, verify, compare, and
-   replay through CLI, JavaScript, CI, and thin agent/browser adapters. Doe
-   owns the execution contract; it does not become an agent framework.
-
-Track status is evidence-driven: active implementation, physical proof,
-candidate, diagnostic, archived, or external-owned. An idea cannot enter the
-active Doe roadmap merely because a sibling document describes it.
-
-### Idea ledger
-
-This compact ledger keeps named visions from becoming orphaned. The strategy
-narrative stays here; implementation and evidence stay in the linked sources.
-
-| ID | Idea | State | What it means now |
-| --- | --- | --- | --- |
-| `DOE-01` | Fawn local-first agent browser | `active` | Product target for persistent private endpoint workflows at the Chromium WebGPU seam; K0 remains a separate remote comparator, current evidence remains diagnostic, and browser-wide agent orchestration is outside Doe. |
-| `DOE-02` | DoeKernel accelerator scheduler | `candidate` | Queue/resource contracts and prototypes; no browser-wide scheduler claim. |
-| `DOE-03` | DoeVM portable compute layer | `diagnostic` | WGSL/IR/TSIR/HostPlan/CSL direction; not yet a universal VM. |
-| `DOE-04` | DoeProof execution evidence | `active` | Workload, oracle, receipt, replay, and qualification trunk; provider-neutral callback, unchanged-process, and CLI/CI execution are public through `doe-gpu/node-webgpu`, `doe-gpu/node-webgpu-process`, and `doe-proof-node`. |
-| `DOE-05` | DoeHypervisor agent isolation | `horizon` | Possible accelerator capability policy; OS/browser security remains external. |
-| `DOE-06` | Intent-to-capability web | `external-owned` | WebMCP/site/agent protocols supply workloads; Doe executes their compute edges. |
-| `DOE-07` | DoeMind private local AI | `candidate` | Node/Bun/Electron workload wedge; browser-wide personal memory is not current Doe scope. |
-| `DOE-08` | DoeCanvas generative rendering | `archived` | Track B rendering modules remain historical until a real unifying workload reopens them. |
-| `DOE-09` | DoeForge autonomous software validation | `candidate` | Agent-driven browser/CI validation using Doe receipts and comparison lanes. |
-| `DOE-10` | Multiverse/counterfactual execution | `horizon` | Possible branch-comparison workload; browser state forking is external. |
-| `DOE-11` | DoeMesh heterogeneous fabric | `horizon` | Local multi-adapter direction; remote/wafer scheduling is not a product claim. |
-| `DOE-12` | DoeExchange machine economy | `horizon` | No Doe owner, buyer, settlement, or authority evidence. |
-
-States are deliberately separate from technical maturity and commercial value.
-Promote an idea only by linking a contract, implementation, physical or buyer
-result, and a concrete next gate. Rename ideas without creating new IDs.
-
-## Platform analogy
-
-The long-term analogy is the JVM, not Java: a portable execution layer
-specialized for heterogeneous AI, ML, and agent workloads.
-
-| JVM ecosystem | Doe platform |
-| --- | --- |
-| Source and bytecode | Agent-authored application, model, WGSL, or versioned workload |
-| JVM and JIT backends | Doe runtime and lowering to Metal, Vulkan, D3D12, WebGPU, CSL, and later accelerators |
-| Class and artifact loading | Exact model, shader, and program artifact loading by hash |
-| Runtime and security policy | Backend, fallback, memory, privacy, and capability policy |
-| Stack traces and profilers | Structured traces, timing, diagnostics, and first-failure boundaries |
-| Write once, run anywhere | Define once, execute verifiably across declared compute surfaces |
-
-Doe adds what ordinary VM analogies do not guarantee: an independent output
-oracle, physical hardware identity, fallback decisions, replay material, and a
-hash-bound execution receipt. “Compute VM” is the platform vision; the current
-product claim remains the narrower supported WebGPU provider and workload
-matrix described below.
-
-Agents sit above Doe. They decide what computation is needed; Doe proves what
-actually ran.
-
-## Priority order
-
-1. Correct output.
-2. Operational reliability.
-3. Compatibility with real applications.
-4. Material end-to-end performance.
-5. Frictionless installation.
-6. Receipts, replay, governance, and support.
-
-Reliability and speed are the admission ticket. Receipts are essential
-evidence and an enterprise retention advantage; they do not compensate for an
-incompatible, incorrect, unstable, or slower runtime.
-
-## Initial wedge
-
-The initial offer is **DoeRuntime Application Integration**, with DoeProof as
-its impartial qualification feature. A
-customer supplies one pinned application workload, its expected result and
-independent oracle, the target hardware tuple, and the strongest eligible
-incumbent. Doe returns exact execution identity, fallback state, output and
-lifecycle evidence, clean-process replay, matched ownership comparisons, and a
-blocking qualification, rejection, or requalification decision.
-
-Capture the ambient I0 and pinned I1 incumbent, qualify I1 as W0, and evaluate
-D0 on the identical frozen application. Test P0 when a credible smallest viable
-incumbent patch is eligible. Runtime promotion must beat the governed incumbent
-and that patch; a successful W0 alone remains a negative runtime-ownership
-result for this application, not an obstacle to conducting the comparison.
-
-The initial provider-substitution surface remains `doe-gpu` for controlled
-Node, Bun, applicable Electron, and CI compute environments. The first likely
-users are teams shipping local inference, embeddings, search, image, or other
-GPU compute through JavaScript runtimes. Doe deliberately supports a narrow,
-declared matrix of applications, workloads, runtimes, operating systems,
-architectures, backends, adapters, and drivers.
-
-Integrate through the application's normal provider seam without rewriting its
-product logic or shaders. Preserve the incumbent control, validate the existing
-application oracle, and record the maintainer's adoption and retention decisions. No local Zig build, hidden fallback, or undocumented
-environment setup belongs in the promoted path.
-
-Several deeply supported applications are more valuable than broad API-shaped
-coverage that no real downstream project exercises.
-
-## Downstream-application portfolio
-
-Doe must build and maintain a portfolio of real downstream applications whose
-correctness, reliability, installation, performance, and receipt contracts can
-block Doe releases on their declared hardware matrices.
-
-Every candidate begins as evidence, not as a customer claim. Doe runs the
-unchanged workload through the incumbent provider and Doe, using the same
-inputs, output oracle, commands, synchronization, readback, and measurement
-scope. A useful external result either proves a reproducible advantage or
-exposes a concrete runtime failure that Doe can diagnose and fix.
-
-When an application is promoted into the supported portfolio, its contract
-must define:
-
-- pinned upstream source, license, and update policy;
-- supported runtime, operating-system, adapter, and driver matrix;
-- clean installation and provider-substitution path;
-- output oracle and tolerance;
-- crash, hang, timeout, concurrency, teardown, device-loss, and memory gates;
-- cold and warm end-to-end p50, p95, and p99 performance thresholds;
-- fallback prohibition and runtime-identity requirements;
-- required receipts, diagnostics, and retained evidence.
-
-A diagnostic run is not a promoted release gate. Promotion requires physical
-hardware evidence, equivalent work, a passing oracle, repeated clean-process
-reliability, and the declared performance decision.
-
-## Product flywheel
-
-```text
-external application
--> exposes a real failure or measurable loss
--> generalized runtime or compiler fix
--> permanent focused regression
--> promoted downstream release gate
--> safer release
--> credible adoption
--> supported commercial relationship
-```
-
-This creates compounding defensibility. Doe accumulates maintained application
-dependencies, hardware evidence, regression history, runtime policy, and
-explainable execution knowledge. Individual features can be reproduced; the
-governed body of real-application behavior and evidence is harder to reproduce.
-
-## Adoption and commercial journey
-
-The Doe-first commercial journey is:
-
-```text
-frozen unchanged external application -> independent incumbent and DoeRuntime comparison
--> predeclared material advantage -> voluntary maintainer adoption
--> repeat retention and requalification -> supported runtime relationship
-```
-
-This journey is not a registry state machine. Relationship hypotheses,
-engagement status, and evidence maturity remain independent so a technically
-capable peer can still be a valuable adopter or design partner, and a measured
-project is not automatically outreach-ready.
-
-Projects first keep Doe because it improves something operational: regression
-reproduction, runtime identity, cross-driver comparison, explicit fallback,
-incident diagnosis, or measured performance. The first commercial buyer is
-likely a local-AI, browser-AI, developer-platform, or release-infrastructure
-team rather than an individual JavaScript developer.
-
-Start with one application's normal provider substitution, compare complete
-startup, compilation, dispatch, memory, readback, recovery, package size, and
-lifecycle outcomes, and publish parity-qualified raw samples with p50/p95/p99.
-Turn accepted use into a maintained release gate. Repeat after an application,
-shader, runtime, driver, or workload change. Broader support and Fawn distribution
-follow earned adoption; receipts and internal benchmarks cannot replace it.
-
-Sibling products provide low-cost entry points, not strategic ownership:
-
-- Doppler can supply a local-AI workload and model artifact.
-- Dream can provide a composed workflow that makes the result legible.
-- Columbo/Valera can serve as a demanding private-document design partner.
-- Reploid/Poolday can exercise browser-agent participation and receipt flows.
-- Cerebras can test Doe's retargeting beyond commodity GPUs.
-
-Doe can land directly with platform, QA, release, browser, or AI teams through
-shadow validation. If a sibling product succeeds, it proves a Doe capability
-and creates a reference customer; it does not make Doe merely an internal
-upsell.
-
-## Technical advantage
-
-Doe preserves one program identity across source, intermediate
-representations, backend binaries, command graphs, execution results, and
-receipts. That identity makes correctness and performance claims auditable
-across Metal, Vulkan, D3D12, and later execution targets.
-
-Runtime ownership is a hypothesis, not automatic product credit. Each promoted
-application must compare the owned runtime with an ambient incumbent, a pinned
-incumbent, and that pinned incumbent under the same DoeProof policy, oracle,
-receipt, and replay contract. Doe owns execution only where that comparison
-proves a durable enforcement, diagnosis, lifecycle, program-identity,
-correction, or performance advantage that a governed incumbent cannot provide
-at lower durable cost. The adjudication and application-tier contract is
-[`runtime-ownership-decision.md`](runtime-ownership-decision.md).
-
-The implementation principles are:
-
-- source-preserving lowering;
-- explicit provider and backend selection;
-- typed unsupported behavior;
-- independent output oracles;
-- deterministic schemas and artifact hashes;
-- no hidden fallback in promoted lanes;
-- user-visible operation timing rather than isolated internal phases;
-- machine-owned support and claim state.
-
-## Expansion boundaries
-
-Two longer-range paths reuse the same contracts:
-
-- Chromium-family WebGPU integration beneath `navigator.gpu`;
-- Doppler Program Bundle to TSIR, HostPlan, CSL, simulator, and Cerebras
-  hardware execution.
-
-The browser path is Doe's first-class external-facing host for browser-operated
-software and agents. Doe's browser strategy is piecewise GPU replacement:
-begin at the WebGPU/Dawn implementation seam, then earn adjacent GPU-heavy browser work
-through separate correctness and compatibility evidence. The objective is to
-move more deterministic, parallel work onto accelerators and reduce CPU
-orchestration where that improves real workloads; it is not to rewrite
-Chromium's policy or user-facing browser architecture.
-
-A controlled headless or headful Chromium artifact must prove forced-Doe
-execution,
-fallback policy, browser compatibility, reliability, installation, and release
-identity before browser claims are made. A browser or package wrapper alone is
-insufficient.
-
-Fawn's first promotion objective is not a broad browser benchmark win. It is a
-released archive that runs one unchanged application through each declared
-lane with an
-independent output oracle, forced-provider and physical-hardware identity,
-fallback detection, replay, repeated lifecycle and teardown coverage,
-concurrency and memory-growth checks, and matched p50/p95/p99 evidence when a
-performance advantage is claimed.
-
-The archive must retain four independent lanes: stock Chromium plus Dawn,
-Fawn plus Dawn, Fawn plus Doe, and Fawn Direct Protocol plus Doe. Fawn shell
-promotion depends on B versus A. DoeRuntime browser ownership depends on C
-versus B. Direct Protocol promotion depends on D versus C. Failure of one layer
-does not erase a proven result in another.
-
-Cloudflare Browser Run plus Kitesurf is `K0`, a separate external product
-comparator rather than a fifth component-substitution lane. Official scope and
-freshness are recorded in
-[`browser-product-comparison-policy.json`](../config/browser-product-comparison-policy.json).
-Vendor documentation defines comparator scope only; it does not become Doe or
-Fawn evidence.
-
-The shared suite freezes HTML extraction, screenshots, navigation, automation
-success, wall time, tokens, memory, cost, failures, unsupported behavior,
-retries, recovery, and total task outcomes. The differentiation suite freezes
-persistent authentication, restart recovery, offline local operation, WebGL,
-WebGPU, private state, and long-running sessions under the same no-cherry-pick
-law.
-
-If K0 wins the shared suite and customers do not value differentiation, stop
-treating Fawn as a product. If B does not beat A, do not grant Fawn shell value.
-If C does not beat B, DoeRuntime has not earned browser execution. If D does
-not beat C on the declared total task outcome, stop funding Direct Protocol.
-
-Controlled GPU worker fleets are another later surface: a worker can advertise
-its runtime, backend, adapter, driver, limits, and policy capabilities, while a
-submitted workload declares what it requires. This is an execution and
-admission surface, not a new workload model.
-
-Neither path inherits promotion from Node/Bun evidence. Each must pass its own
-compatibility, correctness, reliability, installation, and performance gates.
-Browser users cannot select the implementation beneath `navigator.gpu`, so
-browser adoption requires a real browser integration and artifact rather than
-an npm wrapper. Cross-accelerator portability requires hardware evidence, not
-simulator results.
-
-Doe does not initially pursue:
-
-- universal Dawn replacement;
-- arbitrary npm WebGPU compatibility;
-- a general-purpose agent SDK, MCP server, or browser automation product;
-- browser replacement inferred from package evidence;
-- determinism as an abstract purchasing argument;
-- broad speed claims from one workload or machine;
-- governance language used to mask runtime gaps.
+DoeLab owns this failure-to-correction process. Its next product-level test is
+whether accumulated corrections make subsequent applications easier to support,
+not whether the regression archive grows. Keep source, interfaces, and
+reproduction tools open. Compound development momentum, maintained integrations,
+and implementation knowledge through useful results.
+
+## Demonstrate a newly practical application
+
+Start with a non-Doppler scientific or image-processing application that repeats
+multistage computation on physical AMD Vulkan. Reproduce the mechanism on Apple
+Metal and apply it to another application.
+
+Before tuning, freeze source, inputs, independent numerical requirements,
+hardware and driver, fallback policy, lifecycle obligations, timing scopes,
+memory accounting, and a meaningful application outcome. Identity hashes bind
+bytes; numerical comparisons establish acceptable results.
+
+Compare against competently configured Dawn and wgpu with persistent pipelines,
+batching, and caches. Report preparation, cold startup, repeated latency and CPU
+cost, peak memory, cancellation, recovery, and when preparation is recovered.
+Keep raw samples, tails, failures, and structural work. Distinguish process RSS
+and requested buffer bytes from peak GPU memory. Disclose host and effective
+readback differences rather than presenting them as runtime speed.
+
+Cross a predeclared useful boundary: a missed interactive deadline, an analysis
+memory limit, or unacceptable repeated CPU cost. Numerical parity alone does
+not establish that crossing. A transferred correctness fix does not establish
+a transferred performance breakthrough. Preserve losses and audit implausibly
+large wins before accepting them.
+
+Repository-owned applications can prove a mechanism. External voluntary
+adoption and retention require separate evidence from the application's owner.
+Receipts, internal benchmarks, sibling integrations, and paid qualification do
+not establish adoption. Revenue is not required for the first proof.
+
+## Ownership and independent controls
+
+DoeRuntime is primary. DoeProof remains useful around the strongest eligible
+incumbent and cannot select a favorable execution provider. Doppler may supply
+a workload or become a user; it receives no qualification preference.
+
+Preserve I0, I1, W0, D0, and credible eligible P0 under the governed
+[runtime ownership decision](runtime-ownership-decision.md). An unchanged
+application measures provider substitution. An explicit program integration
+measures the disclosed application/runtime treatment under identical useful
+work. Each freezes the strongest control; neither inherits the other's result.
+
+Priorities remain correctness, operational reliability, compatibility, material
+end-to-end value, simple installation, and useful diagnostics and replay.
+Receipts cannot compensate for incorrect, unstable, incompatible, or slower work.
+
+## Focus and founder responsibilities
+
+Compiler/runtime ownership covers transformations, reusable plans, invalidation,
+resource lifecycle, and backend execution. Application/evaluation ownership
+covers integration, packaging, independent controls, diagnostics, and reproducible
+tests. Both own the frozen application outcome and transfer test.
+
+Exclude browser construction, Flutter replacement, peer networks, distributed
+training, and universal accelerator support from the first demonstration. Dynamic
+shapes follow explicit fixed-shape assumptions and verified invalidation.
+
+Later, embedding partners may distribute the same runtime through frameworks,
+applications, or browser distributions. Fawn remains separately gated. Existing
+A/B/C/D and K0 browser laws retain their meaning; browser construction is not a
+dependency. Accelerator work retains separate hardware admission and cannot
+broaden the initial matrix through simulator evidence.
+
+## Acquisition hypothesis
+
+An acquirer would buy an execution advantage, its engineering team, development
+momentum, and an ecosystem that depends on it. Open code can be licensed;
+ownership must add difficult implementation knowledge and maintained integration
+capacity that licensing or sponsorship does not supply.
+
+AMD's Nod.ai acquisition is a precedent for interest in compiler expertise and
+optimized deployment, not evidence of Doe's valuation. Buyer interest and
+valuation remain hypotheses requiring independent evidence.
 
 ## Strategy execution map
 
-- [`node-bun-developer-wedge.md`](node-bun-developer-wedge.md) defines the
-  package and downstream promotion contract.
-- [`product-strategy-contract.md`](product-strategy-contract.md) maps the
-  validated product roles, qualification offer, evidence custody, platform
-  sequence, milestones, and claim boundaries.
-- [`ecosystem.md`](ecosystem.md) defines actor scoring, state, and evidence
-  routing without inventing a commercial funnel.
-- [`performance-strategy.md`](performance-strategy.md) defines measurement and
-  comparison requirements.
-- [`workload-system.md`](workload-system.md) defines the versioned workload,
-  executor, oracle, and receipt contract that carries the strategy across
-  execution surfaces.
-- [`process.md`](process.md) defines repository stage and gate law.
-- [`browser-lane.md`](browser-lane.md) routes the future Chromium execution
-  surface without making it current package evidence.
-- [`doe-support-matrix.md`](doe-support-matrix.md) defines promoted support
-  tuples.
-- `config/ecosystem-registry.json` owns current actors and evaluation order.
-- `reports/ecosystem/` owns reviewed downstream results.
-- `reports/claim-index.json` owns eligible public measured claims.
+- [GOALS.md](../GOALS.md) owns mission and durable goals.
+- [CATSCAN.md](../CATSCAN.md) and child charters own component authority.
+- [Reusable compute programs](reusable-compute-programs.md) owns initial API,
+  invalidation, reproduction, and limitations.
+- [Developer wedge](node-bun-developer-wedge.md) owns package integration and
+  downstream promotion.
+- [Product strategy contract](product-strategy-contract.md) maps strategy into
+  `config/doe-product-strategy.json`.
+- [Performance](performance-strategy.md), [workloads](workload-system.md), and
+  [process](process.md) own measurement, evidence, and stage law.
+- [Ecosystem](ecosystem.md), `config/ecosystem-registry.json`, and
+  `reports/ecosystem/` own external evaluation and adoption state.
+- [Support matrix](doe-support-matrix.md) and `reports/claim-index.json` own
+  promoted support and public claim eligibility.
+- [Browser lane](browser-lane.md) owns the separate browser evidence path.
 
-Changing the objective, priority order, wedge, flywheel, commercial journey,
-or expansion boundaries requires changing this document. Current measurements
-and actor status belong only in their machine-owned artifacts.
+Artifacts own current outcomes. Strategy prose does not promote an
+implementation, benchmark, package, browser, or adoption claim.

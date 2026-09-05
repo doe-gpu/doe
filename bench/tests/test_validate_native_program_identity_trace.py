@@ -123,6 +123,26 @@ class NativeProgramIdentityTraceValidatorTests(unittest.TestCase):
             result["verdict"]["failureCodes"],
         )
 
+    def test_prepared_replay_binds_native_creation_and_submission(self) -> None:
+        common = {'schemaVersion': 1, 'traceKind': 'doe_native_program_identity_v1', 'processId': 41}
+        self.rows = [self.rows[0],
+                     {**common, 'event': 'native_object_created', 'sequence': 2,
+                      'objectType': 'fixture.Buffer', 'objectSize': 4, 'objectAddress': 10},
+                     {**common, 'event': 'compute_program_prepared', 'sequence': 3,
+                      'backend': 'doe_vulkan', 'programId': 7, 'dispatchCount': 1, 'submissionIndex': 0},
+                     {**common, 'event': 'compute_program_submitted', 'sequence': 4,
+                      'backend': 'doe_vulkan', 'programId': 7, 'dispatchCount': 1, 'submissionIndex': 1}]
+        self._write_rows()
+        result = self._validate()
+        self.assertEqual(result['verdict']['status'], 'passed')
+        self.assertEqual(result['counts']['submissions'], 1)
+        self.rows[-1]['programId'] = 8
+        self._write_rows()
+        self.assertEqual(self._validate()['verdict']['status'], 'failed')
+        self.rows.pop()
+        self._write_rows()
+        self.assertIn('compute_dispatch_lacks_later_submission', self._validate()['verdict']['failureCodes'])
+
     def test_missing_render_completion_fails_strict_validation(self) -> None:
         self.rows[2].pop("completion")
         self._write_rows()

@@ -18,12 +18,35 @@ import argparse
 import json
 import os
 import shlex
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+PROGRAM_COMMANDS = {
+    "evaluate": (
+        [sys.executable, "-m", "bench.runners.run_compute_program_evidence"],
+        "Audit and measure declared programs on a physical backend",
+    ),
+    "qualify-package": (
+        [sys.executable, "-m", "bench.runners.qualify_compute_program_package"],
+        "Install retained packages in Node, Bun, and Electron",
+    ),
+    "verify": (
+        [sys.executable, "-m", "bench.gates.compute_program_gate"],
+        "Verify retained numerical outputs, identities, and execution work",
+    ),
+    "verify-native": (
+        [sys.executable, "-m", "bench.tools.validate_native_program_identity_trace"],
+        "Validate native recording/replay identities and retained SPIR-V",
+    ),
+    "prepare-lif": (
+        ["node", "bench/external-projects/holoscript-snn-webgpu/prepare-compute-program.mjs"],
+        "Freeze an upstream HoloScript LIF shader, inputs, and CPU oracle",
+    ),
+}
 
 if __name__ == "__main__" and not __package__:
     environment = os.environ.copy()
@@ -680,6 +703,22 @@ def main() -> int:
         "reproduce", help="Prepare, gate, run the harness, and emit a reproduction receipt"
     )
     _add_external_action_args(external_reproduce_parser)
+
+    program_parser = subparsers.add_parser(
+        "program", help="Evaluate declared compute programs and retained packages"
+    )
+    program_subparsers = program_parser.add_subparsers(
+        dest="program_command", required=True
+    )
+    for name, (_, description) in PROGRAM_COMMANDS.items():
+        program_subparsers.add_parser(name, help=description, add_help=False)
+    if len(argv) >= 2 and argv[0] == "program" and argv[1] in PROGRAM_COMMANDS:
+        command, _ = PROGRAM_COMMANDS[argv[1]]
+        return subprocess.run(
+            [*command, *argv[2:]],
+            cwd=REPO_ROOT,
+            check=False,
+        ).returncode
 
     if argv and argv[0] == "compare":
         compare_parser = argparse.ArgumentParser(

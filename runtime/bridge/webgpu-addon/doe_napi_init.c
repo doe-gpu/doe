@@ -14,6 +14,11 @@
 
 /* Library loading (doe_napi_globals.c or doe_napi.c) */
 napi_value doe_load_library(napi_env env, napi_callback_info info);
+napi_value doe_compute_program_contract_version(napi_env env, napi_callback_info info);
+napi_value doe_compute_program_prepare(napi_env env, napi_callback_info info);
+napi_value doe_compute_program_supported(napi_env env, napi_callback_info info);
+napi_value doe_compute_program_submit(napi_env env, napi_callback_info info);
+napi_value doe_compute_program_release(napi_env env, napi_callback_info info);
 
 /* Native-direct path (doe_napi.c) */
 napi_value doe_native_direct_create(napi_env env, napi_callback_info info);
@@ -338,6 +343,11 @@ napi_value doe_module_init(napi_env env, napi_value exports) {
         EXPORT_FN("adapterGetLimits",                         doe_adapter_get_limits),
         EXPORT_FN("adapterHasFeature",                        doe_adapter_has_feature),
         EXPORT_FN("deviceGetLimits",                          doe_device_get_limits),
+        EXPORT_FN("nativeComputeProgramContractVersion",       doe_compute_program_contract_version),
+        EXPORT_FN("computeProgramPrepare",                    doe_compute_program_prepare),
+        EXPORT_FN("computeProgramSupported",                  doe_compute_program_supported),
+        EXPORT_FN("computeProgramSubmit",                     doe_compute_program_submit),
+        EXPORT_FN("computeProgramRelease",                    doe_compute_program_release),
         EXPORT_FN("deviceHasFeature",                         doe_device_has_feature),
         EXPORT_FN("deviceGetLabel",                           doe_device_get_label),
         EXPORT_FN("deviceSetLabel",                           doe_device_set_label),

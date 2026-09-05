@@ -212,15 +212,13 @@ pub fn create_fence(self: anytype) !void {
 }
 
 pub fn find_memory_type_index(self: anytype, type_bits: u32, required_flags: u32) !u32 {
+    return find_memory_type_index_with_preference(self, type_bits, required_flags, 0);
+}
+
+pub fn find_memory_type_index_with_preference(self: anytype, type_bits: u32, required_flags: u32, preferred_flags: u32) !u32 {
     var memory_props = std.mem.zeroes(c.VkPhysicalDeviceMemoryProperties);
     c.vkGetPhysicalDeviceMemoryProperties(self.physical_device, &memory_props);
-    var i: u32 = 0;
-    while (i < memory_props.memoryTypeCount) : (i += 1) {
-        const supports_type = (type_bits & (@as(u32, 1) << @as(u5, @intCast(i)))) != 0;
-        if (!supports_type) continue;
-        if ((memory_props.memoryTypes[i].propertyFlags & required_flags) == required_flags) return i;
-    }
-    return error.UnsupportedFeature;
+    return @import("vk_memory_policy.zig").select_memory_type_index(memory_props, type_bits, required_flags, preferred_flags);
 }
 
 fn select_preferred_physical_device(self: anytype, devices: []const VkPhysicalDevice) !PhysicalDeviceSelection {

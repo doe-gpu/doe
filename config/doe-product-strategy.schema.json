@@ -4,27 +4,10 @@
   "title": "Doe product strategy contract",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "$schema",
-    "schemaVersion",
-    "strategyVersion",
-    "artifactKind",
-    "authority",
-    "positioning",
-    "independenceBoundary",
-    "surfaces",
-    "commercialOffer",
-    "comparisonLaw",
-    "externalProductComparison",
-    "evidenceSpine",
-    "customerEvidencePolicy",
-    "platformSequence",
-    "milestones",
-    "claimBoundary"
-  ],
+  "required": ["$schema", "schemaVersion", "strategyVersion", "artifactKind", "authority", "positioning", "independenceBoundary", "surfaces", "commercialOffer", "comparisonLaw", "externalProductComparison", "evidenceSpine", "customerEvidencePolicy", "platformSequence", "milestones", "claimBoundary", "reusableProgram", "executionOwnership"],
   "properties": {
     "$schema": { "type": "string", "const": "doe-product-strategy.schema.json" },
-    "schemaVersion": { "type": "integer", "const": 3 },
+    "schemaVersion": { "type": "integer", "const": 4 },
     "strategyVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
     "artifactKind": { "type": "string", "const": "doe-product-strategy" },
     "authority": {
@@ -149,8 +132,8 @@
     },
     "milestones": {
       "type": "array",
-      "minItems": 3,
-      "maxItems": 3,
+      "minItems": 5,
+      "maxItems": 5,
       "items": { "$ref": "#/$defs/milestone" }
     },
     "claimBoundary": {
@@ -165,6 +148,108 @@
           "items": { "type": "string", "minLength": 1 }
         },
         "currentStateAuthority": { "$ref": "#/$defs/path" }
+      }
+    },
+    "reusableProgram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractPath",
+        "descriptorSchemaPath",
+        "evaluationPolicyPath",
+        "initialScope",
+        "demonstrationGate",
+        "adoptionBoundary"
+      ],
+      "properties": {
+        "contractPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "descriptorSchemaPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluationPolicyPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "initialScope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "demonstrationGate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adoptionBoundary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "executionOwnership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operatingObjective",
+        "allocationPercent",
+        "externalApplicationRange",
+        "expansionPrerequisite"
+      ],
+      "properties": {
+        "operatingObjective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allocationPercent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "runtimeCompilerAndPlans",
+            "externalWorkloadQualification",
+            "packagingIntegration",
+            "experimentalSurfaces"
+          ],
+          "properties": {
+            "runtimeCompilerAndPlans": {
+              "type": "integer",
+              "const": 60
+            },
+            "externalWorkloadQualification": {
+              "type": "integer",
+              "const": 25
+            },
+            "packagingIntegration": {
+              "type": "integer",
+              "const": 10
+            },
+            "experimentalSurfaces": {
+              "type": "integer",
+              "const": 5
+            }
+          }
+        },
+        "externalApplicationRange": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minimum",
+            "maximum"
+          ],
+          "properties": {
+            "minimum": {
+              "const": 3
+            },
+            "maximum": {
+              "const": 5
+            }
+          }
+        },
+        "expansionPrerequisite": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     }
   },
@@ -198,7 +283,7 @@
       "required": ["id", "portfolioRole", "marketRole", "job", "promotionGate", "authorityPaths"],
       "properties": {
         "id": { "type": "string", "enum": ["doeproof","doeruntime","fawn","doelab"] },
-        "portfolioRole": { "type": "string", "enum": ["primary-product","product-feature","secondary-product","operating-model"] },
+        "portfolioRole": { "type": "string", "enum": ["primary-product", "product-feature", "secondary-product", "operating-model", "experimental-distribution"] },
         "marketRole": { "type": "string", "enum": ["runtime-adoption","qualification-evidence","runtime-distribution","learning-loop"] },
         "job": { "type": "string", "minLength": 1 },
         "promotionGate": { "type": "string", "minLength": 1 },
@@ -242,7 +327,7 @@
           },
           "then": {
             "properties": {
-              "portfolioRole": { "const": "secondary-product" },
+              "portfolioRole": { "const": "experimental-distribution" },
               "marketRole": { "const": "runtime-distribution" }
             }
           }
@@ -270,7 +355,7 @@
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "name": { "type": "string", "minLength": 1 },
-        "deliveryMode": { "type": "string", "const": "unchanged-provider-substitution" },
+        "deliveryMode": { "type": "string", "const": "provider-substitution-or-declared-program" },
         "promise": { "type": "string", "minLength": 1 },
         "buyers": { "$ref": "#/$defs/stringList" },
         "intake": { "$ref": "#/$defs/stringList" },
@@ -405,8 +490,8 @@
       "additionalProperties": false,
       "required": ["order", "id", "outcome", "requiredEvidence", "currentAssessment", "stateAuthorityPaths"],
       "properties": {
-        "order": { "type": "integer", "minimum": 1, "maximum": 3 },
-        "id": { "type": "string", "enum": ["release-passport-v1","owned-capability-v1","fawn-agent-compute-v1"] },
+        "order": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "id": { "type": "string", "enum": ["provider-qualification-v1", "prepared-doeplan-v1", "external-application-qualification-v1", "transferable-corrections-v1", "embedding-expansion-v1"] },
         "outcome": { "type": "string", "minLength": 1 },
         "requiredEvidence": { "$ref": "#/$defs/stringList" },
         "currentAssessment": { "type": "string", "enum": ["unestablished","diagnostic","claimable"] },

@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Repeated application evaluation policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "width",
+    "height",
+    "heatIterations",
+    "warmupRuns",
+    "timedRuns",
+    "processRuns",
+    "absoluteTolerance",
+    "relativeTolerance",
+    "interactiveDeadlineMs",
+    "minimumCpuReductionRatio",
+    "denoVersion",
+    "applications",
+    "providers",
+    "claimStatus",
+    "processTimeoutMs",
+    "preparedExecution",
+    "percentileMethod"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "oneOf": [
+        {
+          "const": 2
+        },
+        {
+          "const": 3
+        }
+      ]
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "heatIterations": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "warmupRuns": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "timedRuns": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "processRuns": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "absoluteTolerance": {
+      "type": "number",
+      "minimum": 0
+    },
+    "relativeTolerance": {
+      "type": "number",
+      "minimum": 0
+    },
+    "interactiveDeadlineMs": {
+      "type": "number",
+      "minimum": 1
+    },
+    "minimumCpuReductionRatio": {
+      "type": "number",
+      "minimum": 1
+    },
+    "denoVersion": {
+      "type": "string",
+      "const": "2.9.6"
+    },
+    "applications": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "providers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "doe-recorded",
+          "doe-webgpu",
+          "dawn",
+          "wgpu"
+        ]
+      },
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true
+    },
+    "claimStatus": {
+      "type": "string",
+      "const": "diagnostic"
+    },
+    "processTimeoutMs": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "preparedExecution": {
+      "type": "string",
+      "enum": [
+        "gpu-recorded",
+        "native-recorded"
+      ]
+    },
+    "percentileMethod": {
+      "type": "string",
+      "const": "nearest-rank"
+    },
+    "fixtures": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "hash"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 3
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "fixtures"
+        ]
+      }
+    }
+  ]
+}

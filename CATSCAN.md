@@ -4,9 +4,10 @@ Parent: none
 
 ## Target
 
-Earn repeat voluntary DoeRuntime adoption through an unchanged application's
-measured advantage on a declared hardware matrix. DoeProof is a supporting
-qualification feature; Fawn is a secondary browser product.
+Make useful GPU programs safely reusable and earn repeat voluntary DoeRuntime
+adoption through measured application advantage on a declared hardware matrix.
+Compatibility and explicitly declared program integration are distinct entry
+points. DoeProof evaluates providers impartially; browser distribution is optional.
 
 ## Authority
 
@@ -35,6 +36,8 @@ Outputs:
 - Package, native, browser, simulator, and hardware evidence never inherit one another's claims.
 - Runtime ownership receives credit only through the governed ownership comparison.
 - Qualification, receipts, and interoperability alone do not prove application adoption.
+- Reuse preserves frozen source and resource assumptions; changing shape,
+  shader, resource, or device invalidates the affected prepared state.
 
 ## Acceptance
 

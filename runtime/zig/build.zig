@@ -269,6 +269,46 @@ fn configure_non_windows_graphics(artifact: *std.Build.Step.Compile, b: *std.Bui
     }
 }
 
+fn addComputeProgramContract(options: *std.Build.Step.Options, allocator: std.mem.Allocator) void {
+    const file = std.fs.cwd().openFile("../../config/compute-program.schema.json", .{}) catch
+        @panic("config/compute-program.schema.json not found");
+    defer file.close();
+    const bytes = file.readToEndAlloc(allocator, 64 * 1024) catch
+        @panic("failed to read compute-program.schema.json");
+    const Schema = struct { properties: struct { schemaVersion: struct { @"const": u32 } } };
+    const schema = std.json.parseFromSlice(Schema, allocator, bytes, .{ .ignore_unknown_fields = true }) catch
+        @panic("invalid compute program schema version");
+    options.addOption(u32, "compute_program_contract_version", schema.value.properties.schemaVersion.@"const");
+    const memory_file = std.fs.cwd().openFile("../../config/vulkan-buffer-memory-policy.json", .{}) catch
+        @panic("config/vulkan-buffer-memory-policy.json not found");
+    defer memory_file.close();
+    const memory_bytes = memory_file.readToEndAlloc(allocator, 64 * 1024) catch
+        @panic("failed to read vulkan-buffer-memory-policy.json");
+    const Property = enum { @"host-visible", @"host-coherent", @"host-cached" };
+    const MemoryPolicy = struct {
+        schemaVersion: u32,
+        readbackRequiredProperties: []Property,
+        readbackPreferredProperties: []Property,
+        unavailablePreference: enum { @"use-required-properties" },
+    };
+    const memory = std.json.parseFromSlice(MemoryPolicy, allocator, memory_bytes, .{}) catch
+        @panic("invalid Vulkan buffer memory policy");
+    if (memory.value.schemaVersion != 1) @panic("unsupported Vulkan buffer memory policy version");
+    const vk = @import("src/backend/vulkan/vk_constants.zig");
+    var flags: [2]u32 = .{ 0, 0 };
+    for ([_][]Property{ memory.value.readbackRequiredProperties, memory.value.readbackPreferredProperties }, 0..) |properties, index| {
+        for (properties) |property| flags[index] |= switch (property) {
+            .@"host-visible" => vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+            .@"host-coherent" => vk.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            .@"host-cached" => vk.VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+        };
+    }
+    const required = vk.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | vk.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    if ((flags[0] & required) != required) @panic("readback requires host-visible coherent memory");
+    options.addOption(u32, "vulkan_readback_required_properties", flags[0]);
+    options.addOption(u32, "vulkan_readback_preferred_properties", flags[1]);
+}
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
@@ -285,6 +325,7 @@ pub fn build(b: *std.Build) void {
 
     const lean_verified = b.option(bool, "lean-verified", "Embed Lean proof artifact and validate at comptime") orelse false;
     const build_options = b.addOptions();
+    addComputeProgramContract(build_options, b.allocator);
     build_options.addOption(bool, "lean_verified", lean_verified);
     build_options.addOption(BuildTier, "build_tier", build_tier);
     addProofProvenanceOptions(build_options, proof_provenance);
@@ -1144,6 +1185,7 @@ pub fn build(b: *std.Build) void {
     // The default `dropin` step uses the --tier option (default: headless).
     // These named steps override tier for convenience.
     const compute_build_options = b.addOptions();
+    addComputeProgramContract(compute_build_options, b.allocator);
     compute_build_options.addOption(bool, "lean_verified", lean_verified);
     compute_build_options.addOption(BuildTier, "build_tier", .compute);
     addProofProvenanceOptions(compute_build_options, proof_provenance);
@@ -1218,6 +1260,7 @@ pub fn build(b: *std.Build) void {
 
     // Full Dawn drop-in variant (tier=full).
     const full_build_options = b.addOptions();
+    addComputeProgramContract(full_build_options, b.allocator);
     full_build_options.addOption(bool, "lean_verified", lean_verified);
     full_build_options.addOption(BuildTier, "build_tier", .full);
     addProofProvenanceOptions(full_build_options, proof_provenance);

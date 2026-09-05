@@ -27,8 +27,9 @@ current browser evidence remains diagnostic.
 
 ## Strategic decomposition
 
-Doe's docs should read as one dominance program against the Chromium WebGPU
-incumbent stack, not as isolated feature tracks. The decomposition is:
+Doe owns an independent execution product. Controlled package/native hosts
+provide the compatibility entry; explicitly declared repeated programs expose
+work that can be prepared and retained. The decomposition is:
 
 1. **Program identity preservation**
    Source-preserving execution and multi-backend lowering are the same concern:
@@ -111,6 +112,21 @@ The current Lean theorem inventory is recorded in
 refer to that artifact rather than restating counts.
 
 ## Execution model
+
+The optional `doe-gpu/compute-program` contract binds inline WGSL, fixed buffer
+sizes and roles, ordered dispatches, and a readback output. Preparation retains
+private allocations, shaders, pipelines, and bindings. Explicit `gpu-recorded`
+execution owns compiled Vulkan commands and their pipeline and descriptor
+lifetimes. `native-recorded` retains host commands and replays them through Zig;
+`webgpu` retains resources and encodes each invocation as an explicit control.
+GPU recordings validate native buffer identities before submission and isolate
+their pipeline caches from ordinary runtime cache replacement.
+
+Full input snapshots and scratch/output clears define each invocation's state.
+An atomic update shares only resources with identical declaration keys, records
+the replacement plan, and closes the old program after successful preparation.
+Source, shape, resource changes, and device loss therefore cannot silently reuse
+stale command assumptions. See [`reusable-compute-programs.md`](reusable-compute-programs.md).
 
 Doe is designed around explicit runtime behavior:
 

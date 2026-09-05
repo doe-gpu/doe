@@ -28,7 +28,9 @@ pub const REQUIRED_TEXTURE_UPLOAD_USAGE: model_gpu_types.WGPUFlags = model_gpu_t
 const DEVICE_LOCAL_STORAGE_PROMOTION_MIN_BYTES: u64 = 16 * 1024;
 const BUFFER_WRITE_STAGING_MIN_CAPACITY: u64 = 64 * 1024;
 
-pub const ComputeBufferMemoryKind = enum { host_visible, device_local };
+pub const ComputeBufferMemoryKind = enum { host_visible, readback, device_local };
+
+const memory_policy = @import("vk_memory_policy.zig");
 
 pub const ComputeBuffer = struct {
     buffer: VkBuffer,
@@ -214,6 +216,10 @@ pub fn create_compute_buffer(
     return create_compute_buffer_with_kind(self, bytes, initialize_buffers_on_create, .host_visible);
 }
 
+pub fn create_readback_buffer(self: anytype, bytes: u64, initialize_buffers_on_create: bool) !ComputeBuffer {
+    return create_compute_buffer_with_kind(self, bytes, initialize_buffers_on_create, .readback);
+}
+
 fn create_compute_buffer_with_kind(
     self: anytype,
     bytes: u64,
@@ -245,12 +251,14 @@ fn create_compute_buffer_with_kind(
     c.vkGetBufferMemoryRequirements(self.device, buffer, &requirements);
     const memory_properties = switch (memory_kind) {
         .host_visible => c.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | c.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        .readback => memory_policy.readback_required_properties,
         .device_local => c.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
     };
-    const memory_index = try vk_device.find_memory_type_index(
+    const memory_index = try vk_device.find_memory_type_index_with_preference(
         self,
         requirements.memoryTypeBits,
         memory_properties,
+        if (memory_kind == .readback) memory_policy.readback_preferred_properties else 0,
     );
     var alloc_info = c.VkMemoryAllocateInfo{
         .sType = c.VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
@@ -262,7 +270,7 @@ fn create_compute_buffer_with_kind(
     errdefer if (memory != VK_NULL_U64) c.vkFreeMemory(self.device, memory, null);
 
     try c.check_vk(c.vkBindBufferMemory(self.device, buffer, memory, 0));
-    if (memory_kind == .host_visible) {
+    if (memory_kind != .device_local) {
         try c.check_vk(c.vkMapMemory(self.device, memory, 0, bytes, 0, &mapped));
         errdefer if (mapped != null) c.vkUnmapMemory(self.device, memory);
 
@@ -342,7 +350,7 @@ pub fn stage_compute_buffer_write(
         self.streaming_copy_pending_count != 0 or
         self.replay_prefix_copy_pending;
 
-    if (upload_path_policy == .allow_mapped_shortcuts and compute_buffer.memory_kind == .host_visible and !queue_has_pending_work) {
+    if (upload_path_policy == .allow_mapped_shortcuts and compute_buffer.memory_kind != .device_local and !queue_has_pending_work) {
         const mapped = compute_buffer.mapped orelse return error.InvalidState;
         const dst: [*]u8 = @ptrCast(mapped);
         @memcpy(dst[@intCast(offset)..][0..data_bytes.len], data_bytes);
@@ -388,7 +396,7 @@ pub fn capture_compute_buffer(
     const end = std.math.add(u64, offset, size) catch return error.InvalidArgument;
     if (size == 0 or end > compute_buffer.size) return error.InvalidArgument;
 
-    if (compute_buffer.memory_kind == .host_visible) {
+    if (compute_buffer.memory_kind != .device_local) {
         const mapped = compute_buffer.mapped orelse return error.InvalidState;
         const source = @as([*]u8, @ptrCast(mapped))[@intCast(offset)..@intCast(end)];
         return try allocator.dupe(u8, source);

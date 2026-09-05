@@ -39,7 +39,10 @@ class BrowserProductComparisonPolicyTests(unittest.TestCase):
         surfaces = {row["id"]: row for row in strategy["surfaces"]}
         self.assertEqual(surfaces["doeruntime"]["portfolioRole"], "primary-product")
         self.assertEqual(surfaces["doeproof"]["portfolioRole"], "product-feature")
-        self.assertEqual(surfaces["fawn"]["portfolioRole"], "secondary-product")
+        self.assertEqual(surfaces["fawn"]["portfolioRole"], "experimental-distribution")
+        surfaces["fawn"]["portfolioRole"] = "secondary-product"
+        self.assertFalse(validator.is_valid(strategy))
+        surfaces["fawn"]["portfolioRole"] = "experimental-distribution"
         surfaces["doeproof"]["portfolioRole"] = "primary-product"
         self.assertFalse(validator.is_valid(strategy))
 

@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Physical compute program diagnostic comparison matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "status",
+    "policyHash",
+    "backend",
+    "rows",
+    "sources",
+    "artifacts",
+    "error"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "compute_program_matrix"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "failed",
+        "diagnostic"
+      ]
+    },
+    "policyHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "backend": {
+      "enum": [
+        "vulkan",
+        "metal"
+      ]
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rowId",
+          "backend",
+          "comparator",
+          "claimStatus",
+          "baselineStatsMs",
+          "comparisonStatsMs",
+          "p50SpeedRatio",
+          "p95SpeedRatio",
+          "p99SpeedRatio",
+          "cpuP95Ratio",
+          "preparationRecoveredAfterRuns",
+          "deadlineCrossing",
+          "cpuOutcome",
+          "suspiciousSpeedup",
+          "artifactPaths",
+          "caveat"
+        ],
+        "properties": {
+          "rowId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "backend": {
+            "enum": [
+              "vulkan",
+              "metal"
+            ]
+          },
+          "comparator": {
+            "enum": [
+              "doe-webgpu",
+              "dawn",
+              "wgpu"
+            ]
+          },
+          "claimStatus": {
+            "const": "diagnostic"
+          },
+          "baselineStatsMs": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "count",
+              "minMs",
+              "maxMs",
+              "p10Ms",
+              "p50Ms",
+              "p95Ms",
+              "p99Ms",
+              "meanMs",
+              "stdevMs"
+            ],
+            "properties": {
+              "count": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "maxMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p10Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p50Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p95Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p99Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "meanMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "stdevMs": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "comparisonStatsMs": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "count",
+              "minMs",
+              "maxMs",
+              "p10Ms",
+              "p50Ms",
+              "p95Ms",
+              "p99Ms",
+              "meanMs",
+              "stdevMs"
+            ],
+            "properties": {
+              "count": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "maxMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p10Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p50Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p95Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "p99Ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "meanMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "stdevMs": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "p50SpeedRatio": {
+            "type": "number",
+            "minimum": 0
+          },
+          "p95SpeedRatio": {
+            "type": "number",
+            "minimum": 0
+          },
+          "p99SpeedRatio": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cpuP95Ratio": {
+            "type": "number",
+            "minimum": 0
+          },
+          "preparationRecoveredAfterRuns": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "deadlineCrossing": {
+            "type": "boolean"
+          },
+          "cpuOutcome": {
+            "type": "boolean"
+          },
+          "suspiciousSpeedup": {
+            "type": "boolean"
+          },
+          "artifactPaths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "caveat": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "hash"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "hash"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "error": {
+      "type": [
+        "null",
+        "string"
+      ]
+    }
+  }
+}

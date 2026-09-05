@@ -1,7 +1,7 @@
 {
   "$schema": "doe-product-strategy.schema.json",
-  "schemaVersion": 3,
-  "strategyVersion": "2.0.0",
+  "schemaVersion": 4,
+  "strategyVersion": "3.0.0",
   "artifactKind": "doe-product-strategy",
   "authority": {
     "goals": "GOALS.md",
@@ -11,13 +11,13 @@
     "currentClaims": "reports/claim-index.json"
   },
   "positioning": {
-    "category": "Application-adopted source-preserving GPU runtime",
-    "promise": "Earn voluntary DoeRuntime adoption through a repeatable material application advantage; DoeProof supplies independent qualification and replay.",
+    "category": "Independent compiler and runtime for reusable GPU programs",
+    "promise": "Make useful GPU computation easy to create, cheap to repeat, inspectable, and portable across supported hardware.",
     "governingQuestion": "Did this exact workload run correctly on the declared hardware and provider without hidden fallback, and did runtime ownership materially improve the application outcome?",
     "operatingLaw": "Hexagonal inside; vertically integrated outside."
   },
   "independenceBoundary": {
-    "rule": "DoeRuntime must earn adoption in an unchanged non-Doppler application first. DoeProof is its provider-neutral qualification feature and must still qualify the strongest incumbent without favoring DoeRuntime, Doppler, or Fawn.",
+    "rule": "DoeRuntime must prove safe reuse and mechanism transfer in non-Doppler applications, then earn independent adoption. Compatibility substitution and explicit declared-program integration are distinct treatments. DoeProof qualifies providers impartially; browser construction is not a prerequisite.",
     "requiredEvidence": [
       "externally owned unchanged non-Doppler application",
       "independent application oracle and clean-process replay",
@@ -31,9 +31,12 @@
       "id": "doeruntime",
       "portfolioRole": "primary-product",
       "marketRole": "runtime-adoption",
-      "job": "Provide the owned source-preserving compiler, runtime, scheduling, resources, lifecycle, and native backends through the application's normal provider seam.",
-      "promotionGate": "An external unchanged non-Doppler application voluntarily adopts D0 for a measured advantage over W0 and credible eligible P0, then retains it across another release or workload.",
-      "authorityPaths": ["docs/runtime-ownership-decision.md", "docs/doe-support-matrix.md"]
+      "job": "Own source-preserving GPU compilation, safe reusable programs, resources, synchronization, and backend execution through provider compatibility and optional declared computation.",
+      "promotionGate": "A frozen non-Doppler application demonstrates a material advantage over the strongest eligible controls; declared-program changes are disclosed; external adoption and repeat retention remain independently evidenced.",
+      "authorityPaths": [
+        "docs/runtime-ownership-decision.md",
+        "docs/doe-support-matrix.md"
+      ]
     },
     {
       "id": "doeproof",
@@ -41,15 +44,22 @@
       "marketRole": "qualification-evidence",
       "job": "Qualify provider identity, correctness, fallback, replay, lifecycle, and release admissibility without requiring runtime replacement.",
       "promotionGate": "Qualify incumbent and DoeRuntime impartially with independent output validation, provider identity, explicit fallback, and replay; this feature does not itself prove runtime adoption.",
-      "authorityPaths": ["docs/workload-system.md", "docs/runtime-ownership-decision.md"]
+      "authorityPaths": [
+        "docs/workload-system.md",
+        "docs/runtime-ownership-decision.md"
+      ]
     },
     {
       "id": "fawn",
-      "portfolioRole": "secondary-product",
+      "portfolioRole": "experimental-distribution",
       "marketRole": "runtime-distribution",
-      "job": "Distribute local-first persistent private browser state, semantic interaction, recovery, and qualified local compute through a real Chromium artifact.",
-      "promotionGate": "A hash-bound Fawn release wins B versus A, remains valuable against the separately measured K0 external product comparator, and uses C versus B and D versus C only for their narrower fork decisions.",
-      "authorityPaths": ["docs/browser-lane.md", "config/browser-product-comparison-policy.json", "browser/chromium/bench/workflows/browser-milestones.json"]
+      "job": "Carry the same execution runtime into a separately qualified Chromium distribution after transferred application wins.",
+      "promotionGate": "Requires prior transferred runtime application wins and a separately hash-bound browser integration with unchanged causal controls.",
+      "authorityPaths": [
+        "docs/browser-lane.md",
+        "config/browser-product-comparison-policy.json",
+        "browser/chromium/bench/workflows/browser-milestones.json"
+      ]
     },
     {
       "id": "doelab",
@@ -57,14 +67,17 @@
       "marketRole": "learning-loop",
       "job": "Turn retained physical failures into minimized reproductions, candidate corrections, and permanent regression gates.",
       "promotionGate": "A retained field failure produces a reusable qualified correction without weakening evidence or promotion rules.",
-      "authorityPaths": ["pipeline/agent/fawn_matrix_learning_bridge.py", "runtime/zig/src/contracts/promotion_receipt.zig"]
+      "authorityPaths": [
+        "pipeline/agent/fawn_matrix_learning_bridge.py",
+        "runtime/zig/src/contracts/promotion_receipt.zig"
+      ]
     }
   ],
   "commercialOffer": {
     "id": "doeruntime-application-adoption",
     "name": "DoeRuntime Application Integration",
-    "deliveryMode": "unchanged-provider-substitution",
-    "promise": "Substitute DoeRuntime through the application's normal provider seam, prove a material outcome under independent DoeProof controls, and earn repeat voluntary use.",
+    "deliveryMode": "provider-substitution-or-declared-program",
+    "promise": "Enter through provider compatibility; offer explicit repeated-computation integration and earn voluntary use through independently measured application advantage.",
     "buyers": [
       "local-AI vendors",
       "Electron application teams",
@@ -98,7 +111,11 @@
     ],
     "ciDecision": {
       "mode": "blocking",
-      "outcomes": ["qualify", "reject", "requalify"],
+      "outcomes": [
+        "qualify",
+        "reject",
+        "requalify"
+      ],
       "failureBehavior": "Missing, stale, conflicting, or failed evidence blocks release; it never silently downgrades the gate."
     },
     "requalificationTriggers": [
@@ -124,13 +141,42 @@
   "comparisonLaw": {
     "authorityPath": "docs/runtime-ownership-decision.md",
     "lanes": [
-      { "id": "I0", "executor": "ambient incumbent", "governance": "ambient application behavior", "conditional": false },
-      { "id": "I1", "executor": "pinned incumbent", "governance": "pinned reproducible control", "conditional": false },
-      { "id": "W0", "executor": "pinned incumbent", "governance": "DoeProof policy, oracle, receipt, replay, and release gate", "conditional": false },
-      { "id": "D0", "executor": "DoeRuntime", "governance": "the identical DoeProof contract used by W0", "conditional": false },
-      { "id": "P0", "executor": "smallest viable incumbent patch", "governance": "the identical DoeProof contract used by W0", "conditional": true }
+      {
+        "id": "I0",
+        "executor": "ambient incumbent",
+        "governance": "ambient application behavior",
+        "conditional": false
+      },
+      {
+        "id": "I1",
+        "executor": "pinned incumbent",
+        "governance": "pinned reproducible control",
+        "conditional": false
+      },
+      {
+        "id": "W0",
+        "executor": "pinned incumbent",
+        "governance": "DoeProof policy, oracle, receipt, replay, and release gate",
+        "conditional": false
+      },
+      {
+        "id": "D0",
+        "executor": "DoeRuntime",
+        "governance": "the identical DoeProof contract used by W0",
+        "conditional": false
+      },
+      {
+        "id": "P0",
+        "executor": "smallest viable incumbent patch",
+        "governance": "the identical DoeProof contract used by W0",
+        "conditional": true
+      }
     ],
-    "selectionOutcomes": ["doe-runtime", "incumbent", "dual"]
+    "selectionOutcomes": [
+      "doe-runtime",
+      "incumbent",
+      "dual"
+    ]
   },
   "externalProductComparison": {
     "authorityPath": "config/browser-product-comparison-policy.json",
@@ -184,46 +230,79 @@
     {
       "id": "workload-contract",
       "canonicalJob": "Freeze application work, inputs, executor, output, and comparison scope.",
-      "ownerPaths": ["docs/workload-system.md", "runtime/zig/src/contracts/workload_profile.zig"]
+      "ownerPaths": [
+        "docs/workload-system.md",
+        "runtime/zig/src/contracts/workload_profile.zig"
+      ]
     },
     {
       "id": "execution-policy",
       "canonicalJob": "Declare provider selection, fallback, backend, timing, and admissibility policy.",
-      "ownerPaths": ["config/governed-lanes.json", "docs/process.md"]
+      "ownerPaths": [
+        "config/governed-lanes.json",
+        "docs/process.md"
+      ]
     },
     {
       "id": "independent-oracle",
       "canonicalJob": "Judge application output independently of the executor under test.",
-      "ownerPaths": ["docs/workload-system.md", "runtime/zig/src/evidence/oracle.zig"]
+      "ownerPaths": [
+        "docs/workload-system.md",
+        "runtime/zig/src/evidence/oracle.zig"
+      ]
     },
     {
       "id": "program-identity",
       "canonicalJob": "Bind source, lowered program, backend artifact, command graph, and execution identity.",
-      "ownerPaths": ["runtime/zig/src/contracts/identity.zig", "docs/runtime-ownership-decision.md"]
+      "ownerPaths": [
+        "runtime/zig/src/contracts/identity.zig",
+        "docs/runtime-ownership-decision.md"
+      ]
     },
     {
       "id": "execution-receipt",
       "canonicalJob": "Record what executed, its outcome, identities, fallback, and evidence references.",
-      "ownerPaths": ["runtime/zig/src/evidence/receipt.zig", "config/doe-run-receipt-v1.schema.json"]
+      "ownerPaths": [
+        "runtime/zig/src/evidence/receipt.zig",
+        "config/doe-run-receipt-v1.schema.json"
+      ]
     },
     {
       "id": "replay-artifact",
       "canonicalJob": "Retain immutable inputs and hashes required to reproduce the declared execution.",
-      "ownerPaths": ["runtime/zig/src/evidence/replay.zig", "docs/operator-runbook.md"]
+      "ownerPaths": [
+        "runtime/zig/src/evidence/replay.zig",
+        "docs/operator-runbook.md"
+      ]
     },
     {
       "id": "qualification-decision",
       "canonicalJob": "Admit, reject, retain, revoke, or require requalification without mutating prior evidence.",
-      "ownerPaths": ["runtime/zig/src/contracts/promotion_receipt.zig", "reports/claim-index.json"]
+      "ownerPaths": [
+        "runtime/zig/src/contracts/promotion_receipt.zig",
+        "reports/claim-index.json"
+      ]
     }
   ],
   "customerEvidencePolicy": {
     "defaultRule": "Customer content and customer-specific knowledge remain isolated unless explicit authority permits a narrower transfer.",
     "classes": [
-      { "id": "customer-content", "crossProductRule": "never-by-default" },
-      { "id": "customer-derived", "crossProductRule": "explicit-authorization" },
-      { "id": "sanitized-runtime-failure", "crossProductRule": "sanitized-only" },
-      { "id": "reproducible-backend-defect", "crossProductRule": "reproducible-evidence-only" }
+      {
+        "id": "customer-content",
+        "crossProductRule": "never-by-default"
+      },
+      {
+        "id": "customer-derived",
+        "crossProductRule": "explicit-authorization"
+      },
+      {
+        "id": "sanitized-runtime-failure",
+        "crossProductRule": "sanitized-only"
+      },
+      {
+        "id": "reproducible-backend-defect",
+        "crossProductRule": "reproducible-evidence-only"
+      }
     ]
   },
   "platformSequence": [
@@ -252,48 +331,99 @@
   "milestones": [
     {
       "order": 1,
-      "id": "owned-capability-v1",
-      "outcome": "An externally owned unchanged non-Doppler application voluntarily adopts DoeRuntime because its predeclared outcome improves, then retains it across another release or workload.",
+      "id": "provider-qualification-v1",
+      "outcome": "One retained package qualifies explicit provider selection, compilation, execution, readback, teardown and recovery in controlled Node, Bun, Electron and native hosts.",
       "requiredEvidence": [
-        "frozen application",
-        "strongest incumbent",
-        "identical work",
-        "independent oracle",
-        "physical evidence",
-        "predeclared material advantage",
-        "voluntary maintainer adoption",
-        "retained across another release or workload",
-        "non-Doppler first adopter"
+        "retained package hashes",
+        "same package across runtime hosts",
+        "native library and backend identity",
+        "physical GPU and driver identity",
+        "shader and numerical output",
+        "explicit fallback state",
+        "lifecycle and recovery"
       ],
       "currentAssessment": "unestablished",
-      "stateAuthorityPaths": ["docs/runtime-ownership-decision.md", "reports/claim-index.json"]
+      "stateAuthorityPaths": [
+        "docs/status/reusable-compute-programs.md",
+        "reports/claim-index.json"
+      ]
     },
     {
       "order": 2,
-      "id": "release-passport-v1",
-      "outcome": "Supporting DoeProof qualification binds physical identities, independent oracle, replay, and release gates for incumbent and DoeRuntime without granting runtime adoption credit.",
-      "requiredEvidence": ["unchanged application workload", "physical hardware identity", "independent oracle", "blocking CI decision", "repeat requalification"],
+      "id": "prepared-doeplan-v1",
+      "outcome": "Declared fixed-shape programs progressively retain safe compiler and execution state, with explicit invalidation and an ordinary WebGPU control.",
+      "requiredEvidence": [
+        "versioned program contract",
+        "persistent allocations and pipelines",
+        "source and shape invalidation",
+        "device and runtime-policy identity",
+        "replay correctness",
+        "transactional updates",
+        "ordinary execution control"
+      ],
       "currentAssessment": "unestablished",
-      "stateAuthorityPaths": ["config/ecosystem-registry.json", "reports/claim-index.json"]
+      "stateAuthorityPaths": [
+        "docs/status/reusable-compute-programs.md",
+        "reports/claim-index.json"
+      ]
     },
     {
       "order": 3,
-      "id": "fawn-agent-compute-v1",
-      "outcome": "A downloadable hash-bound Fawn archive proves its browser shell, runtime, and direct protocol independently on one complete unchanged agent workflow while K0 separately tests external-product substitution.",
+      "id": "external-application-qualification-v1",
+      "outcome": "Frozen non-Doppler external applications demonstrate a transferred useful-operation advantage against the strongest incumbent.",
       "requiredEvidence": [
-        "stock Chromium plus Dawn control",
-        "Fawn plus Dawn",
-        "Fawn plus Doe",
-        "Fawn Direct Protocol plus Doe",
-        "separate K0 external-product comparison on eligible shared tasks",
-        "shared task suite",
-        "differentiation task suite",
-        "task oracle",
-        "lifecycle and recovery",
-        "matched p50 p95 p99 when performance is claimed"
+        "pinned upstream applications and WGSL",
+        "incumbent, ordinary Doe and prepared Doe lanes",
+        "independent numerical oracle",
+        "cold and first execution",
+        "preparation amortization",
+        "repeated latency tails",
+        "CPU overhead and GPU time",
+        "peak memory and allocation counts",
+        "submission work",
+        "teardown and recovery",
+        "AMD Vulkan and Apple Metal physical transfer"
       ],
-      "currentAssessment": "diagnostic",
-      "stateAuthorityPaths": ["bench/fawn_matrix/config/matrix-workloads.json", "browser/chromium/bench/workflows/browser-milestones.json"]
+      "currentAssessment": "unestablished",
+      "stateAuthorityPaths": [
+        "docs/status/reusable-compute-programs.md",
+        "reports/claim-index.json"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "transferable-corrections-v1",
+      "outcome": "DoeLab turns reproduced application failures into permanent compiler or runtime corrections validated across applications and physical backends.",
+      "requiredEvidence": [
+        "small reproduction",
+        "responsible layer",
+        "unchanged semantic regression",
+        "candidate correction",
+        "physical cross-backend evaluation",
+        "source-to-backend identity"
+      ],
+      "currentAssessment": "unestablished",
+      "stateAuthorityPaths": [
+        "docs/status/reusable-compute-programs.md",
+        "reports/claim-index.json"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "embedding-expansion-v1",
+      "outcome": "Distribution integrations expand the same execution system after demonstrated application wins.",
+      "requiredEvidence": [
+        "prior provider qualification",
+        "prior transferred application advantage",
+        "separate integration artifact",
+        "physical lifecycle and correctness evidence",
+        "independent repeat use"
+      ],
+      "currentAssessment": "unestablished",
+      "stateAuthorityPaths": [
+        "docs/status/reusable-compute-programs.md",
+        "reports/claim-index.json"
+      ]
     }
   ],
   "claimBoundary": {
@@ -311,5 +441,27 @@
       "Paid qualification, DoeProof receipts, compiler breadth, internal benchmarks, and Doppler interoperability cannot substitute for DoeRuntime adoption."
     ],
     "currentStateAuthority": "reports/claim-index.json"
+  },
+  "reusableProgram": {
+    "contractPath": "docs/reusable-compute-programs.md",
+    "descriptorSchemaPath": "config/compute-program.schema.json",
+    "evaluationPolicyPath": "config/compute-program-evaluation.json",
+    "initialScope": "Explicit fixed-shape buffer compute; source and shape changes invalidate affected state.",
+    "demonstrationGate": "Independent numerical parity, meaningful predeclared application outcome against persistent Dawn and wgpu, lifecycle and memory evidence, AMD Vulkan to Apple Metal reproduction, and transfer to another application.",
+    "adoptionBoundary": "Repository demonstrations do not establish external voluntary adoption or retention."
+  },
+  "executionOwnership": {
+    "operatingObjective": "Take unchanged WebGPU workloads through Doe and earn more execution ownership through measured preparation, execution and repetition advantages.",
+    "allocationPercent": {
+      "runtimeCompilerAndPlans": 60,
+      "externalWorkloadQualification": 25,
+      "packagingIntegration": 10,
+      "experimentalSurfaces": 5
+    },
+    "externalApplicationRange": {
+      "minimum": 3,
+      "maximum": 5
+    },
+    "expansionPrerequisite": "Transferred physical application wins; Chromium/Fawn, Flutter/Impeller, ONNX Runtime EP and TSIR/Cerebras remain distribution experiments until this gate passes."
   }
 }

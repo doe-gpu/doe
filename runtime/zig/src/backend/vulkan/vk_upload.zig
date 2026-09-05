@@ -145,15 +145,22 @@ fn finalize_recorded_submit_replay(self: anytype) !RecordedReplaySubmitTimings {
     try c.check_vk(c.vkEndCommandBuffer(self.replay_command_buffer));
     timings.command_buffer_end_ns = common_timing.ns_delta(common_timing.now_ns(), end_started_ns);
 
+    var submitted = try submit_replay_command_buffer(self, self.replay_command_buffer);
+    submitted.command_buffer_end_ns = timings.command_buffer_end_ns;
+    return submitted;
+}
+
+pub fn submit_replay_command_buffer(self: anytype, command_buffer: c.VkCommandBuffer) !RecordedReplaySubmitTimings {
+    var timings = RecordedReplaySubmitTimings{};
     var command_buffers = [_]c.VkCommandBuffer{
-        self.replay_command_buffer,
+        command_buffer,
         null,
     };
     var command_buffer_count: u32 = 1;
     if (self.replay_prefix_copy_pending) {
         if (self.replay_prefix_copy_buffer == null) return error.InvalidState;
         command_buffers[0] = self.replay_prefix_copy_buffer;
-        command_buffers[1] = self.replay_command_buffer;
+        command_buffers[1] = command_buffer;
         command_buffer_count = 2;
     }
 
@@ -658,26 +665,24 @@ pub fn streaming_copy_buffer_region(self: anytype, src: c.VkBuffer, src_offset: 
 
 pub fn record_replay_buffer_copy(
     self: anytype,
-    src_handle: u64,
     src: anytype,
     src_offset: u64,
-    dst_handle: u64,
     dst: anytype,
     dst_offset: u64,
     size: u64,
 ) !void {
     if (size == 0) return;
-    if (!self.replay_recording_active or self.replay_command_buffer == null) return error.InvalidState;
+    _ = try self.begin_prepared_dispatch_replay();
 
-    vk_compute_sync.make_prior_transfer_writes_visible_for_transfer_read(self, self.replay_command_buffer);
-    vk_compute_sync.make_prior_compute_writes_visible_for_buffer_copy(
-        self,
-        self.replay_command_buffer,
-        src_handle,
-        src.buffer,
-        dst_handle,
-        dst.buffer,
-    );
+    // A copy-only submission must also order reads and writes from earlier
+    // submissions. Mapped memory does not make an in-flight producer complete.
+    const barrier = c.VkMemoryBarrier{
+        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+        .pNext = null,
+        .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT | c.VK_ACCESS_TRANSFER_WRITE_BIT,
+        .dstAccessMask = c.VK_ACCESS_TRANSFER_READ_BIT | c.VK_ACCESS_TRANSFER_WRITE_BIT,
+    };
+    c.vkCmdPipelineBarrier(self.replay_command_buffer, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 1, @ptrCast(&barrier), 0, null, 0, null);
 
     var region = c.VkBufferCopy{
         .srcOffset = src_offset,
@@ -687,7 +692,7 @@ pub fn record_replay_buffer_copy(
     c.vkCmdCopyBuffer(self.replay_command_buffer, src.buffer, dst.buffer, 1, @ptrCast(&region));
     self.has_pending_transfer_writes = true;
 
-    if (dst.memory_kind == .host_visible) {
+    if (dst.memory_kind != .device_local) {
         vk_compute_sync.make_transfer_writes_visible_for_host_read(self.replay_command_buffer);
     }
 }
@@ -702,6 +707,25 @@ pub fn streaming_fill_buffer(self: anytype, dst: c.VkBuffer, dst_offset: u64, si
     if (!self.streaming_copy_active) try begin_streaming_copy(self);
     c.vkCmdFillBuffer(self.streaming_copy_buffer, dst, dst_offset, size, data);
     self.streaming_copy_count += 1;
+}
+
+/// A recorded clear is ordered against preceding reads as well as writes.
+pub fn record_replay_buffer_clear(self: anytype, dst: c.VkBuffer, offset: u64, size: u64) !void {
+    if (size == 0) return;
+    const command_buffer = try self.begin_prepared_dispatch_replay();
+    var barrier = c.VkMemoryBarrier{
+        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+        .pNext = null,
+        .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT | c.VK_ACCESS_TRANSFER_WRITE_BIT,
+        .dstAccessMask = c.VK_ACCESS_TRANSFER_WRITE_BIT,
+    };
+    c.vkCmdPipelineBarrier(command_buffer, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 1, @ptrCast(&barrier), 0, null, 0, null);
+    c.vkCmdFillBuffer(command_buffer, dst, offset, size, 0);
+    self.has_pending_transfer_writes = true;
+    barrier.srcAccessMask = c.VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = c.VK_ACCESS_SHADER_READ_BIT | c.VK_ACCESS_SHADER_WRITE_BIT |
+        c.VK_ACCESS_TRANSFER_READ_BIT | c.VK_ACCESS_TRANSFER_WRITE_BIT | c.VK_ACCESS_HOST_READ_BIT;
+    c.vkCmdPipelineBarrier(command_buffer, c.VK_PIPELINE_STAGE_TRANSFER_BIT, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT | c.VK_PIPELINE_STAGE_HOST_BIT, 0, 1, @ptrCast(&barrier), 0, null, 0, null);
 }
 
 /// Submit a single copy region and wait for completion.

@@ -1011,6 +1011,7 @@ pub export fn doeNativeDeviceCreateComputePipelineMain(dev_raw: ?*anyopaque, sha
 
 pub export fn doeNativeComputePipelineRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeComputePipeline, raw)) |p| {
+        if (!native_helpers.object_should_destroy(p)) return;
         label_store.remove(raw);
         if (p.mtl_pso) |pso| metal_bridge_release(pso);
         if (p.dispatch_preconditions.len > 0) alloc.free(p.dispatch_preconditions);

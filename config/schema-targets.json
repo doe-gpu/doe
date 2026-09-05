@@ -6,6 +6,14 @@
       "data": "config/schema-targets.json"
     },
     {
+      "schema": "config/compute-program.schema.json",
+      "data": "examples/compute-program.sample.json"
+    },
+    {
+      "schema": "config/compute-program-evaluation.schema.json",
+      "data": "config/compute-program-evaluation.json"
+    },
+    {
       "schema": "config/fawn-matrix-workloads.schema.json",
       "data": "bench/fawn_matrix/config/matrix-workloads.json"
     },
@@ -1328,6 +1336,14 @@
     {
       "schema": "config/doe-provenance.schema.json",
       "data": "examples/doe-promoted-artifact-provenance.sample.json"
+    },
+    {
+      "schema": "config/vulkan-buffer-memory-policy.schema.json",
+      "data": "config/vulkan-buffer-memory-policy.json"
+    },
+    {
+      "schema": "config/compute-program-evaluation.schema.json",
+      "data": "config/compute-program-external-evaluation.json"
     }
   ],
   "globTargets": [
@@ -1381,6 +1397,31 @@
     {
       "schema": "config/ecosystem-report.schema.json",
       "glob": "reports/ecosystem/*/*.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/compute-program-run.schema.json",
+      "glob": "bench/out/compute-program/*-final/*.process-[0-9].json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/compute-program-run.schema.json",
+      "glob": "bench/out/compute-program/*-final/*.audit.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/compute-program-matrix.schema.json",
+      "glob": "bench/out/compute-program/*-final/summary.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/compute-program-package.schema.json",
+      "glob": "bench/out/compute-program/*-retained-package/summary.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/compute-program-fixture.schema.json",
+      "glob": "bench/out/compute-program/*-fixture/fixture.json",
       "allowEmpty": true
     }
   ]

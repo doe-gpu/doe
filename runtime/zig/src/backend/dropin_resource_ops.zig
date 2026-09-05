@@ -63,28 +63,6 @@ fn failVulkanResourceError(dev: *DoeDevice, comptime operation: []const u8, err:
     return failVulkanResourceOp(dev, operation, @errorName(err));
 }
 
-pub fn handleVulkanClearBuffer(
-    enc: *DoeCommandEncoder,
-    buffer: *DoeBuffer,
-    offset: u64,
-    fill_size: u64,
-) bool {
-    if (enc.dev.backend != .vulkan) return false;
-    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "clearBuffer", "backend compiled without Vulkan support");
-    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
-        return failVulkanResourceOp(enc.dev, "clearBuffer", "device has no Vulkan runtime");
-    if (buffer.vk_id == 0) return failVulkanResourceOp(enc.dev, "clearBuffer", "buffer has no Vulkan resource");
-    const cb = rt.compute_buffers.get(buffer.vk_id) orelse
-        return failVulkanResourceOp(enc.dev, "clearBuffer", "buffer resource is not registered");
-    const ptr = cb.mapped orelse
-        return failVulkanResourceOp(enc.dev, "clearBuffer", "buffer resource is not CPU-mapped");
-    const n: usize = @intCast(fill_size);
-    const o: usize = @intCast(offset);
-    const d: [*]u8 = @ptrCast(ptr);
-    @memset(d[o .. o + n], 0);
-    return true;
-}
-
 pub fn handleVulkanCopyBufferToTexture(
     enc: *DoeCommandEncoder,
     src_buffer: *DoeBuffer,

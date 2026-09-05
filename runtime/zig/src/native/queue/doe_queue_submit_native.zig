@@ -9,9 +9,21 @@ const shared = @import("doe_queue_submit_shared.zig");
 const d3d12_submit = @import("doe_queue_submit_d3d12.zig");
 const metal_submit = @import("doe_queue_submit_metal.zig");
 const vulkan_submit = @import("doe_queue_submit_vulkan.zig");
+const compute_program = @import("../compute/doe_compute_program_native.zig");
+
+comptime {
+    _ = &compute_program.doeNativeComputeProgramSupported;
+    _ = &compute_program.doeNativeComputeProgramPrepare;
+    _ = &compute_program.doeNativeComputeProgramSubmit;
+    _ = &compute_program.doeNativeComputeProgramRelease;
+}
 
 const cast = native_helpers.cast;
 const DoeQueue = native_types.DoeQueue;
+
+pub export fn doeNativeComputeProgramContractVersion() callconv(.c) u32 {
+    return @import("build_options").compute_program_contract_version;
+}
 
 pub const flush_pending_work = shared.flush_pending_work;
 pub const flush_pending_work_timed = shared.flush_pending_work_timed;

@@ -1,5 +1,15 @@
 #include "doe_napi_internal.h"
 
+napi_value doe_compute_program_contract_version(napi_env env, napi_callback_info info) {
+    (void)info;
+    CHECK_LIB_LOADED(env);
+    const uint32_t unsupported_contract = 0;
+    uint32_t (*version)(void) = (uint32_t (*)(void))LIB_SYM(g_lib, "doeNativeComputeProgramContractVersion");
+    napi_value result;
+    napi_create_uint32(env, version ? version() : unsupported_contract, &result);
+    return result;
+}
+
 /* ================================================================
  * Device capabilities: limits, features
  * ================================================================ */

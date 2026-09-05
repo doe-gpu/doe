@@ -148,10 +148,6 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                     vulkan_compute.vulkan_run_prepared_dispatch_indirect(rt, dispatch_indirect_cmd);
                     recorded_replay_work = true;
                 },
-                // Replay the copy in encoder-recorded order. When it follows
-                // recorded dispatches, keep it in the same Vulkan command
-                // buffer with an explicit compute->transfer barrier so
-                // queue.submit does not synchronously drain before readback.
                 .copy_buf => |copy_cmd| {
                     const src_buf = cast(native_types.DoeBuffer, copy_cmd.src) orelse continue;
                     const dst_buf = cast(native_types.DoeBuffer, copy_cmd.dst) orelse continue;
@@ -161,64 +157,18 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                     const copy_end_src = std.math.add(u64, copy_cmd.src_off, copy_cmd.size) catch continue;
                     const copy_end_dst = std.math.add(u64, copy_cmd.dst_off, copy_cmd.size) catch continue;
                     if (copy_end_src > scb.size or copy_end_dst > dcb.size) continue;
-                    const src_has_pending_compute_write =
-                        rt.has_pending_compute_writes and
-                        rt.has_pending_compute_write_for_buffer(src_buf.vk_id);
-                    const src_has_pending_transfer_write = rt.has_pending_transfer_writes;
-                    if (rt.replay_recording_active and (scb.mapped == null or src_has_pending_compute_write or src_has_pending_transfer_write)) {
-                        vk_upload.record_replay_buffer_copy(
-                            rt,
-                            src_buf.vk_id,
-                            scb,
-                            copy_cmd.src_off,
-                            dst_buf.vk_id,
-                            dcb,
-                            copy_cmd.dst_off,
-                            copy_cmd.size,
-                        ) catch |err| {
-                            shared.deliverInternalError(
-                                q.dev,
-                                "doe_queue_submit: vulkan record copy_buf: {s}",
-                                .{@errorName(err)},
-                            );
-                        };
-                        recorded_replay_work = true;
-                        continue;
-                    }
-                    if (recorded_replay_work) {
-                        _ = rt.flush_queue() catch |err| {
-                            shared.deliverInternalError(
-                                q.dev,
-                                "doe_queue_submit: vulkan flush before copy_buf: {s}",
-                                .{@errorName(err)},
-                            );
-                        };
-                        recorded_replay_work = false;
-                        resetPreparedDispatchState(&prepared_dispatch);
-                    }
-                    if (scb.mapped != null and dcb.mapped != null) {
-                        const n: usize = @intCast(copy_cmd.size);
-                        const so: usize = @intCast(copy_cmd.src_off);
-                        const doff: usize = @intCast(copy_cmd.dst_off);
-                        const s: [*]const u8 = @ptrCast(scb.mapped.?);
-                        const d: [*]u8 = @ptrCast(dcb.mapped.?);
-                        @memcpy(d[doff .. doff + n], s[so .. so + n]);
-                        continue;
-                    }
-                    vk_upload.copy_buffer_region_and_wait(
+                    vk_upload.record_replay_buffer_copy(
                         rt,
-                        scb.buffer,
+                        scb,
                         copy_cmd.src_off,
-                        dcb.buffer,
+                        dcb,
                         copy_cmd.dst_off,
                         copy_cmd.size,
                     ) catch |err| {
-                        shared.deliverInternalError(
-                            q.dev,
-                            "doe_queue_submit: vulkan copy_buf: {s}",
-                            .{@errorName(err)},
-                        );
+                        shared.deliverInternalError(q.dev, "doe_queue_submit: vulkan record copy_buf: {s}", .{@errorName(err)});
+                        continue;
                     };
+                    recorded_replay_work = true;
                 },
                 .copy_texture_to_buffer => |copy_cmd| {
                     if (!flushRecordedReplay(q, rt, &recorded_replay_work, "before copy_texture_to_buffer")) continue;
@@ -274,8 +224,26 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                         );
                     };
                 },
+                .clear_buffer => |clear_cmd| {
+                    const buffer = cast(native_types.DoeBuffer, clear_cmd.buffer) orelse {
+                        shared.deliverInternalError(q.dev, "Vulkan clearBuffer: invalid buffer", .{});
+                        return;
+                    };
+                    const target = rt.compute_buffers.get(buffer.vk_id) orelse {
+                        shared.deliverInternalError(q.dev, "Vulkan clearBuffer: resource unavailable", .{});
+                        return;
+                    };
+                    if (clear_cmd.offset > target.size or clear_cmd.size > target.size - clear_cmd.offset) {
+                        shared.deliverInternalError(q.dev, "Vulkan clearBuffer: range exceeds buffer", .{});
+                        return;
+                    }
+                    vk_upload.record_replay_buffer_clear(rt, target.buffer, clear_cmd.offset, clear_cmd.size) catch |err| {
+                        shared.deliverInternalError(q.dev, "Vulkan clearBuffer: {s}", .{@errorName(err)});
+                        return;
+                    };
+                    recorded_replay_work = true;
+                },
                 .copy_buffer_to_texture,
-                .clear_buffer,
                 .render_pass,
                 => {},
                 .write_timestamp => |timestamp_cmd| {

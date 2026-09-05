@@ -4,6 +4,24 @@ const builtin = @import("builtin");
 pub const TRACE_PATH_ENV = "DOE_PROGRAM_IDENTITY_TRACE_PATH";
 pub const TRACE_KIND = "doe_native_program_identity_v1";
 
+pub fn recordComputeProgramPrepared(program_id: usize, dispatch_count: u64) void {
+    recordComputeProgram("compute_program_prepared", program_id, dispatch_count, 0);
+}
+
+pub fn recordComputeProgramSubmitted(program_id: usize, dispatch_count: u64, submission: u64) void {
+    recordComputeProgram("compute_program_submitted", program_id, dispatch_count, submission);
+}
+
+fn recordComputeProgram(event: []const u8, program_id: usize, dispatch_count: u64, submission: u64) void {
+    if (!enabled()) return;
+    g_trace_lock.lock();
+    defer g_trace_lock.unlock();
+    const path = g_trace_path orelse return;
+    var buffer: [512]u8 = undefined;
+    const row = std.fmt.bufPrint(&buffer, "{{\"schemaVersion\":1,\"traceKind\":\"{s}\",\"event\":\"{s}\",\"processId\":{},\"sequence\":{},\"backend\":\"doe_vulkan\",\"programId\":{},\"dispatchCount\":{},\"submissionIndex\":{}}}\n", .{ TRACE_KIND, event, processId(), nextSequence(), program_id, dispatch_count, submission }) catch return;
+    _ = appendLocked(path, row);
+}
+
 var g_ready: std.atomic.Value(u8) = .init(0);
 var g_init_lock: std.Thread.Mutex = .{};
 var g_trace_lock: std.Thread.Mutex = .{};
