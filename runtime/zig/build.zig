@@ -279,6 +279,13 @@ fn addComputeProgramContract(options: *std.Build.Step.Options, allocator: std.me
     const schema = std.json.parseFromSlice(Schema, allocator, bytes, .{ .ignore_unknown_fields = true }) catch
         @panic("invalid compute program schema version");
     options.addOption(u32, "compute_program_contract_version", std.mem.max(u32, schema.value.properties.schemaVersion.@"enum"));
+    const pipeline_bytes = std.fs.cwd().readFileAlloc(allocator, "../../config/vulkan-compute-pipeline-policy.json", 64 * 1024) catch
+        @panic("failed to read vulkan-compute-pipeline-policy.json");
+    const PipelinePolicy = struct { schemaVersion: u32, reuse: enum { private, @"share-live-exact" } };
+    const pipeline_policy = std.json.parseFromSlice(PipelinePolicy, allocator, pipeline_bytes, .{}) catch
+        @panic("invalid Vulkan compute pipeline policy");
+    if (pipeline_policy.value.schemaVersion != 1) @panic("unsupported Vulkan compute pipeline policy version");
+    options.addOption(bool, "vulkan_share_live_compute_pipelines", pipeline_policy.value.reuse == .@"share-live-exact");
     const memory_file = std.fs.cwd().openFile("../../config/vulkan-buffer-memory-policy.json", .{}) catch
         @panic("config/vulkan-buffer-memory-policy.json not found");
     defer memory_file.close();

@@ -64,6 +64,11 @@ classified and cannot be promoted by benchmark results.
   independently. Interleaved programs, ordinary execution, updates, and device
   destruction exercise retained resource ownership. Evaluation policy selects
   the percentile estimator; changing it cannot reinterpret historical results.
+- Native pipeline reuse requires exact identity checks and a device-owned
+  lifetime. Regression evidence checks actual handles and GPU output across
+  independent bindings, creator teardown, shader/layout changes, allocation
+  failure, and device isolation. Public resource counters alone do not establish
+  native pipeline reuse or reduced useful-operation latency.
 - External declared-program fixtures retain pinned shader and oracle source,
   toolchain, input bytes, and expected outputs before provider audits. The gate
   checks every reference, declared input extent, and complete oracle coverage.

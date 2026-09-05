@@ -1,5 +1,6 @@
 const std = @import("std");
 const c = @import("vk_constants.zig");
+const shared = @import("vk_shared_pipeline.zig");
 
 const VK_NULL_U64 = c.VK_NULL_U64;
 pub const HOT_COMPUTE_STATE_CACHE_CAPACITY: usize = 16;
@@ -14,9 +15,9 @@ pub const CachedDescriptorState = struct {
 };
 
 pub const CachedComputeState = struct {
-    shader_module: c.VkShaderModule = VK_NULL_U64,
     pipeline_layout: c.VkPipelineLayout = VK_NULL_U64,
     pipeline: c.VkPipeline = VK_NULL_U64,
+    shared_pipeline: ?*shared.Pipeline = null,
     descriptor_pool: c.VkDescriptorPool = VK_NULL_U64,
     descriptor_set_layouts: [c.MAX_DESCRIPTOR_SETS]c.VkDescriptorSetLayout = [_]c.VkDescriptorSetLayout{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS,
     descriptor_sets: [c.MAX_DESCRIPTOR_SETS]c.VkDescriptorSet = [_]c.VkDescriptorSet{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS,
@@ -24,11 +25,9 @@ pub const CachedComputeState = struct {
     current_pipeline_hash: u64 = 0,
     current_layout_hash: u64 = 0,
     current_descriptor_bindings_hash: u64 = 0,
-    current_entry_point_owned: ?[:0]u8 = null,
     hot_descriptor_state_hashes: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** HOT_DESCRIPTOR_STATE_CACHE_CAPACITY,
     hot_descriptor_states: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]CachedDescriptorState = undefined,
     descriptor_state_cache: std.AutoHashMapUnmanaged(u64, CachedDescriptorState) = .{},
-    has_shader_module: bool = false,
     has_pipeline_layout: bool = false,
     has_pipeline: bool = false,
     has_descriptor_pool: bool = false,
@@ -36,19 +35,17 @@ pub const CachedComputeState = struct {
 };
 
 pub fn has_active_compute_state(self: anytype) bool {
-    return self.has_shader_module or
-        self.has_pipeline_layout or
+    return self.has_pipeline_layout or
         self.has_pipeline or
         self.has_descriptor_pool or
         self.current_pipeline_hash != 0 or
-        self.current_layout_hash != 0 or
-        self.current_entry_point_owned != null;
+        self.current_layout_hash != 0;
 }
 
 pub fn clear_active_compute_state(self: anytype) void {
-    self.shader_module = VK_NULL_U64;
     self.pipeline_layout = VK_NULL_U64;
     self.pipeline = VK_NULL_U64;
+    self.shared_pipeline = null;
     self.descriptor_pool = VK_NULL_U64;
     self.descriptor_set_layouts = [_]c.VkDescriptorSetLayout{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS;
     self.descriptor_sets = [_]c.VkDescriptorSet{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS;
@@ -56,11 +53,9 @@ pub fn clear_active_compute_state(self: anytype) void {
     self.current_pipeline_hash = 0;
     self.current_layout_hash = 0;
     self.current_descriptor_bindings_hash = 0;
-    self.current_entry_point_owned = null;
     self.hot_descriptor_state_hashes = [_]u64{0} ** HOT_DESCRIPTOR_STATE_CACHE_CAPACITY;
     self.hot_descriptor_states = undefined;
     self.current_descriptor_state_cache = .{};
-    self.has_shader_module = false;
     self.has_pipeline_layout = false;
     self.has_pipeline = false;
     self.has_descriptor_pool = false;
@@ -69,9 +64,9 @@ pub fn clear_active_compute_state(self: anytype) void {
 
 pub fn capture_active_compute_state(self: anytype) CachedComputeState {
     return .{
-        .shader_module = self.shader_module,
         .pipeline_layout = self.pipeline_layout,
         .pipeline = self.pipeline,
+        .shared_pipeline = self.shared_pipeline,
         .descriptor_pool = self.descriptor_pool,
         .descriptor_set_layouts = self.descriptor_set_layouts,
         .descriptor_sets = self.descriptor_sets,
@@ -79,11 +74,9 @@ pub fn capture_active_compute_state(self: anytype) CachedComputeState {
         .current_pipeline_hash = self.current_pipeline_hash,
         .current_layout_hash = self.current_layout_hash,
         .current_descriptor_bindings_hash = self.current_descriptor_bindings_hash,
-        .current_entry_point_owned = self.current_entry_point_owned,
         .hot_descriptor_state_hashes = self.hot_descriptor_state_hashes,
         .hot_descriptor_states = self.hot_descriptor_states,
         .descriptor_state_cache = self.current_descriptor_state_cache,
-        .has_shader_module = self.has_shader_module,
         .has_pipeline_layout = self.has_pipeline_layout,
         .has_pipeline = self.has_pipeline,
         .has_descriptor_pool = self.has_descriptor_pool,
@@ -92,9 +85,9 @@ pub fn capture_active_compute_state(self: anytype) CachedComputeState {
 }
 
 pub fn restore_active_compute_state(self: anytype, cached: CachedComputeState) void {
-    self.shader_module = cached.shader_module;
     self.pipeline_layout = cached.pipeline_layout;
     self.pipeline = cached.pipeline;
+    self.shared_pipeline = cached.shared_pipeline;
     self.descriptor_pool = cached.descriptor_pool;
     self.descriptor_set_layouts = cached.descriptor_set_layouts;
     self.descriptor_sets = cached.descriptor_sets;
@@ -102,11 +95,9 @@ pub fn restore_active_compute_state(self: anytype, cached: CachedComputeState) v
     self.current_pipeline_hash = cached.current_pipeline_hash;
     self.current_layout_hash = cached.current_layout_hash;
     self.current_descriptor_bindings_hash = cached.current_descriptor_bindings_hash;
-    self.current_entry_point_owned = cached.current_entry_point_owned;
     self.hot_descriptor_state_hashes = cached.hot_descriptor_state_hashes;
     self.hot_descriptor_states = cached.hot_descriptor_states;
     self.current_descriptor_state_cache = cached.descriptor_state_cache;
-    self.has_shader_module = cached.has_shader_module;
     self.has_pipeline_layout = cached.has_pipeline_layout;
     self.has_pipeline = cached.has_pipeline;
     self.has_descriptor_pool = cached.has_descriptor_pool;
@@ -132,8 +123,9 @@ pub fn release_descriptor_state_cache(self: anytype) void {
 }
 
 pub fn destroy_cached_compute_state(self: anytype, cached: CachedComputeState) void {
-    if (cached.pipeline != VK_NULL_U64) c.vkDestroyPipeline(self.device, cached.pipeline, null);
-    if (cached.shader_module != VK_NULL_U64) c.vkDestroyShaderModule(self.device, cached.shader_module, null);
+    if (cached.shared_pipeline) |entry| {
+        self.shared_pipelines.release(self.allocator, self.device, entry);
+    } else if (cached.pipeline != VK_NULL_U64) c.vkDestroyPipeline(self.device, cached.pipeline, null);
     if (cached.descriptor_pool != VK_NULL_U64) c.vkDestroyDescriptorPool(self.device, cached.descriptor_pool, null);
     for (cached.hot_descriptor_state_hashes, 0..) |hash, index| {
         if (hash == 0) continue;
@@ -149,7 +141,6 @@ pub fn destroy_cached_compute_state(self: anytype, cached: CachedComputeState) v
         if (layout != VK_NULL_U64) c.vkDestroyDescriptorSetLayout(self.device, layout, null);
     }
     if (cached.pipeline_layout != VK_NULL_U64) c.vkDestroyPipelineLayout(self.device, cached.pipeline_layout, null);
-    if (cached.current_entry_point_owned) |entry_name| self.allocator.free(entry_name);
 }
 
 pub fn release_cached_compute_states(self: anytype) void {
@@ -215,10 +206,11 @@ pub fn activate_cached_compute_state(self: anytype, pipeline_hash: u64) bool {
 test "hot compute state cache activates before hash map fallback" {
     const TestRuntime = struct {
         allocator: std.mem.Allocator,
+        shared_pipelines: shared.Registry = .{},
         device: c.VkDevice = null,
-        shader_module: c.VkShaderModule = VK_NULL_U64,
         pipeline_layout: c.VkPipelineLayout = VK_NULL_U64,
         pipeline: c.VkPipeline = VK_NULL_U64,
+        shared_pipeline: ?*shared.Pipeline = null,
         descriptor_pool: c.VkDescriptorPool = VK_NULL_U64,
         descriptor_set_layouts: [c.MAX_DESCRIPTOR_SETS]c.VkDescriptorSetLayout = [_]c.VkDescriptorSetLayout{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS,
         descriptor_sets: [c.MAX_DESCRIPTOR_SETS]c.VkDescriptorSet = [_]c.VkDescriptorSet{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS,
@@ -226,14 +218,12 @@ test "hot compute state cache activates before hash map fallback" {
         current_pipeline_hash: u64 = 0,
         current_layout_hash: u64 = 0,
         current_descriptor_bindings_hash: u64 = 0,
-        current_entry_point_owned: ?[:0]u8 = null,
         hot_descriptor_state_hashes: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** HOT_DESCRIPTOR_STATE_CACHE_CAPACITY,
         hot_descriptor_states: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]CachedDescriptorState = undefined,
         current_descriptor_state_cache: std.AutoHashMapUnmanaged(u64, CachedDescriptorState) = .{},
         hot_compute_state_hashes: [HOT_COMPUTE_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** HOT_COMPUTE_STATE_CACHE_CAPACITY,
         hot_compute_states: [HOT_COMPUTE_STATE_CACHE_CAPACITY]CachedComputeState = undefined,
         cached_compute_states: std.AutoHashMapUnmanaged(u64, CachedComputeState) = .{},
-        has_shader_module: bool = false,
         has_pipeline_layout: bool = false,
         has_pipeline: bool = false,
         has_descriptor_pool: bool = false,

@@ -16,6 +16,7 @@ const vk_device = @import("vk_device.zig");
 const vk_sync = @import("vk_sync.zig");
 const vk_upload = @import("vk_upload.zig");
 const vk_pipeline = @import("vk_pipeline.zig");
+const shared = @import("vk_shared_pipeline.zig");
 const vk_shader_source = @import("vk_shader_source.zig");
 const vk_pipeline_cache_persistent = @import("vk_pipeline_cache_persistent.zig");
 const vk_resources = @import("vk_resources.zig");
@@ -82,9 +83,10 @@ pub const NativeVulkanRuntime = struct {
     streaming_copy_active: bool = false,
     streaming_copy_count: u32 = 0,
 
-    shader_module: c.VkShaderModule = VK_NULL_U64,
     pipeline_layout: c.VkPipelineLayout = VK_NULL_U64,
     pipeline: c.VkPipeline = VK_NULL_U64,
+    shared_pipeline: ?*shared.Pipeline = null,
+    shared_pipelines: shared.Registry = .{},
     descriptor_pool: c.VkDescriptorPool = VK_NULL_U64,
     descriptor_set_layouts: [c.MAX_DESCRIPTOR_SETS]c.VkDescriptorSetLayout = [_]c.VkDescriptorSetLayout{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS,
     descriptor_sets: [c.MAX_DESCRIPTOR_SETS]c.VkDescriptorSet = [_]c.VkDescriptorSet{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS,
@@ -95,7 +97,6 @@ pub const NativeVulkanRuntime = struct {
     bound_compute_pipeline: c.VkPipeline = VK_NULL_U64,
     bound_compute_pipeline_layout: c.VkPipelineLayout = VK_NULL_U64,
     bound_descriptor_bindings_hash: u64 = 0,
-    current_entry_point_owned: ?[:0]u8 = null,
     current_descriptor_state_cache: std.AutoHashMapUnmanaged(u64, vk_pipeline.CachedDescriptorState) = .{},
     hot_descriptor_state_hashes: [vk_pipeline.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** vk_pipeline.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY,
     hot_descriptor_states: [vk_pipeline.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]vk_pipeline.CachedDescriptorState = undefined,
@@ -141,7 +142,6 @@ pub const NativeVulkanRuntime = struct {
     has_fence: bool = false,
     has_fence_pool: bool = false,
     has_timeline_semaphore: bool = false,
-    has_shader_module: bool = false,
     has_pipeline_layout: bool = false,
     has_pipeline: bool = false,
     has_descriptor_pool: bool = false,
@@ -252,6 +252,7 @@ pub const NativeVulkanRuntime = struct {
         vk_pipeline.release_descriptor_state_cache(self);
         vk_shader_source.release_kernel_spirv_cache(self);
         vk_pipeline.destroy_pipeline_objects(self);
+        self.shared_pipelines.deinit(self.allocator);
         vk_pipeline.destroy_descriptor_state(self);
         vk_resources.release_compute_buffers(self);
         vk_resources.release_textures(self);

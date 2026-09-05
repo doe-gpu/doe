@@ -120,10 +120,14 @@ private allocations, shaders, pipelines, and bindings. Explicit `gpu-recorded`
 execution owns compiled Vulkan commands and their pipeline and descriptor
 lifetimes. `native-recorded` retains host commands and replays them through Zig;
 `webgpu` retains resources and encodes each invocation as an explicit control.
-GPU recordings validate native buffer identities before submission and isolate
-their pipeline caches from ordinary runtime cache replacement.
+GPU recordings validate native buffer identities before submission and own
+private descriptor state. A device-local registry shares live Vulkan compute
+pipelines after checking SPIR-V, entry point, descriptor layout, and effective
+subgroup requirements. References outlive ordinary cache replacement and release
+the pipeline when the last state closes.
 
-Full input snapshots and scratch/output clears define each invocation's state.
+Invocation-local buffers use input snapshots and scratch/output clears.
+Explicit program-lifetime buffers retain state between invocations.
 An atomic update shares only resources with identical declaration keys, records
 the replacement plan, and closes the old program after successful preparation.
 Source, shape, resource changes, and device loss therefore cannot silently reuse

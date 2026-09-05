@@ -31,14 +31,30 @@ support. It requires a native contract version supporting the declaration, deriv
 build time from the descriptor schema. Native version 2 accepts descriptor
 versions 1 and 2; older libraries reject version 2 before allocation.
 `gpu-recorded` requires Vulkan support advertised by both the addon and library.
-It owns a compiled GPU command buffer, pipeline cache, and descriptor pools.
+It owns a compiled GPU command buffer, retained pipelines, and descriptor pools.
 Buffer identities and extents are checked before submission; mapping or changing
-an allocation invalidates the recording. Separate programs own separate native
-pipeline state, so ordinary cache replacement cannot invalidate their commands.
+an allocation invalidates the recording. Programs own private descriptor state;
+ordinary cache replacement cannot invalidate their commands.
 Preparation does not dispatch the program; newly allocated resident state is
 zeroed once and drained before preparation returns. Native pipeline creation costs are
-included in preparation. Replacement currently recompiles GPU command state;
-unchanged public resources still share their declared lifetime.
+included in preparation. Replacement records new GPU commands while retaining
+unchanged public resources and compatible live native compute pipelines.
+
+[`vulkan-compute-pipeline-policy.json`](../config/vulkan-compute-pipeline-policy.json)
+selects `share-live-exact` at build time. The device registry checks complete
+SPIR-V words, entry point, ordered descriptor layout definitions, and effective
+required subgroup size before sharing a pipeline. Resource handles, buffer
+extents, and dispatch counts remain private recording inputs; changing them
+requires a new recording but can preserve its pipeline. Changed shader code,
+layout, entry point, or subgroup requirement creates another pipeline. Another
+device has another registry. The last active, cached, retired, or prepared owner
+releases the pipeline; the registry does not retain unused pipeline history.
+The shared owner also retains its creation layout for Vulkan implementations
+without maintenance4 lifetime guarantees.
+The `private` policy builds independent pipelines for controlled comparisons.
+Compatible descriptor layouts permit sharing the compiled pipeline while
+keeping descriptor sets independent, as specified by
+[Vulkan layout compatibility](https://docs.vulkan.org/spec/latest/chapters/descriptorsets.html#descriptorsets-compatibility).
 
 Optional `gpuTiming: 'timestamp-query'` requires a device created with the
 `timestamp-query` feature. The default is `off`, declared in the options schema.
@@ -227,6 +243,14 @@ the ordinary provider, repeated lifecycle, and plan regressions from the
 installed package. It grants neither registry publication nor release admission.
 
 ## Migration and evidence boundaries
+
+The Vulkan compute pipeline policy is an additive build contract. Existing
+package descriptors, public receipts, and native ABI versions keep their
+meanings; rebuild the native library to apply the policy. Native lifecycle
+regressions check shared Vulkan handles, private descriptor pools, changed code
+and layouts, allocation failures, creator teardown, and device isolation with
+actual dispatch/readback. Package resource counters continue to describe public
+resource acquisition and must not be interpreted as native pipeline counts.
 
 This is an additive contract. Existing plan/capture and Doppler Program Bundle
 formats keep their meanings; they are not automatically executable programs.

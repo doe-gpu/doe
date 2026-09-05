@@ -5,6 +5,8 @@
 
 const std = @import("std");
 const c = @import("vk_constants.zig");
+const shared = @import("vk_shared_pipeline.zig");
+const build_options = @import("build_options");
 const vk_device = @import("vk_device.zig");
 const vk_formats = @import("vk_formats.zig");
 const vk_pipeline_cache = @import("vk_pipeline_cache.zig");
@@ -112,9 +114,8 @@ pub const PendingDescriptorWrite = struct {
 };
 
 pub const RetiredPipelineState = struct {
+    shared_pipeline: ?*shared.Pipeline = null,
     pipeline: c.VkPipeline = VK_NULL_U64,
-    shader_module: c.VkShaderModule = VK_NULL_U64,
-    entry_point_owned: ?[:0]u8 = null,
 };
 
 pub const RetiredDescriptorState = struct {
@@ -159,20 +160,17 @@ fn release_or_retire_descriptor_state(self: anytype) void {
 }
 
 fn retire_pipeline_objects(self: anytype) void {
-    if (!self.has_pipeline and !self.has_shader_module and self.current_entry_point_owned == null) {
+    if (!self.has_pipeline) {
         self.current_pipeline_hash = 0;
         return;
     }
     self.retired_pipeline_states.append(self.allocator, .{
         .pipeline = self.pipeline,
-        .shader_module = self.shader_module,
-        .entry_point_owned = self.current_entry_point_owned,
+        .shared_pipeline = self.shared_pipeline,
     }) catch std.debug.panic("vk_pipeline: OOM retiring pipeline state", .{});
     self.has_pipeline = false;
     self.pipeline = VK_NULL_U64;
-    self.has_shader_module = false;
-    self.shader_module = VK_NULL_U64;
-    self.current_entry_point_owned = null;
+    self.shared_pipeline = null;
     self.current_pipeline_hash = 0;
 }
 
@@ -226,9 +224,9 @@ fn retire_descriptor_pool_only(self: anytype) void {
 
 pub fn release_retired_states(self: anytype) void {
     for (self.retired_pipeline_states.items) |retired| {
-        if (retired.pipeline != VK_NULL_U64) c.vkDestroyPipeline(self.device, retired.pipeline, null);
-        if (retired.shader_module != VK_NULL_U64) c.vkDestroyShaderModule(self.device, retired.shader_module, null);
-        if (retired.entry_point_owned) |entry_name| self.allocator.free(entry_name);
+        if (retired.shared_pipeline) |entry| {
+            self.shared_pipelines.release(self.allocator, self.device, entry);
+        } else if (retired.pipeline != VK_NULL_U64) c.vkDestroyPipeline(self.device, retired.pipeline, null);
     }
     self.retired_pipeline_states.clearRetainingCapacity();
     for (self.retired_descriptor_states.items) |retired| {
@@ -327,28 +325,22 @@ pub fn build_pipeline_for_words(
     if (!spirv_has_entry_point(words, entry_name)) {
         return error.InvalidArgument;
     }
-    const owned_entry = try self.allocator.dupeZ(u8, entry_name);
-    errdefer self.allocator.free(owned_entry);
-
-    var shader_info = c.VkShaderModuleCreateInfo{ .sType = c.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO, .pNext = null, .flags = 0, .codeSize = words.len * @sizeOf(u32), .pCode = words.ptr };
-    try c.check_vk(c.vkCreateShaderModule(self.device, &shader_info, null, &self.shader_module));
-    self.has_shader_module = true;
-
-    var required_subgroup_size_info = c.VkPipelineShaderStageRequiredSubgroupSizeCreateInfo{
-        .sType = c.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO,
-        .pNext = null,
-        .requiredSubgroupSize = 0,
-    };
-    const stage_pnext: ?*const anyopaque = if (required_subgroup_size_for_pipeline(self, words)) |required_size| blk: {
-        required_subgroup_size_info.requiredSubgroupSize = required_size;
-        break :blk @ptrCast(&required_subgroup_size_info);
-    } else null;
-    const stage_info = c.VkPipelineShaderStageCreateInfo{ .sType = c.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, .pNext = stage_pnext, .flags = 0, .stage = c.VK_SHADER_STAGE_COMPUTE_BIT, .module = self.shader_module, .pName = owned_entry.ptr, .pSpecializationInfo = null };
-    var pipeline_info = c.VkComputePipelineCreateInfo{ .sType = c.VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO, .pNext = null, .flags = 0, .stage = stage_info, .layout = self.pipeline_layout, .basePipelineHandle = VK_NULL_U64, .basePipelineIndex = -1 };
-    const compute_cache_handle = self.pipeline_cache.handleForPipelineCreation();
-    try c.check_vk(c.vkCreateComputePipelines(self.device, compute_cache_handle, 1, @ptrCast(&pipeline_info), null, @ptrCast(&self.pipeline)));
+    const entry = try self.shared_pipelines.acquire(
+        self.allocator,
+        self.device,
+        self.pipeline_cache.handleForPipelineCreation(),
+        self.descriptor_set_layouts[0..self.descriptor_set_count],
+        .{
+            .words = words,
+            .entry_point = entry_name,
+            .bindings = bindings orelse &.{},
+            .required_subgroup_size = required_subgroup_size_for_pipeline(self, words),
+        },
+        build_options.vulkan_share_live_compute_pipelines,
+    );
+    self.shared_pipeline = entry;
+    self.pipeline = entry.handle;
     self.has_pipeline = true;
-    self.current_entry_point_owned = owned_entry;
     self.current_pipeline_hash = pipeline_hash;
 }
 
@@ -418,18 +410,12 @@ fn is_single_invocation_workgroup(local_size: ?vk_spirv_inspect.LocalSize) bool 
 
 pub fn destroy_pipeline_objects(self: anytype) void {
     if (self.has_pipeline) {
-        c.vkDestroyPipeline(self.device, self.pipeline, null);
+        if (self.shared_pipeline) |entry| {
+            self.shared_pipelines.release(self.allocator, self.device, entry);
+            self.shared_pipeline = null;
+        } else c.vkDestroyPipeline(self.device, self.pipeline, null);
         self.has_pipeline = false;
         self.pipeline = VK_NULL_U64;
-    }
-    if (self.has_shader_module) {
-        c.vkDestroyShaderModule(self.device, self.shader_module, null);
-        self.has_shader_module = false;
-        self.shader_module = VK_NULL_U64;
-    }
-    if (self.current_entry_point_owned) |entry_name| {
-        self.allocator.free(entry_name);
-        self.current_entry_point_owned = null;
     }
     self.current_pipeline_hash = 0;
 }
@@ -758,20 +744,7 @@ fn ensure_descriptor_pool(self: anytype, bindings: ?[]const model_compute_types.
 
 // --- Pure helpers ---
 
-pub fn descriptor_type_for_binding(binding: model_compute_types.KernelBinding) !u32 {
-    return switch (binding.resource_kind) {
-        .buffer => switch (binding.buffer_type) {
-            model_binding_types.WGPUBufferBindingType_Uniform => c.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            model_binding_types.WGPUBufferBindingType_Storage,
-            model_binding_types.WGPUBufferBindingType_ReadOnlyStorage,
-            => c.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-            else => error.UnsupportedFeature,
-        },
-        .texture => c.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-        .storage_texture => c.VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-        .sampler => c.VK_DESCRIPTOR_TYPE_SAMPLER,
-    };
-}
+pub const descriptor_type_for_binding = shared.descriptorType;
 
 pub fn validate_texture_binding(binding: model_compute_types.KernelBinding, texture: vk_resources.TextureResource) !void {
     if (binding.texture_view_dimension != model_texture_types.WGPUTextureViewDimension_Undefined and

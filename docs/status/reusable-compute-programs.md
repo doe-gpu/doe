@@ -1,5 +1,18 @@
 # Reusable compute programs
 
+## Native pipeline reuse
+
+Vulkan recordings now share live compiled pipelines through a device-owned
+registry. Exact SPIR-V, entry-point, layout, and subgroup checks govern sharing;
+descriptor pools remain private. The owner retains the creation layout for
+older Vulkan implementations and destroys the pipeline at its last release.
+Shader modules are temporary creation inputs. The build contract is
+`config/vulkan-compute-pipeline-policy.json`; package and receipt versions keep
+their meanings. Native handles, output, changed layouts/shaders, allocation
+failures, creator teardown, and device isolation pass under both policy modes.
+Source, policy controls, and logs are retained under
+`bench/out/compute-program/20260905-shared-pipeline-native/`.
+
 ## Resident sequence and cache ownership
 
 The external fixture generator now freezes continuous simulation oracles before
@@ -69,7 +82,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-cache-ownership-package/summary.json`.
+`bench/out/compute-program/20260905-shared-pipeline-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -77,7 +90,7 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-cache-ownership-matrix/summary.json`.
+`bench/out/compute-program/20260905-shared-pipeline-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the new receipt contract. It does not measure a
@@ -90,8 +103,10 @@ Earlier native replay and SPIR-V validation results are retained separately unde
 
 Metal GPU recording and physical transfer remain open; the known Mac host is
 currently unreachable from this workspace. Windows requires an approved
-physical D3D12 lane. Changed plans still rebuild native recordings and private
-pipelines while retaining unchanged public resources.
+physical D3D12 lane. Changed plans still rebuild command recordings and private
+descriptor state while retaining unchanged public resources and compatible
+live compute pipelines. Pipeline sharing alone does not establish reduced
+useful-operation latency.
 
 The external portfolio, a measured application boundary crossing, resident
 sequence numerical qualification, and independent repeat use remain open.

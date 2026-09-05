@@ -6,8 +6,8 @@ const pipeline = @import("vk_pipeline.zig");
 const upload = @import("vk_upload.zig");
 const device = @import("vk_device.zig");
 
-// Prepared programs own their descriptor pools and pipelines. Ordinary cache
-// replacement cannot invalidate a command buffer retained by a program.
+// Prepared programs own private descriptor pools and retained pipeline references.
+// Ordinary cache replacement cannot invalidate their command buffers.
 const ComputeCache = struct {
     active: cache.CachedComputeState = .{},
     hashes: [cache.HOT_COMPUTE_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** cache.HOT_COMPUTE_STATE_CACHE_CAPACITY,

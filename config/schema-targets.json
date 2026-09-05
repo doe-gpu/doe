@@ -1348,6 +1348,10 @@
     {
       "schema": "config/vulkan-timestamp-policy.schema.json",
       "data": "config/vulkan-timestamp-policy.json"
+    },
+    {
+      "schema": "config/vulkan-compute-pipeline-policy.schema.json",
+      "data": "config/vulkan-compute-pipeline-policy.json"
     }
   ],
   "globTargets": [

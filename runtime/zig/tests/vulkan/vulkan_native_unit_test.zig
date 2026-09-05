@@ -606,7 +606,7 @@ test "vulkan: NativeVulkanRuntime default state is uninitialized" {
     try std.testing.expect(!rt.has_command_pool);
     try std.testing.expect(!rt.has_primary_command_buffer);
     try std.testing.expect(!rt.has_fence);
-    try std.testing.expect(!rt.has_shader_module);
+    try std.testing.expect(rt.shared_pipeline == null);
     try std.testing.expect(!rt.has_pipeline_layout);
     try std.testing.expect(!rt.has_pipeline);
     try std.testing.expect(!rt.has_descriptor_pool);
@@ -634,7 +634,7 @@ test "vulkan: NativeVulkanRuntime default descriptor sets are null" {
     try std.testing.expectEqual(@as(u32, 0), rt.descriptor_set_count);
     try std.testing.expectEqual(@as(u64, 0), rt.current_pipeline_hash);
     try std.testing.expectEqual(@as(u64, 0), rt.current_layout_hash);
-    try std.testing.expectEqual(@as(?[:0]u8, null), rt.current_entry_point_owned);
+    try std.testing.expectEqual(@as(usize, 0), rt.shared_pipelines.entries.items.len);
 }
 
 test "vulkan: NativeVulkanRuntime default fast upload state is uninitialized" {

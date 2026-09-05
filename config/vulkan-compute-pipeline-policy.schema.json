@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Vulkan compute pipeline reuse policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "reuse"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "reuse": { "type": "string", "enum": ["private", "share-live-exact"] }
+  }
+}

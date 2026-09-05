@@ -1228,9 +1228,9 @@
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "d35ff9232768eb178d47871fda3fe4e64cca338ef50f79c0c5dad4ffc2a4ed97",
-        "reason": "Keep: physical device selection owns timestamp calibration; uninitialized runtime state cannot imply a nanosecond clock.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "0583cfe0dac7a9dd9846b6475017873da611334d1082e625ce02133603b64998",
+        "reason": "Keep: Vulkan device runtime owns the shared live-pipeline registry and destroys it after all compute owners release their references.",
+        "reviewer": "codex-execution-ownership/2026-09-05"
       },
       "src/backend/vulkan/vk_adapter_probe.zig": {
         "decision": "Keep",
@@ -1330,15 +1330,15 @@
       },
       "src/backend/vulkan/vk_pipeline.zig": {
         "decision": "Keep",
-        "moduleSha256": "84bb86dc073ca4cfc5ce49126463cf482c73bbc2802eb4ef4973e31b144bb0f8",
-        "reason": "Keep: Vulkan compute-pipeline and descriptor-state lifetime capsule; kernel source resolution and SPIR-V compilation now have a separate owner.",
-        "reviewer": "codex-architecture-refactor/2026-08-23"
+        "moduleSha256": "fb7c87082dfbbe6b0087f21df74442770f212c05a7a1aefc9839e4d721384368",
+        "reason": "Keep: compute preparation owns private layouts and descriptors while delegating immutable pipeline ownership to the device registry.",
+        "reviewer": "codex-execution-ownership/2026-09-05"
       },
       "src/backend/vulkan/vk_pipeline_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "2f3bb87f1560097b69f2cc71f5584caeadebaf6c26dcf912bd8dbb14f845742c",
-        "reason": "Keep: Vulkan compute and descriptor cache ownership, including transactional allocation-failure regressions.",
-        "reviewer": "codex-cache-ownership/2026-09-05"
+        "moduleSha256": "0dc26c6c2405b206856e0ec8b83d972aaebd1bf7e7f44ee2cb0b19f4e73eeac9",
+        "reason": "Keep: cached compute state moves pipeline references with descriptor ownership and releases each reference exactly once.",
+        "reviewer": "codex-execution-ownership/2026-09-05"
       },
       "src/backend/vulkan/vk_pipeline_cache_persistent.zig": {
         "decision": "Keep",
@@ -4222,15 +4222,21 @@
       },
       "src/backend/vulkan/vk_compute_program.zig": {
         "decision": "Keep",
-        "moduleSha256": "3ea960e69884b8b449b000fdd9ac60181bff91bf23f33ce43052358fe612673e",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "e32c08ebf3440c5c1f96485f685387abd64481eb4beb786ffa7f9d82eb7bd6c3",
+        "reason": "Keep: prepared command buffers retain private descriptor state and shared pipeline references independently of the ordinary cache.",
+        "reviewer": "codex-execution-ownership/2026-09-05"
       },
       "src/native/compute/doe_compute_program_native.zig": {
         "decision": "Keep",
         "moduleSha256": "b6556017fdb2461e1ca39cbfca6122eba28a96030f579f67213829841f616f90",
         "reason": "Keep: prepared query lifetimes remain invalidation inputs; the additive timing ABI distinguishes normalized nanoseconds from historical hardware ticks.",
         "reviewer": "codex-gpu-program/2026-09-05"
+      },
+      "src/backend/vulkan/vk_shared_pipeline.zig": {
+        "decision": "Keep",
+        "moduleSha256": "73b1ef700506366c2f517487324aa404cb17fc6ba22996b1959321be9cbfa04f",
+        "reason": "Keep: device-local native compute pipeline creation, exact identity, and reference-counted lifetime have one owner; descriptor mutation stays in private compute state.",
+        "reviewer": "codex-execution-ownership/2026-09-05"
       }
     },
     "linePolicy": {
