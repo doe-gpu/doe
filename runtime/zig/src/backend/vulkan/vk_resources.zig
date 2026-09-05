@@ -152,25 +152,29 @@ pub fn ensure_compute_buffer(
     if (handle == 0 or required_size == 0) return error.InvalidArgument;
     if (self.compute_buffers.getPtr(handle)) |existing| {
         if (existing.size >= required_size) return existing.*;
-        if (self.has_deferred_submissions) _ = try vk_upload.flush_queue(self);
-        release_compute_buffer(self, existing.*);
-        existing.* = try create_compute_buffer_with_kind(
+        _ = try vk_upload.flush_queue(self);
+        const replacement = try create_compute_buffer_with_kind(
             self,
             required_size,
             initialize_buffers_on_create,
             existing.memory_kind,
         );
+        const previous = existing.*;
+        existing.* = replacement;
+        release_compute_buffer(self, previous);
         return existing.*;
     }
+    return insert_compute_buffer(self, handle, required_size, initialize_buffers_on_create, .host_visible);
+}
 
-    const compute_buffer = try create_compute_buffer_with_kind(
-        self,
-        required_size,
-        initialize_buffers_on_create,
-        .host_visible,
-    );
-    try self.compute_buffers.put(self.allocator, handle, compute_buffer);
-    return self.compute_buffers.get(handle).?;
+fn insert_compute_buffer(self: anytype, handle: u64, bytes: u64, initialize: bool, kind: ComputeBufferMemoryKind) !ComputeBuffer {
+    if (handle == 0 or bytes == 0) return error.InvalidArgument;
+    // Initialization can enqueue GPU work. Reserve its owner before creating
+    // the allocation so publication cannot fail after that command is recorded.
+    try self.compute_buffers.ensureUnusedCapacity(self.allocator, 1);
+    const buffer = try create_compute_buffer_with_kind(self, bytes, initialize, kind);
+    self.compute_buffers.putAssumeCapacityNoClobber(handle, buffer);
+    return buffer;
 }
 
 pub fn ensure_compute_buffer_for_binding(
@@ -182,9 +186,7 @@ pub fn ensure_compute_buffer_for_binding(
     const required_size = try required_compute_buffer_size(self, binding);
     const desired_memory_kind = compute_buffer_memory_kind_for_binding(binding, required_size);
     const compute_buffer = if (self.compute_buffers.get(binding.resource_handle) == null and desired_memory_kind == .device_local) blk: {
-        const created = try create_compute_buffer_with_kind(self, required_size, initialize_buffers_on_create, .device_local);
-        try self.compute_buffers.put(self.allocator, binding.resource_handle, created);
-        break :blk created;
+        break :blk try insert_compute_buffer(self, binding.resource_handle, required_size, initialize_buffers_on_create, .device_local);
     } else try ensure_compute_buffer(self, binding.resource_handle, required_size, initialize_buffers_on_create);
     if (compute_buffer_memory_kind_for_binding(binding, required_size) != .device_local or
         compute_buffer.memory_kind == .device_local)

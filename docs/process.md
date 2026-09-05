@@ -69,6 +69,11 @@ classified and cannot be promoted by benchmark results.
   independent bindings, creator teardown, shader/layout changes, allocation
   failure, and device isolation. Public resource counters alone do not establish
   native pipeline reuse or reduced useful-operation latency.
+- Buffer registry publication must be reserved before initialization can queue
+  GPU commands. Replacement drains prior work and preserves the old allocation
+  until creation succeeds. Allocation-failure regressions verify that failed
+  publication cannot leave unowned initialization work and that retry/readback
+  still succeeds.
 - External declared-program fixtures retain pinned shader and oracle source,
   toolchain, input bytes, and expected outputs before provider audits. The gate
   checks every reference, declared input extent, and complete oracle coverage.

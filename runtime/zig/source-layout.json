@@ -1360,9 +1360,9 @@
       },
       "src/backend/vulkan/vk_resources.zig": {
         "decision": "Keep",
-        "moduleSha256": "88428b9016429b329abaed4170f8aba65eb7b164c84e85c07241ea918c8cec29",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "faa675a2790b201ac1df225cc1458664312679a4872ef1a1ac3b3326f615d39b",
+        "reason": "Keep: Vulkan resource owner reserves publication before GPU initialization and preserves existing allocation ownership until replacement succeeds.",
+        "reviewer": "codex-resource-ownership/2026-09-05"
       },
       "src/backend/vulkan/vk_runtime_probe_ops.zig": {
         "decision": "Keep",

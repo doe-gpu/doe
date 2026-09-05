@@ -148,3 +148,34 @@ loss and recovery, and Apple Metal transfer remain unevidenced in this lane.
 
 History remains under [`archive/`](./); current measurements live only in
 their artifacts.
+
+## Compiler diagnostics and cache ownership at native pipeline reuse
+
+Preserved from the live status after commit `301be4f5d`.
+
+Vulkan compute and descriptor cache insertion now restores the active owner if
+allocation fails. The regression also retries the insertion successfully.
+The original ownership-loss reproduction is retained under
+`bench/out/compute-program/20260905-vulkan-cache-ownership-failure/`.
+The repaired source and successful native test log are retained under
+`bench/out/compute-program/20260905-vulkan-cache-ownership-correction/`.
+
+## Compiler corrections and package entrypoints
+
+Vulkan shader wrappers now preserve parser/semantic causes and WGSL locations
+instead of flattening them to `ShaderCompileFailed`. The native ABI and
+compilation-info fields are unchanged; consumers need the rebuilt library.
+Earlier receipts keep their original diagnostics. The reproduction is retained
+under `bench/out/compute-program/20260905-compiler-diagnostics-failure/`.
+The repaired output and successful native/package test logs are retained under
+`bench/out/compute-program/20260905-compiler-diagnostics-correction/`.
+Graphics translation emits each stage once, transfers owned SPIR-V directly,
+and releases reflection allocations. The allocation-accounted failing case is
+under `bench/out/compute-program/20260905-graphics-translation-memory-failure/accounted-case/`.
+
+The package's first-kernel host entrypoints share WGSL, output validation, and
+guaranteed device teardown. Electron retains its mapped-range probe. Their
+receipt shape and workload hashes are unchanged. Compute declarations and
+closed bundles share recursive JSON key ordering with historical hashes pinned
+by the package contract tests. The public README starts with provider selection
+and documents opt-in resident execution separately.

@@ -17,6 +17,43 @@ const REUSE_SHADER =
     \\}
 ;
 const REUSE_BUFFER_BYTES = 4 * @sizeOf(u32);
+const DEVICE_LOCAL_FAILURE_BYTES = 64 * 1024;
+
+test "Vulkan buffer publication failure cannot leave an unowned initialization command" {
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    const binding = compute.KernelBinding{
+        .binding = 0,
+        .resource_kind = .buffer,
+        .resource_handle = 301,
+        .buffer_size = DEVICE_LOCAL_FAILURE_BYTES,
+        .buffer_type = binding_types.WGPUBufferBindingType_Storage,
+    };
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 0 });
+    rt.allocator = failing.allocator();
+    defer rt.allocator = std.testing.allocator;
+    try std.testing.expectError(error.OutOfMemory, resources.ensure_compute_buffer_for_binding(&rt, binding, true));
+    try std.testing.expectEqual(@as(usize, 0), rt.compute_buffers.count());
+    try std.testing.expect(!rt.streaming_copy_active);
+
+    rt.allocator = std.testing.allocator;
+    const created = try resources.ensure_compute_buffer_for_binding(&rt, binding, true);
+    try std.testing.expectEqual(resources.ComputeBufferMemoryKind.device_local, created.buffer.memory_kind);
+    _ = try rt.flush_queue();
+    const initialized = try resources.capture_compute_buffer(&rt, std.testing.allocator, created.buffer, 0, REUSE_BUFFER_BYTES);
+    defer std.testing.allocator.free(initialized);
+    try std.testing.expectEqualSlices(u8, &([_]u8{0} ** REUSE_BUFFER_BYTES), initialized);
+    const replacement = try resources.ensure_compute_buffer(&rt, binding.resource_handle, DEVICE_LOCAL_FAILURE_BYTES * 2, true);
+    try std.testing.expect(replacement.buffer != created.buffer.buffer);
+    try std.testing.expectEqual(replacement.buffer, rt.compute_buffers.get(binding.resource_handle).?.buffer);
+    _ = try rt.flush_queue();
+    const resized = try resources.capture_compute_buffer(&rt, std.testing.allocator, replacement, 0, REUSE_BUFFER_BYTES);
+    defer std.testing.allocator.free(resized);
+    try std.testing.expectEqualSlices(u8, initialized, resized);
+}
 
 fn prepare_reuse_program(rt: *native_runtime.NativeVulkanRuntime, words: []const u32, bindings: []const compute.KernelBinding, workgroups: u32) !compute_program.ComputeProgram {
     for (bindings) |binding| _ = try resources.ensure_compute_buffer_for_binding(rt, binding, true);

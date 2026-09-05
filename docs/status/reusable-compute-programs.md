@@ -1,5 +1,14 @@
 # Reusable compute programs
 
+## Buffer publication and replacement
+
+Buffer registry capacity is reserved before allocation and GPU initialization.
+Resizing drains prior work and keeps the old allocation until replacement
+succeeds. Descriptor, receipt, and native ABI contracts are unchanged. The
+original physical failure and corrected allocation/retry evidence are retained
+under `bench/out/compute-program/20260905-buffer-publication-failure/` and
+`bench/out/compute-program/20260905-buffer-publication-correction/`.
+
 ## Native pipeline reuse
 
 Vulkan recordings now share live compiled pipelines through a device-owned
@@ -13,7 +22,7 @@ failures, creator teardown, and device isolation pass under both policy modes.
 Source, policy controls, and logs are retained under
 `bench/out/compute-program/20260905-shared-pipeline-native/`.
 
-## Resident sequence and cache ownership
+## Resident numerical acceptance
 
 The external fixture generator now freezes continuous simulation oracles before
 GPU execution. Evaluation records warmups and lifecycle runs as part of the
@@ -27,33 +36,6 @@ bytes; controls are retained under
 `bench/out/compute-program/20260905-resident-sequence-numerical-controls/`.
 This is an open continuous-simulation numerical acceptance issue, not a
 prepared-command speed result. The frozen oracle and tolerances remain intact.
-
-Vulkan compute and descriptor cache insertion now restores the active owner if
-allocation fails. The regression also retries the insertion successfully.
-The original ownership-loss reproduction is retained under
-`bench/out/compute-program/20260905-vulkan-cache-ownership-failure/`.
-The repaired source and successful native test log are retained under
-`bench/out/compute-program/20260905-vulkan-cache-ownership-correction/`.
-
-## Compiler corrections and package entrypoints
-
-Vulkan shader wrappers now preserve parser/semantic causes and WGSL locations
-instead of flattening them to `ShaderCompileFailed`. The native ABI and
-compilation-info fields are unchanged; consumers need the rebuilt library.
-Earlier receipts keep their original diagnostics. The reproduction is retained
-under `bench/out/compute-program/20260905-compiler-diagnostics-failure/`.
-The repaired output and successful native/package test logs are retained under
-`bench/out/compute-program/20260905-compiler-diagnostics-correction/`.
-Graphics translation emits each stage once, transfers owned SPIR-V directly,
-and releases reflection allocations. The allocation-accounted failing case is
-under `bench/out/compute-program/20260905-graphics-translation-memory-failure/accounted-case/`.
-
-The package's first-kernel host entrypoints share WGSL, output validation, and
-guaranteed device teardown. Electron retains its mapped-range probe. Their
-receipt shape and workload hashes are unchanged. Compute declarations and
-closed bundles share recursive JSON key ordering with historical hashes pinned
-by the package contract tests. The public README starts with provider selection
-and documents opt-in resident execution separately.
 
 ## Current boundary
 
@@ -82,7 +64,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-shared-pipeline-package/summary.json`.
+`bench/out/compute-program/20260905-buffer-publication-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -90,7 +72,7 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-shared-pipeline-matrix/summary.json`.
+`bench/out/compute-program/20260905-buffer-publication-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the new receipt contract. It does not measure a

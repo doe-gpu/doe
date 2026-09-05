@@ -252,6 +252,12 @@ and layouts, allocation failures, creator teardown, and device isolation with
 actual dispatch/readback. Package resource counters continue to describe public
 resource acquisition and must not be interpreted as native pipeline counts.
 
+Vulkan buffer publication reserves registry capacity before native allocation
+and initialization. Failed publication cannot leave a queued clear without a
+resource owner. Resizing drains prior work and retains the old allocation until
+its replacement is created. This ownership correction changes no descriptor,
+receipt, or ABI fields; earlier failure artifacts remain historical evidence.
+
 This is an additive contract. Existing plan/capture and Doppler Program Bundle
 formats keep their meanings; they are not automatically executable programs.
 The preparation counters and run receipt schemas accompany the descriptor.
