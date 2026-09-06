@@ -1,5 +1,14 @@
 # Reusable compute programs
 
+## Evidence schema routing
+
+The schema gate now distinguishes package qualification from application
+matrices using the report's declared kind. This repairs the final-summary
+directory-name collision without changing retained observations. The accepted
+package and application summaries are explicit schema targets; unknown report
+kinds and malformed bodies still fail. The migration is in
+[schema enforcement](../config-schema-enforcement.md#schema-target-registry-migration).
+
 ## Resource lifetime correction
 
 The physical retained-package image probe exposed buffer and descriptor
@@ -14,6 +23,10 @@ controlled host, is
 `bench/out/compute-program/20260906-resource-lifetime-qualified/summary.json`.
 The image probe's raw timed/untimed checkpoints and CSV are under
 `bench/out/compute-program/20260906-resource-lifetime-scratch/`.
+The corresponding guarded application comparisons remain diagnostic in
+`bench/out/compute-program/20260906-resource-lifetime-qualified-applications/summary.json`.
+Continuous simulation audits and independent SPIR-V checks are retained in
+`bench/out/compute-program/20260906-resource-lifetime-resident/`.
 Reproduction commands, checksums, and intermediate failures are indexed in
 `bench/out/compute-program/20260906-resource-lifetime-correction/README.md`.
 This work does not establish peak GPU memory, arbitrary-object garbage

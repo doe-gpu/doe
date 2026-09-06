@@ -207,6 +207,9 @@ classified and cannot be promoted by benchmark results.
 ## Gate policy and failure precedence
 
 - Schema, correctness, trace, and required verification gates are blocking.
+- Mixed report globs use the registered explicit kind-to-schema mapping;
+  unknown kinds fail before body validation. See
+  [schema registry migration](config-schema-enforcement.md#schema-target-registry-migration).
 - Claim runs additionally require comparability coherence, structural
   equivalence, timing/sample policy, claimability, and indexed evidence gates
   selected by the claim contract.

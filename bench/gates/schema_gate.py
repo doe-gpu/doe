@@ -143,18 +143,28 @@ def load_schema_target_registry(root: Path) -> list[ValidationTarget]:
 
     for glob_target in registry_payload.get("globTargets", []):
         schema_rel = glob_target.get("schema")
+        schemas_by_kind = glob_target.get("schemasByKind")
         glob_pattern = glob_target.get("glob")
         allow_empty = glob_target.get("allowEmpty") is True
-        if not isinstance(schema_rel, str) or not isinstance(glob_pattern, str):
-            raise ValueError(f"invalid registry glob target entry: {glob_target}")
         var_found = False
         for data_path in sorted(root.glob(glob_pattern)):
             if not data_path.is_file():
                 continue
             var_found = True
+            selected_schema = schema_rel
+            if schemas_by_kind is not None:
+                payload = load_json(data_path)
+                kind = payload.get("kind") if isinstance(payload, dict) else None
+                if not isinstance(kind, str) or kind not in schemas_by_kind:
+                    expected = ", ".join(sorted(schemas_by_kind))
+                    raise ValueError(
+                        f"{data_path.relative_to(root)}: expected registered "
+                        f"kind ({expected}), received {kind!r}"
+                    )
+                selected_schema = schemas_by_kind[kind]
             targets.append(
                 ValidationTarget(
-                    schema_rel=schema_rel,
+                    schema_rel=selected_schema,
                     data_rel=str(data_path.relative_to(root)),
                 )
             )

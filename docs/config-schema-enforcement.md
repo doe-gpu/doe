@@ -16,3 +16,16 @@ Required rules:
 
 The normative stage and gate order lives in [`process.md`](process.md).
 Machine-owned tool boundaries live in `config/tool-surfaces.json`.
+
+## Schema target registry migration
+
+Registry version 2 preserves fixed `schema` targets and adds `schemasByKind`
+for globs containing different report types. Each glob declares exactly one
+selection form. The gate reads the report's explicit `kind`, requires a
+registered mapping, then validates its complete body with that schema. Missing
+or unknown kinds fail; directory suffixes do not establish report type.
+
+The existing compute-program final-summary glob now routes matrices and package
+qualification separately. Its scope is unchanged, preserving historical
+observations rather than rewriting them to satisfy a different report contract.
+Current accepted package and application summaries are registered explicitly.

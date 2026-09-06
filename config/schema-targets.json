@@ -1,6 +1,14 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "targets": [
+    {
+      "schema": "config/compute-program-package.schema.json",
+      "data": "bench/out/compute-program/20260906-resource-lifetime-qualified/summary.json"
+    },
+    {
+      "schema": "config/compute-program-matrix.schema.json",
+      "data": "bench/out/compute-program/20260906-resource-lifetime-qualified-applications/summary.json"
+    },
     {
       "schema": "config/spirv-compute-arithmetic-policy.schema.json",
       "data": "config/spirv-compute-arithmetic-policy.json"
@@ -1422,7 +1430,10 @@
       "allowEmpty": true
     },
     {
-      "schema": "config/compute-program-matrix.schema.json",
+      "schemasByKind": {
+        "compute_program_matrix": "config/compute-program-matrix.schema.json",
+        "compute_program_package_qualification": "config/compute-program-package.schema.json"
+      },
       "glob": "bench/out/compute-program/*-final/summary.json",
       "allowEmpty": true
     },

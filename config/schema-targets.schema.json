@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Fawn Schema Target Registry",
+  "title": "Doe schema target registry",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "targets", "globTargets"],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
+    "schemaVersion": { "type": "integer", "const": 2 },
     "targets": {
       "type": "array",
       "items": {
@@ -23,9 +23,19 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["schema", "glob"],
+        "required": ["glob"],
+        "oneOf": [
+          { "required": ["schema"] },
+          { "required": ["schemasByKind"] }
+        ],
         "properties": {
           "schema": { "type": "string", "minLength": 1 },
+          "schemasByKind": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": { "minLength": 1 },
+            "additionalProperties": { "type": "string", "minLength": 1 }
+          },
           "glob": { "type": "string", "minLength": 1 },
           "allowEmpty": { "type": "boolean" }
         }
