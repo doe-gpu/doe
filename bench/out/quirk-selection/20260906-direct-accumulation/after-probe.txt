@@ -1,0 +1,18 @@
+decisions	false	90e3073d735b62ed728a38c5efa8ea4bf4db60a6963bdc0602e39a94a708167f
+sample	false	0	2000	6753938	0	0
+sample	false	1	2000	7198686	0	0
+sample	false	2	2000	6442762	0	0
+sample	false	3	2000	6515169	0	0
+sample	false	4	2000	6379784	0	0
+sample	false	5	2000	6392106	0	0
+sample	false	6	2000	6941892	0	0
+cleanup	false	0	0	658940
+decisions	true	a5cd13e08239abf85a0d352fa8e994ddcd5cb11f44ffffcd7555a806e9470d9b
+sample	true	0	2000	5565630	0	0
+sample	true	1	2000	5590186	0	0
+sample	true	2	2000	5626555	0	0
+sample	true	3	2000	5617518	0	0
+sample	true	4	2000	5601287	0	0
+sample	true	5	2000	5593814	0	0
+sample	true	6	2000	5601959	0	0
+cleanup	true	0	0	1317880

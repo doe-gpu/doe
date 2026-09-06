@@ -1,0 +1,559 @@
+diff --git a/runtime/zig/source-layout.json b/runtime/zig/source-layout.json
+index ad5055916..d95ea139b 100644
+--- a/runtime/zig/source-layout.json
++++ b/runtime/zig/source-layout.json
+@@ -3928,9 +3928,9 @@
+       },
+       "src/quirk/runtime.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "51723506c7debbb1e6f1fbda4e8d9f37f6f61ff575021610377549f3e5587e8d",
+-        "reason": "Keep: reachable quirk implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+-        "reviewer": "codex-recomposition-review/2026-08-08"
++        "moduleSha256": "64c83ff04d7a59bd6c44f055c0e34e28ee691ce9a4c5e48cb8d9c63d0582de1a",
++        "reason": "Keep: quirk selection owns matching, stable ranking, and bounded dispatch bucket preparation with characterization coverage.",
++        "reviewer": "codex-quirk-selection/2026-09-06"
+       },
+       "src/quirk/toggle_registry.zig": {
+         "decision": "Keep",
+diff --git a/runtime/zig/src/quirk/runtime.zig b/runtime/zig/src/quirk/runtime.zig
+index 3286f33be..bc4a085d6 100644
+--- a/runtime/zig/src/quirk/runtime.zig
++++ b/runtime/zig/src/quirk/runtime.zig
+@@ -50,6 +50,7 @@ pub const CommandDispatchBucket = struct {
+     action_is_identity: bool = true,
+ };
+ 
++/// Borrows quirk payloads. The allocator field and deinit retain the existing caller contract.
+ pub const DispatchContext = struct {
+     allocator: std.mem.Allocator,
+     upload: CommandDispatchBucket,
+@@ -96,7 +97,7 @@ pub fn emptyDecision(context: DispatchContext, command: model.Command) DispatchD
+     };
+ }
+ 
+-pub fn buildDispatchContext(allocator: std.mem.Allocator, quirks: []const model.Quirk) !DispatchContext {
++pub fn buildDispatchContext(allocator: std.mem.Allocator, quirks: []const model.Quirk) std.mem.Allocator.Error!DispatchContext {
+     if (quirks.len == 0) {
+         return emptyContext(allocator);
+     }
+@@ -108,192 +109,23 @@ pub fn buildDispatchContext(allocator: std.mem.Allocator, quirks: []const model.
+         .driver_version = .{ .major = 9999, .minor = 9999, .patch = 9999 },
+     };
+ 
+-    var upload = std.ArrayList(ScoredQuirk).empty;
+-    var copy_buffer_to_texture = std.ArrayList(ScoredQuirk).empty;
+-    var barrier = std.ArrayList(ScoredQuirk).empty;
+-    var dispatch_commands = std.ArrayList(ScoredQuirk).empty;
+-    var kernel_dispatch = std.ArrayList(ScoredQuirk).empty;
+-    var render_draw = std.ArrayList(ScoredQuirk).empty;
+-    var sampler_create = std.ArrayList(ScoredQuirk).empty;
+-    var sampler_destroy = std.ArrayList(ScoredQuirk).empty;
+-    var texture_write = std.ArrayList(ScoredQuirk).empty;
+-    var texture_query = std.ArrayList(ScoredQuirk).empty;
+-    var texture_destroy = std.ArrayList(ScoredQuirk).empty;
+-    var surface_create = std.ArrayList(ScoredQuirk).empty;
+-    var surface_capabilities = std.ArrayList(ScoredQuirk).empty;
+-    var surface_configure = std.ArrayList(ScoredQuirk).empty;
+-    var surface_acquire = std.ArrayList(ScoredQuirk).empty;
+-    var surface_present = std.ArrayList(ScoredQuirk).empty;
+-    var surface_unconfigure = std.ArrayList(ScoredQuirk).empty;
+-    var surface_release = std.ArrayList(ScoredQuirk).empty;
+-    var async_diagnostics = std.ArrayList(ScoredQuirk).empty;
+-    var map_async = std.ArrayList(ScoredQuirk).empty;
+-
+-    for (quirks) |quirk| {
+-        // Comptime table built from supportsCommand (correct by construction).
+-        // Lean scopeCommandTableComplete is a redundant second check (comptime_verified tier).
+-        const si = @intFromEnum(quirk.scope);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.upload)])
+-            try appendScored(allocator, &upload, quirk, .upload, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.copy_buffer_to_texture)])
+-            try appendScored(allocator, &copy_buffer_to_texture, quirk, .copy_buffer_to_texture, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.barrier)])
+-            try appendScored(allocator, &barrier, quirk, .barrier, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.dispatch)])
+-            try appendScored(allocator, &dispatch_commands, quirk, .dispatch, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.kernel_dispatch)])
+-            try appendScored(allocator, &kernel_dispatch, quirk, .kernel_dispatch, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.render_draw)])
+-            try appendScored(allocator, &render_draw, quirk, .render_draw, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_create)])
+-            try appendScored(allocator, &sampler_create, quirk, .sampler_create, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_destroy)])
+-            try appendScored(allocator, &sampler_destroy, quirk, .sampler_destroy, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_write)])
+-            try appendScored(allocator, &texture_write, quirk, .texture_write, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_query)])
+-            try appendScored(allocator, &texture_query, quirk, .texture_query, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_destroy)])
+-            try appendScored(allocator, &texture_destroy, quirk, .texture_destroy, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_create)])
+-            try appendScored(allocator, &surface_create, quirk, .surface_create, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_capabilities)])
+-            try appendScored(allocator, &surface_capabilities, quirk, .surface_capabilities, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_configure)])
+-            try appendScored(allocator, &surface_configure, quirk, .surface_configure, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_acquire)])
+-            try appendScored(allocator, &surface_acquire, quirk, .surface_acquire, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_present)])
+-            try appendScored(allocator, &surface_present, quirk, .surface_present, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_unconfigure)])
+-            try appendScored(allocator, &surface_unconfigure, quirk, .surface_unconfigure, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_release)])
+-            try appendScored(allocator, &surface_release, quirk, .surface_release, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.async_diagnostics)])
+-            try appendScored(allocator, &async_diagnostics, quirk, .async_diagnostics, scoring_profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.map_async)])
+-            try appendScored(allocator, &map_async, quirk, .map_async, scoring_profile);
+-    }
+-
+-    return DispatchContext{
+-        .allocator = allocator,
+-        .upload = finalizeBucket(allocator, &upload),
+-        .copy_buffer_to_texture = finalizeBucket(allocator, &copy_buffer_to_texture),
+-        .barrier = finalizeBucket(allocator, &barrier),
+-        .dispatch = finalizeBucket(allocator, &dispatch_commands),
+-        .kernel_dispatch = finalizeBucket(allocator, &kernel_dispatch),
+-        .render_draw = finalizeBucket(allocator, &render_draw),
+-        .sampler_create = finalizeBucket(allocator, &sampler_create),
+-        .sampler_destroy = finalizeBucket(allocator, &sampler_destroy),
+-        .texture_write = finalizeBucket(allocator, &texture_write),
+-        .texture_query = finalizeBucket(allocator, &texture_query),
+-        .texture_destroy = finalizeBucket(allocator, &texture_destroy),
+-        .surface_create = finalizeBucket(allocator, &surface_create),
+-        .surface_capabilities = finalizeBucket(allocator, &surface_capabilities),
+-        .surface_configure = finalizeBucket(allocator, &surface_configure),
+-        .surface_acquire = finalizeBucket(allocator, &surface_acquire),
+-        .surface_present = finalizeBucket(allocator, &surface_present),
+-        .surface_unconfigure = finalizeBucket(allocator, &surface_unconfigure),
+-        .surface_release = finalizeBucket(allocator, &surface_release),
+-        .async_diagnostics = finalizeBucket(allocator, &async_diagnostics),
+-        .map_async = finalizeBucket(allocator, &map_async),
+-    };
++    var context = emptyContext(allocator);
++    for (quirks) |quirk| accumulateQuirk(&context, quirk, scoring_profile);
++    finalizeContext(&context);
++    return context;
+ }
+ 
+ pub fn buildProfileDispatchContext(
+     allocator: std.mem.Allocator,
+     profile: model.DeviceProfile,
+     quirks: []const model.Quirk,
+-) !DispatchContext {
+-    var upload = std.ArrayList(ScoredQuirk).empty;
+-    var copy_buffer_to_texture = std.ArrayList(ScoredQuirk).empty;
+-    var barrier = std.ArrayList(ScoredQuirk).empty;
+-    var dispatch_commands = std.ArrayList(ScoredQuirk).empty;
+-    var kernel_dispatch = std.ArrayList(ScoredQuirk).empty;
+-    var render_draw = std.ArrayList(ScoredQuirk).empty;
+-    var sampler_create = std.ArrayList(ScoredQuirk).empty;
+-    var sampler_destroy = std.ArrayList(ScoredQuirk).empty;
+-    var texture_write = std.ArrayList(ScoredQuirk).empty;
+-    var texture_query = std.ArrayList(ScoredQuirk).empty;
+-    var texture_destroy = std.ArrayList(ScoredQuirk).empty;
+-    var surface_create = std.ArrayList(ScoredQuirk).empty;
+-    var surface_capabilities = std.ArrayList(ScoredQuirk).empty;
+-    var surface_configure = std.ArrayList(ScoredQuirk).empty;
+-    var surface_acquire = std.ArrayList(ScoredQuirk).empty;
+-    var surface_present = std.ArrayList(ScoredQuirk).empty;
+-    var surface_unconfigure = std.ArrayList(ScoredQuirk).empty;
+-    var surface_release = std.ArrayList(ScoredQuirk).empty;
+-    var async_diagnostics = std.ArrayList(ScoredQuirk).empty;
+-    var map_async = std.ArrayList(ScoredQuirk).empty;
+-
++) std.mem.Allocator.Error!DispatchContext {
++    var context = emptyContext(allocator);
+     for (quirks) |quirk| {
+-        if (!matchesProfile(profile, quirk)) continue;
+-        const si = @intFromEnum(quirk.scope);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.upload)])
+-            try appendScored(allocator, &upload, quirk, .upload, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.copy_buffer_to_texture)])
+-            try appendScored(allocator, &copy_buffer_to_texture, quirk, .copy_buffer_to_texture, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.barrier)])
+-            try appendScored(allocator, &barrier, quirk, .barrier, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.dispatch)])
+-            try appendScored(allocator, &dispatch_commands, quirk, .dispatch, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.kernel_dispatch)])
+-            try appendScored(allocator, &kernel_dispatch, quirk, .kernel_dispatch, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.render_draw)])
+-            try appendScored(allocator, &render_draw, quirk, .render_draw, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_create)])
+-            try appendScored(allocator, &sampler_create, quirk, .sampler_create, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_destroy)])
+-            try appendScored(allocator, &sampler_destroy, quirk, .sampler_destroy, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_write)])
+-            try appendScored(allocator, &texture_write, quirk, .texture_write, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_query)])
+-            try appendScored(allocator, &texture_query, quirk, .texture_query, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_destroy)])
+-            try appendScored(allocator, &texture_destroy, quirk, .texture_destroy, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_create)])
+-            try appendScored(allocator, &surface_create, quirk, .surface_create, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_capabilities)])
+-            try appendScored(allocator, &surface_capabilities, quirk, .surface_capabilities, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_configure)])
+-            try appendScored(allocator, &surface_configure, quirk, .surface_configure, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_acquire)])
+-            try appendScored(allocator, &surface_acquire, quirk, .surface_acquire, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_present)])
+-            try appendScored(allocator, &surface_present, quirk, .surface_present, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_unconfigure)])
+-            try appendScored(allocator, &surface_unconfigure, quirk, .surface_unconfigure, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_release)])
+-            try appendScored(allocator, &surface_release, quirk, .surface_release, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.async_diagnostics)])
+-            try appendScored(allocator, &async_diagnostics, quirk, .async_diagnostics, profile);
+-        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.map_async)])
+-            try appendScored(allocator, &map_async, quirk, .map_async, profile);
++        if (matchesProfile(profile, quirk)) accumulateQuirk(&context, quirk, profile);
+     }
+-
+-    return DispatchContext{
+-        .allocator = allocator,
+-        .upload = finalizeBucket(allocator, &upload),
+-        .copy_buffer_to_texture = finalizeBucket(allocator, &copy_buffer_to_texture),
+-        .barrier = finalizeBucket(allocator, &barrier),
+-        .dispatch = finalizeBucket(allocator, &dispatch_commands),
+-        .kernel_dispatch = finalizeBucket(allocator, &kernel_dispatch),
+-        .render_draw = finalizeBucket(allocator, &render_draw),
+-        .sampler_create = finalizeBucket(allocator, &sampler_create),
+-        .sampler_destroy = finalizeBucket(allocator, &sampler_destroy),
+-        .texture_write = finalizeBucket(allocator, &texture_write),
+-        .texture_query = finalizeBucket(allocator, &texture_query),
+-        .texture_destroy = finalizeBucket(allocator, &texture_destroy),
+-        .surface_create = finalizeBucket(allocator, &surface_create),
+-        .surface_capabilities = finalizeBucket(allocator, &surface_capabilities),
+-        .surface_configure = finalizeBucket(allocator, &surface_configure),
+-        .surface_acquire = finalizeBucket(allocator, &surface_acquire),
+-        .surface_present = finalizeBucket(allocator, &surface_present),
+-        .surface_unconfigure = finalizeBucket(allocator, &surface_unconfigure),
+-        .surface_release = finalizeBucket(allocator, &surface_release),
+-        .async_diagnostics = finalizeBucket(allocator, &async_diagnostics),
+-        .map_async = finalizeBucket(allocator, &map_async),
+-    };
++    finalizeContext(&context);
++    return context;
+ }
+ 
+ pub fn dispatch(profile: model.DeviceProfile, context: DispatchContext, command: model.Command) struct {
+@@ -379,55 +211,49 @@ pub fn emptyContext(allocator: std.mem.Allocator) DispatchContext {
+     };
+ }
+ 
+-fn appendScored(
+-    allocator: std.mem.Allocator,
+-    storage: *std.ArrayList(ScoredQuirk),
+-    quirk: model.Quirk,
+-    command_kind: model.CommandKind,
+-    profile: model.DeviceProfile,
+-) !void {
+-    try storage.append(allocator, .{
+-        .quirk = quirk,
+-        .score = scoreRule(quirk, command_kind, profile),
+-    });
++fn accumulateQuirk(context: *DispatchContext, quirk: model.Quirk, profile: model.DeviceProfile) void {
++    const si = @intFromEnum(quirk.scope);
++    inline for (std.meta.fields(DispatchContext)) |field| {
++        if (field.type == CommandDispatchBucket) {
++            const kind = @field(model.CommandKind, field.name);
++            if (SCOPE_COMMAND_TABLE[si][@intFromEnum(kind)]) {
++                const bucket = &@field(context, field.name);
++                const candidate = ScoredQuirk{ .quirk = quirk, .score = scoreRule(quirk, kind, profile) };
++                bucket.matched_count += 1;
++                // Strict improvement preserves the stable sort's first-input tie rule.
++                if (bucket.best == null or compareScoredQuirk({}, candidate, .{ .quirk = bucket.best.?, .score = bucket.best_score })) {
++                    bucket.best = quirk;
++                    bucket.best_score = candidate.score;
++                }
++            }
++        }
++    }
+ }
+ 
+-fn finalizeBucket(
+-    allocator: std.mem.Allocator,
+-    storage: *std.ArrayList(ScoredQuirk),
+-) CommandDispatchBucket {
+-    if (storage.items.len == 0) {
+-        storage.deinit(allocator);
+-        return CommandDispatchBucket{};
++fn finalizeContext(context: *DispatchContext) void {
++    inline for (std.meta.fields(DispatchContext)) |field| {
++        if (field.type == CommandDispatchBucket) finalizeBucket(&@field(context, field.name));
+     }
++}
+ 
+-    std.mem.sort(ScoredQuirk, storage.items, {}, compareScoredQuirk);
+-    const best = storage.items[0];
+-    const requires_lean = model.requiresProof(best.quirk.verification_mode);
++fn finalizeBucket(bucket: *CommandDispatchBucket) void {
++    const quirk = bucket.best orelse return;
++    const requires_lean = model.requiresProof(quirk.verification_mode);
+     const is_blocking = if (lean_proof.lean_verified) blk: {
+         // Blocking shortcuts (comptime_verified tier — verifiable by enum exhaustion).
+-        if (best.quirk.proof_level == .rejected) break :blk true;
+-        if (best.quirk.safety_class == .critical) break :blk best.quirk.proof_level != .proven;
+-        break :blk requires_lean and best.quirk.proof_level != .proven;
+-    } else requires_lean and best.quirk.proof_level != .proven;
+-
+-    const action_is_identity = switch (best.quirk.action) {
++        if (quirk.proof_level == .rejected) break :blk true;
++        if (quirk.safety_class == .critical) break :blk quirk.proof_level != .proven;
++        break :blk requires_lean and quirk.proof_level != .proven;
++    } else requires_lean and quirk.proof_level != .proven;
++
++    bucket.requires_lean = requires_lean;
++    bucket.is_blocking = is_blocking;
++    bucket.action_is_identity = switch (quirk.action) {
+         .no_op => true,
+         .toggle => |payload| toggle_registry.effect(payload.toggle_name) != .behavioral,
+         .use_temporary_buffer => false,
+         .use_temporary_render_texture => false,
+     };
+-
+-    const result = CommandDispatchBucket{
+-        .best = best.quirk,
+-        .best_score = best.score,
+-        .matched_count = @intCast(storage.items.len),
+-        .requires_lean = requires_lean,
+-        .is_blocking = is_blocking,
+-        .action_is_identity = action_is_identity,
+-    };
+-    storage.deinit(allocator);
+-    return result;
+ }
+ 
+ fn compareScoredQuirk(_: void, a: ScoredQuirk, b: ScoredQuirk) bool {
+@@ -661,3 +487,230 @@ test "vendor comparison ignores case" {
+ test "proof priority ordering prefers proven over guarded" {
+     try std.testing.expect(proofPriority(.proven) > proofPriority(.guarded));
+ }
++
++test "quirk builders retain their public allocator error contract" {
++    const plain = @typeInfo(@TypeOf(buildDispatchContext)).@"fn".return_type.?;
++    const filtered = @typeInfo(@TypeOf(buildProfileDispatchContext)).@"fn".return_type.?;
++    try std.testing.expect(@typeInfo(plain).error_union.error_set == std.mem.Allocator.Error);
++    try std.testing.expect(@typeInfo(filtered).error_union.error_set == std.mem.Allocator.Error);
++}
++
++const TEST_PROFILE = model.DeviceProfile{
++    .vendor = "AMD",
++    .api = .vulkan,
++    .device_family = "test-family",
++    .driver_version = .{ .major = 2, .minor = 3, .patch = 4 },
++};
++
++fn testQuirk(id: []const u8) model.Quirk {
++    return .{
++        .schema_version = model_policy.CURRENT_SCHEMA_VERSION,
++        .quirk_id = id,
++        .scope = .driver_toggle,
++        .match_spec = .{ .vendor = "amd", .api = .vulkan },
++        .action = .no_op,
++        .safety_class = .moderate,
++        .verification_mode = .guard_only,
++        .proof_level = .guarded,
++        .provenance = .{ .source_repo = "test", .source_path = "test", .source_commit = "test", .observed_at = "test" },
++    };
++}
++
++test "quirk selection ranks score then proof then priority then identifier" {
++    const base = ScoredQuirk{ .quirk = testQuirk("middle"), .score = 100 };
++    var better = base;
++    better.score += 1;
++    better.quirk.proof_level = .rejected;
++    try std.testing.expect(compareScoredQuirk({}, better, base));
++    better = base;
++    better.quirk.proof_level = .proven;
++    better.quirk.quirk_id = "z";
++    try std.testing.expect(compareScoredQuirk({}, better, base));
++    better = base;
++    better.quirk.priority += 1;
++    better.quirk.quirk_id = "z";
++    try std.testing.expect(compareScoredQuirk({}, better, base));
++    better = base;
++    better.quirk.quirk_id = "a";
++    try std.testing.expect(compareScoredQuirk({}, better, base));
++    try std.testing.expect(!compareScoredQuirk({}, base, better));
++    try std.testing.expect(!compareScoredQuirk({}, base, base));
++}
++
++test "quirk selection exact ties retain first input including its action" {
++    var quirks = [_]model.Quirk{testQuirk("same")} ** 48;
++    for (&quirks, 0..) |*quirk, i| {
++        quirk.action = .{ .use_temporary_buffer = .{ .alignment_bytes = @intCast(i + 1) } };
++    }
++    for (0..quirks.len) |_| {
++        const plain = try buildDispatchContext(std.testing.allocator, &quirks);
++        defer plain.deinit();
++        const filtered = try buildProfileDispatchContext(std.testing.allocator, TEST_PROFILE, &quirks);
++        defer filtered.deinit();
++        inline for (@typeInfo(DispatchContext).@"struct".fields) |field| {
++            if (field.type == CommandDispatchBucket) {
++                for ([_]DispatchContext{ plain, filtered }) |context| {
++                    const bucket = @field(context, field.name);
++                    try std.testing.expectEqualDeep(quirks[0], bucket.best.?);
++                    try std.testing.expectEqual(quirks.len, bucket.matched_count);
++                }
++            }
++        }
++        std.mem.rotate(model.Quirk, &quirks, 1);
++    }
++}
++
++// The historical list/sort algorithm remains only as an oracle for the bounded
++// selector. Scope, scoring and ranking still have one production owner.
++fn expectSortedContext(context: DispatchContext, quirks: []const model.Quirk, profile: model.DeviceProfile, filter_profile: bool) !void {
++    inline for (@typeInfo(DispatchContext).@"struct".fields) |field| {
++        if (field.type == CommandDispatchBucket) {
++            const kind = @field(model.CommandKind, field.name);
++            var matches = std.ArrayList(ScoredQuirk).empty;
++            defer matches.deinit(std.testing.allocator);
++            for (quirks) |quirk| {
++                if (filter_profile and !matchesProfile(profile, quirk)) continue;
++                if (!supportsCommand(quirk.scope, kind)) continue;
++                try matches.append(std.testing.allocator, .{ .quirk = quirk, .score = scoreRule(quirk, kind, profile) });
++            }
++            std.mem.sort(ScoredQuirk, matches.items, {}, compareScoredQuirk);
++            const bucket = @field(context, field.name);
++            try std.testing.expectEqual(matches.items.len, bucket.matched_count);
++            if (matches.items.len == 0) {
++                try std.testing.expectEqualDeep(CommandDispatchBucket{}, bucket);
++            } else {
++                const winner = matches.items[0];
++                try std.testing.expectEqualDeep(winner.quirk, bucket.best.?);
++                try std.testing.expectEqual(winner.score, bucket.best_score);
++                const required = winner.quirk.verification_mode == .lean_required;
++                const blocked = if (lean_proof.lean_verified)
++                    winner.quirk.proof_level == .rejected or ((required or winner.quirk.safety_class == .critical) and winner.quirk.proof_level != .proven)
++                else
++                    required and winner.quirk.proof_level != .proven;
++                try std.testing.expectEqual(required, bucket.requires_lean);
++                try std.testing.expectEqual(blocked, bucket.is_blocking);
++            }
++        }
++    }
++}
++
++test "quirk selection matches stable sort across scopes profiles and input orders" {
++    var quirks: [120]model.Quirk = undefined;
++    const ids = [_][]const u8{ "z", "a", "same" };
++    const scopes = std.enums.values(model.Scope);
++    const proofs = std.enums.values(model.ProofLevel);
++    const safety = std.enums.values(model.SafetyClass);
++    const modes = std.enums.values(model.VerificationMode);
++    for (&quirks, 0..) |*quirk, i| {
++        quirk.* = testQuirk(ids[i % ids.len]);
++        quirk.scope = scopes[i % scopes.len];
++        quirk.priority = @intCast(i % 11);
++        quirk.proof_level = proofs[i % proofs.len];
++        quirk.safety_class = safety[i % safety.len];
++        quirk.verification_mode = modes[(i / 3) % modes.len];
++        switch (i % 9) {
++            0 => quirk.match_spec.vendor = "intel",
++            1 => quirk.match_spec.api = .metal,
++            2 => quirk.match_spec.device_family = "other-family",
++            3 => quirk.match_spec.device_family = "test-family",
++            4 => quirk.match_spec.driver_range = ">=2.0.0,<3.0.0",
++            5 => quirk.match_spec.driver_range = ">=3.0.0",
++            6 => quirk.match_spec.driver_range = "invalid",
++            else => {},
++        }
++    }
++    const scoring_profile = model.DeviceProfile{
++        .vendor = "",
++        .api = quirks[0].match_spec.api,
++        .driver_version = .{ .major = 9999, .minor = 9999, .patch = 9999 },
++    };
++    for (0..quirks.len + 1) |len| {
++        const plain = try buildDispatchContext(std.testing.allocator, quirks[0..len]);
++        defer plain.deinit();
++        try expectSortedContext(plain, quirks[0..len], scoring_profile, false);
++        const filtered = try buildProfileDispatchContext(std.testing.allocator, TEST_PROFILE, quirks[0..len]);
++        defer filtered.deinit();
++        try expectSortedContext(filtered, quirks[0..len], TEST_PROFILE, true);
++        std.mem.rotate(model.Quirk, &quirks, 1);
++    }
++}
++
++fn expectAllocationFreeContext(comptime filter_profile: bool) !void {
++    // The backing arena cleans up even a regression that strands an allocation;
++    // the wrapper independently accounts for frees made by the actual builder.
++    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
++    defer arena.deinit();
++    var failing = std.testing.FailingAllocator.init(arena.allocator(), .{ .fail_index = 1 });
++    const quirks = [_]model.Quirk{testQuirk("all-commands")};
++    const result = if (filter_profile)
++        buildProfileDispatchContext(failing.allocator(), TEST_PROFILE, &quirks)
++    else
++        buildDispatchContext(failing.allocator(), &quirks);
++    if (result) |context| context.deinit() else |_| {}
++    try std.testing.expectEqual(failing.allocated_bytes, failing.freed_bytes);
++    _ = try result;
++    try std.testing.expectEqual(@as(usize, 0), failing.allocations);
++    try std.testing.expect(!failing.has_induced_failure);
++}
++
++test "quirk unfiltered context construction does not allocate or strand partial state" {
++    try expectAllocationFreeContext(false);
++}
++
++test "quirk profile context construction does not allocate or strand partial state" {
++    try expectAllocationFreeContext(true);
++}
++
++test "quirk context profile filters remain separate from prefiltered construction" {
++    const base = testQuirk("match");
++    var quirks = [_]model.Quirk{base} ** 8;
++    quirks[1].match_spec.vendor = "intel";
++    quirks[2].match_spec.api = .metal;
++    quirks[3].match_spec.device_family = "different-family";
++    quirks[4].match_spec.driver_range = ">=3.0.0";
++    quirks[5].match_spec.driver_range = "invalid";
++    quirks[6].match_spec.driver_range = ">=2.0.0,<3.0.0";
++    quirks[7].match_spec.device_family = TEST_PROFILE.device_family;
++
++    const filtered = try buildProfileDispatchContext(std.testing.allocator, TEST_PROFILE, &quirks);
++    defer filtered.deinit();
++    try std.testing.expectEqual(@as(u32, 3), filtered.upload.matched_count);
++    try std.testing.expectEqualDeep(quirks[7], filtered.upload.best.?);
++    const prefiltered = try buildDispatchContext(std.testing.allocator, &quirks);
++    defer prefiltered.deinit();
++    try std.testing.expectEqual(quirks.len, prefiltered.upload.matched_count);
++    try std.testing.expectEqualDeep(quirks[4], prefiltered.upload.best.?);
++}
++
++test "quirk context bucket metadata preserves proof blocking and identity decisions" {
++    inline for (std.meta.tags(model.ProofLevel)) |proof| {
++        inline for (std.meta.tags(model.VerificationMode)) |mode| {
++            inline for (std.meta.tags(model.SafetyClass)) |safety| {
++                var quirk = testQuirk("metadata");
++                quirk.proof_level = proof;
++                quirk.verification_mode = mode;
++                quirk.safety_class = safety;
++                const context = try buildProfileDispatchContext(std.testing.allocator, TEST_PROFILE, &.{quirk});
++                defer context.deinit();
++                const required = mode == .lean_required;
++                const blocking = proof != .proven and (required or (lean_proof.lean_verified and (proof == .rejected or safety == .critical)));
++                try std.testing.expectEqual(required, context.upload.requires_lean);
++                try std.testing.expectEqual(blocking, context.upload.is_blocking);
++                try std.testing.expect(context.upload.action_is_identity);
++            }
++        }
++    }
++    const actions = [_]model.QuirkAction{
++        .no_op,
++        .{ .toggle = .{ .toggle_name = "unknown-informational-toggle" } },
++        .{ .use_temporary_buffer = .{ .alignment_bytes = 256 } },
++        .{ .use_temporary_render_texture = .{ .min_mip_level = 1 } },
++    };
++    for (actions, [_]bool{ true, true, false, false }) |action, identity| {
++        var quirk = testQuirk("action");
++        quirk.action = action;
++        const context = try buildDispatchContext(std.testing.allocator, &.{quirk});
++        defer context.deinit();
++        try std.testing.expectEqual(identity, context.upload.action_is_identity);
++    }
++}

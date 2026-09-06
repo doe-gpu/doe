@@ -3928,9 +3928,9 @@
       },
       "src/quirk/runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "51723506c7debbb1e6f1fbda4e8d9f37f6f61ff575021610377549f3e5587e8d",
-        "reason": "Keep: reachable quirk implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "64c83ff04d7a59bd6c44f055c0e34e28ee691ce9a4c5e48cb8d9c63d0582de1a",
+        "reason": "Keep: quirk selection owns matching, stable ranking, and bounded dispatch bucket preparation with characterization coverage.",
+        "reviewer": "codex-quirk-selection/2026-09-06"
       },
       "src/quirk/toggle_registry.zig": {
         "decision": "Keep",

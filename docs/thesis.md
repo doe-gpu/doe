@@ -138,6 +138,16 @@ Receipts cannot compensate for incorrect, unstable, incompatible, or slower work
 
 ## Focus and founder responsibilities
 
+The immediate engineering focus is a smaller, clearer, cheaper Zig core. Give
+each semantic decision one owner, make resource acquisition and release
+complete, and remove unnecessary allocation, repeated analysis, and command
+preparation. Qualification verifies these improvements. Use compile-time
+programming for facts known at build time; resolve physical device and driver
+facts at initialization when their lifetime permits. Shared algorithms must
+reduce real work without hiding backend-specific responsibilities. Preserve
+characterizing tests and check execution cost, generated code size, and build
+cost before accepting a structural optimization.
+
 Compiler/runtime ownership covers transformations, reusable plans, invalidation,
 resource lifecycle, and backend execution. Application/evaluation ownership
 covers integration, packaging, independent controls, diagnostics, and reproducible
@@ -152,6 +162,84 @@ applications, or browser distributions. Fawn remains separately gated. Existing
 A/B/C/D and K0 browser laws retain their meaning; browser construction is not a
 dependency. Accelerator work retains separate hardware admission and cannot
 broaden the initial matrix through simulator evidence.
+
+## Proposed user journeys
+
+These journeys describe intended user outcomes, not current support or release
+commitments. Begin with provider compatibility, repeated computation, and
+transferable corrections. Broader integrations follow demonstrated application
+wins and earn separate physical qualification under the existing strategy
+contract.
+
+### Replace a WebGPU provider without rewriting the application
+
+A developer selects `doe-gpu` in Node, Bun, or Electron while retaining the
+application and WGSL. Compare clean installation, startup, memory, complete
+operation latency, and resource release using the same retained package.
+Success requires correct output, unchanged validation, explicit capabilities,
+and no hidden fallback. A declared program rejects unsupported requirements
+before execution. Ordinary WebGPU calls reject unsupported operations before
+their dependent GPU work; provider substitution cannot predict future
+JavaScript calls. Electron main and renderer integrations qualify separately.
+
+### Keep repeated computation fast and interactive
+
+A photographer adjusts filters or a researcher advances a simulation while
+Doe retains buffers and prepared commands. Input changes preserve unaffected
+resources, and simulation steps preserve declared state. Cancellation,
+transactional updates, cleanup, and reopening have predictable outcomes.
+Success means useful responsiveness or faster accepted iterations against
+independent numerical checks, with stable memory over prolonged sessions.
+Account for initial preparation and final cleanup as well as repetition.
+
+### Fix shader and driver failures once
+
+A contributor reproduces a failing shader on the affected device and follows
+source diagnostics through compiler transformations and backend execution.
+A narrowly scoped correction or workaround must repair the original program,
+preserve unrelated regressions, and transfer to other programs. Keep allocation
+failure and cleanup ownership explicit, and avoid unnecessary work on unaffected
+devices. Device-specific conditions remain attached to their qualification.
+
+### Ship local AI across desktop hardware
+
+An application team embeds the same runtime through WebGPU, its C interface,
+or a separately qualified ONNX Runtime integration for offline search, image
+inspection, or inference. Qualify Linux, macOS, and Windows independently.
+Success combines acceptable output quality, a smaller deployment burden,
+predictable resources, explicit unsupported operations, and reproducible
+upgrades without a separate user-installed shader toolchain. A proposed
+integration does not expand the current support matrix.
+
+### Coordinate competing workloads across workstation GPUs
+
+A scientist uses an agent to run independent jobs across integrated and
+discrete GPUs while retaining interactive responsiveness. This conditional
+extension schedules bounded submissions, enforces declared budgets, and
+accounts for every required transfer. It must improve accepted batch completion
+or responsiveness over the strongest eligible single-device control after
+scheduling and copying costs. It assumes neither shared memory nor kernel
+preemption nor authority over unrelated applications.
+
+### Accelerate existing browsers and application engines
+
+A browser or Flutter engine maintainer integrates Doe beneath an existing
+rendering or WebGPU boundary. Users manipulate diagrams, preview video, or run
+local analysis within that host. Success means fewer missed frames, fewer
+transfers, or lower complete operation cost while preserving visual output,
+isolation, external textures, color handling, and surface lifecycle. Each
+host integration requires its own artifact and physical evidence; it distributes
+the same runtime after the initial application proof.
+
+### Turn new algorithms into optimized GPU programs
+
+A researcher supplies an algorithm and independent reference tests. A coding
+agent proposes GPU implementations and hardware optimizations, measures and
+checks each candidate before adoption, and retains prior versions. Success
+means useful acceleration of unfamiliar work across supported hardware without
+handwritten backend code. Changed drivers trigger revalidation, and accepted
+improvements must transfer beyond their original benchmark. This extends the
+existing correction loop rather than creating a general agent framework.
 
 ## Acquisition hypothesis
 

@@ -1,0 +1,1 @@
+PASS: both builder decision digests match; measured allocation bytes are fully released in each successful baseline and corrected run.

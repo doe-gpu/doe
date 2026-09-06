@@ -10,6 +10,16 @@ The import fence and source-layout gates are the structural authority; this
 page records the lifecycle interpretation and follow-up decisions. The target
 structural roadmap lives in [`../runtime-hexagonal-architecture-plan.md`](../runtime-hexagonal-architecture-plan.md).
 
+## Current quirk preparation boundary
+
+Quirk preparation retains the existing bucket and allocator interfaces while
+sharing selection between the profile-filtered and prefiltered builders. The
+current selector uses bounded bucket state; stable ranking, profile admission,
+proof decisions, and command aliases retain their existing meaning. Retained
+failure, parity, allocation, and preparation-cost evidence lives in
+[`quirk selection`](../../bench/out/quirk-selection/20260906-direct-accumulation/README.md).
+This CPU preparation evidence does not promote backend or application performance.
+
 ## Current ABI approval boundary
 
 Recomposition ABI approval is symbol-scoped. The reviewed PCI-identity

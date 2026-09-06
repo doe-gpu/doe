@@ -53,6 +53,12 @@ classified and cannot be promoted by benchmark results.
 - A workload declares immutable input identity, oracle, executor, policy,
   required artifacts, and evidence extensions.
 - Correctness precedes performance interpretation.
+- Quirk selector changes preserve scope membership, profile filtering, ranking,
+  first-input ties, match counts, and proof/action decisions. Characterize both
+  builders against retained decisions and exercise allocation failure before
+  measuring preparation. A selector microbenchmark does not establish GPU or
+  application latency, and compile-time specialization must also account for
+  generated code and build cost.
 - Declared reusable-program evaluations freeze numerical oracles before tuning,
   measure preparation separately, include persistent/batched incumbent controls,
   and test reset, source/shape updates, cancellation, and recovery. Package

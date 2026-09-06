@@ -50,7 +50,6 @@ pub const CommandDispatchBucket = struct {
     action_is_identity: bool = true,
 };
 
-/// Borrows quirk payloads. The allocator field and deinit retain the existing caller contract.
 pub const DispatchContext = struct {
     allocator: std.mem.Allocator,
     upload: CommandDispatchBucket,
@@ -97,7 +96,7 @@ pub fn emptyDecision(context: DispatchContext, command: model.Command) DispatchD
     };
 }
 
-pub fn buildDispatchContext(allocator: std.mem.Allocator, quirks: []const model.Quirk) std.mem.Allocator.Error!DispatchContext {
+pub fn buildDispatchContext(allocator: std.mem.Allocator, quirks: []const model.Quirk) !DispatchContext {
     if (quirks.len == 0) {
         return emptyContext(allocator);
     }
@@ -109,23 +108,192 @@ pub fn buildDispatchContext(allocator: std.mem.Allocator, quirks: []const model.
         .driver_version = .{ .major = 9999, .minor = 9999, .patch = 9999 },
     };
 
-    var context = emptyContext(allocator);
-    for (quirks) |quirk| accumulateQuirk(&context, quirk, scoring_profile);
-    finalizeContext(&context);
-    return context;
+    var upload = std.ArrayList(ScoredQuirk).empty;
+    var copy_buffer_to_texture = std.ArrayList(ScoredQuirk).empty;
+    var barrier = std.ArrayList(ScoredQuirk).empty;
+    var dispatch_commands = std.ArrayList(ScoredQuirk).empty;
+    var kernel_dispatch = std.ArrayList(ScoredQuirk).empty;
+    var render_draw = std.ArrayList(ScoredQuirk).empty;
+    var sampler_create = std.ArrayList(ScoredQuirk).empty;
+    var sampler_destroy = std.ArrayList(ScoredQuirk).empty;
+    var texture_write = std.ArrayList(ScoredQuirk).empty;
+    var texture_query = std.ArrayList(ScoredQuirk).empty;
+    var texture_destroy = std.ArrayList(ScoredQuirk).empty;
+    var surface_create = std.ArrayList(ScoredQuirk).empty;
+    var surface_capabilities = std.ArrayList(ScoredQuirk).empty;
+    var surface_configure = std.ArrayList(ScoredQuirk).empty;
+    var surface_acquire = std.ArrayList(ScoredQuirk).empty;
+    var surface_present = std.ArrayList(ScoredQuirk).empty;
+    var surface_unconfigure = std.ArrayList(ScoredQuirk).empty;
+    var surface_release = std.ArrayList(ScoredQuirk).empty;
+    var async_diagnostics = std.ArrayList(ScoredQuirk).empty;
+    var map_async = std.ArrayList(ScoredQuirk).empty;
+
+    for (quirks) |quirk| {
+        // Comptime table built from supportsCommand (correct by construction).
+        // Lean scopeCommandTableComplete is a redundant second check (comptime_verified tier).
+        const si = @intFromEnum(quirk.scope);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.upload)])
+            try appendScored(allocator, &upload, quirk, .upload, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.copy_buffer_to_texture)])
+            try appendScored(allocator, &copy_buffer_to_texture, quirk, .copy_buffer_to_texture, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.barrier)])
+            try appendScored(allocator, &barrier, quirk, .barrier, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.dispatch)])
+            try appendScored(allocator, &dispatch_commands, quirk, .dispatch, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.kernel_dispatch)])
+            try appendScored(allocator, &kernel_dispatch, quirk, .kernel_dispatch, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.render_draw)])
+            try appendScored(allocator, &render_draw, quirk, .render_draw, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_create)])
+            try appendScored(allocator, &sampler_create, quirk, .sampler_create, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_destroy)])
+            try appendScored(allocator, &sampler_destroy, quirk, .sampler_destroy, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_write)])
+            try appendScored(allocator, &texture_write, quirk, .texture_write, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_query)])
+            try appendScored(allocator, &texture_query, quirk, .texture_query, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_destroy)])
+            try appendScored(allocator, &texture_destroy, quirk, .texture_destroy, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_create)])
+            try appendScored(allocator, &surface_create, quirk, .surface_create, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_capabilities)])
+            try appendScored(allocator, &surface_capabilities, quirk, .surface_capabilities, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_configure)])
+            try appendScored(allocator, &surface_configure, quirk, .surface_configure, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_acquire)])
+            try appendScored(allocator, &surface_acquire, quirk, .surface_acquire, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_present)])
+            try appendScored(allocator, &surface_present, quirk, .surface_present, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_unconfigure)])
+            try appendScored(allocator, &surface_unconfigure, quirk, .surface_unconfigure, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_release)])
+            try appendScored(allocator, &surface_release, quirk, .surface_release, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.async_diagnostics)])
+            try appendScored(allocator, &async_diagnostics, quirk, .async_diagnostics, scoring_profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.map_async)])
+            try appendScored(allocator, &map_async, quirk, .map_async, scoring_profile);
+    }
+
+    return DispatchContext{
+        .allocator = allocator,
+        .upload = finalizeBucket(allocator, &upload),
+        .copy_buffer_to_texture = finalizeBucket(allocator, &copy_buffer_to_texture),
+        .barrier = finalizeBucket(allocator, &barrier),
+        .dispatch = finalizeBucket(allocator, &dispatch_commands),
+        .kernel_dispatch = finalizeBucket(allocator, &kernel_dispatch),
+        .render_draw = finalizeBucket(allocator, &render_draw),
+        .sampler_create = finalizeBucket(allocator, &sampler_create),
+        .sampler_destroy = finalizeBucket(allocator, &sampler_destroy),
+        .texture_write = finalizeBucket(allocator, &texture_write),
+        .texture_query = finalizeBucket(allocator, &texture_query),
+        .texture_destroy = finalizeBucket(allocator, &texture_destroy),
+        .surface_create = finalizeBucket(allocator, &surface_create),
+        .surface_capabilities = finalizeBucket(allocator, &surface_capabilities),
+        .surface_configure = finalizeBucket(allocator, &surface_configure),
+        .surface_acquire = finalizeBucket(allocator, &surface_acquire),
+        .surface_present = finalizeBucket(allocator, &surface_present),
+        .surface_unconfigure = finalizeBucket(allocator, &surface_unconfigure),
+        .surface_release = finalizeBucket(allocator, &surface_release),
+        .async_diagnostics = finalizeBucket(allocator, &async_diagnostics),
+        .map_async = finalizeBucket(allocator, &map_async),
+    };
 }
 
 pub fn buildProfileDispatchContext(
     allocator: std.mem.Allocator,
     profile: model.DeviceProfile,
     quirks: []const model.Quirk,
-) std.mem.Allocator.Error!DispatchContext {
-    var context = emptyContext(allocator);
+) !DispatchContext {
+    var upload = std.ArrayList(ScoredQuirk).empty;
+    var copy_buffer_to_texture = std.ArrayList(ScoredQuirk).empty;
+    var barrier = std.ArrayList(ScoredQuirk).empty;
+    var dispatch_commands = std.ArrayList(ScoredQuirk).empty;
+    var kernel_dispatch = std.ArrayList(ScoredQuirk).empty;
+    var render_draw = std.ArrayList(ScoredQuirk).empty;
+    var sampler_create = std.ArrayList(ScoredQuirk).empty;
+    var sampler_destroy = std.ArrayList(ScoredQuirk).empty;
+    var texture_write = std.ArrayList(ScoredQuirk).empty;
+    var texture_query = std.ArrayList(ScoredQuirk).empty;
+    var texture_destroy = std.ArrayList(ScoredQuirk).empty;
+    var surface_create = std.ArrayList(ScoredQuirk).empty;
+    var surface_capabilities = std.ArrayList(ScoredQuirk).empty;
+    var surface_configure = std.ArrayList(ScoredQuirk).empty;
+    var surface_acquire = std.ArrayList(ScoredQuirk).empty;
+    var surface_present = std.ArrayList(ScoredQuirk).empty;
+    var surface_unconfigure = std.ArrayList(ScoredQuirk).empty;
+    var surface_release = std.ArrayList(ScoredQuirk).empty;
+    var async_diagnostics = std.ArrayList(ScoredQuirk).empty;
+    var map_async = std.ArrayList(ScoredQuirk).empty;
+
     for (quirks) |quirk| {
-        if (matchesProfile(profile, quirk)) accumulateQuirk(&context, quirk, profile);
+        if (!matchesProfile(profile, quirk)) continue;
+        const si = @intFromEnum(quirk.scope);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.upload)])
+            try appendScored(allocator, &upload, quirk, .upload, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.copy_buffer_to_texture)])
+            try appendScored(allocator, &copy_buffer_to_texture, quirk, .copy_buffer_to_texture, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.barrier)])
+            try appendScored(allocator, &barrier, quirk, .barrier, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.dispatch)])
+            try appendScored(allocator, &dispatch_commands, quirk, .dispatch, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.kernel_dispatch)])
+            try appendScored(allocator, &kernel_dispatch, quirk, .kernel_dispatch, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.render_draw)])
+            try appendScored(allocator, &render_draw, quirk, .render_draw, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_create)])
+            try appendScored(allocator, &sampler_create, quirk, .sampler_create, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.sampler_destroy)])
+            try appendScored(allocator, &sampler_destroy, quirk, .sampler_destroy, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_write)])
+            try appendScored(allocator, &texture_write, quirk, .texture_write, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_query)])
+            try appendScored(allocator, &texture_query, quirk, .texture_query, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.texture_destroy)])
+            try appendScored(allocator, &texture_destroy, quirk, .texture_destroy, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_create)])
+            try appendScored(allocator, &surface_create, quirk, .surface_create, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_capabilities)])
+            try appendScored(allocator, &surface_capabilities, quirk, .surface_capabilities, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_configure)])
+            try appendScored(allocator, &surface_configure, quirk, .surface_configure, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_acquire)])
+            try appendScored(allocator, &surface_acquire, quirk, .surface_acquire, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_present)])
+            try appendScored(allocator, &surface_present, quirk, .surface_present, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_unconfigure)])
+            try appendScored(allocator, &surface_unconfigure, quirk, .surface_unconfigure, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.surface_release)])
+            try appendScored(allocator, &surface_release, quirk, .surface_release, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.async_diagnostics)])
+            try appendScored(allocator, &async_diagnostics, quirk, .async_diagnostics, profile);
+        if (SCOPE_COMMAND_TABLE[si][@intFromEnum(model.CommandKind.map_async)])
+            try appendScored(allocator, &map_async, quirk, .map_async, profile);
     }
-    finalizeContext(&context);
-    return context;
+
+    return DispatchContext{
+        .allocator = allocator,
+        .upload = finalizeBucket(allocator, &upload),
+        .copy_buffer_to_texture = finalizeBucket(allocator, &copy_buffer_to_texture),
+        .barrier = finalizeBucket(allocator, &barrier),
+        .dispatch = finalizeBucket(allocator, &dispatch_commands),
+        .kernel_dispatch = finalizeBucket(allocator, &kernel_dispatch),
+        .render_draw = finalizeBucket(allocator, &render_draw),
+        .sampler_create = finalizeBucket(allocator, &sampler_create),
+        .sampler_destroy = finalizeBucket(allocator, &sampler_destroy),
+        .texture_write = finalizeBucket(allocator, &texture_write),
+        .texture_query = finalizeBucket(allocator, &texture_query),
+        .texture_destroy = finalizeBucket(allocator, &texture_destroy),
+        .surface_create = finalizeBucket(allocator, &surface_create),
+        .surface_capabilities = finalizeBucket(allocator, &surface_capabilities),
+        .surface_configure = finalizeBucket(allocator, &surface_configure),
+        .surface_acquire = finalizeBucket(allocator, &surface_acquire),
+        .surface_present = finalizeBucket(allocator, &surface_present),
+        .surface_unconfigure = finalizeBucket(allocator, &surface_unconfigure),
+        .surface_release = finalizeBucket(allocator, &surface_release),
+        .async_diagnostics = finalizeBucket(allocator, &async_diagnostics),
+        .map_async = finalizeBucket(allocator, &map_async),
+    };
 }
 
 pub fn dispatch(profile: model.DeviceProfile, context: DispatchContext, command: model.Command) struct {
@@ -211,49 +379,55 @@ pub fn emptyContext(allocator: std.mem.Allocator) DispatchContext {
     };
 }
 
-fn accumulateQuirk(context: *DispatchContext, quirk: model.Quirk, profile: model.DeviceProfile) void {
-    const si = @intFromEnum(quirk.scope);
-    inline for (std.meta.fields(DispatchContext)) |field| {
-        if (field.type == CommandDispatchBucket) {
-            const kind = @field(model.CommandKind, field.name);
-            if (SCOPE_COMMAND_TABLE[si][@intFromEnum(kind)]) {
-                const bucket = &@field(context, field.name);
-                const candidate = ScoredQuirk{ .quirk = quirk, .score = scoreRule(quirk, kind, profile) };
-                bucket.matched_count += 1;
-                // Strict improvement preserves the stable sort's first-input tie rule.
-                if (bucket.best == null or compareScoredQuirk({}, candidate, .{ .quirk = bucket.best.?, .score = bucket.best_score })) {
-                    bucket.best = quirk;
-                    bucket.best_score = candidate.score;
-                }
-            }
-        }
-    }
+fn appendScored(
+    allocator: std.mem.Allocator,
+    storage: *std.ArrayList(ScoredQuirk),
+    quirk: model.Quirk,
+    command_kind: model.CommandKind,
+    profile: model.DeviceProfile,
+) !void {
+    try storage.append(allocator, .{
+        .quirk = quirk,
+        .score = scoreRule(quirk, command_kind, profile),
+    });
 }
 
-fn finalizeContext(context: *DispatchContext) void {
-    inline for (std.meta.fields(DispatchContext)) |field| {
-        if (field.type == CommandDispatchBucket) finalizeBucket(&@field(context, field.name));
+fn finalizeBucket(
+    allocator: std.mem.Allocator,
+    storage: *std.ArrayList(ScoredQuirk),
+) CommandDispatchBucket {
+    if (storage.items.len == 0) {
+        storage.deinit(allocator);
+        return CommandDispatchBucket{};
     }
-}
 
-fn finalizeBucket(bucket: *CommandDispatchBucket) void {
-    const quirk = bucket.best orelse return;
-    const requires_lean = model.requiresProof(quirk.verification_mode);
+    std.mem.sort(ScoredQuirk, storage.items, {}, compareScoredQuirk);
+    const best = storage.items[0];
+    const requires_lean = model.requiresProof(best.quirk.verification_mode);
     const is_blocking = if (lean_proof.lean_verified) blk: {
         // Blocking shortcuts (comptime_verified tier — verifiable by enum exhaustion).
-        if (quirk.proof_level == .rejected) break :blk true;
-        if (quirk.safety_class == .critical) break :blk quirk.proof_level != .proven;
-        break :blk requires_lean and quirk.proof_level != .proven;
-    } else requires_lean and quirk.proof_level != .proven;
+        if (best.quirk.proof_level == .rejected) break :blk true;
+        if (best.quirk.safety_class == .critical) break :blk best.quirk.proof_level != .proven;
+        break :blk requires_lean and best.quirk.proof_level != .proven;
+    } else requires_lean and best.quirk.proof_level != .proven;
 
-    bucket.requires_lean = requires_lean;
-    bucket.is_blocking = is_blocking;
-    bucket.action_is_identity = switch (quirk.action) {
+    const action_is_identity = switch (best.quirk.action) {
         .no_op => true,
         .toggle => |payload| toggle_registry.effect(payload.toggle_name) != .behavioral,
         .use_temporary_buffer => false,
         .use_temporary_render_texture => false,
     };
+
+    const result = CommandDispatchBucket{
+        .best = best.quirk,
+        .best_score = best.score,
+        .matched_count = @intCast(storage.items.len),
+        .requires_lean = requires_lean,
+        .is_blocking = is_blocking,
+        .action_is_identity = action_is_identity,
+    };
+    storage.deinit(allocator);
+    return result;
 }
 
 fn compareScoredQuirk(_: void, a: ScoredQuirk, b: ScoredQuirk) bool {
@@ -486,13 +660,6 @@ test "vendor comparison ignores case" {
 
 test "proof priority ordering prefers proven over guarded" {
     try std.testing.expect(proofPriority(.proven) > proofPriority(.guarded));
-}
-
-test "quirk builders retain their public allocator error contract" {
-    const plain = @typeInfo(@TypeOf(buildDispatchContext)).@"fn".return_type.?;
-    const filtered = @typeInfo(@TypeOf(buildProfileDispatchContext)).@"fn".return_type.?;
-    try std.testing.expect(@typeInfo(plain).error_union.error_set == std.mem.Allocator.Error);
-    try std.testing.expect(@typeInfo(filtered).error_union.error_set == std.mem.Allocator.Error);
 }
 
 const TEST_PROFILE = model.DeviceProfile{
