@@ -73,17 +73,18 @@ var cached_selected_backend: RequestedBackend = switch (builtin.os.tag) {
     else => .vulkan,
 };
 var selected_backend_initialized = false;
+var selected_backend_mutex: std.Thread.Mutex = .{};
 
 fn instance_add_ref(inst: *DoeInstance) void {
-    inst.ref_count +|= 1;
+    native_helpers.object_add_ref(DoeInstance, toOpaque(inst));
 }
 
 fn adapter_add_ref(adapter: *DoeAdapter) void {
-    adapter.ref_count +|= 1;
+    native_helpers.object_add_ref(DoeAdapter, toOpaque(adapter));
 }
 
 fn device_add_ref(device: *DoeDevice) void {
-    device.ref_count +|= 1;
+    native_helpers.object_add_ref(DoeDevice, toOpaque(device));
 }
 
 fn parse_requested_backend(raw: []const u8) ?RequestedBackend {
@@ -109,6 +110,8 @@ fn requested_backend_from_lane(raw: []const u8) ?RequestedBackend {
 }
 
 fn selected_backend() RequestedBackend {
+    selected_backend_mutex.lock();
+    defer selected_backend_mutex.unlock();
     if (selected_backend_initialized) {
         return cached_selected_backend;
     }
@@ -424,6 +427,7 @@ fn create_device_for_adapter(
         .adapter = adapter,
         .mtl_device = adapter.mtl_device,
         .mtl_queue = queue,
+        .metal_libraries = .{ .ops = .{ .retain = backend_lifecycle.metal_bridge_retain, .release = backend_lifecycle.metal_bridge_release } },
         .enabled_features = enabled_features,
     };
     return dev;
@@ -453,7 +457,10 @@ pub export fn doeNativeInstanceRelease(raw: ?*anyopaque) callconv(.c) void {
         // InstanceRelease again when the last external texture is destroyed.
         const ext_tex = @import("../resource/doe_external_texture_native.zig");
         if (ext_tex.instance_external_texture_count(raw) > 0) {
-            if (inst.ref_count > 1) inst.ref_count -= 1;
+            var count = @atomicLoad(u32, &inst.ref_count, .monotonic);
+            while (count > 1) {
+                count = @cmpxchgWeak(u32, &inst.ref_count, count, count - 1, .acq_rel, .monotonic) orelse break;
+            }
             return;
         }
         if (!native_helpers.object_should_destroy(inst)) return;
@@ -544,17 +551,15 @@ pub export fn doeNativeAdapterGetInstance(raw: ?*anyopaque) callconv(.c) ?*anyop
 }
 
 pub export fn doeNativeAdapterRelease(raw: ?*anyopaque) callconv(.c) void {
-    // Adapter does NOT own the MTLDevice — device ownership transfers to DoeDevice.
+    // Every DoeDevice retains its adapter; the adapter owns their shared Metal device.
     if (cast(DoeAdapter, raw)) |a| {
-        if (a.ref_count > 1) {
-            a.ref_count -= 1;
-            return;
-        }
+        if (!native_helpers.object_should_destroy(a)) return;
         label_store.remove(raw);
         if (comptime has_vulkan) {
             if (a.backend == .vulkan) vulkan_feature_cache.remove_adapter(raw);
         }
         if (a.backend == .d3d12) d3d12_device_caps.remove_adapter_caps(raw);
+        if (a.backend == .metal) if (a.mtl_device) |device| metal_bridge_release(device);
         if (a.instance) |instance_ref| doeNativeInstanceRelease(toOpaque(instance_ref));
         alloc.destroy(a);
     }
@@ -629,12 +634,9 @@ pub export fn doeNativeDeviceGetAdapter(raw: ?*anyopaque) callconv(.c) ?*anyopaq
 
 pub export fn doeNativeDeviceRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeDevice, raw)) |d| {
-        if (d.ref_count > 1) {
-            d.ref_count -= 1;
-            return;
-        }
+        if (!native_helpers.object_should_destroy(d)) return;
         label_store.remove(raw);
-        d.metal_libraries.deinit(alloc);
+        if (d.metal_libraries) |*cache| cache.deinit(alloc);
         // Fire the device-lost callback with reason "destroyed" before teardown.
         const multi_adapter = @import("../../runtime/device/multi_adapter.zig");
         multi_adapter.notify_device_released(raw);
@@ -656,7 +658,6 @@ pub export fn doeNativeDeviceRelease(raw: ?*anyopaque) callconv(.c) void {
             } else {
                 package_metal_pipeline_cache.deinitForDevice(d);
                 if (d.mtl_queue) |q| metal_bridge_release(q);
-                if (d.mtl_device) |dev| metal_bridge_release(dev);
             }
         } else if (d.backend == .d3d12) {
             if (d.d3d12_runtime) |ptr| {
@@ -667,7 +668,6 @@ pub export fn doeNativeDeviceRelease(raw: ?*anyopaque) callconv(.c) void {
         } else {
             package_metal_pipeline_cache.deinitForDevice(d);
             if (d.mtl_queue) |q| metal_bridge_release(q);
-            if (d.mtl_device) |dev| metal_bridge_release(dev);
         }
         if (d.enabled_features.len > 0) alloc.free(d.enabled_features);
         const adapter = d.adapter;
@@ -679,7 +679,7 @@ pub export fn doeNativeDeviceRelease(raw: ?*anyopaque) callconv(.c) void {
 pub export fn doeNativeDeviceGetQueue(raw: ?*anyopaque) callconv(.c) ?*anyopaque {
     const dev = cast(DoeDevice, raw) orelse return null;
     if (dev.queue) |q| {
-        q.ref_count +|= 1;
+        native_helpers.object_add_ref(DoeQueue, toOpaque(q));
         return toOpaque(q);
     }
     const q = make(DoeQueue) orelse return null;

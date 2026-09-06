@@ -172,7 +172,7 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
     if (d_off + copy_bytes > @as(usize, @intCast(dst.size))) return;
     native_helpers.object_add_ref(DoeQuerySet, qs_raw);
 
-    references.retainBuffer(&enc.references, dst);
+    references.retainBuffer(native_helpers.alloc, &enc.references, dst);
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
@@ -280,7 +280,7 @@ pub export fn doeNativeQuerySetDestroy(qs_raw: ?*anyopaque) callconv(.c) void {
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     if (qs.destroyed) return;
     qs.destroyed = true;
-    if (qs.ref_count == 1) releaseQuerySetResources(qs);
+    if (@atomicLoad(u32, &qs.ref_count, .acquire) == 1) releaseQuerySetResources(qs);
 }
 
 pub export fn doeNativeQuerySetRelease(qs_raw: ?*anyopaque) callconv(.c) void {
@@ -448,6 +448,13 @@ pub export fn doeNativeRenderPassBeginOcclusionQuery(
     if (query_index >= qs.count) return;
     pass.occlusion_query_active = true;
     pass.occlusion_query_index = query_index;
+}
+
+pub fn retainRecordedReference(enc: *native_types.DoeCommandEncoder, raw: ?*anyopaque) void {
+    _ = native_helpers.cast(DoeQuerySet, raw) orelse return;
+    enc.references.append(native_helpers.alloc, .{ .handle = raw, .release = doeNativeQuerySetRelease }) catch
+        std.debug.panic("doe_query_native: OOM retaining recorded query set", .{});
+    native_helpers.object_add_ref(DoeQuerySet, raw);
 }
 
 pub export fn doeNativeRenderPassEndOcclusionQuery(

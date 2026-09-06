@@ -65,14 +65,14 @@ const Program = struct {
         if (buffer.dev != self.device or buffer.error_object or buffer.vk_id == 0 or buffer.mapped) return error.InvalidBuffer;
         for (self.buffers.items) |reference| if (reference.object == buffer) return;
         try self.buffers.append(alloc, .{ .object = buffer, .resource_id = buffer.vk_id });
-        buffer.ref_count += 1;
+        helpers.object_add_ref(objects.DoeBuffer, raw);
     }
 
     fn retainPipeline(self: *Program, raw: ?*anyopaque) !void {
         const pipeline = helpers.cast(objects.DoeComputePipeline, raw) orelse return error.InvalidPipeline;
         for (self.pipelines.items) |retained| if (retained == pipeline) return;
         try self.pipelines.append(alloc, pipeline);
-        pipeline.ref_count += 1;
+        helpers.object_add_ref(objects.DoeComputePipeline, raw);
     }
 
     fn retainQuery(self: *Program, raw: ?*anyopaque, first: u32, count: u32) !void {
@@ -82,7 +82,7 @@ const Program = struct {
             object.vk_query_pool == 0 or try std.math.add(u32, first, count) > object.count) return error.InvalidQuery;
         for (self.queries.items) |reference| if (reference.object == object) return;
         try self.queries.append(alloc, .{ .object = object, .pool = object.vk_query_pool, .count = object.count });
-        object.ref_count += 1;
+        helpers.object_add_ref(query.DoeQuerySet, raw);
     }
 
     fn prepare(self: *Program) !void {
@@ -197,8 +197,8 @@ pub export fn doeNativeComputeProgramPrepare(queue_raw: ?*anyopaque, commands_ra
     const rt = runtime_helpers.device_vk_runtime(queue.dev) orelse return null;
     const program = alloc.create(Program) catch return null;
     program.* = .{ .device = queue.dev, .commands = commands, .runtime = rt };
-    queue.dev.ref_count += 1;
-    commands.ref_count += 1;
+    helpers.object_add_ref(objects.DoeDevice, helpers.toOpaque(queue.dev));
+    helpers.object_add_ref(objects.DoeCommandBuffer, helpers.toOpaque(commands));
     program.prepare() catch |err| {
         errors.deliverInternalError(queue.dev, "compute program preparation: {s}", .{@errorName(err)});
         program.destroy();

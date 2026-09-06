@@ -93,8 +93,8 @@ pub export fn doeNativeCopyBufferToBuffer(enc_raw: ?*anyopaque, src_raw: ?*anyop
     const src = cast(DoeBuffer, src_raw) orelse return;
     const dst = cast(DoeBuffer, dst_raw) orelse return;
     if (src.error_object or dst.error_object or src.destroyed or dst.destroyed) return;
-    references.retainBuffer(&enc.references, src);
-    references.retainBuffer(&enc.references, dst);
+    references.retainBuffer(alloc, &enc.references, src);
+    references.retainBuffer(alloc, &enc.references, dst);
     enc.cmds.append(alloc, .{ .copy_buf = .{
         .src = @ptrCast(src),
         .src_off = src_off,
@@ -120,8 +120,8 @@ pub export fn doeNativeCommandEncoderCopyBufferToTexture(
     const src_buffer = cast(DoeBuffer, src_buffer_raw) orelse return;
     const dst_texture = cast(DoeTexture, dst_texture_raw) orelse return;
     if (src_buffer.error_object or src_buffer.destroyed or dst_texture.error_object) return;
-    references.retainBuffer(&enc.references, src_buffer);
-    references.retainTexture(&enc.references, dst_texture);
+    references.retainBuffer(alloc, &enc.references, src_buffer);
+    references.retainTexture(alloc, &enc.references, dst_texture);
     if (resource_ops.handleVulkanCopyBufferToTexture(
         enc,
         src_buffer,
@@ -165,8 +165,8 @@ pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
     const src_texture = cast(DoeTexture, src_texture_raw) orelse return;
     const dst_buffer = cast(DoeBuffer, dst_buffer_raw) orelse return;
     if (src_texture.error_object or dst_buffer.error_object or dst_buffer.destroyed) return;
-    references.retainTexture(&enc.references, src_texture);
-    references.retainBuffer(&enc.references, dst_buffer);
+    references.retainTexture(alloc, &enc.references, src_texture);
+    references.retainBuffer(alloc, &enc.references, dst_buffer);
     const vulkan = enc.dev.backend == .vulkan;
     enc.cmds.append(alloc, .{ .copy_texture_to_buffer = .{
         .src_texture = if (vulkan) @ptrCast(src_texture) else src_texture.mtl,
@@ -284,5 +284,42 @@ test "compute pass pins encoder and transferred pipeline and binding state" {
     try std.testing.expectEqual(@as(u32, 1), pipeline.ref_count);
     try std.testing.expectEqual(@as(u32, 1), first_group.ref_count);
     try std.testing.expectEqual(@as(u32, 1), second_group.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), device.ref_count);
+}
+
+test "render recording retains caller-released state until command buffer release" {
+    const render = @import("../render/doe_render_native.zig");
+    var device = DoeDevice{};
+    // The fixture's extra reference observes the count after command cleanup.
+    var pipeline = native_types.DoeRenderPipeline{ .ref_count = 2 };
+    var group = DoeBindGroup{ .ref_count = 2 };
+    var vertex = DoeBuffer{ .size = 16, .ref_count = 2 };
+    var index = DoeBuffer{ .size = 16, .ref_count = 2 };
+    var indirect = DoeBuffer{ .size = 16, .ref_count = 2 };
+    const encoder = doeNativeDeviceCreateCommandEncoder(toOpaque(&device), null).?;
+    const pass = render.doeNativeCommandEncoderBeginRenderPass(encoder, null).?;
+    render.doeNativeRenderPassSetPipeline(pass, toOpaque(&pipeline));
+    render.doeNativeRenderPassSetBindGroup(pass, 0, toOpaque(&group), 0, null);
+    render.doeNativeRenderPassSetVertexBuffer(pass, 0, toOpaque(&vertex), 0, 16);
+    render.doeNativeRenderPassSetIndexBuffer(pass, toOpaque(&index), 2, 0, 16);
+    render.doeNativeRenderPassDrawIndirect(pass, toOpaque(&indirect), 0);
+    native_exports.doeNativeRenderPipelineRelease(toOpaque(&pipeline));
+    native_exports.doeNativeBindGroupRelease(toOpaque(&group));
+    native_exports.doeNativeBufferRelease(toOpaque(&vertex));
+    native_exports.doeNativeBufferRelease(toOpaque(&index));
+    native_exports.doeNativeBufferRelease(toOpaque(&indirect));
+    try std.testing.expectEqual(@as(u32, 2), pipeline.ref_count);
+    render.doeNativeRenderPassEnd(pass);
+    const commands = doeNativeCommandEncoderFinish(encoder, null).?;
+    doeNativeCommandEncoderRelease(encoder);
+    try std.testing.expectEqual(@as(u32, 1), cast(DoeCommandEncoder, encoder).?.ref_count);
+    render.doeNativeRenderPassRelease(pass);
+    try std.testing.expectEqual(@as(u32, 2), pipeline.ref_count);
+    doeNativeCommandBufferRelease(commands);
+    try std.testing.expectEqual(@as(u32, 1), pipeline.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), group.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), vertex.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), index.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), indirect.ref_count);
     try std.testing.expectEqual(@as(u32, 1), device.ref_count);
 }

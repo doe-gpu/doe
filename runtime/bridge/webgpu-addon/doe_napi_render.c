@@ -805,9 +805,12 @@ napi_value doe_create_render_bundle_encoder(napi_env env, napi_callback_info inf
     uint32_t* fmts = fmt_count > 0 ? (uint32_t*)malloc(fmt_count * sizeof(uint32_t)) : NULL;
     for (uint32_t i = 0; i < fmt_count; i++) {
         napi_value elem; napi_get_element(env, argv[1], i, &elem);
-        napi_get_value_uint32(env, elem, &fmts[i]);
+        napi_valuetype type; napi_typeof(env, elem, &type);
+        fmts[i] = type == napi_null || type == napi_undefined ? 0 : texture_format_from_string(env, elem);
     }
-    uint32_t depth_stencil_format = 0; napi_get_value_uint32(env, argv[2], &depth_stencil_format);
+    napi_valuetype depth_type; napi_typeof(env, argv[2], &depth_type);
+    uint32_t depth_stencil_format = depth_type == napi_null || depth_type == napi_undefined
+        ? 0 : texture_format_from_string(env, argv[2]);
     uint32_t sample_count = 1;         napi_get_value_uint32(env, argv[3], &sample_count);
     bool depth_read_only = false;      napi_get_value_bool(env, argv[4], &depth_read_only);
     bool stencil_read_only = false;    napi_get_value_bool(env, argv[5], &stencil_read_only);

@@ -58,7 +58,8 @@ pub const DoeAdapter = struct {
 
 pub const DoeDevice = struct {
     pub const TYPE_MAGIC = MAGIC_DEVICE;
-    metal_libraries: @import("../cache/doe_metal_library_cache.zig").Cache = .{},
+    metal_libraries: ?@import("../cache/doe_metal_library_cache.zig").Cache = null,
+    metal_pipeline_cache: ?*anyopaque = null,
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     adapter: ?*DoeAdapter = null,
@@ -124,6 +125,7 @@ pub const DoeBuffer = struct {
 
 pub const DoeShaderModule = struct {
     pub const TYPE_MAGIC = MAGIC_SHADER;
+    device: ?*DoeDevice = null,
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     mtl_library: ?*anyopaque = null,
@@ -341,6 +343,7 @@ pub const DoeRenderPipeline = struct {
     pub const TYPE_MAGIC = MAGIC_RENDER_PIPE;
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
+    device_ref: ?*DoeDevice = null,
     mtl_pso: ?*anyopaque = null,
     backend_root_signature: ?*anyopaque = null,
     layout: ?*DoePipelineLayout = null,
@@ -396,6 +399,7 @@ pub const DoeRenderPass = struct {
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     enc: *DoeCommandEncoder,
+    owns_encoder: bool = false,
     pipeline: ?*DoeRenderPipeline = null,
     max_draw_count: u64 = 50_000_000,
     recorded_draw_count: u64 = 0,

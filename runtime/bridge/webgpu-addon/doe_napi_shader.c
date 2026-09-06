@@ -350,16 +350,18 @@ napi_value doe_shader_module_get_compilation_info(napi_env env, napi_callback_in
  * Bindings
  * ================================================================ */
 
-napi_value doe_shader_module_get_bindings(napi_env env, napi_callback_info info) {
-    NAPI_ASSERT_ARGC(env, info, 1);
-    WGPUShaderModule shader_module = unwrap_ptr(env, _args[0]);
-    if (!shader_module) NAPI_THROW(env, "shaderModuleGetBindings: null shader module");
-    if (!pfn_doeNativeShaderModuleGetBindings) NAPI_THROW(env, "shaderModuleGetBindings: native binding metadata not available");
-
-    DoeShaderBindingInfo bindings[DOE_SHADER_BINDING_CAPACITY];
-    size_t count = pfn_doeNativeShaderModuleGetBindings(
-        shader_module, bindings, DOE_SHADER_BINDING_CAPACITY);
-
+static napi_value shader_bindings_to_js(napi_env env, const DoeShaderBindingInfo* bindings, size_t count) {
+    if (count == SIZE_MAX) {
+        char message[DOE_ERROR_BUF_CAP];
+        copy_library_error_message(message, sizeof(message));
+        napi_throw_error(env, "DOE_SHADER_REFLECTION_ERROR",
+            message[0] ? message : "shader binding reflection failed");
+        return NULL;
+    }
+    if (count > DOE_SHADER_BINDING_CAPACITY) {
+        napi_throw_error(env, "DOE_SHADER_REFLECTION_ERROR", "shader binding metadata exceeds addon capacity");
+        return NULL;
+    }
     napi_value array;
     napi_create_array_with_length(env, count, &array);
     for (size_t i = 0; i < count; i++) {
@@ -384,6 +386,19 @@ napi_value doe_shader_module_get_bindings(napi_env env, napi_callback_info info)
     return array;
 }
 
+napi_value doe_shader_module_get_bindings(napi_env env, napi_callback_info info) {
+    NAPI_ASSERT_ARGC(env, info, 1);
+    WGPUShaderModule shader_module = unwrap_ptr(env, _args[0]);
+    if (!shader_module) NAPI_THROW(env, "shaderModuleGetBindings: null shader module");
+    if (!pfn_doeNativeShaderModuleGetBindings) NAPI_THROW(env, "shaderModuleGetBindings: native binding metadata not available");
+
+    DoeShaderBindingInfo bindings[DOE_SHADER_BINDING_CAPACITY];
+    size_t count = pfn_doeNativeShaderModuleGetBindings(
+        shader_module, bindings, DOE_SHADER_BINDING_CAPACITY);
+
+    return shader_bindings_to_js(env, bindings, count);
+}
+
 napi_value doe_shader_module_get_bindings_for_entry_point(napi_env env, napi_callback_info info) {
     NAPI_ASSERT_ARGC(env, info, 2);
     WGPUShaderModule shader_module = unwrap_ptr(env, _args[0]);
@@ -401,23 +416,5 @@ napi_value doe_shader_module_get_bindings_for_entry_point(napi_env env, napi_cal
     size_t count = pfn_doeNativeShaderModuleGetBindingsForEntryPoint(
         shader_module, entry_point, entry_len, bindings, DOE_SHADER_BINDING_CAPACITY);
     free(entry_point);
-    napi_value array;
-    napi_create_array_with_length(env, count, &array);
-    for (size_t i = 0; i < count; i++) {
-        napi_value entry;
-        napi_create_object(env, &entry);
-        napi_value group, binding, kind, space, access;
-        napi_create_uint32(env, bindings[i].group, &group);
-        napi_create_uint32(env, bindings[i].binding, &binding);
-        napi_create_string_utf8(env, doe_binding_kind_name(bindings[i].kind), NAPI_AUTO_LENGTH, &kind);
-        napi_create_string_utf8(env, doe_binding_space_name(bindings[i].addr_space), NAPI_AUTO_LENGTH, &space);
-        napi_create_string_utf8(env, doe_binding_access_name(bindings[i].access), NAPI_AUTO_LENGTH, &access);
-        napi_set_named_property(env, entry, "group", group);
-        napi_set_named_property(env, entry, "binding", binding);
-        napi_set_named_property(env, entry, "type", kind);
-        napi_set_named_property(env, entry, "space", space);
-        napi_set_named_property(env, entry, "access", access);
-        napi_set_element(env, array, i, entry);
-    }
-    return array;
+    return shader_bindings_to_js(env, bindings, count);
 }

@@ -383,9 +383,9 @@ fn appendRecordedDispatch(
     }
     vulkan_fast.populateRecordedDispatchBindingState(pipe, bind_groups[0..], &cmd.dispatch);
     if (native_cmds.tryMergeDispatchIntoLast(&cb.cmds, &cmd)) return true;
-    references.retainPipeline(&cb.references, pipe);
+    references.retainPipeline(alloc, &cb.references, pipe);
     for (bind_groups) |maybe_bg| if (maybe_bg) |bg| {
-        references.retainBindGroup(&cb.references, bg);
+        references.retainBindGroup(alloc, &cb.references, bg);
     };
     cb.cmds.append(alloc, cmd) catch std.debug.panic("doe_compute_fast: OOM recording dispatch command", .{});
     return true;
@@ -402,8 +402,8 @@ fn appendCopyIfPresent(
     const source = native_helpers.cast(native_types.DoeBuffer, copy_src) orelse return false;
     const destination = native_helpers.cast(native_types.DoeBuffer, copy_dst) orelse return false;
     if (source.error_object or source.destroyed or destination.error_object or destination.destroyed) return false;
-    references.retainBuffer(&cb.references, source);
-    references.retainBuffer(&cb.references, destination);
+    references.retainBuffer(alloc, &cb.references, source);
+    references.retainBuffer(alloc, &cb.references, destination);
     cb.cmds.append(alloc, .{ .copy_buf = .{
         .src = copy_src,
         .src_off = copy_src_off,

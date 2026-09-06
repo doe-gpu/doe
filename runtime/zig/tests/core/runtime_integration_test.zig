@@ -159,7 +159,7 @@ test "buffer: MAX_DEFERRED_RESOLVES constant is 8" {
 
 test "encoder: CmdTag enum has all expected variants" {
     const fields = @typeInfo(native.CmdTag).@"enum".fields;
-    try testing.expectEqual(@as(usize, 10), fields.len);
+    try testing.expectEqual(@as(usize, 11), fields.len);
     // Verify names via comptime inline loop.
     const expected_names = [_][]const u8{
         "dispatch",
@@ -172,6 +172,7 @@ test "encoder: CmdTag enum has all expected variants" {
         "render_pass",
         "write_timestamp",
         "resolve_query_set",
+        "vulkan_render",
     };
     inline for (expected_names, 0..) |name, i| {
         try testing.expectEqualStrings(name, fields[i].name);

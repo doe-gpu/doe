@@ -2,12 +2,14 @@
 // Sharded from doe_wgpu_native.zig to stay under the line-limit policy.
 
 const std = @import("std");
-const log = std.log.scoped(.doe_bundle_native);
+const error_scope = @import("../../runtime/diagnostics/error_scope.zig");
 const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const native_cmds = @import("../support/doe_native_command_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
+const references = @import("../command/doe_command_references.zig");
+const leases = @import("../../contracts/resource_lease.zig");
 const bundle = @import("../../runtime/render/render_bundle.zig");
 
 const alloc = native_helpers.alloc;
@@ -40,8 +42,8 @@ pub export fn doeNativeDeviceCreateRenderBundleEncoder(
     else
         0;
 
-    bundle.set_allocator(alloc);
     const enc = bundle.make_bundle_encoder(
+        alloc,
         color_fmt,
         d.depthStencilFormat,
         if (d.sampleCount == 0) 1 else d.sampleCount,
@@ -49,11 +51,14 @@ pub export fn doeNativeDeviceCreateRenderBundleEncoder(
         d.stencilReadOnly != 0,
     ) orelse return null;
     enc.backend = dev.backend;
+    references.retainDevice(enc.allocator, &enc.references, dev);
     return @ptrCast(enc);
 }
 
 pub export fn doeNativeRenderBundleEncoderRelease(raw: ?*anyopaque) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(raw) orelse return;
+    if (!native_helpers.object_should_destroy(enc)) return;
+    leases.releaseAll(enc.allocator, &enc.references);
     native_helpers.label_store.remove(raw);
     const a = enc.allocator;
     enc.cmds.deinit(a);
@@ -70,6 +75,7 @@ pub export fn doeNativeRenderBundleEncoderSetPipeline(
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
     const pip = cast(DoeRenderPipeline, pip_raw) orelse return;
+    references.retainRenderPipeline(enc.allocator, &enc.references, pip);
     const pipeline_handle = if (enc.backend == .vulkan) toOpaque(pip) else pip.mtl_pso;
     bundle.bundle_encoder_push(enc, .{ .set_pipeline = .{
         .pipeline_handle = pipeline_handle,
@@ -88,6 +94,7 @@ pub export fn doeNativeRenderBundleEncoderSetBindGroup(
     _ = dynamic_offsets;
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
     const bg = cast(DoeBindGroup, bg_raw) orelse return;
+    references.retainBindGroup(enc.allocator, &enc.references, bg);
 
     var bg_entry = bundle.BundleBindGroup{
         .entries = undefined,
@@ -117,6 +124,7 @@ pub export fn doeNativeRenderBundleEncoderSetVertexBuffer(
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
     const buf = cast(DoeBuffer, buf_raw) orelse return;
     if (buf.error_object) return;
+    references.retainBuffer(enc.allocator, &enc.references, buf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(buf) else buf.mtl;
     bundle.bundle_encoder_push(enc, .{ .set_vertex_buffer = .{
         .slot = slot,
@@ -136,6 +144,7 @@ pub export fn doeNativeRenderBundleEncoderSetIndexBuffer(
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
     const buf = cast(DoeBuffer, buf_raw) orelse return;
     if (buf.error_object) return;
+    references.retainBuffer(enc.allocator, &enc.references, buf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(buf) else buf.mtl;
     bundle.bundle_encoder_push(enc, .{ .set_index_buffer = .{
         .buffer_handle = buffer_handle,
@@ -187,6 +196,7 @@ pub export fn doeNativeRenderBundleEncoderDrawIndirect(
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
     const ibuf = cast(DoeBuffer, indirect_buf_raw) orelse return;
     if (ibuf.error_object) return;
+    references.retainBuffer(enc.allocator, &enc.references, ibuf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(ibuf) else ibuf.mtl;
     bundle.bundle_encoder_push(enc, .{ .draw_indirect = .{
         .indirect_buffer = buffer_handle,
@@ -202,6 +212,7 @@ pub export fn doeNativeRenderBundleEncoderDrawIndexedIndirect(
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
     const ibuf = cast(DoeBuffer, indirect_buf_raw) orelse return;
     if (ibuf.error_object) return;
+    references.retainBuffer(enc.allocator, &enc.references, ibuf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(ibuf) else ibuf.mtl;
     bundle.bundle_encoder_push(enc, .{ .draw_indexed_indirect = .{
         .indirect_buffer = buffer_handle,
@@ -219,15 +230,15 @@ pub export fn doeNativeRenderBundleEncoderFinish(
 ) callconv(.c) ?*anyopaque {
     _ = desc;
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return null;
-    bundle.set_allocator(alloc);
     const b = bundle.bundle_encoder_finish(enc) orelse return null;
     return @ptrCast(b);
 }
 
 pub export fn doeNativeRenderBundleRelease(raw: ?*anyopaque) callconv(.c) void {
     const b = bundle.cast_bundle(raw) orelse return;
+    if (!native_helpers.object_should_destroy(b)) return;
     native_helpers.label_store.remove(raw);
-    bundle.bundle_destroy(b);
+    bundle.destroyReleasedBundle(b);
 }
 
 // ============================================================
@@ -452,20 +463,17 @@ pub export fn doeNativeRenderPassExecuteBundles(
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
     const is_vulkan = pass.enc.dev.backend == .vulkan;
 
-    // The pass format is not exposed through DoeRenderPass here, so we only
-    // validate the bundle sample count and treat format compatibility as
-    // caller-managed by the render pass path.
-    const pass_samples: u32 = 1;
-
     for (bundles[0..bundle_count]) |raw| {
         const b = bundle.cast_bundle(raw) orelse continue;
-        if (b.sample_count != 0 and b.sample_count != pass_samples) {
-            log.warn("executeBundles sample count mismatch: bundle={} pass={}", .{
-                b.sample_count,
-                pass_samples,
-            });
-            continue;
+        bundle.check_compatibility(b, pass.target_format, pass.sample_count) catch |err| {
+            pass.enc.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, @errorName(err));
+            return;
+        };
+        if (b.depth_stencil_format != pass.depth_stencil_format) {
+            pass.enc.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "render bundle depth/stencil format differs from the render pass");
+            return;
         }
+        references.retainRenderBundle(alloc, &pass.enc.references, b);
         const saved_vulkan_state: ?SavedVulkanBundlePassState = if (is_vulkan)
             SavedVulkanBundlePassState.capture(pass)
         else

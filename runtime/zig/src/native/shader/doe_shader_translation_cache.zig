@@ -78,6 +78,7 @@ const CachedPayload = struct {
 
 var global_cache: ?*PipelineCache = null;
 var init_attempted: bool = false;
+var cache_mutex: std.Thread.Mutex = .{};
 
 pub fn lookupComputeTranslation(
     allocator: std.mem.Allocator,
@@ -124,6 +125,8 @@ fn lookupComputePayload(
     wgsl_source: []const u8,
     expected_kind: PayloadKind,
 ) ?CachedPayload {
+    cache_mutex.lock();
+    defer cache_mutex.unlock();
     const cache = ensureGlobalCache() orelse return null;
     const payload = cache.lookup(&buildComputeKey(wgsl_source, expected_kind)) orelse return null;
     return decodePayload(allocator, payload, expected_kind);
@@ -136,9 +139,11 @@ fn storeComputePayload(
     info: *const TranslationInfo,
     payload_kind: PayloadKind,
 ) void {
-    const cache = ensureGlobalCache() orelse return;
     const payload = encodePayload(allocator, payload_source, info, payload_kind) catch return;
     defer allocator.free(payload);
+    cache_mutex.lock();
+    defer cache_mutex.unlock();
+    const cache = ensureGlobalCache() orelse return;
     cache.store(&buildComputeKey(wgsl_source, payload_kind), payload);
 }
 
@@ -308,7 +313,8 @@ fn decodePayload(
 
     const payload_copy = allocator.dupe(u8, payload[offset .. offset + payload_len]) catch return null;
     offset += payload_len;
-    errdefer allocator.free(payload_copy);
+    var published = false;
+    defer if (!published) allocator.free(payload_copy);
 
     const dispatch_preconditions = duplicateStructSlice(
         allocator,
@@ -317,7 +323,7 @@ fn decodePayload(
         dispatch_count,
     ) orelse return null;
     offset += dispatch_bytes_len;
-    errdefer if (dispatch_preconditions.len > 0) allocator.free(dispatch_preconditions);
+    defer if (!published and dispatch_preconditions.len > 0) allocator.free(dispatch_preconditions);
 
     const texture_dispatch_preconditions = duplicateStructSlice(
         allocator,
@@ -326,6 +332,7 @@ fn decodePayload(
         texture_dispatch_count,
     ) orelse return null;
 
+    published = true;
     return .{
         .payload = payload_copy,
         .info = .{
@@ -441,6 +448,36 @@ test "shader translation cache rejects stale contract digest" {
 
     payload[@offsetOf(Header, "contract_digest")] ^= 0xff;
     try std.testing.expect(decodePayload(std.testing.allocator, payload, .msl) == null);
+}
+
+fn decodeWithAllocationFailures(allocator: std.mem.Allocator, payload: []const u8) !void {
+    var decoded = decodePayload(allocator, payload, .msl) orelse return error.OutOfMemory;
+    defer decoded.deinit(allocator);
+    try std.testing.expectEqualStrings("kernel msl", decoded.payload);
+    try std.testing.expectEqual(@as(usize, 1), decoded.info.dispatch_preconditions.len);
+    try std.testing.expectEqual(@as(usize, 1), decoded.info.texture_dispatch_preconditions.len);
+}
+
+test "shader translation cache cleans partial optional results on allocation failure" {
+    const dispatch = [_]ir.DispatchPrecondition{.{
+        .gid_axis = 0,
+        .storage_binding = .{ .group = 0, .binding = 1 },
+        .element_stride_bytes = 4,
+    }};
+    const texture = [_]ir.TextureDispatchPrecondition{.{
+        .kind = .gid_coords_2d,
+        .texture_binding = .{ .group = 0, .binding = 2 },
+        .mip_level = 0,
+    }};
+    const info = TranslationInfo{
+        .workgroup_size = .{ 1, 1, 1 },
+        .needs_sizes_buf = false,
+        .dispatch_preconditions = &dispatch,
+        .texture_dispatch_preconditions = &texture,
+    };
+    const payload = try encodePayload(std.testing.allocator, "kernel msl", &info, .msl);
+    defer std.testing.allocator.free(payload);
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, decodeWithAllocationFailures, .{payload});
 }
 
 pub fn metalLibraryConfiguration() [32]u8 {

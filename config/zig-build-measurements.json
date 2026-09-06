@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "buildStep": "dropin",
+  "optimize": "ReleaseFast",
+  "snapshotRoots": [
+    "runtime/zig",
+    "runtime/bridge",
+    "config",
+    "assets",
+    "pipeline/lean"
+  ],
+  "edits": [
+    {
+      "id": "leaf-backend",
+      "path": "src/backend/vulkan/vk_formats.zig",
+      "before": "pub fn bytes_per_pixel(format: model_gpu_types.WGPUTextureFormat) !u32 {\n    return switch (format) {",
+      "after": "pub fn bytes_per_pixel(texture_format: model_gpu_types.WGPUTextureFormat) !u32 {\n    return switch (texture_format) {"
+    },
+    {
+      "id": "shared-contract",
+      "path": "src/contracts/model/model_binding_value_types.zig",
+      "before": "pub const WGPUShaderStage_Compute: u64 = 0x0000000000000004;",
+      "after": "pub const WGPUShaderStage_Compute: u64 = 1 << 2;"
+    },
+    {
+      "id": "compiler-stage",
+      "path": "src/compiler/wgsl/frontend/parser_expr.zig",
+      "before": "    return parseOr(self);",
+      "after": "    const expression = try parseOr(self);\n    return expression;"
+    },
+    {
+      "id": "public-entrypoint",
+      "path": "src/native/compute/doe_compute_program_native.zig",
+      "before": "    return @intFromBool(builtin.os.tag == .linux);",
+      "after": "    const supported = builtin.os.tag == .linux;\n    return @intFromBool(supported);"
+    }
+  ]
+}

@@ -2,6 +2,14 @@
   "schemaVersion": 2,
   "targets": [
     {
+      "schema": "config/zig-build-measurements-report.schema.json",
+      "data": "bench/out/shader-ownership/20260906-owned-diagnostics/build-measurements-v3.json"
+    },
+    {
+      "schema": "config/zig-build-measurements.schema.json",
+      "data": "config/zig-build-measurements.json"
+    },
+    {
       "schema": "config/compute-program-package.schema.json",
       "data": "bench/out/compute-program/20260906-command-ownership-qualified-mapping/summary.json"
     },

@@ -49,12 +49,15 @@ const NATIVE_DESC_HANDLE_OFFSET: usize = 24;
 // ============================================================
 
 var instance_ext_counts: std.AutoHashMapUnmanaged(usize, u32) = .{};
+var instance_ext_mutex: std.Thread.Mutex = .{};
 
 fn registry_key(inst: *native_types.DoeInstance) usize {
     return @intFromPtr(inst);
 }
 
 fn instance_register(inst: *native_types.DoeInstance) void {
+    instance_ext_mutex.lock();
+    defer instance_ext_mutex.unlock();
     const key = registry_key(inst);
     if (instance_ext_counts.getPtr(key)) |slot| {
         slot.* +|= 1;
@@ -64,6 +67,8 @@ fn instance_register(inst: *native_types.DoeInstance) void {
 }
 
 fn instance_deregister(inst: *native_types.DoeInstance) void {
+    instance_ext_mutex.lock();
+    defer instance_ext_mutex.unlock();
     const key = registry_key(inst);
     if (instance_ext_counts.getPtr(key)) |slot| {
         if (slot.* <= 1) {
@@ -75,6 +80,8 @@ fn instance_deregister(inst: *native_types.DoeInstance) void {
 }
 
 pub fn instance_external_texture_count(inst_raw: ?*anyopaque) u32 {
+    instance_ext_mutex.lock();
+    defer instance_ext_mutex.unlock();
     const inst = native_helpers.cast(native_types.DoeInstance, inst_raw) orelse return 0;
     return instance_ext_counts.get(registry_key(inst)) orelse 0;
 }
@@ -209,11 +216,12 @@ fn createFromNativeImport(
     imported: NativePlaneLayout,
     instance_ref: ?*native_types.DoeInstance,
 ) ?*anyopaque {
-    if (instance_ref) |inst| inst.ref_count +|= 1;
+    if (instance_ref) |inst| native_helpers.object_add_ref(native_types.DoeInstance, native_helpers.toOpaque(inst));
 
     const ext = std.heap.c_allocator.create(DoeExternalTexture) catch {
         if (instance_ref) |inst| {
-            if (inst.ref_count > 1) inst.ref_count -= 1;
+            const last_reference = native_helpers.object_should_destroy(inst);
+            std.debug.assert(!last_reference);
         }
         // Release the imported MTLTexture handles on allocation failure.
         external_texture_ops.releasePlanes(imported);
@@ -241,13 +249,14 @@ fn createFromTextureViews(
     const plane0_view = texture_sampler.registeredTextureView(plane0) orelse return null;
     const plane1_view = texture_sampler.registeredTextureView(plane1);
 
-    if (instance_ref) |inst| inst.ref_count +|= 1;
+    if (instance_ref) |inst| native_helpers.object_add_ref(native_types.DoeInstance, native_helpers.toOpaque(inst));
     native_helpers.object_add_ref(DoeTextureView, native_helpers.toOpaque(plane0_view));
     if (plane1_view) |view| native_helpers.object_add_ref(DoeTextureView, native_helpers.toOpaque(view));
 
     const ext = std.heap.c_allocator.create(DoeExternalTexture) catch {
         if (instance_ref) |inst| {
-            if (inst.ref_count > 1) inst.ref_count -= 1;
+            const last_reference = native_helpers.object_should_destroy(inst);
+            std.debug.assert(!last_reference);
         }
         native_exports.doeNativeTextureViewRelease(native_helpers.toOpaque(plane0_view));
         if (plane1_view) |view| native_exports.doeNativeTextureViewRelease(native_helpers.toOpaque(view));
@@ -266,13 +275,12 @@ fn createFromTextureViews(
 // -- Lifecycle --
 
 pub export fn doeNativeExternalTextureAddRef(raw: ?*anyopaque) callconv(.c) void {
-    const ext = cast(raw) orelse return;
-    ext.ref_count +|= 1;
+    native_helpers.object_add_ref(DoeExternalTexture, raw);
 }
 
 pub export fn doeNativeExternalTextureRelease(raw: ?*anyopaque) callconv(.c) void {
     const ext = cast(raw) orelse return;
-    if (ext.ref_count <= 1) {
+    if (native_helpers.object_should_destroy(ext)) {
         const instance_ref = ext.instance;
         const plane0 = ext.plane0;
         const plane1 = ext.plane1;
@@ -295,7 +303,6 @@ pub export fn doeNativeExternalTextureRelease(raw: ?*anyopaque) callconv(.c) voi
         }
         return;
     }
-    ext.ref_count -= 1;
 }
 
 pub export fn doeNativeExternalTextureDestroy(raw: ?*anyopaque) callconv(.c) void {

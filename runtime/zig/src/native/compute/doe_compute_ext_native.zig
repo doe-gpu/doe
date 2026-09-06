@@ -133,7 +133,7 @@ fn bumpPassState(pass: *DoeComputePass) void {
 
 fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
     if (pass.pipeline == pip) return;
-    if (pip) |pipeline| references.retainPipeline(&pass.enc.references, pipeline);
+    if (pip) |pipeline| references.retainPipeline(alloc, &pass.enc.references, pipeline);
     pass.pipeline = pip;
     bumpPassState(pass);
 }
@@ -141,7 +141,7 @@ fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
 fn setPassBindGroup(pass: *DoeComputePass, index: usize, bg: ?*DoeBindGroup) void {
     if (index >= pass.bind_groups.len) return;
     if (pass.bind_groups[index] == bg) return;
-    if (bg) |group| references.retainBindGroup(&pass.enc.references, group);
+    if (bg) |group| references.retainBindGroup(alloc, &pass.enc.references, group);
     pass.bind_groups[index] = bg;
     bumpPassState(pass);
 }
@@ -384,7 +384,7 @@ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_ra
             pass.bind_groups[0..],
         );
     }
-    references.retainBuffer(&pass.enc.references, indirect_buf);
+    references.retainBuffer(alloc, &pass.enc.references, indirect_buf);
     pass.enc.cmds.append(alloc, cmd) catch
         std.debug.panic("doe_compute_ext_native: OOM recording indirect dispatch command", .{});
 }

@@ -1,11 +1,9 @@
 const std = @import("std");
 const shared = @import("doe_native_shared_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
 
-pub const CommandReference = struct {
-    handle: ?*anyopaque,
-    release: *const fn (?*anyopaque) callconv(.c) void,
-};
+pub const CommandReference = @import("../../contracts/resource_lease.zig").ResourceLease;
 
 pub const DeferredCopy = struct {
     src: [*]const u8,
@@ -46,6 +44,7 @@ pub const CmdTag = enum {
     render_pass,
     write_timestamp,
     resolve_query_set,
+    vulkan_render,
 };
 
 pub const TimestampWritePosition = enum {
@@ -226,6 +225,11 @@ pub const RecordedCmd = union(CmdTag) {
         dst_mtl: ?*anyopaque,
         dst_buffer: ?*anyopaque = null,
         dst_offset: u64,
+    },
+    vulkan_render: struct {
+        command: model_render_types.RenderDrawCommand,
+        pipeline: ?*anyopaque,
+        clear_only: bool = false,
     },
 };
 

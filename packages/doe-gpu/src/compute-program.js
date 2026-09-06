@@ -5,13 +5,16 @@ import { setImmediate } from 'node:timers/promises';
 import { globals } from './vendor/webgpu/webgpu-constants.js';
 import { awaitProgramCompletion } from './compute-program-completion.js';
 import { nativeProgramProvider } from './compute-program-native.js';
-import { hashBytes, programError, validateComputeProgram, validateProgramOptions } from './compute-program-contract.js';
+import { PROGRAM_SCHEMA, hashBytes, programError, validateComputeProgram, validateProgramOptions } from './compute-program-contract.js';
 import { lifetime, outputReference, releaseEntry, inputBatch } from './compute-program-residency.js';
+import { bufferKey, assessUpdate, authorizeUpdate } from './compute-program-update.js';
 import { QUERY_COUNT, QUERY_BYTES, timestampInfo, timestampResult } from './compute-program-timing.js';
 
 const { GPUBufferUsage } = globals;
 const DEVICE_OPERATIONS = new WeakSet();
 const DEVICE_LOSS = new WeakMap();
+// Descriptor v3 adds host-owned update policy; recorded commands still use v2.
+const NATIVE_CONTRACT = PROGRAM_SCHEMA.$defs.nativeContractVersion.const;
 
 function deviceLoss(device) {
   let monitor = DEVICE_LOSS.get(device);
@@ -63,9 +66,10 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'device.gpuRecording',
       'Vulkan GPU recording with a current addon and library', 'unavailable');
   }
-  if (native && native.contractVersion < plan.schemaVersion) {
+  const requiredNativeContract = Math.min(plan.schemaVersion, NATIVE_CONTRACT);
+  if (native && native.contractVersion < requiredNativeContract) {
     throw programError('DOE_PROGRAM_UNSUPPORTED', 'device.runtimeContract',
-      `native compute program contract ${plan.schemaVersion}; rebuild the addon and native library`, native.contractVersion);
+      `native compute program contract ${requiredNativeContract}; rebuild the addon and native library`, native.contractVersion);
   }
   const clock = timestampInfo(device, native, gpuTiming);
   const buffers = new Map();
@@ -93,6 +97,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
   let state = 'preparing';
   let reason = null;
   let runs = 0;
+  let revision = 0;
   let active = null;
   let closed = false;
   const loss = deviceLoss(device);
@@ -161,7 +166,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
           throw programError('DOE_PROGRAM_LIMIT', `buffers.${declaration.id}`, 'size within device limits', declaration.size);
         }
         const bindingUsage = declaration.type === 'uniform' ? GPUBufferUsage.UNIFORM : GPUBufferUsage.STORAGE;
-        const key = `buffer:${JSON.stringify(declaration)}`;
+        const key = bufferKey(declaration);
         buffers.set(declaration.id, acquire(key, () => device.createBuffer({
           label: declaration.id, size: declaration.size,
           usage: bindingUsage | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
@@ -213,7 +218,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
       }
       if (execution !== 'webgpu') recording = native.prepare(encode(), execution);
       const initialized = resident.filter((buffer) => buffer.role !== 'input'
-        && !previous?.has(`buffer:${JSON.stringify(buffer)}`));
+        && !previous?.has(bufferKey(buffer)));
       if (initialized.length) {
         const encoder = device.createCommandEncoder({ label: `${plan.id}:initialize` });
         for (const buffer of initialized) encoder.clearBuffer(buffers.get(buffer.id));
@@ -360,14 +365,24 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
     run(values = {}, { signal } = {}) {
       assertReady();
       if (active || owner.readers) throw programError('DOE_PROGRAM_BUSY', 'program.run', 'idle unleased program', 'operation in progress');
+      if (!Number.isSafeInteger(revision + 1)) {
+        throw programError('DOE_PROGRAM_INVALIDATED', 'program.revision', 'safe integer', 'exhausted');
+      }
       const batch = inputBatch(owner, inputs, bufferEntries, values);
+      revision += 1;
       active = execute(batch, signal).finally(() => { active = null; });
       return active;
     },
-    update(nextDescriptor) {
+    assessUpdate(nextDescriptor) {
+      assertReady();
+      if (active || owner.readers) throw programError('DOE_PROGRAM_BUSY', 'program.assessUpdate', 'idle program', 'operation in progress');
+      return assessUpdate(identity, validateComputeProgram(nextDescriptor), owner, revision);
+    },
+    update(nextDescriptor, options = {}) {
       assertReady();
       if (active || owner.readers) throw programError('DOE_PROGRAM_BUSY', 'program.update', 'idle program', 'operation in progress');
       const next = validateComputeProgram(nextDescriptor);
+      authorizeUpdate(identity, next, owner, revision, options);
       if (next.programHash === identity.programHash) return Promise.resolve(api);
       state = 'updating';
       active = buildComputeProgram(device, next.descriptor, { execution, gpuTiming, readback: readbackMode }, resources).then(async (replacement) => {

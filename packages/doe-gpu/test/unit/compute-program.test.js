@@ -6,6 +6,7 @@ import { timestampInfo, timestampResult } from '../../src/compute-program-timing
 import { inputBatch, outputReference } from '../../src/compute-program-residency.js';
 import { sortedJsonValue } from '../../src/json-canonical.js';
 import { awaitProgramCompletion } from '../../src/compute-program-completion.js';
+import { assessUpdate, authorizeUpdate } from '../../src/compute-program-update.js';
 
 for (const first of ['queue', 'map']) {
   for (const failed of [null, 'queue', 'map']) {
@@ -73,7 +74,7 @@ for (const change of [
   assert.notEqual(validated.programHash, validateComputeProgram(changed).programHash);
 }
 for (const change of [
-  (d) => { d.schemaVersion = 3; },
+  (d) => { d.schemaVersion = 4; },
   (d) => { d.extra = true; },
   (d) => { d.steps[0].workgroups[0] = 0; },
   (d) => { d.steps[0].workgroups.push(1); },
@@ -145,3 +146,52 @@ retained.generation += 1;
 assert.throws(() => inputBatch(target, inputDeclarations, entries,
   { a: reference, b: new Uint32Array([7]) }), { code: 'DOE_PROGRAM_INPUT' });
 console.log('ok: resident schema migration, partial-input lease rollback, foreign device and stale generation');
+
+const strictDescriptor = structuredClone(residentDescriptor);
+strictDescriptor.schemaVersion = 3;
+assert.throws(() => validateComputeProgram(strictDescriptor), { code: 'DOE_PROGRAM_INVALID' });
+strictDescriptor.buffers[0].stateFormat = 'counter-u32-v1';
+const strictIdentity = validateComputeProgram(strictDescriptor);
+for (const change of [
+  (d) => { d.schemaVersion = 2; },
+  (d) => { d.buffers[0].lifetime = 'invocation'; },
+  (d) => { d.buffers[0].stateFormat = ''; },
+]) {
+  const changed = structuredClone(strictDescriptor);
+  change(changed);
+  assert.throws(() => validateComputeProgram(changed), { code: 'DOE_PROGRAM_INVALID' });
+}
+const sameLayoutEdit = structuredClone(strictDescriptor);
+sameLayoutEdit.buffers[0].stateFormat = 'counter-f32-v1';
+const nextIdentity = validateComputeProgram(sameLayoutEdit);
+const updateOwner = {};
+const assessment = assessUpdate(strictIdentity, nextIdentity, updateOwner, 0);
+assert.equal(assessment.requiresReset, true);
+assert.equal(assessment.retained.length, 0);
+assert.deepEqual(assessment.replaced, [{
+  before: strictIdentity.descriptor.buffers[0], after: nextIdentity.descriptor.buffers[0],
+}]);
+assert(Object.isFrozen(assessment.replaced[0].after));
+assert.throws(() => authorizeUpdate(strictIdentity, nextIdentity, updateOwner, 0, {}),
+  { code: 'DOE_PROGRAM_RESET_REQUIRED' });
+assert.equal(authorizeUpdate(strictIdentity, nextIdentity, updateOwner, 0,
+  { assessment, reset: 'approve' }), assessment);
+for (const [owner, revision, edit, token] of [
+  [{}, 0, nextIdentity, assessment],
+  [updateOwner, 1, nextIdentity, assessment],
+  [updateOwner, 0, strictIdentity, assessment],
+  [updateOwner, 0, nextIdentity, structuredClone(assessment)],
+]) {
+  assert.throws(() => authorizeUpdate(strictIdentity, edit, owner, revision,
+    { assessment: token, reset: 'approve' }), { code: 'DOE_PROGRAM_STALE_ASSESSMENT' });
+}
+assert.throws(() => authorizeUpdate(strictIdentity, nextIdentity, updateOwner, 0,
+  { reset: 'approve' }), { code: 'DOE_PROGRAM_STALE_ASSESSMENT' });
+assert.throws(() => authorizeUpdate(strictIdentity, nextIdentity, updateOwner, 0,
+  { approval: true }), { code: 'DOE_PROGRAM_INVALID' });
+const unchangedAssessment = assessUpdate(strictIdentity, strictIdentity, updateOwner, 0);
+assert.equal(unchangedAssessment.requiresReset, false);
+assert.deepEqual(unchangedAssessment.retained, strictIdentity.descriptor.buffers);
+assert.equal(authorizeUpdate(validated, validateComputeProgram({ ...descriptor, id: 'legacyEdit' }),
+  updateOwner, 0, {}).requiresReset, false);
+console.log('ok: strict state formats and exact-edit approvals reject stale, cloned and foreign authority');

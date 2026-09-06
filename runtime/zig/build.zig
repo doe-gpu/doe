@@ -333,10 +333,10 @@ fn addComputeProgramContract(options: *std.Build.Step.Options, allocator: std.me
     defer file.close();
     const bytes = file.readToEndAlloc(allocator, 64 * 1024) catch
         @panic("failed to read compute-program.schema.json");
-    const Schema = struct { properties: struct { schemaVersion: struct { @"enum": []u32 } } };
+    const Schema = struct { @"$defs": struct { nativeContractVersion: struct { @"const": u32 } } };
     const schema = std.json.parseFromSlice(Schema, allocator, bytes, .{ .ignore_unknown_fields = true }) catch
         @panic("invalid compute program schema version");
-    options.addOption(u32, "compute_program_contract_version", std.mem.max(u32, schema.value.properties.schemaVersion.@"enum"));
+    options.addOption(u32, "compute_program_contract_version", schema.value.@"$defs".nativeContractVersion.@"const");
     const pipeline_bytes = std.fs.cwd().readFileAlloc(allocator, "../../config/vulkan-compute-pipeline-policy.json", 64 * 1024) catch
         @panic("failed to read vulkan-compute-pipeline-policy.json");
     const PipelinePolicy = struct { schemaVersion: u32, reuse: enum { private, @"share-live-exact" } };

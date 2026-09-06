@@ -7,6 +7,7 @@ const model_render_types = @import("../../contracts/model/model_render_types.zig
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
+const error_scope = @import("../../runtime/diagnostics/error_scope.zig");
 const d3d12_formats = resource_ops.d3d12_formats;
 
 const alloc = native_helpers.alloc;
@@ -225,9 +226,18 @@ fn stageEntryName(sv: RenderStringView, fallback: [*:0]const u8) [*:0]const u8 {
 // Render Pipeline
 // ============================================================
 
-pub export fn doeNativeDeviceCreateRenderPipeline(dev_raw: ?*anyopaque, desc_raw: ?*anyopaque) callconv(.c) ?*anyopaque {
+fn createRenderPipeline(dev_raw: ?*anyopaque, desc_raw: ?*anyopaque) ?*anyopaque {
     const dev = cast(DoeDevice, dev_raw) orelse return null;
     const d = @as(*const RenderPipelineDesc, @ptrCast(@alignCast(desc_raw orelse return null)));
+    const shader_handles = [_]?*anyopaque{ d.vertex.module, if (d.fragment) |fragment| fragment.module else null };
+    for (shader_handles) |handle| {
+        if (cast(DoeShaderModule, handle)) |module| {
+            if (module.device != null and module.device != dev) {
+                dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "render pipeline shader belongs to a different device");
+                return null;
+            }
+        }
+    }
     const pip = make(DoeRenderPipeline) orelse return null;
     pip.* = .{};
     pip.layout = cast(DoePipelineLayout, d.layout);
@@ -538,26 +548,25 @@ pub export fn doeNativeDeviceCreateRenderPipeline(dev_raw: ?*anyopaque, desc_raw
     };
     if (vfn) |f| metal_bridge_release(f);
     if (ffn) |f| metal_bridge_release(f);
-    pip.* = .{
-        .mtl_pso = pso,
-        .topology = d.primitive.topology,
-        .front_face = d.primitive.frontFace,
-        .cull_mode = d.primitive.cullMode,
-        .blend_enabled = blend_enabled != 0,
-        .color_operation = color_operation,
-        .color_src_factor = color_src_factor,
-        .color_dst_factor = color_dst_factor,
-        .alpha_operation = alpha_operation,
-        .alpha_src_factor = alpha_src_factor,
-        .alpha_dst_factor = alpha_dst_factor,
-        .color_write_mask = @intCast(target0.writeMask),
-        .sample_count = sample_count,
-    };
+    pip.mtl_pso = pso;
+    pip.topology = d.primitive.topology;
+    pip.front_face = d.primitive.frontFace;
+    pip.cull_mode = d.primitive.cullMode;
+    pip.blend_enabled = blend_enabled != 0;
+    pip.color_operation = color_operation;
+    pip.color_src_factor = color_src_factor;
+    pip.color_dst_factor = color_dst_factor;
+    pip.alpha_operation = alpha_operation;
+    pip.alpha_src_factor = alpha_src_factor;
+    pip.alpha_dst_factor = alpha_dst_factor;
+    pip.color_write_mask = @intCast(target0.writeMask);
+    pip.sample_count = sample_count;
     return toOpaque(pip);
 }
 
 pub export fn doeNativeRenderPipelineRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeRenderPipeline, raw)) |p| {
+        if (!native_helpers.object_should_destroy(p)) return;
         native_helpers.label_store.remove(raw);
         if (p.backend_root_signature != null) {
             if (p.mtl_pso) |pso| d3d12_bridge_release(pso);
@@ -569,6 +578,19 @@ pub export fn doeNativeRenderPipelineRelease(raw: ?*anyopaque) callconv(.c) void
         if (p.fragment_spirv_data) |s| alloc.free(s);
         if (p.vertex_entry_point) |ep| alloc.free(ep);
         if (p.fragment_entry_point) |ep| alloc.free(ep);
+        if (p.layout) |layout| @import("../support/doe_native_exports.zig").doeNativePipelineLayoutRelease(toOpaque(layout));
+        const device = p.device_ref;
         alloc.destroy(p);
+        if (device) |owner| @import("../support/doe_native_exports.zig").doeNativeDeviceRelease(toOpaque(owner));
     }
+}
+
+pub export fn doeNativeDeviceCreateRenderPipeline(dev_raw: ?*anyopaque, desc_raw: ?*anyopaque) callconv(.c) ?*anyopaque {
+    const raw = createRenderPipeline(dev_raw, desc_raw) orelse return null;
+    const pipeline = cast(DoeRenderPipeline, raw).?;
+    const device = cast(native_types.DoeDevice, dev_raw).?;
+    native_helpers.object_add_ref(native_types.DoeDevice, dev_raw);
+    pipeline.device_ref = device;
+    if (pipeline.layout) |layout| native_helpers.object_add_ref(DoePipelineLayout, toOpaque(layout));
+    return raw;
 }

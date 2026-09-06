@@ -4,6 +4,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 #include "metal_bridge.h"
+#include "../../../vendor/webgpu-headers/webgpu.h"
 #include <string.h>
 #include <dispatch/dispatch.h>
 #include <mach/mach_time.h>
@@ -303,59 +304,59 @@ static MTLCompareFunction wgpu_to_mtl_compare(uint32_t compare_fn) {
 static MTLVertexFormat wgpu_to_mtl_vertex_format(uint32_t format) {
     switch (format) {
         /* 8-bit uint */
-        case 0x01: return MTLVertexFormatUChar;
-        case 0x02: return MTLVertexFormatUChar2;
-        case 0x03: return MTLVertexFormatUChar4;
+        case WGPUVertexFormat_Uint8: return MTLVertexFormatUChar;
+        case WGPUVertexFormat_Uint8x2: return MTLVertexFormatUChar2;
+        case WGPUVertexFormat_Uint8x4: return MTLVertexFormatUChar4;
         /* 8-bit sint */
-        case 0x04: return MTLVertexFormatChar;
-        case 0x05: return MTLVertexFormatChar2;
-        case 0x06: return MTLVertexFormatChar4;
+        case WGPUVertexFormat_Sint8: return MTLVertexFormatChar;
+        case WGPUVertexFormat_Sint8x2: return MTLVertexFormatChar2;
+        case WGPUVertexFormat_Sint8x4: return MTLVertexFormatChar4;
         /* 8-bit unorm */
-        case 0x07: return MTLVertexFormatUCharNormalized;
-        case 0x08: return MTLVertexFormatUChar2Normalized;
-        case 0x09: return MTLVertexFormatUChar4Normalized;
+        case WGPUVertexFormat_Unorm8: return MTLVertexFormatUCharNormalized;
+        case WGPUVertexFormat_Unorm8x2: return MTLVertexFormatUChar2Normalized;
+        case WGPUVertexFormat_Unorm8x4: return MTLVertexFormatUChar4Normalized;
         /* 8-bit snorm */
-        case 0x0A: return MTLVertexFormatCharNormalized;
-        case 0x0B: return MTLVertexFormatChar2Normalized;
-        case 0x0C: return MTLVertexFormatChar4Normalized;
+        case WGPUVertexFormat_Snorm8: return MTLVertexFormatCharNormalized;
+        case WGPUVertexFormat_Snorm8x2: return MTLVertexFormatChar2Normalized;
+        case WGPUVertexFormat_Snorm8x4: return MTLVertexFormatChar4Normalized;
         /* 16-bit uint */
-        case 0x0D: return MTLVertexFormatUShort;
-        case 0x0E: return MTLVertexFormatUShort2;
-        case 0x0F: return MTLVertexFormatUShort4;
+        case WGPUVertexFormat_Uint16: return MTLVertexFormatUShort;
+        case WGPUVertexFormat_Uint16x2: return MTLVertexFormatUShort2;
+        case WGPUVertexFormat_Uint16x4: return MTLVertexFormatUShort4;
         /* 16-bit sint */
-        case 0x10: return MTLVertexFormatShort;
-        case 0x11: return MTLVertexFormatShort2;
-        case 0x12: return MTLVertexFormatShort4;
+        case WGPUVertexFormat_Sint16: return MTLVertexFormatShort;
+        case WGPUVertexFormat_Sint16x2: return MTLVertexFormatShort2;
+        case WGPUVertexFormat_Sint16x4: return MTLVertexFormatShort4;
         /* 16-bit unorm */
-        case 0x13: return MTLVertexFormatUShortNormalized;
-        case 0x14: return MTLVertexFormatUShort2Normalized;
-        case 0x15: return MTLVertexFormatUShort4Normalized;
+        case WGPUVertexFormat_Unorm16: return MTLVertexFormatUShortNormalized;
+        case WGPUVertexFormat_Unorm16x2: return MTLVertexFormatUShort2Normalized;
+        case WGPUVertexFormat_Unorm16x4: return MTLVertexFormatUShort4Normalized;
         /* 16-bit snorm */
-        case 0x16: return MTLVertexFormatShortNormalized;
-        case 0x17: return MTLVertexFormatShort2Normalized;
-        case 0x18: return MTLVertexFormatShort4Normalized;
+        case WGPUVertexFormat_Snorm16: return MTLVertexFormatShortNormalized;
+        case WGPUVertexFormat_Snorm16x2: return MTLVertexFormatShort2Normalized;
+        case WGPUVertexFormat_Snorm16x4: return MTLVertexFormatShort4Normalized;
         /* 32-bit float */
-        case 0x19: return MTLVertexFormatFloat;
-        case 0x1A: return MTLVertexFormatFloat2;
-        case 0x1B: return MTLVertexFormatFloat3;
-        case 0x1C: return MTLVertexFormatFloat4;
+        case WGPUVertexFormat_Float32: return MTLVertexFormatFloat;
+        case WGPUVertexFormat_Float32x2: return MTLVertexFormatFloat2;
+        case WGPUVertexFormat_Float32x3: return MTLVertexFormatFloat3;
+        case WGPUVertexFormat_Float32x4: return MTLVertexFormatFloat4;
         /* 16-bit float */
-        case 0x1D: return MTLVertexFormatHalf;
-        case 0x1E: return MTLVertexFormatHalf2;
-        case 0x1F: return MTLVertexFormatHalf4;
-        /* 32-bit uint (0x20 skipped) */
-        case 0x21: return MTLVertexFormatUInt;
-        case 0x22: return MTLVertexFormatUInt2;
-        case 0x23: return MTLVertexFormatUInt3;
-        case 0x24: return MTLVertexFormatUInt4;
+        case WGPUVertexFormat_Float16: return MTLVertexFormatHalf;
+        case WGPUVertexFormat_Float16x2: return MTLVertexFormatHalf2;
+        case WGPUVertexFormat_Float16x4: return MTLVertexFormatHalf4;
+        /* 32-bit uint */
+        case WGPUVertexFormat_Uint32: return MTLVertexFormatUInt;
+        case WGPUVertexFormat_Uint32x2: return MTLVertexFormatUInt2;
+        case WGPUVertexFormat_Uint32x3: return MTLVertexFormatUInt3;
+        case WGPUVertexFormat_Uint32x4: return MTLVertexFormatUInt4;
         /* 32-bit sint */
-        case 0x25: return MTLVertexFormatInt;
-        case 0x26: return MTLVertexFormatInt2;
-        case 0x27: return MTLVertexFormatInt3;
-        case 0x28: return MTLVertexFormatInt4;
+        case WGPUVertexFormat_Sint32: return MTLVertexFormatInt;
+        case WGPUVertexFormat_Sint32x2: return MTLVertexFormatInt2;
+        case WGPUVertexFormat_Sint32x3: return MTLVertexFormatInt3;
+        case WGPUVertexFormat_Sint32x4: return MTLVertexFormatInt4;
         /* packed formats */
-        case 0x29: return MTLVertexFormatUInt1010102Normalized;
-        case 0x2A: return MTLVertexFormatUChar4Normalized_BGRA;
+        case WGPUVertexFormat_Unorm10_10_10_2: return MTLVertexFormatUInt1010102Normalized;
+        case WGPUVertexFormat_Unorm8x4BGRA: return MTLVertexFormatUChar4Normalized_BGRA;
         default: return MTLVertexFormatInvalid;
     }
 }

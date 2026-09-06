@@ -1,3 +1,4 @@
+const vertex_formats = @import("../../contracts/vertex_format.zig");
 // WebGPU-to-DXGI format translation.
 //
 // Maps WGPUTextureFormat values to DXGI_FORMAT constants and provides
@@ -368,116 +369,64 @@ pub fn is_any_compressed(format: model_gpu_types.WGPUTextureFormat) bool {
 
 // --- Vertex format translation ---
 //
-// WebGPU vertex format enum values (from doe_napi_formats.c):
-//   0x01..0x0C  8-bit (uint8..snorm8x4)
-//   0x0D..0x18  16-bit (uint16..snorm16x4)
-//   0x19..0x1C  32-bit float (float32..float32x4)
-//   0x1D..0x1F  16-bit float (float16..float16x4)
-//   0x21..0x28  32-bit int (uint32..sint32x4)  — note 0x20 is skipped
-//   0x29        unorm10-10-10-2
-//   0x2A        unorm8x4-bgra
+// Vertex identities come from the shared contract; Vulkan format conversion stays local.
 
-const WGPU_VERTEX_FORMAT_UINT8: u32 = 0x01;
-const WGPU_VERTEX_FORMAT_UINT8X2: u32 = 0x02;
-const WGPU_VERTEX_FORMAT_UINT8X4: u32 = 0x03;
-const WGPU_VERTEX_FORMAT_SINT8: u32 = 0x04;
-const WGPU_VERTEX_FORMAT_SINT8X2: u32 = 0x05;
-const WGPU_VERTEX_FORMAT_SINT8X4: u32 = 0x06;
-const WGPU_VERTEX_FORMAT_UNORM8: u32 = 0x07;
-const WGPU_VERTEX_FORMAT_UNORM8X2: u32 = 0x08;
-const WGPU_VERTEX_FORMAT_UNORM8X4: u32 = 0x09;
-const WGPU_VERTEX_FORMAT_SNORM8: u32 = 0x0A;
-const WGPU_VERTEX_FORMAT_SNORM8X2: u32 = 0x0B;
-const WGPU_VERTEX_FORMAT_SNORM8X4: u32 = 0x0C;
-const WGPU_VERTEX_FORMAT_UINT16: u32 = 0x0D;
-const WGPU_VERTEX_FORMAT_UINT16X2: u32 = 0x0E;
-const WGPU_VERTEX_FORMAT_UINT16X4: u32 = 0x0F;
-const WGPU_VERTEX_FORMAT_SINT16: u32 = 0x10;
-const WGPU_VERTEX_FORMAT_SINT16X2: u32 = 0x11;
-const WGPU_VERTEX_FORMAT_SINT16X4: u32 = 0x12;
-const WGPU_VERTEX_FORMAT_UNORM16: u32 = 0x13;
-const WGPU_VERTEX_FORMAT_UNORM16X2: u32 = 0x14;
-const WGPU_VERTEX_FORMAT_UNORM16X4: u32 = 0x15;
-const WGPU_VERTEX_FORMAT_SNORM16: u32 = 0x16;
-const WGPU_VERTEX_FORMAT_SNORM16X2: u32 = 0x17;
-const WGPU_VERTEX_FORMAT_SNORM16X4: u32 = 0x18;
-const WGPU_VERTEX_FORMAT_FLOAT32: u32 = 0x19;
-const WGPU_VERTEX_FORMAT_FLOAT32X2: u32 = 0x1A;
-const WGPU_VERTEX_FORMAT_FLOAT32X3: u32 = 0x1B;
-const WGPU_VERTEX_FORMAT_FLOAT32X4: u32 = 0x1C;
-const WGPU_VERTEX_FORMAT_FLOAT16: u32 = 0x1D;
-const WGPU_VERTEX_FORMAT_FLOAT16X2: u32 = 0x1E;
-const WGPU_VERTEX_FORMAT_FLOAT16X4: u32 = 0x1F;
-const WGPU_VERTEX_FORMAT_UINT32: u32 = 0x21;
-const WGPU_VERTEX_FORMAT_UINT32X2: u32 = 0x22;
-const WGPU_VERTEX_FORMAT_UINT32X3: u32 = 0x23;
-const WGPU_VERTEX_FORMAT_UINT32X4: u32 = 0x24;
-const WGPU_VERTEX_FORMAT_SINT32: u32 = 0x25;
-const WGPU_VERTEX_FORMAT_SINT32X2: u32 = 0x26;
-const WGPU_VERTEX_FORMAT_SINT32X3: u32 = 0x27;
-const WGPU_VERTEX_FORMAT_SINT32X4: u32 = 0x28;
-const WGPU_VERTEX_FORMAT_UNORM10_10_10_2: u32 = 0x29;
-const WGPU_VERTEX_FORMAT_UNORM8X4_BGRA: u32 = 0x2A;
-
-/// Maps a WebGPU vertex format enum value to the corresponding DXGI_FORMAT.
 pub fn wgpu_vertex_format_to_dxgi(format: u32) !u32 {
-    return switch (format) {
+    return switch (try vertex_formats.fromCode(format)) {
         // 8-bit uint
-        WGPU_VERTEX_FORMAT_UINT8 => DXGI_FORMAT_R8_UINT,
-        WGPU_VERTEX_FORMAT_UINT8X2 => DXGI_FORMAT_R8G8_UINT,
-        WGPU_VERTEX_FORMAT_UINT8X4 => DXGI_FORMAT_R8G8B8A8_UINT,
+        .uint8 => DXGI_FORMAT_R8_UINT,
+        .uint8x2 => DXGI_FORMAT_R8G8_UINT,
+        .uint8x4 => DXGI_FORMAT_R8G8B8A8_UINT,
         // 8-bit sint
-        WGPU_VERTEX_FORMAT_SINT8 => DXGI_FORMAT_R8_SINT,
-        WGPU_VERTEX_FORMAT_SINT8X2 => DXGI_FORMAT_R8G8_SINT,
-        WGPU_VERTEX_FORMAT_SINT8X4 => DXGI_FORMAT_R8G8B8A8_SINT,
+        .sint8 => DXGI_FORMAT_R8_SINT,
+        .sint8x2 => DXGI_FORMAT_R8G8_SINT,
+        .sint8x4 => DXGI_FORMAT_R8G8B8A8_SINT,
         // 8-bit unorm
-        WGPU_VERTEX_FORMAT_UNORM8 => DXGI_FORMAT_R8_UNORM,
-        WGPU_VERTEX_FORMAT_UNORM8X2 => DXGI_FORMAT_R8G8_UNORM,
-        WGPU_VERTEX_FORMAT_UNORM8X4 => DXGI_FORMAT_R8G8B8A8_UNORM,
+        .unorm8 => DXGI_FORMAT_R8_UNORM,
+        .unorm8x2 => DXGI_FORMAT_R8G8_UNORM,
+        .unorm8x4 => DXGI_FORMAT_R8G8B8A8_UNORM,
         // 8-bit snorm
-        WGPU_VERTEX_FORMAT_SNORM8 => DXGI_FORMAT_R8_SNORM,
-        WGPU_VERTEX_FORMAT_SNORM8X2 => DXGI_FORMAT_R8G8_SNORM,
-        WGPU_VERTEX_FORMAT_SNORM8X4 => DXGI_FORMAT_R8G8B8A8_SNORM,
+        .snorm8 => DXGI_FORMAT_R8_SNORM,
+        .snorm8x2 => DXGI_FORMAT_R8G8_SNORM,
+        .snorm8x4 => DXGI_FORMAT_R8G8B8A8_SNORM,
         // 16-bit uint
-        WGPU_VERTEX_FORMAT_UINT16 => DXGI_FORMAT_R16_UINT,
-        WGPU_VERTEX_FORMAT_UINT16X2 => DXGI_FORMAT_R16G16_UINT,
-        WGPU_VERTEX_FORMAT_UINT16X4 => DXGI_FORMAT_R16G16B16A16_UINT,
+        .uint16 => DXGI_FORMAT_R16_UINT,
+        .uint16x2 => DXGI_FORMAT_R16G16_UINT,
+        .uint16x4 => DXGI_FORMAT_R16G16B16A16_UINT,
         // 16-bit sint
-        WGPU_VERTEX_FORMAT_SINT16 => DXGI_FORMAT_R16_SINT,
-        WGPU_VERTEX_FORMAT_SINT16X2 => DXGI_FORMAT_R16G16_SINT,
-        WGPU_VERTEX_FORMAT_SINT16X4 => DXGI_FORMAT_R16G16B16A16_SINT,
+        .sint16 => DXGI_FORMAT_R16_SINT,
+        .sint16x2 => DXGI_FORMAT_R16G16_SINT,
+        .sint16x4 => DXGI_FORMAT_R16G16B16A16_SINT,
         // 16-bit unorm
-        WGPU_VERTEX_FORMAT_UNORM16 => DXGI_FORMAT_R16_UNORM,
-        WGPU_VERTEX_FORMAT_UNORM16X2 => DXGI_FORMAT_R16G16_UNORM,
-        WGPU_VERTEX_FORMAT_UNORM16X4 => DXGI_FORMAT_R16G16B16A16_UNORM,
+        .unorm16 => DXGI_FORMAT_R16_UNORM,
+        .unorm16x2 => DXGI_FORMAT_R16G16_UNORM,
+        .unorm16x4 => DXGI_FORMAT_R16G16B16A16_UNORM,
         // 16-bit snorm
-        WGPU_VERTEX_FORMAT_SNORM16 => DXGI_FORMAT_R16_SNORM,
-        WGPU_VERTEX_FORMAT_SNORM16X2 => DXGI_FORMAT_R16G16_SNORM,
-        WGPU_VERTEX_FORMAT_SNORM16X4 => DXGI_FORMAT_R16G16B16A16_SNORM,
+        .snorm16 => DXGI_FORMAT_R16_SNORM,
+        .snorm16x2 => DXGI_FORMAT_R16G16_SNORM,
+        .snorm16x4 => DXGI_FORMAT_R16G16B16A16_SNORM,
         // 32-bit float
-        WGPU_VERTEX_FORMAT_FLOAT32 => DXGI_FORMAT_R32_FLOAT,
-        WGPU_VERTEX_FORMAT_FLOAT32X2 => DXGI_FORMAT_R32G32_FLOAT,
-        WGPU_VERTEX_FORMAT_FLOAT32X3 => DXGI_FORMAT_R32G32B32_FLOAT,
-        WGPU_VERTEX_FORMAT_FLOAT32X4 => DXGI_FORMAT_R32G32B32A32_FLOAT,
+        .float32 => DXGI_FORMAT_R32_FLOAT,
+        .float32x2 => DXGI_FORMAT_R32G32_FLOAT,
+        .float32x3 => DXGI_FORMAT_R32G32B32_FLOAT,
+        .float32x4 => DXGI_FORMAT_R32G32B32A32_FLOAT,
         // 16-bit float
-        WGPU_VERTEX_FORMAT_FLOAT16 => DXGI_FORMAT_R16_FLOAT,
-        WGPU_VERTEX_FORMAT_FLOAT16X2 => DXGI_FORMAT_R16G16_FLOAT,
-        WGPU_VERTEX_FORMAT_FLOAT16X4 => DXGI_FORMAT_R16G16B16A16_FLOAT,
+        .float16 => DXGI_FORMAT_R16_FLOAT,
+        .float16x2 => DXGI_FORMAT_R16G16_FLOAT,
+        .float16x4 => DXGI_FORMAT_R16G16B16A16_FLOAT,
         // 32-bit uint
-        WGPU_VERTEX_FORMAT_UINT32 => DXGI_FORMAT_R32_UINT,
-        WGPU_VERTEX_FORMAT_UINT32X2 => DXGI_FORMAT_R32G32_UINT,
-        WGPU_VERTEX_FORMAT_UINT32X3 => DXGI_FORMAT_R32G32B32_UINT,
-        WGPU_VERTEX_FORMAT_UINT32X4 => DXGI_FORMAT_R32G32B32A32_UINT,
+        .uint32 => DXGI_FORMAT_R32_UINT,
+        .uint32x2 => DXGI_FORMAT_R32G32_UINT,
+        .uint32x3 => DXGI_FORMAT_R32G32B32_UINT,
+        .uint32x4 => DXGI_FORMAT_R32G32B32A32_UINT,
         // 32-bit sint
-        WGPU_VERTEX_FORMAT_SINT32 => DXGI_FORMAT_R32_SINT,
-        WGPU_VERTEX_FORMAT_SINT32X2 => DXGI_FORMAT_R32G32_SINT,
-        WGPU_VERTEX_FORMAT_SINT32X3 => DXGI_FORMAT_R32G32B32_SINT,
-        WGPU_VERTEX_FORMAT_SINT32X4 => DXGI_FORMAT_R32G32B32A32_SINT,
+        .sint32 => DXGI_FORMAT_R32_SINT,
+        .sint32x2 => DXGI_FORMAT_R32G32_SINT,
+        .sint32x3 => DXGI_FORMAT_R32G32B32_SINT,
+        .sint32x4 => DXGI_FORMAT_R32G32B32A32_SINT,
         // Packed
-        WGPU_VERTEX_FORMAT_UNORM10_10_10_2 => DXGI_FORMAT_R10G10B10A2_UNORM,
-        WGPU_VERTEX_FORMAT_UNORM8X4_BGRA => DXGI_FORMAT_B8G8R8A8_UNORM,
-
-        else => error.UnsupportedFeature,
+        .unorm10_10_10_2 => DXGI_FORMAT_R10G10B10A2_UNORM,
+        .unorm8x4_bgra => DXGI_FORMAT_B8G8R8A8_UNORM,
     };
 }
 
@@ -614,33 +563,33 @@ test "wgpu_vertex_format_to_dxgi maps 16-bit formats" {
 }
 
 test "wgpu_vertex_format_to_dxgi maps 32-bit float formats" {
-    try testing.expectEqual(DXGI_FORMAT_R32_FLOAT, try wgpu_vertex_format_to_dxgi(0x19));
-    try testing.expectEqual(DXGI_FORMAT_R32G32_FLOAT, try wgpu_vertex_format_to_dxgi(0x1A));
-    try testing.expectEqual(DXGI_FORMAT_R32G32B32_FLOAT, try wgpu_vertex_format_to_dxgi(0x1B));
-    try testing.expectEqual(DXGI_FORMAT_R32G32B32A32_FLOAT, try wgpu_vertex_format_to_dxgi(0x1C));
+    try testing.expectEqual(DXGI_FORMAT_R32_FLOAT, try wgpu_vertex_format_to_dxgi(0x1C));
+    try testing.expectEqual(DXGI_FORMAT_R32G32_FLOAT, try wgpu_vertex_format_to_dxgi(0x1D));
+    try testing.expectEqual(DXGI_FORMAT_R32G32B32_FLOAT, try wgpu_vertex_format_to_dxgi(0x1E));
+    try testing.expectEqual(DXGI_FORMAT_R32G32B32A32_FLOAT, try wgpu_vertex_format_to_dxgi(0x1F));
 }
 
 test "wgpu_vertex_format_to_dxgi maps 16-bit float formats" {
-    try testing.expectEqual(DXGI_FORMAT_R16_FLOAT, try wgpu_vertex_format_to_dxgi(0x1D));
-    try testing.expectEqual(DXGI_FORMAT_R16G16_FLOAT, try wgpu_vertex_format_to_dxgi(0x1E));
-    try testing.expectEqual(DXGI_FORMAT_R16G16B16A16_FLOAT, try wgpu_vertex_format_to_dxgi(0x1F));
+    try testing.expectEqual(DXGI_FORMAT_R16_FLOAT, try wgpu_vertex_format_to_dxgi(0x19));
+    try testing.expectEqual(DXGI_FORMAT_R16G16_FLOAT, try wgpu_vertex_format_to_dxgi(0x1A));
+    try testing.expectEqual(DXGI_FORMAT_R16G16B16A16_FLOAT, try wgpu_vertex_format_to_dxgi(0x1B));
 }
 
 test "wgpu_vertex_format_to_dxgi maps 32-bit int formats" {
-    try testing.expectEqual(DXGI_FORMAT_R32_UINT, try wgpu_vertex_format_to_dxgi(0x21));
-    try testing.expectEqual(DXGI_FORMAT_R32G32B32_UINT, try wgpu_vertex_format_to_dxgi(0x23));
-    try testing.expectEqual(DXGI_FORMAT_R32G32B32A32_UINT, try wgpu_vertex_format_to_dxgi(0x24));
-    try testing.expectEqual(DXGI_FORMAT_R32_SINT, try wgpu_vertex_format_to_dxgi(0x25));
-    try testing.expectEqual(DXGI_FORMAT_R32G32B32A32_SINT, try wgpu_vertex_format_to_dxgi(0x28));
+    try testing.expectEqual(DXGI_FORMAT_R32_UINT, try wgpu_vertex_format_to_dxgi(0x20));
+    try testing.expectEqual(DXGI_FORMAT_R32G32B32_UINT, try wgpu_vertex_format_to_dxgi(0x22));
+    try testing.expectEqual(DXGI_FORMAT_R32G32B32A32_UINT, try wgpu_vertex_format_to_dxgi(0x23));
+    try testing.expectEqual(DXGI_FORMAT_R32_SINT, try wgpu_vertex_format_to_dxgi(0x24));
+    try testing.expectEqual(DXGI_FORMAT_R32G32B32A32_SINT, try wgpu_vertex_format_to_dxgi(0x27));
 }
 
 test "wgpu_vertex_format_to_dxgi maps packed formats" {
-    try testing.expectEqual(DXGI_FORMAT_R10G10B10A2_UNORM, try wgpu_vertex_format_to_dxgi(0x29));
-    try testing.expectEqual(DXGI_FORMAT_B8G8R8A8_UNORM, try wgpu_vertex_format_to_dxgi(0x2A));
+    try testing.expectEqual(DXGI_FORMAT_R10G10B10A2_UNORM, try wgpu_vertex_format_to_dxgi(0x28));
+    try testing.expectEqual(DXGI_FORMAT_B8G8R8A8_UNORM, try wgpu_vertex_format_to_dxgi(0x29));
 }
 
 test "wgpu_vertex_format_to_dxgi rejects invalid format" {
     try testing.expectError(error.UnsupportedFeature, wgpu_vertex_format_to_dxgi(0x00));
-    try testing.expectError(error.UnsupportedFeature, wgpu_vertex_format_to_dxgi(0x20));
+    try testing.expectError(error.UnsupportedFeature, wgpu_vertex_format_to_dxgi(0x2A));
     try testing.expectError(error.UnsupportedFeature, wgpu_vertex_format_to_dxgi(0xFF));
 }

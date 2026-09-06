@@ -161,10 +161,11 @@ pub fn loadToolchainConfigWithDiagnostic(alloc: std.mem.Allocator, diagnostic: *
         },
         else => {
             setLastErrorFmt("failed to read {s}: {s}", .{ DXC_ENV_VAR, @errorName(err) }, diagnostic);
+            if (err == error.OutOfMemory) return error.OutOfMemory;
             return error.ShaderToolchainUnavailable;
         },
     };
-    errdefer alloc.free(env_value);
+    defer alloc.free(env_value);
     return toolchainConfigFromEnvValueWithDiagnostic(alloc, env_value, diagnostic);
 }
 

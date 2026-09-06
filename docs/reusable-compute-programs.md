@@ -28,8 +28,10 @@ external-application portfolio or general WebGPU conformance requirements.
 Pass a device and select `gpu-recorded`, `native-recorded`, or `webgpu`. The recorded modes accept
 the registered Doe Node addon provider, also usable through Bun's Node addon
 support. It requires a native contract version supporting the declaration, derived at
-build time from the descriptor schema. Native version 2 accepts descriptor
-versions 1 and 2; older libraries reject version 2 before allocation.
+build time from the schema's `nativeContractVersion` definition. Native version
+2 accepts descriptor versions 1, 2, and 3; version 3's additional state-update
+policy runs in the package. Older libraries reject resident declarations before
+allocation. The native command ABI has not changed.
 `gpu-recorded` requires Vulkan support advertised by both the addon and library.
 It owns a compiled GPU command buffer, retained pipelines, and descriptor pools.
 Buffer identities and extents are checked before submission; mapping or changing
@@ -195,6 +197,40 @@ releases temporary resources and leaves the prior program available. Device
 loss requires preparation on a new device. Programs reject overlapping runs,
 and program operations serialize error-scope ownership on a shared device.
 Applications must keep unrelated device operations outside a program operation.
+
+### State-update approval migration
+
+Descriptor versions 1 and 2 preserve their previous update behavior. Version 3
+requires a nonempty, application-owned `stateFormat` on program-lifetime buffers
+and rejects it on invocation-lifetime buffers. Changing a format explicitly
+changes state interpretation even when the byte size is identical. Keeping a
+format declares compatible interpretation; the runtime does not infer semantic
+equivalence of arbitrary shader edits.
+
+`assessUpdate(next)` runs while the program is idle and returns an immutable
+assessment with retained, replaced, discarded, and created resident state.
+Replaced entries include both declarations. Its schema is `updateAssessment`
+under the descriptor schema. Assessment causes no allocation or GPU work beyond
+host metadata. If either the old or proposed descriptor is version 3, replacing
+or discarding resident buffers requires
+`update(next, { assessment, reset: 'approve' })`. The default is `preserve`.
+Downgrading a descriptor cannot bypass this check. Compatible edits can call
+`update(next)` directly.
+
+Approval is bound to the exact immutable proposed descriptor, original program
+instance, and invocation revision. Starting another accepted run expires the
+assessment, even if that run is subsequently cancelled. An invalid input rejected
+before a run starts does not expire it. Serialized or copied assessments carry
+information without authority. A rejected reset throws `DOE_PROGRAM_RESET_REQUIRED`
+with its assessment; a foreign, copied, or stale approval throws
+`DOE_PROGRAM_STALE_ASSESSMENT`. No replacement resource is acquired before these
+checks. Failed replacement preparation preserves old state; its assessment can
+be retried while that state remains at the assessed revision. Success closes the
+old program and releases its resources only after replacement preparation.
+
+Updates still require an idle program and own its device error scopes during
+preparation. This contract does not imply background pipeline compilation or
+kernel preemption.
 
 Cancellation before submission prevents dispatch. Cancellation after submission
 drains already-submitted work and discards output; it does not preempt a running

@@ -1,0 +1,8 @@
+passed: image_edges/doe-recorded
+passed: image_edges/doe-webgpu
+passed: heat_diffusion/doe-recorded
+passed: heat_diffusion/doe-webgpu
+passed: holoscript_lif/doe-recorded
+passed: holoscript_lif/doe-webgpu
+passed: holoscript_lif_resident/doe-recorded
+passed: holoscript_lif_resident/doe-webgpu

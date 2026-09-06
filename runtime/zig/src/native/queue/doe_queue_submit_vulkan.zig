@@ -243,9 +243,25 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                     };
                     recorded_replay_work = true;
                 },
-                .copy_buffer_to_texture,
-                .render_pass,
-                => {},
+                .copy_buffer_to_texture => {},
+                .render_pass => {
+                    shared.deliverInternalError(q.dev, "Vulkan submission received commands recorded for another backend", .{});
+                    return;
+                },
+                .vulkan_render => |render| {
+                    if (!flushRecordedReplay(q, rt, &recorded_replay_work, "before render")) return;
+                    resetPreparedDispatchState(&prepared_dispatch);
+                    const result = if (render.clear_only) rt.run_render_clear(render.command) else rt.run_render_draw(render.command);
+                    _ = result catch |err| {
+                        shared.deliverInternalError(q.dev, "Vulkan recorded render: {s}", .{@errorName(err)});
+                        return;
+                    };
+                    if (!render.clear_only and render.command.index_count == null and render.command.indirect_buffer_handle == 0) {
+                        if (cast(native_types.DoeRenderPipeline, render.pipeline)) |pipeline| {
+                            program_identity_trace.recordVulkanRenderDraw(pipeline, render.command.vertex_count, render.command.instance_count, render.command.first_vertex, render.command.first_instance);
+                        }
+                    }
+                },
                 .write_timestamp => |timestamp_cmd| {
                     query_native.vulkanRecordWriteTimestamp(
                         rt,

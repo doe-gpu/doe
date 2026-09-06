@@ -1,0 +1,5 @@
+
+> doe-gpu@0.5.0 build:addon
+> node scripts/build-addon.js
+
+doe-gpu: built native addon at /home/x/deco/doe/packages/doe-gpu/build/Release/doe_napi.node

@@ -5,13 +5,13 @@ const native_shared = @import("../support/doe_native_shared_types.zig");
 const wgsl_analysis = @import("../../compiler/wgsl/pipeline/analysis.zig");
 const runtime_compile = @import("../../compiler/wgsl/runtime/runtime_graphics_translation.zig");
 const shared = @import("vulkan_render_shared.zig");
+const error_scope = @import("../../runtime/diagnostics/error_scope.zig");
 
 pub fn vulkan_create_render_pipeline(
     dev: *shared.DoeDevice,
     pip: *shared.DoeRenderPipeline,
     desc: *const anyopaque,
 ) bool {
-    _ = dev;
     const RenderStringView = extern struct {
         data: ?[*]const u8,
         length: usize,
@@ -168,50 +168,91 @@ pub fn vulkan_create_render_pipeline(
         }
     }
 
-    if (native_helpers.cast(shared.DoeShaderModule, d.vertex_module)) |vert_sm| {
-        if (vert_sm.wgsl_source) |wgsl| {
-            std.crypto.hash.sha2.Sha256.hash(wgsl, &pip.vertex_wgsl_sha256, .{});
-            pip.vertex_wgsl_sha256_ready = true;
-        }
-        if (vert_sm.vertex_spirv_data) |vs| {
-            pip.vertex_spirv_data = native_helpers.alloc.dupe(u32, vs) catch null;
-        }
+    const vertex = native_helpers.cast(shared.DoeShaderModule, d.vertex_module);
+    const fragment = if (d.fragment) |frag| native_helpers.cast(shared.DoeShaderModule, frag.module) else null;
+    if (d.fragment != null and fragment == null) {
+        dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "render pipeline requires a valid fragment shader");
+        return false;
     }
-    if (d.fragment) |frag| {
-        if (native_helpers.cast(shared.DoeShaderModule, frag.module)) |frag_sm| {
-            if (frag_sm.wgsl_source) |wgsl| {
-                std.crypto.hash.sha2.Sha256.hash(wgsl, &pip.fragment_wgsl_sha256, .{});
-                pip.fragment_wgsl_sha256_ready = true;
-            }
-            if (frag_sm.fragment_spirv_data) |fs| {
-                pip.fragment_spirv_data = native_helpers.alloc.dupe(u32, fs) catch null;
-            }
-        }
-    }
-
-    if (d.vertex_ep_data) |ep_data| {
-        const ep_len = if (d.vertex_ep_length == abi_core.WGPU_STRLEN)
-            std.mem.len(@as([*:0]const u8, @ptrCast(ep_data)))
-        else
-            d.vertex_ep_length;
-        if (ep_len > 0) {
-            pip.vertex_entry_point = native_helpers.alloc.dupe(u8, ep_data[0..ep_len]) catch null;
-        }
-    }
-    if (d.fragment) |frag| {
-        if (frag.entryPoint.data) |ep_data| {
-            const ep_len = if (frag.entryPoint.length == abi_core.WGPU_STRLEN)
-                std.mem.len(@as([*:0]const u8, @ptrCast(ep_data)))
-            else
-                frag.entryPoint.length;
-            if (ep_len > 0) {
-                pip.fragment_entry_point = native_helpers.alloc.dupe(u8, ep_data[0..ep_len]) catch null;
-            }
-        }
-    }
+    retainShaderCode(native_helpers.alloc, pip, vertex, fragment, entryPoint(d.vertex_ep_data, d.vertex_ep_length), if (d.fragment) |frag| entryPoint(frag.entryPoint.data, frag.entryPoint.length) else null) catch |err| {
+        dev.error_scopes.deliver(error_scope.zig_error_to_type(err), if (err == error.OutOfMemory) "render pipeline could not retain shader code" else "render pipeline requires compiled graphics shader code");
+        return false;
+    };
 
     pip.mtl_pso = null;
     return true;
+}
+
+fn entryPoint(data: ?[*]const u8, length: usize) ?[]const u8 {
+    const bytes = data orelse return null;
+    const len = if (length == abi_core.WGPU_STRLEN) std.mem.len(@as([*:0]const u8, @ptrCast(bytes))) else length;
+    return if (len == 0) null else bytes[0..len];
+}
+
+fn retainShaderCode(
+    allocator: std.mem.Allocator,
+    pipeline: *shared.DoeRenderPipeline,
+    vertex: ?*const shared.DoeShaderModule,
+    fragment: ?*const shared.DoeShaderModule,
+    vertex_entry: ?[]const u8,
+    fragment_entry: ?[]const u8,
+) !void {
+    const vertex_module = vertex orelse return error.ShaderCompileFailed;
+    const vertex_source = vertex_module.vertex_spirv_data orelse return error.ShaderCompileFailed;
+    const fragment_source = if (fragment) |module| module.fragment_spirv_data orelse return error.ShaderCompileFailed else null;
+    const vs = try allocator.dupe(u32, vertex_source);
+    errdefer allocator.free(vs);
+    const fs = if (fragment_source) |source| try allocator.dupe(u32, source) else null;
+    errdefer if (fs) |source| allocator.free(source);
+    const ve = if (vertex_entry) |name| try allocator.dupe(u8, name) else null;
+    errdefer if (ve) |name| allocator.free(name);
+    const fe = if (fragment_entry) |name| try allocator.dupe(u8, name) else null;
+    pipeline.vertex_spirv_data = vs;
+    pipeline.fragment_spirv_data = fs;
+    pipeline.vertex_entry_point = ve;
+    pipeline.fragment_entry_point = fe;
+    if (vertex_module.wgsl_source) |source| {
+        std.crypto.hash.sha2.Sha256.hash(source, &pipeline.vertex_wgsl_sha256, .{});
+        pipeline.vertex_wgsl_sha256_ready = true;
+    }
+    if (fragment) |module| if (module.wgsl_source) |source| {
+        std.crypto.hash.sha2.Sha256.hash(source, &pipeline.fragment_wgsl_sha256, .{});
+        pipeline.fragment_wgsl_sha256_ready = true;
+    };
+}
+
+fn shaderCodeAllocationFailures(allocator: std.mem.Allocator) !void {
+    var pipeline = shared.DoeRenderPipeline{};
+    const vertex = shared.DoeShaderModule{ .vertex_spirv_data = &.{ 1, 2 }, .wgsl_source = "vertex" };
+    const fragment = shared.DoeShaderModule{ .fragment_spirv_data = &.{ 3, 4 }, .wgsl_source = "fragment" };
+    retainShaderCode(allocator, &pipeline, &vertex, &fragment, "vertex", "fragment") catch |err| {
+        try std.testing.expectEqual(@as(?[]const u32, null), pipeline.vertex_spirv_data);
+        try std.testing.expectEqual(@as(?[]const u32, null), pipeline.fragment_spirv_data);
+        try std.testing.expectEqual(@as(?[]const u8, null), pipeline.vertex_entry_point);
+        try std.testing.expectEqual(@as(?[]const u8, null), pipeline.fragment_entry_point);
+        try std.testing.expect(!pipeline.vertex_wgsl_sha256_ready);
+        return err;
+    };
+    defer allocator.free(pipeline.vertex_spirv_data.?);
+    defer allocator.free(pipeline.fragment_spirv_data.?);
+    defer allocator.free(pipeline.vertex_entry_point.?);
+    defer allocator.free(pipeline.fragment_entry_point.?);
+    try std.testing.expectEqualSlices(u32, vertex.vertex_spirv_data.?, pipeline.vertex_spirv_data.?);
+    try std.testing.expect(pipeline.vertex_spirv_data.?.ptr != vertex.vertex_spirv_data.?.ptr);
+    try std.testing.expectEqualStrings("fragment", pipeline.fragment_entry_point.?);
+}
+
+test "render shader retention publishes only after every allocation succeeds" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, shaderCodeAllocationFailures, .{});
+}
+
+test "missing graphics code is a shader failure rather than an empty pipeline" {
+    var pipeline = shared.DoeRenderPipeline{};
+    const missing = shared.DoeShaderModule{};
+    try std.testing.expectError(error.ShaderCompileFailed, retainShaderCode(std.testing.allocator, &pipeline, &missing, null, null, null));
+    const vertex = shared.DoeShaderModule{ .vertex_spirv_data = &.{1} };
+    try std.testing.expectError(error.ShaderCompileFailed, retainShaderCode(std.testing.allocator, &pipeline, &vertex, &missing, null, null));
+    try std.testing.expectEqual(@as(?[]const u32, null), pipeline.vertex_spirv_data);
 }
 
 pub fn probe_has_graphics_entry_points(wgsl: []const u8) bool {

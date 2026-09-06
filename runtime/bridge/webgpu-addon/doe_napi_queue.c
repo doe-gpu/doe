@@ -160,9 +160,11 @@ napi_value doe_command_encoder_copy_buffer_to_texture(napi_env env, napi_callbac
     if (pfn_wgpuCommandEncoderCopyBufferToTexture) {
         pfn_wgpuCommandEncoderCopyBufferToTexture(enc, &src, &dst, &size);
     } else if (pfn_doeNativeCommandEncoderCopyBufferToTexture) {
+        if (dst.origin.x || dst.origin.y || dst.origin.z || dst.aspect > 1)
+            NAPI_THROW(env, "commandEncoderCopyBufferToTexture: legacy native entry requires zero origin and all aspects");
         pfn_doeNativeCommandEncoderCopyBufferToTexture(enc, src.buffer,
             src.layout.offset, src.layout.bytesPerRow, src.layout.rowsPerImage,
-            dst.texture, dst.mipLevel, dst.origin.x, dst.origin.y, dst.origin.z, dst.aspect,
+            dst.texture, dst.mipLevel,
             size.width, size.height, size.depthOrArrayLayers);
     } else {
         NAPI_THROW(env, "commandEncoderCopyBufferToTexture: no implementation available in loaded library");
@@ -197,8 +199,9 @@ napi_value doe_command_encoder_copy_texture_to_buffer(napi_env env, napi_callbac
     if (pfn_wgpuCommandEncoderCopyTextureToBuffer) {
         pfn_wgpuCommandEncoderCopyTextureToBuffer(enc, &src, &dst, &size);
     } else if (pfn_doeNativeCommandEncoderCopyTextureToBuffer) {
+        if (src.origin.x || src.origin.y || src.origin.z || src.aspect > 1)
+            NAPI_THROW(env, "commandEncoderCopyTextureToBuffer: legacy native entry requires zero origin and all aspects");
         pfn_doeNativeCommandEncoderCopyTextureToBuffer(enc, src.texture, src.mipLevel,
-            src.origin.x, src.origin.y, src.origin.z, src.aspect,
             dst.buffer, dst.layout.offset, dst.layout.bytesPerRow, dst.layout.rowsPerImage,
             size.width, size.height, size.depthOrArrayLayers);
     } else {

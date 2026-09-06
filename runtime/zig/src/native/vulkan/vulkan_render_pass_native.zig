@@ -3,7 +3,7 @@ const binding_contract = @import("../../contracts/binding.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const query_native = @import("../resource/doe_query_native.zig");
-const program_identity_trace = @import("../diagnostics/doe_program_identity_trace.zig");
+const std = @import("std");
 const shared = @import("vulkan_render_shared.zig");
 
 const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);
@@ -33,6 +33,8 @@ fn populate_draw_cmd_from_pass(cmd: *model_render_types.RenderDrawCommand, pass:
         if (native_helpers.cast(shared.DoeTextureView, @ptrFromInt(pass.target_view_handle))) |tv| {
             cmd.target_handle = tv.tex.vk_id;
             cmd.target_view_handle = if (tv.handle) |h| @intFromPtr(h) else tv.tex.vk_id;
+            cmd.target_width = @max(1, tv.tex.width >> @intCast(tv.base_mip_level));
+            cmd.target_height = @max(1, tv.tex.height >> @intCast(tv.base_mip_level));
         }
     }
     cmd.target_format = pass.target_format;
@@ -170,126 +172,59 @@ fn base_vulkan_render_cmd(pass: *shared.DoeRenderPass) model_render_types.Render
     };
 }
 
-pub fn vulkan_render_pass_draw(
-    pass: *shared.DoeRenderPass,
-    vertex_count: u32,
-    instance_count: u32,
-    first_vertex: u32,
-    first_instance: u32,
-) void {
-    if (comptime !shared.has_vulkan) return;
-    const rt = shared.get_runtime(pass.enc.dev) orelse {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: render pass draw: no Vulkan runtime", .{});
-        return;
-    };
+fn recordRender(pass: *shared.DoeRenderPass, cmd: model_render_types.RenderDrawCommand, clear_only: bool) void {
+    pass.enc.cmds.append(native_helpers.alloc, .{ .vulkan_render = .{
+        .command = cmd,
+        .pipeline = if (pass.pipeline) |pipeline| native_helpers.toOpaque(pipeline) else null,
+        .clear_only = clear_only,
+    } }) catch std.debug.panic("Vulkan render: OOM recording draw state", .{});
+}
 
+pub fn vulkan_render_pass_draw(pass: *shared.DoeRenderPass, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) void {
     var cmd = base_vulkan_render_cmd(pass);
     cmd.vertex_count = vertex_count;
     cmd.instance_count = instance_count;
     cmd.first_vertex = first_vertex;
     cmd.first_instance = first_instance;
     populate_draw_cmd_from_pass(&cmd, pass);
-
-    _ = rt.run_render_draw(cmd) catch |err| {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: run_render_draw failed: {s}", .{@errorName(err)});
-        return;
-    };
-    if (pass.pipeline) |pipeline| {
-        program_identity_trace.recordVulkanRenderDraw(
-            pipeline,
-            vertex_count,
-            instance_count,
-            first_vertex,
-            first_instance,
-        );
-    }
+    recordRender(pass, cmd, false);
 }
 
-pub fn vulkan_render_pass_draw_indexed(
-    pass: *shared.DoeRenderPass,
-    index_count: u32,
-    instance_count: u32,
-    first_index: u32,
-    base_vertex: i32,
-    first_instance: u32,
-) void {
-    if (comptime !shared.has_vulkan) return;
-    const rt = shared.get_runtime(pass.enc.dev) orelse {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: render pass draw_indexed: no Vulkan runtime", .{});
-        return;
-    };
-
+pub fn vulkan_render_pass_draw_indexed(pass: *shared.DoeRenderPass, index_count: u32, instance_count: u32, first_index: u32, base_vertex: i32, first_instance: u32) void {
     var cmd = base_vulkan_render_cmd(pass);
     cmd.instance_count = instance_count;
     cmd.first_instance = first_instance;
     cmd.index_count = index_count;
     cmd.first_index = first_index;
     cmd.base_vertex = base_vertex;
-    cmd.index_binding = if (pass.index_buffer) |idx_buf| .{
-        .handle = @ptrCast(idx_buf),
-        .offset = pass.index_offset,
-        .size = pass.index_buffer_size,
-        .format = pass.index_format,
-    } else null;
     populate_draw_cmd_from_pass(&cmd, pass);
-
-    _ = rt.run_render_draw(cmd) catch |err| {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: run_render_draw (indexed) failed: {s}", .{@errorName(err)});
-    };
+    recordRender(pass, cmd, false);
 }
 
 pub fn vulkan_render_pass_draw_indirect(pass: *shared.DoeRenderPass, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) void {
-    if (comptime !shared.has_vulkan) return;
-    const indirect_buf = native_helpers.cast(shared.DoeBuffer, indirect_buffer_raw) orelse return;
-    if (indirect_buf.error_object) return;
-    if (indirect_buf.vk_id == 0) return;
-    const rt = shared.get_runtime(pass.enc.dev) orelse return;
-
+    const indirect = native_helpers.cast(shared.DoeBuffer, indirect_buffer_raw) orelse return;
+    if (indirect.error_object or indirect.vk_id == 0) return;
     var cmd = base_vulkan_render_cmd(pass);
-    cmd.indirect_buffer_handle = indirect_buf.vk_id;
+    cmd.indirect_buffer_handle = indirect.vk_id;
     cmd.indirect_offset = indirect_offset;
     populate_draw_cmd_from_pass(&cmd, pass);
-
-    _ = rt.run_render_draw(cmd) catch |err| {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: run_render_draw (indirect) failed: {s}", .{@errorName(err)});
-    };
+    recordRender(pass, cmd, false);
 }
 
 pub fn vulkan_render_pass_draw_indexed_indirect(pass: *shared.DoeRenderPass, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) void {
-    if (comptime !shared.has_vulkan) return;
-    const indirect_buf = native_helpers.cast(shared.DoeBuffer, indirect_buffer_raw) orelse return;
-    if (indirect_buf.error_object) return;
-    if (indirect_buf.vk_id == 0) return;
-    const rt = shared.get_runtime(pass.enc.dev) orelse return;
-
+    const indirect = native_helpers.cast(shared.DoeBuffer, indirect_buffer_raw) orelse return;
+    if (indirect.error_object or indirect.vk_id == 0) return;
     var cmd = base_vulkan_render_cmd(pass);
-    cmd.indirect_buffer_handle = indirect_buf.vk_id;
+    cmd.indirect_buffer_handle = indirect.vk_id;
     cmd.indirect_offset = indirect_offset;
-    cmd.index_binding = if (pass.index_buffer) |idx_buf| .{
-        .handle = @ptrCast(idx_buf),
-        .offset = pass.index_offset,
-        .size = pass.index_buffer_size,
-        .format = pass.index_format,
-    } else null;
+    cmd.index_count = 0;
     populate_draw_cmd_from_pass(&cmd, pass);
-
-    _ = rt.run_render_draw(cmd) catch |err| {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: run_render_draw (indexed indirect) failed: {s}", .{@errorName(err)});
-    };
+    recordRender(pass, cmd, false);
 }
 
 pub fn vulkan_render_pass_end(pass: *shared.DoeRenderPass) void {
-    if (comptime !shared.has_vulkan) return;
     if (pass.recorded_draw_count != 0) return;
-    const rt = shared.get_runtime(pass.enc.dev) orelse {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: render pass clear: no Vulkan runtime", .{});
-        return;
-    };
-
     var cmd = base_vulkan_render_cmd(pass);
     populate_draw_cmd_from_pass(&cmd, pass);
-
-    _ = rt.run_render_clear(cmd) catch |err| {
-        shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: run_render_clear failed: {s}", .{@errorName(err)});
-    };
+    recordRender(pass, cmd, true);
 }

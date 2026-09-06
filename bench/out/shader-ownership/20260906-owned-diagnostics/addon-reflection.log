@@ -1,0 +1,1 @@
+passed: native addon distinguishes empty reflection from failed extraction and recovers

@@ -1,5 +1,6 @@
 const std = @import("std");
 const program_identity_trace = @import("../diagnostics/doe_program_identity_trace.zig");
+const leases = @import("../../contracts/resource_lease.zig");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 
@@ -21,15 +22,11 @@ pub fn cast(comptime T: type, p: ?*anyopaque) ?*T {
 
 pub fn object_add_ref(comptime T: type, raw: ?*anyopaque) void {
     const obj = cast(T, raw) orelse return;
-    obj.ref_count +|= 1;
+    leases.retainCount(&obj.ref_count);
 }
 
 pub fn object_should_destroy(obj: anytype) bool {
-    if (obj.ref_count > 1) {
-        obj.ref_count -= 1;
-        return false;
-    }
-    return true;
+    return leases.releaseCount(&obj.ref_count);
 }
 
 pub fn toOpaque(p: anytype) ?*anyopaque {

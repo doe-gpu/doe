@@ -230,10 +230,7 @@ pub fn doeNativeQueueFamilySupportsGraphics(q_raw: ?*anyopaque) u32 {
 
 pub fn doeNativeQueueRelease(raw: ?*anyopaque) void {
     const q = cast(DoeQueue, raw) orelse return;
-    if (q.ref_count > 1) {
-        q.ref_count -= 1;
-        return;
-    }
+    if (!native_helpers.object_should_destroy(q)) return;
     native_helpers.label_store.remove(raw);
     if (q.dev.queue == q) {
         q.dev.queue = null;
@@ -268,8 +265,7 @@ pub fn doeNativeQueueRelease(raw: ?*anyopaque) void {
 }
 
 pub fn doeNativeQueueAddRef(raw: ?*anyopaque) void {
-    const q = cast(DoeQueue, raw) orelse return;
-    q.ref_count +|= 1;
+    native_helpers.object_add_ref(DoeQueue, raw);
 }
 
 const MAX_GLOBAL_WORK_DONE: usize = 128;

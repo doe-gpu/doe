@@ -1,0 +1,546 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Zig build measurement receipt",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "status"
+  ],
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "status",
+        "measurementClass",
+        "buildStep",
+        "optimize",
+        "cleanCompile",
+        "noChangeCompile",
+        "editCompiles",
+        "command",
+        "profile",
+        "profileSha256",
+        "sourceTreeSha256",
+        "snapshotInputs",
+        "sourceChangedDuringCapture",
+        "captureToolChangedDuringCapture",
+        "captureToolSha256",
+        "host",
+        "toolchain"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 3
+        },
+        "status": {
+          "enum": [
+            "captured",
+            "failure"
+          ]
+        },
+        "measurementClass": {
+          "const": "diagnostic-only"
+        },
+        "buildStep": {
+          "type": "string"
+        },
+        "optimize": {
+          "type": "string"
+        },
+        "cleanCompile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "elapsedNs",
+            "exitCode",
+            "peakResidentBytes",
+            "residentScope",
+            "userCpuNs",
+            "systemCpuNs",
+            "stderr",
+            "stderrSha256",
+            "stdout",
+            "stdoutSha256",
+            "artifacts"
+          ],
+          "properties": {
+            "elapsedNs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "exitCode": {
+              "type": "integer"
+            },
+            "peakResidentBytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "residentScope": {
+              "const": "wait4-largest-process-in-build-tree"
+            },
+            "userCpuNs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "systemCpuNs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "stderr": {
+              "type": "string"
+            },
+            "stderrSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "stdout": {
+              "type": "string"
+            },
+            "stdoutSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path",
+                  "sha256",
+                  "sizeBytes"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "sizeBytes": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "noChangeCompile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "elapsedNs",
+            "exitCode",
+            "peakResidentBytes",
+            "residentScope",
+            "userCpuNs",
+            "systemCpuNs",
+            "stderr",
+            "stderrSha256",
+            "stdout",
+            "stdoutSha256"
+          ],
+          "properties": {
+            "elapsedNs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "exitCode": {
+              "type": "integer"
+            },
+            "peakResidentBytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "residentScope": {
+              "const": "wait4-largest-process-in-build-tree"
+            },
+            "userCpuNs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "systemCpuNs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "stderr": {
+              "type": "string"
+            },
+            "stderrSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "stdout": {
+              "type": "string"
+            },
+            "stdoutSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "editCompiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "elapsedNs",
+              "exitCode",
+              "peakResidentBytes",
+              "residentScope",
+              "userCpuNs",
+              "systemCpuNs",
+              "stderr",
+              "stderrSha256",
+              "stdout",
+              "stdoutSha256",
+              "id",
+              "path",
+              "beforeSha256",
+              "afterSha256",
+              "artifacts",
+              "restoreCompile"
+            ],
+            "properties": {
+              "elapsedNs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "exitCode": {
+                "type": "integer"
+              },
+              "peakResidentBytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "residentScope": {
+                "const": "wait4-largest-process-in-build-tree"
+              },
+              "userCpuNs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "systemCpuNs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "stderr": {
+                "type": "string"
+              },
+              "stderrSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "stdout": {
+                "type": "string"
+              },
+              "stdoutSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "id": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "beforeSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "afterSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "artifacts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "path",
+                    "sha256",
+                    "sizeBytes"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "sizeBytes": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "restoreCompile": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "elapsedNs",
+                  "exitCode",
+                  "peakResidentBytes",
+                  "residentScope",
+                  "userCpuNs",
+                  "systemCpuNs",
+                  "stderr",
+                  "stderrSha256",
+                  "stdout",
+                  "stdoutSha256"
+                ],
+                "properties": {
+                  "elapsedNs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "exitCode": {
+                    "type": "integer"
+                  },
+                  "peakResidentBytes": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "residentScope": {
+                    "const": "wait4-largest-process-in-build-tree"
+                  },
+                  "userCpuNs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "systemCpuNs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "stderr": {
+                    "type": "string"
+                  },
+                  "stderrSha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "stdout": {
+                    "type": "string"
+                  },
+                  "stdoutSha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "buildStep",
+            "optimize",
+            "snapshotRoots",
+            "edits"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "const": 1
+            },
+            "buildStep": {
+              "type": "string",
+              "minLength": 1
+            },
+            "optimize": {
+              "enum": [
+                "Debug",
+                "ReleaseSafe",
+                "ReleaseFast",
+                "ReleaseSmall"
+              ]
+            },
+            "snapshotRoots": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "edits": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "path",
+                  "before",
+                  "after"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "before": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "after": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "profileSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceTreeSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshotInputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "sourceChangedDuringCapture": {
+          "type": "boolean"
+        },
+        "captureToolChangedDuringCapture": {
+          "type": "boolean"
+        },
+        "captureToolSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "host": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "machine",
+            "operatingSystem",
+            "release"
+          ],
+          "properties": {
+            "machine": {
+              "type": "string"
+            },
+            "operatingSystem": {
+              "type": "string"
+            },
+            "release": {
+              "type": "string"
+            }
+          }
+        },
+        "toolchain": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "version"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "status",
+        "failureBoundary",
+        "diagnostic"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 3
+        },
+        "status": {
+          "const": "failure"
+        },
+        "failureBoundary": {
+          "const": "build-measurement-setup"
+        },
+        "diagnostic": {
+          "type": "string"
+        }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {},
+    "status": {},
+    "measurementClass": {},
+    "buildStep": {},
+    "optimize": {},
+    "cleanCompile": {},
+    "noChangeCompile": {},
+    "editCompiles": {},
+    "command": {},
+    "profile": {},
+    "profileSha256": {},
+    "sourceTreeSha256": {},
+    "snapshotInputs": {},
+    "sourceChangedDuringCapture": {},
+    "captureToolChangedDuringCapture": {},
+    "captureToolSha256": {},
+    "host": {},
+    "toolchain": {},
+    "failureBoundary": {},
+    "diagnostic": {}
+  }
+}

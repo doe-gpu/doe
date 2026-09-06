@@ -1,0 +1,50 @@
+//! WebGPU vertex-format identity, checked against the pinned C header.
+const std = @import("std");
+
+pub fn fromCode(code: u32) error{UnsupportedFeature}!Format {
+    return std.meta.intToEnum(Format, code) catch error.UnsupportedFeature;
+}
+
+pub const Format = enum(u32) {
+    uint8 = 0x01,
+    uint8x2 = 0x02,
+    uint8x4 = 0x03,
+    sint8 = 0x04,
+    sint8x2 = 0x05,
+    sint8x4 = 0x06,
+    unorm8 = 0x07,
+    unorm8x2 = 0x08,
+    unorm8x4 = 0x09,
+    snorm8 = 0x0A,
+    snorm8x2 = 0x0B,
+    snorm8x4 = 0x0C,
+    uint16 = 0x0D,
+    uint16x2 = 0x0E,
+    uint16x4 = 0x0F,
+    sint16 = 0x10,
+    sint16x2 = 0x11,
+    sint16x4 = 0x12,
+    unorm16 = 0x13,
+    unorm16x2 = 0x14,
+    unorm16x4 = 0x15,
+    snorm16 = 0x16,
+    snorm16x2 = 0x17,
+    snorm16x4 = 0x18,
+    float16 = 0x19,
+    float16x2 = 0x1A,
+    float16x4 = 0x1B,
+    float32 = 0x1C,
+    float32x2 = 0x1D,
+    float32x3 = 0x1E,
+    float32x4 = 0x1F,
+    uint32 = 0x20,
+    uint32x2 = 0x21,
+    uint32x3 = 0x22,
+    uint32x4 = 0x23,
+    sint32 = 0x24,
+    sint32x2 = 0x25,
+    sint32x3 = 0x26,
+    sint32x4 = 0x27,
+    unorm10_10_10_2 = 0x28,
+    unorm8x4_bgra = 0x29,
+};

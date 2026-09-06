@@ -50,6 +50,9 @@ const RecordedRenderCmd = std.meta.TagPayloadByName(native_cmds.RecordedCmd, "re
 
 const texture_sampler = @import("../resource/doe_texture_sampler_native.zig");
 const render_pipeline = @import("doe_render_pipeline_native.zig");
+const references = @import("../command/doe_command_references.zig");
+const native_exports = @import("../support/doe_native_exports.zig");
+const query_native = @import("../resource/doe_query_native.zig");
 
 // Re-export texture/sampler symbols for callers that import doe_render_native.
 pub const doeNativeDeviceCreateTexture = texture_sampler.doeNativeDeviceCreateTexture;
@@ -96,18 +99,22 @@ fn reserve_render_draw(pass: *DoeRenderPass) bool {
 pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPURenderPassDescriptor) callconv(.c) ?*anyopaque {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return null;
     const pass = make(DoeRenderPass) orelse return null;
+    native_helpers.object_add_ref(DoeCommandEncoder, enc_raw);
     pass.* = .{
         .enc = enc,
+        .owns_encoder = true,
         .recorded_command_start = enc.cmds.items.len,
     };
     if (desc) |d| {
         pass.max_draw_count = renderPassMaxDrawCount(d);
         pass.occlusion_query_set = d.occlusionQuerySet;
+        query_native.retainRecordedReference(enc, d.occlusionQuerySet);
         if (d.colorAttachmentCount > 0) {
             if (d.colorAttachments) |attachments| {
                 const att = attachments[0];
                 const tv = cast(DoeTextureView, att.view);
                 if (tv) |v| {
+                    references.retainTextureView(alloc, &enc.references, v);
                     pass.target = if (texture_sampler.d3d12_texture_view_registry.contains(att.view))
                         v.tex.mtl
                     else if (v.handle) |handle|
@@ -119,6 +126,7 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
                     pass.sample_count = if (v.tex.sample_count != 0) v.tex.sample_count else 1;
                 }
                 if (cast(DoeTextureView, att.resolveTarget)) |resolve_view| {
+                    references.retainTextureView(alloc, &enc.references, resolve_view);
                     pass.resolve_target = resolve_view.tex.mtl;
                     pass.resolve_target_view_handle = @intFromPtr(resolve_view);
                 }
@@ -134,6 +142,7 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
         if (d.depthStencilAttachment != null) {
             const depth_att: *const abi_pipeline.WGPURenderPassDepthStencilAttachment = @ptrCast(d.depthStencilAttachment);
             if (cast(DoeTextureView, depth_att.view)) |v| {
+                references.retainTextureView(alloc, &enc.references, v);
                 pass.depth_target = if (texture_sampler.d3d12_texture_view_registry.contains(depth_att.view))
                     v.tex.mtl
                 else if (v.handle) |handle|
@@ -160,6 +169,7 @@ pub export fn doeNativeRenderPassSetPipeline(pass_raw: ?*anyopaque, pip_raw: ?*a
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
     pass.pipeline = cast(DoeRenderPipeline, pip_raw);
     if (pass.pipeline) |pipeline| {
+        references.retainRenderPipeline(alloc, &pass.enc.references, pipeline);
         pass.depth_compare = pipeline.depth_compare;
         pass.depth_write_enabled = pipeline.depth_write_enabled;
     }
@@ -247,6 +257,7 @@ pub export fn doeNativeRenderPassSetVertexBuffer(pass_raw: ?*anyopaque, slot: u3
     if (slot >= native_shared.MAX_VERTEX_BUFFERS) return;
     const buffer = cast(DoeBuffer, buffer_raw);
     if (buffer != null and buffer.?.error_object) return;
+    if (buffer) |value| references.retainBuffer(alloc, &pass.enc.references, value);
     pass.vertex_buffers[slot] = buffer;
     pass.vertex_buffer_offsets[slot] = offset;
     pass.vertex_buffer_sizes[slot] = size;
@@ -256,6 +267,7 @@ pub export fn doeNativeRenderPassSetIndexBuffer(pass_raw: ?*anyopaque, buffer_ra
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
     const buffer = cast(DoeBuffer, buffer_raw);
     if (buffer != null and buffer.?.error_object) return;
+    if (buffer) |value| references.retainBuffer(alloc, &pass.enc.references, value);
     pass.index_buffer = buffer;
     pass.index_format = format;
     pass.index_offset = offset;
@@ -266,6 +278,7 @@ pub export fn doeNativeRenderPassSetBindGroup(pass_raw: ?*anyopaque, group_index
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
     if (group_index >= native_shared.MAX_RENDER_BIND_GROUPS) return;
     pass.bind_groups[group_index] = cast(DoeBindGroup, group_raw);
+    if (pass.bind_groups[group_index]) |group| references.retainBindGroup(alloc, &pass.enc.references, group);
     _ = dynamic_offset_count;
     _ = dynamic_offsets;
 }
@@ -389,6 +402,7 @@ fn base_render_cmd(pass: *DoeRenderPass, pip: ?*DoeRenderPipeline) RecordedRende
 pub export fn doeNativeRenderPassDrawIndirect(pass_raw: ?*anyopaque, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
     if (!reserve_render_draw(pass)) return;
+    if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| references.retainBuffer(alloc, &pass.enc.references, buffer);
     if (pass.enc.dev.backend == .vulkan) {
         const vk_render = @import("../vulkan/vulkan_render_native.zig");
         vk_render.vulkan_render_pass_draw_indirect(pass, indirect_buffer_raw, indirect_offset);
@@ -408,6 +422,7 @@ pub export fn doeNativeRenderPassDrawIndirect(pass_raw: ?*anyopaque, indirect_bu
 pub export fn doeNativeRenderPassDrawIndexedIndirect(pass_raw: ?*anyopaque, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
     if (!reserve_render_draw(pass)) return;
+    if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| references.retainBuffer(alloc, &pass.enc.references, buffer);
     if (pass.enc.dev.backend == .vulkan) {
         const vk_render = @import("../vulkan/vulkan_render_native.zig");
         vk_render.vulkan_render_pass_draw_indexed_indirect(pass, indirect_buffer_raw, indirect_offset);
@@ -455,7 +470,9 @@ pub export fn doeNativeRenderPassEnd(raw: ?*anyopaque) callconv(.c) void {
 
 pub export fn doeNativeRenderPassRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeRenderPass, raw)) |p| {
+        if (!native_helpers.object_should_destroy(p)) return;
         label_store.remove(raw);
+        if (p.owns_encoder) native_exports.doeNativeCommandEncoderRelease(toOpaque(p.enc));
         alloc.destroy(p);
     }
 }

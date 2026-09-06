@@ -1,0 +1,2 @@
+cd runtime/zig
+zig build test test-wgsl dropin dropin-compute dropin-full -Doptimize=ReleaseFast --summary all

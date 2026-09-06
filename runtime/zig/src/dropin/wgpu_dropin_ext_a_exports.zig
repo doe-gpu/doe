@@ -384,12 +384,14 @@ pub export fn wgpuQueueAddRef(a0: types.WGPUQueue) callconv(.c) void {
     native.doeNativeQueueAddRef(a0);
 }
 
-pub export fn wgpuRenderBundleAddRef(_: render.RenderBundle) callconv(.c) void {
-    // Render bundles are opaque Doe allocations; no ref counting yet.
+pub export fn wgpuRenderBundleAddRef(raw: render.RenderBundle) callconv(.c) void {
+    const bundles = @import("../runtime/render/render_bundle.zig");
+    native.object_add_ref(bundles.DoeRenderBundle, raw);
 }
 
-pub export fn wgpuRenderBundleEncoderAddRef(_: render.RenderBundleEncoder) callconv(.c) void {
-    // Render bundle encoders are opaque Doe allocations; no ref counting yet.
+pub export fn wgpuRenderBundleEncoderAddRef(raw: render.RenderBundleEncoder) callconv(.c) void {
+    const bundles = @import("../runtime/render/render_bundle.zig");
+    native.object_add_ref(bundles.DoeBundleEncoder, raw);
 }
 
 pub export fn wgpuRenderBundleEncoderDraw(a0: render.RenderBundleEncoder, a1: u32, a2: u32, a3: u32, a4: u32) callconv(.c) void {

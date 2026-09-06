@@ -518,7 +518,7 @@ test "vulkan upload: is_depth_stencil false for color formats" {
 // ============================================================
 
 test "vulkan upload: vertex format Float32x4 maps to R32G32B32A32_SFLOAT" {
-    const vk_fmt = try vk_formats.wgpu_vertex_format_to_vk(0x1C); // FLOAT32X4
+    const vk_fmt = try vk_formats.wgpu_vertex_format_to_vk(0x1F); // FLOAT32X4
     try std.testing.expectEqual(vk_formats.VK_FORMAT_R32G32B32A32_SFLOAT, vk_fmt);
 }
 

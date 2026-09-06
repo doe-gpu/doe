@@ -272,16 +272,16 @@ test "doeNativeComputePipelineRelease with null does not crash" {
     shader.doeNativeComputePipelineRelease(null);
 }
 
-test "doeNativeShaderModuleGetBindings with null returns 0" {
+test "doeNativeShaderModuleGetBindings with null reports invalid shader" {
     const count = shader.doeNativeShaderModuleGetBindings(null, null, 0);
-    try std.testing.expectEqual(@as(usize, 0), count);
+    try std.testing.expectEqual(std.math.maxInt(usize), count);
 }
 
-test "doeNativeShaderModuleGetBindings with invalid magic returns 0" {
+test "doeNativeShaderModuleGetBindings with invalid magic reports invalid shader" {
     var fake = native.DoeShaderModule{};
     fake.magic = native.DoeBuffer.TYPE_MAGIC;
     const count = shader.doeNativeShaderModuleGetBindings(native.toOpaque(&fake), null, 0);
-    try std.testing.expectEqual(@as(usize, 0), count);
+    try std.testing.expectEqual(std.math.maxInt(usize), count);
 }
 
 // ============================================================

@@ -2,6 +2,7 @@ const std = @import("std");
 const rb = @import("../../src/runtime/render/render_bundle.zig");
 const native = @import("../../src/native/mod.zig");
 const doebundle = @import("../../src/native/render/doe_bundle_native.zig");
+const command_references = @import("../../src/native/command/doe_command_references.zig");
 
 const TEST_DEVICE_MAGIC: u32 = 0xD0E1_0003;
 const TEST_CMD_ENCODER_MAGIC: u32 = 0xD0E1_000B;
@@ -18,7 +19,7 @@ const DoeRenderBundle = rb.DoeRenderBundle;
 // ============================================================
 
 // Create an encoder using the testing allocator instead of the global allocator
-// so tests do not depend on set_allocator / alloc() initialization.
+// so each fixture owns its allocations explicitly.
 fn make_test_encoder(allocator: std.mem.Allocator) DoeBundleEncoder {
     return .{
         .allocator = allocator,
@@ -73,6 +74,7 @@ fn make_native_render_pass(enc: *native.DoeCommandEncoder) native.DoeRenderPass 
     return .{
         .magic = TEST_RENDER_PASS_MAGIC,
         .enc = enc,
+        .target_format = 0x04,
     };
 }
 
@@ -309,6 +311,7 @@ test "executeBundles replays indexed indirect bundles with fresh replay state" {
     var dev = make_native_device();
     var cmd_enc = make_native_command_encoder(&dev);
     defer cmd_enc.cmds.deinit(native.alloc);
+    defer command_references.releaseAll(&cmd_enc.references);
 
     var render_pass = make_native_render_pass(&cmd_enc);
 
@@ -396,6 +399,7 @@ test "executeBundles skips indexed indirect draws without an index buffer" {
     var dev = make_native_device();
     var cmd_enc = make_native_command_encoder(&dev);
     defer cmd_enc.cmds.deinit(native.alloc);
+    defer command_references.releaseAll(&cmd_enc.references);
 
     var render_pass = make_native_render_pass(&cmd_enc);
 
@@ -420,6 +424,7 @@ test "executeBundles preserves render pass ops and bundle pipeline metadata" {
     var dev = make_native_device();
     var cmd_enc = make_native_command_encoder(&dev);
     defer cmd_enc.cmds.deinit(native.alloc);
+    defer command_references.releaseAll(&cmd_enc.references);
 
     var render_pass = make_native_render_pass(&cmd_enc);
     render_pass.color_load_op = 0x00000002;
@@ -541,14 +546,11 @@ test "check_compatibility skips sample count check when bundle sample_count is 0
 }
 
 // ============================================================
-// make_bundle_encoder via global allocator
+// make_bundle_encoder with an explicit allocator
 // ============================================================
 
 test "make_bundle_encoder produces valid encoder with correct fields" {
-    rb.set_allocator(std.testing.allocator);
-    defer rb.set_allocator(std.testing.allocator); // keep stable for other tests
-
-    const enc = rb.make_bundle_encoder(0x04, 0x20, 4, true, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0x20, 4, true, false) orelse
         return error.AllocationFailed;
 
     try std.testing.expectEqual(DoeBundleEncoder.TYPE_MAGIC, enc.magic);
@@ -564,9 +566,7 @@ test "make_bundle_encoder produces valid encoder with correct fields" {
 }
 
 test "make_bundle_encoder normalizes zero sample_count to 1" {
-    rb.set_allocator(std.testing.allocator);
-
-    const enc = rb.make_bundle_encoder(0x04, 0, 0, false, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0, 0, false, false) orelse
         return error.AllocationFailed;
     defer destroy_heap_encoder(enc);
 
@@ -578,9 +578,7 @@ test "make_bundle_encoder normalizes zero sample_count to 1" {
 // ============================================================
 
 test "full lifecycle: create encoder, record, finish, destroy" {
-    rb.set_allocator(std.testing.allocator);
-
-    const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
     defer destroy_heap_encoder(enc);
 
@@ -617,9 +615,7 @@ test "cast_bundle returns null for null input" {
 }
 
 test "cast_bundle_encoder validates magic" {
-    rb.set_allocator(std.testing.allocator);
-
-    const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
     defer destroy_heap_encoder(enc);
 
@@ -631,9 +627,7 @@ test "cast_bundle_encoder validates magic" {
 }
 
 test "cast_bundle validates magic" {
-    rb.set_allocator(std.testing.allocator);
-
-    const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
     defer destroy_heap_encoder(enc);
 
@@ -738,9 +732,7 @@ test "MAX_BINDINGS_PER_GROUP is 16" {
 // ============================================================
 
 test "replay sequence: all command types recorded and data preserved" {
-    rb.set_allocator(std.testing.allocator);
-
-    const enc = rb.make_bundle_encoder(0x04, 0x20, 4, false, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0x20, 4, false, false) orelse
         return error.AllocationFailed;
     defer destroy_heap_encoder(enc);
 
@@ -877,9 +869,7 @@ test "replay sequence: all command types recorded and data preserved" {
 }
 
 test "replay sequence: multiple bind groups in replay order" {
-    rb.set_allocator(std.testing.allocator);
-
-    const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
     defer destroy_heap_encoder(enc);
 
@@ -919,9 +909,7 @@ test "replay sequence: multiple bind groups in replay order" {
 }
 
 test "replay sequence: multiple vertex buffer slots" {
-    rb.set_allocator(std.testing.allocator);
-
-    const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
+    const enc = rb.make_bundle_encoder(std.testing.allocator, 0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
     defer destroy_heap_encoder(enc);
 

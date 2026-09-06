@@ -1,5 +1,72 @@
 # Shader compiler architecture
 
+## Diagnostic and reflection ownership
+
+The addon rejects failed or oversized reflection results before allocating a
+JavaScript array or reading native metadata. Bun FFI also checks both the count
+query and publication result. A valid empty interface still produces an empty
+array. Compilation-info JSON snapshots are thread-local boundary storage, and
+module diagnostics are read under the reflection publication lock.
+
+Shader handles retain their creating device. Pipeline creation rejects a shader
+from another logical device. Metal adapters own their underlying device handle;
+logical devices retain the adapter and own independent library and archive
+caches. Releasing one logical device does not invalidate another device's cache.
+The process-wide archive flush entry point enumerates live caches without owning
+or sharing them. Compilation locks are per archive.
+
+Compiler entry points accepting `Diagnostic` keep parser, semantic-analysis,
+IR-construction, transformation, and emitter failures in the supplied value.
+The diagnostic owns bounded message and context storage without allocating.
+Views returned by that value remain valid until the owner is changed or
+released. Native shader requests use that explicit path and copy compilation
+messages into the shader's own storage, including allocation failures.
+
+Migration: the existing Zig `lastError*` and C `doeNativeCopyLastError*`
+interfaces remain compatibility adapters. Their state is per calling thread;
+legacy views expire at the next call on that thread. Retain a `Diagnostic`
+when results must survive another compilation. No global compilation lock is
+introduced, and shader arithmetic and successful target bytes are unchanged.
+
+Binding reflection distinguishes uncomputed, successfully published, and failed
+metadata. Failed extraction cannot publish a ready empty interface; subsequent
+queries preserve its error. A genuine zero-binding shader remains successful.
+Required source retention fails creation with `OutOfMemory`, and the WebGPU
+creation boundary still returns an error module when allocation permits it.
+
+Migration: native binding-query extensions return `SIZE_MAX` on reflection
+failure, including unavailable source and an invalid entry point. Callers must
+check that sentinel before using the returned count and may copy the native
+error details. Zero means a successfully determined empty interface. A query
+with a smaller destination still reports the complete count and copies only
+the available destination extent; internal extraction rejects a truncated
+interface. No descriptor or receipt fields change.
+
+Metal library caches belong to individual Doe devices. Exact source and the
+translation configuration determine a hit; cached libraries and shader modules
+each own a retained library reference. The translation configuration binds the
+compiler, proof policy, and runtime lowering mode. Pipeline override constants
+continue through separate compilation. Cache teardown releases only its own
+references, and failed source or metadata allocation unwinds acquired state.
+Physical Metal execution remains required to qualify this ownership correction.
+
+Render pipelines retain their device and layout after successful construction.
+Vulkan graphics code and entry-point copies are transactional: unavailable code
+is a shader validation failure, and allocation failure releases partial copies
+without publishing a pipeline. Metal pipeline publication preserves the layout
+and vertex declarations already prepared by its native owner.
+
+Migration: native rendering now retains dependencies through command-buffer
+release, and Vulkan draw execution occurs at submission. Inputs written after
+recording are therefore visible to submitted work. Vertex format values follow
+the pinned WebGPU ABI through `contracts/vertex_format.zig`; Vulkan and D3D12
+convert that exhaustive type locally, while Metal and the addon use the pinned
+C constants. Legacy flat texture-copy addon calls use the existing native
+argument order and reject origins or aspects that interface cannot represent.
+No public descriptor fields change. Broader render-pass semantics and physical
+platform coverage require their own acceptance evidence.
+
+
 ## Compute arithmetic policy
 
 `config/spirv-compute-arithmetic-policy.json` selects scalar `f32` arithmetic

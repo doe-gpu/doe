@@ -1,12 +1,11 @@
 //! Device-owned Metal libraries. Every cache hit acquires an independent lease.
 const std = @import("std");
 const translation = @import("../../compiler/wgsl/runtime/runtime_translation_info.zig");
-const bridge = @import("../../backend/dropin_resource_ops.zig").metal_bridge;
 
 const MAX_ENTRIES: usize = 64;
 pub const LibraryOps = struct {
-    retain: *const fn (?*anyopaque) callconv(.c) ?*anyopaque = bridge.metal_bridge_retain,
-    release: *const fn (?*anyopaque) callconv(.c) void = bridge.metal_bridge_release,
+    retain: *const fn (?*anyopaque) callconv(.c) ?*anyopaque,
+    release: *const fn (?*anyopaque) callconv(.c) void,
 };
 const Entry = struct {
     source: []const u8,
@@ -26,7 +25,7 @@ pub const Cache = struct {
     mutex: std.Thread.Mutex = .{},
     entries: [MAX_ENTRIES]Entry = undefined,
     count: usize = 0,
-    ops: LibraryOps = .{},
+    ops: LibraryOps,
 
     pub fn lookup(self: *Cache, allocator: std.mem.Allocator, source: []const u8, configuration: [32]u8) error{OutOfMemory}!?Lease {
         self.mutex.lock();

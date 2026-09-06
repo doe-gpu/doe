@@ -1,5 +1,23 @@
 # Reusable compute programs
 
+## Explicit simulation state changes
+
+Descriptor version 3 adds application-owned resident state formats and exact-edit
+reset assessment. Destructive edits require explicit approval bound to the old
+program instance and invocation revision; rejected or failed updates preserve
+the old state. Earlier descriptor versions retain their existing behavior.
+The migration and error contract are in
+[reusable compute programs](../reusable-compute-programs.md#state-update-approval-migration).
+The physical integration regression exercises each available execution mode.
+State-update and independent-device qualification is retained in
+`bench/out/compute-program/20260906-state-update-qualified/summary.json`.
+Addon reflection failure qualification is retained in
+`bench/out/compute-program/20260906-explicit-failures-qualified/summary.json`;
+earlier package hashes retain their original scope. Subsequent native rendering
+ownership acceptance is tracked in [compiler and WebGPU](compiler-and-webgpu.md).
+Background preparation and a live-edit application remain the next integration
+work; this contract alone does not establish interactive responsiveness.
+
 ## Native recorded command ownership
 
 The native lifetime audit reproduced a lost copy and a crash when callers

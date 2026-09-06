@@ -833,3 +833,56 @@ test "native last-error adapters isolate concurrent shader calls" {
     }
     for (workers) |worker| if (worker.failure) |err| return err;
 }
+
+const CompilationInfoWorker = struct {
+    ready: std.Thread.ResetEvent = .{},
+    proceed: std.Thread.ResetEvent = .{},
+    failure: ?anyerror = null,
+    fn run(self: *CompilationInfoWorker) void {
+        const compilation_info = @import("../../src/native/shader/doe_shader_compilation_info_native.zig");
+        var module = native.DoeShaderModule{};
+        reflection.setCompilationMessage(&module, .@"error", "worker-cause", 7, 9);
+        const json = std.mem.span(compilation_info.doeNativeShaderModuleGetCompilationInfo(@ptrCast(&module)));
+        self.ready.set();
+        self.proceed.wait();
+        std.testing.expect(std.mem.indexOf(u8, json, "worker-cause") != null) catch |err| {
+            self.failure = err;
+        };
+    }
+};
+
+test "compilation info snapshots are thread-owned and preserve maximally escaped errors" {
+    const compilation_info = @import("../../src/native/shader/doe_shader_compilation_info_native.zig");
+    var worker = CompilationInfoWorker{};
+    const thread = try std.Thread.spawn(.{}, CompilationInfoWorker.run, .{&worker});
+    var joined = false;
+    defer if (!joined) thread.join();
+    defer worker.proceed.set();
+    worker.ready.wait();
+    var module = native.DoeShaderModule{};
+    const message = [_]u8{'"'} ** 512;
+    reflection.setCompilationMessage(&module, .@"error", &message, 3, 4);
+    const json = std.mem.span(compilation_info.doeNativeShaderModuleGetCompilationInfo(@ptrCast(&module)));
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json, .{});
+    defer parsed.deinit();
+    try std.testing.expectEqual(@as(usize, 1), parsed.value.array.items.len);
+    try std.testing.expectEqualStrings(&message, parsed.value.array.items[0].object.get("message").?.string);
+    worker.proceed.set();
+    // Joining below synchronizes the worker result before the assertion.
+    thread.join();
+    joined = true;
+    if (worker.failure) |err| return err;
+}
+
+test "shader handles retain the owning device and reject a foreign pipeline device" {
+    if (@import("builtin").os.tag != .linux) return error.SkipZigTest;
+    var device = native.DoeDevice{ .backend = .vulkan };
+    var other = native.DoeDevice{ .backend = .vulkan };
+    const handle = shader.doeNativeDeviceCreateShaderModuleWgsl(@ptrCast(&device), ZERO_BINDING_SHADER.ptr, ZERO_BINDING_SHADER.len) orelse return error.TestUnexpectedResult;
+    try std.testing.expectEqual(@as(u32, 2), device.ref_count);
+    try std.testing.expectEqual(@as(?*anyopaque, null), shader.doeNativeDeviceCreateComputePipelineMain(@ptrCast(&other), handle, null));
+    var kind: [64]u8 = undefined;
+    try std.testing.expectEqualStrings("ShaderDeviceMismatch", readErrorKind(&kind));
+    shader.doeNativeShaderModuleRelease(handle);
+    try std.testing.expectEqual(@as(u32, 1), device.ref_count);
+}

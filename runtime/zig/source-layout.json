@@ -856,9 +856,9 @@
       },
       "src/backend/d3d12/d3d12_formats.zig": {
         "decision": "Keep",
-        "moduleSha256": "98a0b26b56e260cda9a83edab9c8844c4e0826f0f1ea2d006a3735255bc760b2",
-        "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "6f2e493b258aa54416c8f604c5d9ced9d7742c2fb0db35a0ff63a99074d5226c",
+        "reviewer": "codex-render-submission/2026-09-06",
+        "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
       },
       "src/backend/d3d12/d3d12_native_runtime.zig": {
         "decision": "Keep",
@@ -940,9 +940,9 @@
       },
       "src/backend/dropin_lifecycle.zig": {
         "decision": "Keep",
-        "moduleSha256": "8fbfcaaaf43b27dca3fc98bc5237859ec6de9d5b3808c36d2677c60d1f3876e8",
-        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "128d62e3aa8452df99e99d093f29583e5367d3d25b425355a7a6b4244ebe40f6",
+        "reason": "Native lifecycle seam supplies Metal retain and release operations at device construction; the device cache has no dependency on a concrete backend or native object hub.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/backend/dropin_pipeline_cache.zig": {
         "decision": "Keep",
@@ -1312,9 +1312,9 @@
       },
       "src/backend/vulkan/vk_formats.zig": {
         "decision": "Keep",
-        "moduleSha256": "27f060038d742e1e372702b6acd8e0b2bb6c0735aaf353b12ab3d56082672bbd",
-        "reason": "Keep: reachable backend implementation shared by 6 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "27c788a47b15a11e9b752ea0b2ef1c6db55c1d76aab79bf5e53f5185abe2f6ad",
+        "reviewer": "codex-render-submission/2026-09-06",
+        "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
       },
       "src/backend/vulkan/vk_functions.zig": {
         "decision": "Keep",
@@ -2176,9 +2176,9 @@
       },
       "src/compiler/wgsl/emit/dxil/emit_dxil.zig": {
         "decision": "Keep",
-        "moduleSha256": "1de3802dfa69e07cff574720ef8f44ddae5b8253decbee888d65374faedc3d1b",
-        "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "moduleSha256": "2a194e21dde1e3cf8c91de8f935b06d79938122a54f212becc02b3b3d6ccc554",
+        "reason": "Keep: preserve component ownership while balancing owned references and reporting allocation failure explicitly.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/compiler/wgsl/emit/dxil/emit_dxil_native.zig": {
         "decision": "Keep",
@@ -2368,9 +2368,9 @@
       },
       "src/compiler/wgsl/frontend/parser.zig": {
         "decision": "Keep",
-        "moduleSha256": "ff8bdae50dc0e0b5f5584027bddd26607b959a0b9f61dc423d4c09fb36962428",
-        "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "d467873418a38bdbd079ab9fafba712e5acc0ee351aa0d99dea6923bb900763f",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/frontend/parser_attrs.zig": {
         "decision": "Keep",
@@ -2398,9 +2398,9 @@
       },
       "src/compiler/wgsl/frontend/sema.zig": {
         "decision": "Keep",
-        "moduleSha256": "5306ffcde5fdd1b2d0b6a1653c809147431b7b528eb4214e218bdadea8c49c07",
-        "reason": "Keep semantic registration and resolution together; reserve owners before allocating names so failed analysis releases every allocation.",
-        "reviewer": "codex-sema-allocation/2026-09-05"
+        "moduleSha256": "58d0796378c01963692352c15e774b527a7933d45d7c5cdc5cbcc14c8cd04097",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/frontend/sema_attrs.zig": {
         "decision": "Keep",
@@ -2458,9 +2458,9 @@
       },
       "src/compiler/wgsl/ir/ir_builder.zig": {
         "decision": "Keep",
-        "moduleSha256": "afc289b13c83c0b367058e9c179bcc7ee64707dcda5a3ba3a746531a0e00dce5",
-        "reason": "Keep typed IR construction and owned-name publication together; allocation failure cleans partial expressions and transfers functions only after entry-point allocation.",
-        "reviewer": "codex-ir-allocation/2026-09-05"
+        "moduleSha256": "7db4de67efc3a0ff91b0b69ddbac956481845c176cdb28fa43e222da39971442",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/ir/ir_const_eval.zig": {
         "decision": "Keep",
@@ -2512,15 +2512,15 @@
       },
       "src/compiler/wgsl/pipeline/analysis.zig": {
         "decision": "Keep",
-        "moduleSha256": "8a3fca20ef3ac9b25c04ebe9467194bea7d6421f6949bc806a062a07564af6ee",
-        "reason": "Keep semantic analysis and IR error translation together; preserve allocation failures as OutOfMemory rather than misclassifying them as invalid source.",
-        "reviewer": "codex-compute-fusion/2026-09-05"
+        "moduleSha256": "d15ecf46c5a8bec32ca8e487aea16c372fd6652c975e9c9c9ef14f90327ce5a3",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/pipeline/binding_reflection.zig": {
         "decision": "Keep",
-        "moduleSha256": "baba7244ef80d30b25d13e0cf029fce14f021e34cef70c788a192e3753d62b43",
-        "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "9eb49a88f6f19fe2a18d229505cb2742097ceed2e414cbb5a443c367728cd737",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/pipeline/overrides.zig": {
         "decision": "Keep",
@@ -2530,33 +2530,33 @@
       },
       "src/compiler/wgsl/pipeline/translate_csl.zig": {
         "decision": "Keep",
-        "moduleSha256": "3018e386c795f6ab01ac450e6ff9564205a92eba4efdd13ecf0d6bc88ed79f50",
-        "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "02a3fe678aac40e504bb768b0b9680ded597780d21cbcc8507dffc2d77434f61",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/pipeline/translate_dxil.zig": {
         "decision": "Keep",
-        "moduleSha256": "dcd0a8018388ff518cbfb48fefa091c92335255f574a3554dda42a9789f40e13",
-        "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "ce8294c994ea5290ca28ca7b60a7186c62d81b3aaef46550c56e5801dc345175",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/pipeline/translate_hlsl.zig": {
         "decision": "Keep",
-        "moduleSha256": "327ad70745a47e01d483c183786ef5fa850dccb366d1d614d5f94cc2db2f3ff6",
-        "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-runtime-ownership/2026-08-15"
+        "moduleSha256": "381e9e8b24b630278e23a8d10cf3ea74e752598ef8352ef50a681ea5a9bd0653",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/pipeline/translate_msl.zig": {
         "decision": "Keep",
-        "moduleSha256": "2306700393cf4c33c21c35999dbce92d08d4caf433587fbacf052cd460ac5aa8",
-        "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-runtime-ownership/2026-08-15"
+        "moduleSha256": "d6b8eacfe59c504628fb0a4fea503600815759ea4d5490faa08299a146ee39f7",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/pipeline/translate_spirv.zig": {
         "decision": "Keep",
-        "moduleSha256": "136e2f5a778e6dd2bbea35d168b5805bf62de433604e0d478830fa55ca1c64ba",
-        "reason": "Select versioned compute arithmetic before emission and preserve typed transform failures for both public and runtime translation.",
-        "reviewer": "codex-compute-fusion/2026-09-05"
+        "moduleSha256": "033e5e4c3815d935c5fd795363556451813150382348ca785f1217f113142ee8",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig": {
         "decision": "Keep",
@@ -2596,21 +2596,21 @@
       },
       "src/compiler/wgsl/runtime/runtime_compute_translation.zig": {
         "decision": "Keep",
-        "moduleSha256": "3659e5e607b8d7d99038d9430c13f982a5e2ff31a90a13660ea81d57c89db135",
-        "reason": "Preserve runtime robustness, provenance and timing while delegating arithmetic policy to the SPIR-V pipeline.",
-        "reviewer": "codex-compute-fusion/2026-09-05"
+        "moduleSha256": "945d3e8979882d41cbc2e0cd01b5d97faca1cc578d76246de5b924e12a3d9020",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/runtime/runtime_graphics_translation.zig": {
         "decision": "Keep",
-        "moduleSha256": "dc91210dfc57124f913aeabbf343403ce580e6687cafaf9a5fbae11e6131a877",
-        "reason": "Keep: graphics-stage SPIR-V is emitted once per stage with typed error metadata; stage and reflection allocations retain explicit ownership.",
-        "reviewer": "codex-compiler-diagnostics/2026-09-05"
+        "moduleSha256": "c136c0756b8d80b0b69e9db5f8ef91f635a3964cba28d3283c048dae8cb6b08b",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/runtime/runtime_translation_info.zig": {
         "decision": "Keep",
-        "moduleSha256": "8d009694fbb8d1cb28588c6ff7e00e9b17afa3fb3afcd3051cc707e02134a7d2",
-        "reason": "Keep: shared ownership and construction contract for runtime compute translation metadata.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "7a66d29cdaa5c91857cce584037f6c5a90a0cb6ac9190c9189835b0422ec1621",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/compiler/wgsl/runtime/shader_info.zig": {
         "decision": "Keep",
@@ -3208,9 +3208,9 @@
       },
       "src/dropin/wgpu_dropin_ext_a_exports.zig": {
         "decision": "Keep",
-        "moduleSha256": "3041d6a241babc2e7d3e574114c01c0acb34aacd1e78411ce91b20d85ccd0735",
-        "reason": "Keep: versioned drop-in extension export capsule and C ABI boundary.",
-        "reviewer": "codex-resource-lifetime/2026-09-06"
+        "moduleSha256": "ecfc1aa0884f05f6915eeed4f993c53271d67ab235251c8d88a4b025c48f94b7",
+        "reason": "Keep: WebGPU reference-count adapters now retain real render-bundle and encoder references rather than accepting ineffective calls.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/dropin/wgpu_dropin_ext_a_pipeline.zig": {
         "decision": "Keep",
@@ -3484,15 +3484,15 @@
       },
       "src/native/cache/doe_package_metal_pipeline_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "ed8d954427a6e0d8e708f3266f8d422d7fc118712fa6ef18dab20e186d19aa10",
-        "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-architecture-refactor/2026-08-23"
+        "moduleSha256": "ecdb3924e92799f7dba1621728560296462a434aaf724be4bdd33ca9ef45c3a7",
+        "reason": "Keep: individual logical devices own Metal archives and serialize their own compilation; the legacy flush registry only enumerates live owners.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/native/command/doe_encoder_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "3f8f46c13450e7da1dfc75ba8c4cd40fd18b467d5c1eb592a6a35f3de7ebec68",
-        "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "f410cec26854695978a79d1c38242a82affd53180a14b7a1a22bbe23cbc66455",
+        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/command/doe_immediates_external_native.zig": {
         "decision": "Keep",
@@ -3508,15 +3508,15 @@
       },
       "src/native/compute/doe_compute_ext_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "a9a792e45ede48afd0f306453ec7637bb07f8fb5ddd9f56c51e05da66a728aef",
-        "reason": "Keep: native compute extension ABI boundary consumed by the core export surface.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "3df3a450f320d801015ef3537a91e2aa691386ac813041fb3344d34c567a9aee",
+        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/compute/doe_compute_fast.zig": {
         "decision": "Keep",
-        "moduleSha256": "e5c77666a0ec82b2b7058aef6b04b20470961e45dc42b00099094d481b7cf4c7",
-        "reason": "Keep: promoted native fast-compute API and execution boundary; Vulkan bindings and backend implementation have separate owners.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "b50b9632456d64a6403cffdf69afd77a4668923597392ba9ed7a3d11ca1bfeaa",
+        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/compute/doe_compute_fast_vulkan.zig": {
         "decision": "Keep",
@@ -3556,9 +3556,9 @@
       },
       "src/native/lifecycle/doe_instance_device_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "9522e68c5cc3b4865677f9633c330ada426a1db0a3ec5d629062d12b177eb717",
-        "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-hexagonal-migration/2026-08-22"
+        "moduleSha256": "26fbe0b79e09fd6331893012fd1fe2f502501fcfcd015fbf2b07e5bdcda6229c",
+        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/mod.zig": {
         "decision": "Keep",
@@ -3580,9 +3580,9 @@
       },
       "src/native/queue/doe_queue_lifecycle.zig": {
         "decision": "Keep",
-        "moduleSha256": "56e26697e29b4fbda7b20d15c585a6b05386348d63290415a831bf9c5f43612b",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-doe-completion/2026-08-24"
+        "moduleSha256": "75da5955ab3b9a526c8a0de7700271c79ec9998ea0ac6bcfcad6d109130adf26",
+        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/queue/doe_queue_submit_d3d12.zig": {
         "decision": "Keep",
@@ -3592,9 +3592,9 @@
       },
       "src/native/queue/doe_queue_submit_metal.zig": {
         "decision": "Keep",
-        "moduleSha256": "ef1b0f92e39941fca90844bc85ae08e7c30330a2cb2c2413a1f3f23417d5671a",
-        "reason": "Keep: authoritative Metal recorded-command submission, encoder lifetime, synchronization, and backend resource-binding boundary.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "0a6db901c77d1769a61cf2db7c9f7c8c76323f2ea1a6d8724fb7a51a6c48998f",
+        "reason": "Keep: snapshot Vulkan draw inputs at recording and execute them in submission order, retaining native resources and matching attachment dimensions.",
+        "reviewer": "codex-render-submission/2026-09-06"
       },
       "src/native/queue/doe_queue_submit_native.zig": {
         "decision": "Keep",
@@ -3610,21 +3610,21 @@
       },
       "src/native/queue/doe_queue_submit_vulkan.zig": {
         "decision": "Keep",
-        "moduleSha256": "1816938e79d7e54cb3f6088d335b6e6ca35f823f0881d9302019a3d7388eb9eb",
-        "reason": "Keep: query resolution remains in recorded GPU work; normalize, copy, and later consumers share submission order without a CPU query round trip.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "f43881ae7df3a7e38b3587ebafbc722d854351e0197c5f38a6f751797410c367",
+        "reason": "Keep: snapshot Vulkan draw inputs at recording and execute them in submission order, retaining native resources and matching attachment dimensions.",
+        "reviewer": "codex-render-submission/2026-09-06"
       },
       "src/native/render/doe_bundle_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "30ddc87e723a14d78d4dbda0d31d23f37b02093c05894736e852c4f464a63f7c",
-        "reason": "Keep: render-bundle object lifecycle and command ABI capsule.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "2b167abd6f7df36a3c9420e391806c6e603444b25442eaeb55e322cb63a8366d",
+        "reason": "Keep: render owners validate shader device and bundle signature, retain recorded resources, and finalize only after the last lease.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/render/doe_render_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "139d2c13b2d9e9aac024af33ecb2250f008462902589f12b4f28c75cc2f6ba4c",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "4f7d52096d87eb1787d947961dbe0b3840f94f5f69c69874870018510e12114f",
+        "reason": "Keep: render objects and bundles retain dependencies through command ownership and release only their final references; allocator and device lifetimes are explicit.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/render/doe_render_pass_controls_native.zig": {
         "decision": "Keep",
@@ -3634,9 +3634,9 @@
       },
       "src/native/render/doe_render_pipeline_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "380935081ebb1dee0dae38090ab6360ab9a94331cae10b2673f481d4740d8fd2",
-        "reason": "Keep: render-pipeline creation, validation, and object-lifetime capsule.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "86f2799d9604d294551ca62269383909fff82df92786127b56639ef4730da923",
+        "reason": "Keep: render pipeline construction retains device and layout ownership after successful publication and preserves prepared vertex layouts when publishing Metal state.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/render/doe_render_state_native.zig": {
         "decision": "Keep",
@@ -3658,21 +3658,21 @@
       },
       "src/native/resource/doe_command_texture_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "322f3838f5e05d5e3103b73f49468aafde46ee2b2b84172e21f02c8fc0420826",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "d5ff9406e62fdb703d5f76b25175e9ad8fd805dcaed7893b204258756f89d01e",
+        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/resource/doe_external_texture_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "823c13b7bf7e8470cf33a3e8c45b909a97d2eeee4e69089f7e43ff7d9d0e7a4e",
-        "reason": "Keep: reachable native implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "9619554b22e8ec53b3bbf4f640d2c731429304fa1e0e5f814ece58818b5c1607",
+        "reason": "Keep: preserve component ownership while balancing owned references and reporting allocation failure explicitly.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/resource/doe_query_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "237f771542af76277b7ddfd90cbf72c3118fdf2edfae7b84ae151f58b8825248",
-        "reason": "Keep: native query sets own normalization scratch and release it with the retained pool; resolve uses the common backend conversion and validates device/ranges.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "2a16a9b2f7f52fdf4c1f0ad02abeefa028e67c4e825f9bcf5f7fbd83e6644b6e",
+        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/resource/doe_texture_sampler_native.zig": {
         "decision": "Keep",
@@ -3688,27 +3688,27 @@
       },
       "src/native/shader/doe_shader_compilation_info_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "6f7bdc62f9e6bed42080ec3990296cb2633235b53297012b16d5cce9aafabdf3",
-        "reason": "Keep: asynchronous shader compilation-info callback ABI and lifetime capsule.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "moduleSha256": "1d39c08936d3e66f9fac24f5c8e374a7b0442ce03377c1dbb8b4cff19aab4810",
+        "reason": "Keep: compilation-info JSON is a synchronized module read and a per-thread C boundary snapshot, not compiler diagnostic storage.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/native/shader/doe_shader_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "64ce3c4c36e56df68f834dc62fde6dabd470981b0e393b82e0ed87010910c639",
-        "reason": "Keep: native shader creation captures compiler causes and source locations into module-owned diagnostics; native allocation errors keep their own context.",
-        "reviewer": "codex-compiler-diagnostics/2026-09-05"
+        "moduleSha256": "88de6afe4d9a4b3214e2f7d1f0ec567272e130d5b247a3ca3e037cea8d1ac060",
+        "reason": "Keep: native shader adapters own device leases and consume instance diagnostics; library and archive ownership remain device-scoped cache owners.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/native/shader/doe_shader_translation_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "31487ba7ae2ea83224fad2c9c9533256c14eaba66c81a8f40ffb7e69a8e2d877",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "80c92ed793440096df74cd04851f8c4a18aca6363535acb45e36126a4f2c0edb",
+        "reason": "Keep: device-independent translation cache owns synchronized publication and cloning, with complete cleanup of optional allocation failures; compilation stays outside cache locking.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/shader/shader_binding_reflection.zig": {
         "decision": "Keep",
-        "moduleSha256": "2966273b7256b5327ccdb303c2c29e5166d086d092c165cfc1fa79e297a7301a",
-        "reason": "Keep: reachable native implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "a586f025beed7df1079dcadc521e14317a7132729fda60c56380b9bf301afdce",
+        "reason": "Keep: one owner publishes binding metadata or typed failure and interprets native buffer binding types.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/native/support/doe_adapter_info_native.zig": {
         "decision": "Keep",
@@ -3730,33 +3730,33 @@
       },
       "src/native/support/doe_label_store.zig": {
         "decision": "Keep",
-        "moduleSha256": "d5e7af1b00c5ee989a2624f5e3dcedd9cbc7c35f615cc1f69d7f6ec4037c2fcb",
-        "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "242c2172d17015277fdd1ee19c75551bff9ea1760e80f8b5539a78320dce782d",
+        "reason": "Keep: native object and neutral lease owners centralize atomic reference counts and synchronized label mutation without changing handle layout.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/support/doe_native_command_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "40aed5b9b908401633019be471976a3929becc518ca34f946560ad50a346ec9c",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "349ec7e55fefcdd5f4fb574018d9d297821c6fe1b59a4e803e66a4a80efa95bc",
+        "reviewer": "codex-render-submission/2026-09-06",
+        "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
       },
       "src/native/support/doe_native_exports.zig": {
         "decision": "Keep",
-        "moduleSha256": "4f53168dad4de9dc7fc6fe33e5faa2d5d5c480ef162f53b4bcf6337a42e9ef8e",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "6a97918d717cff3b9407487ce239bab25f1869ef4421f0b64c9cb6788d8270a6",
+        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/support/doe_native_object_helpers.zig": {
         "decision": "Keep",
-        "moduleSha256": "903f3b11878902e90b66048fe4b22ed2304d0e9d9cf27530767d905b2d5b1d4a",
-        "reason": "Keep: reachable native implementation shared by 40 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "ee7028417449234063c804916ed886a056db007a5bdb6dbbc2f17ec748296b56",
+        "reason": "Keep: native object and neutral lease owners centralize atomic reference counts and synchronized label mutation without changing handle layout.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/native/support/doe_native_object_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "7229762c10ab273d071264abbef58f5af21a32b7baa6916a8e9035e8e56d6810",
-        "reason": "Keep: reachable native implementation shared by 43 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "moduleSha256": "83f9105c38ab43332b0526ae8fe38b6e9bab768f3d2a0ca0e20c8f64674bbfd1",
+        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/support/doe_native_runtime_helpers.zig": {
         "decision": "Keep",
@@ -3778,15 +3778,15 @@
       },
       "src/native/vulkan/vulkan_compute_bindings.zig": {
         "decision": "Keep",
-        "moduleSha256": "19983bd1bbe03073f616cddabbbbb470215441b897eece8fea63097af7d9418f",
-        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-runtime-correction/2026-08-16"
+        "moduleSha256": "4a988ac1adfe4e63952cc36c871ed428dbd6f14e16cf8aec71f0621708235cf9",
+        "reason": "Native Vulkan binding preparation consumes one reflected buffer-type interpretation and propagates extraction failures before publishing a usable pipeline.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/native/vulkan/vulkan_compute_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "79ab04b9ecf0b32f01d6bf3ed70ecfa1d435d69ee149b11c5f26d8baa55a0835",
-        "reason": "Keep: Vulkan translation preserves compiler error unions through module and override pipeline creation while retaining explicit execution resource ownership.",
-        "reviewer": "codex-resource-lifetime/2026-09-06"
+        "moduleSha256": "8e669501ae6d00ef595558d13af6b9e1faedbd0f9909e612e08f54ed79232ab6",
+        "reason": "Native Vulkan binding preparation consumes one reflected buffer-type interpretation and propagates extraction failures before publishing a usable pipeline.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/native/vulkan/vulkan_feature_cache.zig": {
         "decision": "Keep",
@@ -3808,21 +3808,21 @@
       },
       "src/native/vulkan/vulkan_render_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "9e0b88a2a2ca4548c194258ad4f7bca2c03239a1426728b4e96cc2ad1ebf6161",
-        "reason": "Keep: reachable native implementation shared by 5 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "708cd8cead043908318645b9549120a7d419a744d22105eaf209dd70d0b9c5b8",
+        "reason": "Native Vulkan binding preparation consumes one reflected buffer-type interpretation and propagates extraction failures before publishing a usable pipeline.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
       },
       "src/native/vulkan/vulkan_render_pass_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "397782fcfed927fc96cf7dd69006da6b733488a5c3ea8d26e59eebe5b1ec9282",
-        "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-render-identity/2026-08-16"
+        "moduleSha256": "cf7751db092f827cd7a68737b2541be390cf3fcdf5452e2d5ebee1d6af3d1330",
+        "reason": "Keep: snapshot Vulkan draw inputs at recording and execute them in submission order, retaining native resources and matching attachment dimensions.",
+        "reviewer": "codex-render-submission/2026-09-06"
       },
       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "5dcf00e4df7c50a94264b8580f4219b8f89bed16c240920d6e457eee5856cad6",
-        "reason": "Keep: Vulkan graphics shader creation transfers stage binaries once and frees translation reflection state; compiler errors propagate to native diagnostics.",
-        "reviewer": "codex-compiler-diagnostics/2026-09-05"
+        "moduleSha256": "eb2e06370066910c450cb239ff6dfa6b805e967a60f5c90ae5edaf487d2d0706",
+        "reason": "Keep: Vulkan pipeline shader code and entry points are cloned transactionally; allocation failures publish no partial resources and missing compiled stages are validation errors.",
+        "reviewer": "codex-render-ownership/2026-09-06"
       },
       "src/native/vulkan/vulkan_render_shared.zig": {
         "decision": "Keep",
@@ -4090,9 +4090,9 @@
       },
       "src/runtime/render/render_bundle.zig": {
         "decision": "Keep",
-        "moduleSha256": "a290d2a51e76800f117568421f18b326cf0bd80ff1fe2e3c79a6d52feb4302c3",
-        "reason": "Keep: reachable runtime implementation shared by 6 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "4d29ba6ec0d4e9d76d734844bbb4a4d94d44422b486e66359b1c25ded48a0e10",
+        "reason": "Keep: render owners validate shader device and bundle signature, retain recorded resources, and finalize only after the last lease.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/runtime/security/wgpu_sandbox_guard.zig": {
         "decision": "Keep",
@@ -4228,9 +4228,9 @@
       },
       "src/native/compute/doe_compute_program_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "b6556017fdb2461e1ca39cbfca6122eba28a96030f579f67213829841f616f90",
-        "reason": "Keep: prepared query lifetimes remain invalidation inputs; the additive timing ABI distinguishes normalized nanoseconds from historical hardware ticks.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "0b363cb64bbf198dba9e19081c48d006fa238b7569cc5900e59384266cc34520",
+        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+        "reviewer": "codex-native-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_shared_pipeline.zig": {
         "decision": "Keep",
@@ -4264,9 +4264,39 @@
       },
       "src/native/command/doe_command_references.zig": {
         "decision": "Keep",
-        "reason": "Keep: command resource retention and release shared by encoder, compute, copy, and query recording owners.",
-        "moduleSha256": "0283557b99ace5ecf294ef5bdc762c44281b54d7aa191d53621ad6e52ba2aede",
-        "reviewer": "codex-command-ownership/2026-09-06"
+        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+        "moduleSha256": "97cb5ad4017203689cc6d78db37ee5562c21329b6ed21c2096302c01c8fd58e7",
+        "reviewer": "codex-native-ownership/2026-09-06"
+      },
+      "src/compiler/wgsl/pipeline/diagnostic.zig": {
+        "decision": "Keep",
+        "moduleSha256": "5b2baf9573212d831e2d327a6dd41996883153b6d80a5461abd13baec7d648c3",
+        "reason": "Compiler stage retains its source and lowering responsibility; explicit request-owned diagnostic and failure context replace shared mutation, with legacy boundary adapters preserved.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
+      },
+      "src/native/cache/doe_metal_library_cache.zig": {
+        "decision": "Keep",
+        "moduleSha256": "24c26216960dfb0598f53b3d26ae00bcc951637b2793c1985e0a2262b46bc8ef",
+        "reason": "Device-owned Metal library cache pairs exact source/configuration identity with independent retained shader leases and transactional allocation cleanup.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
+      },
+      "src/native/shader/shader_diagnostic.zig": {
+        "decision": "Keep",
+        "moduleSha256": "707853d0982a522f16082174b459cce6099143181efdbaccb0e64992808d3d8e",
+        "reason": "Native shader ownership separates request diagnostics, explicit reflection publication, required source retention, and device-owned library leases.",
+        "reviewer": "codex-shader-ownership/2026-09-06"
+      },
+      "src/contracts/resource_lease.zig": {
+        "decision": "Keep",
+        "moduleSha256": "d1f6757deec750f5b3dade5c1bef5c6e29ef6827db8fe837de5d068de427cb3f",
+        "reason": "Keep: native object and neutral lease owners centralize atomic reference counts and synchronized label mutation without changing handle layout.",
+        "reviewer": "codex-native-ownership/2026-09-06"
+      },
+      "src/contracts/vertex_format.zig": {
+        "decision": "Keep",
+        "moduleSha256": "9a030fbd3207e2266c6ebaa1345655a2eb4a97f323a296a5848edf63d06f57d5",
+        "reviewer": "codex-render-submission/2026-09-06",
+        "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
       }
     },
     "linePolicy": {

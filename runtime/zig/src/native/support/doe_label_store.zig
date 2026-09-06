@@ -1,6 +1,5 @@
 // doe_label_store.zig — Global label store for WebGPU object debug labels.
 // Maps opaque object handles (pointer addresses) to heap-copied label strings.
-// Thread-safety: single-threaded (Doe runtime is single-threaded per device).
 
 const std = @import("std");
 
@@ -9,33 +8,39 @@ const alloc = gpa.allocator();
 
 // Label storage: pointer address -> heap-allocated label copy.
 var labels: std.AutoHashMapUnmanaged(usize, []const u8) = .{};
+var labels_mutex: std.Thread.Mutex = .{};
 
 /// Store a label for the given object handle. Overwrites any existing label.
 /// The label string is copied to the heap; the caller's memory is not retained.
 pub fn set(handle: ?*anyopaque, data: ?[*]const u8, len: usize) void {
     const key = @intFromPtr(handle orelse return);
     if (len == 0 or data == null) return;
-    // Remove old label if present.
-    if (labels.fetchRemove(key)) |old| {
-        alloc.free(old.value);
-    }
+    labels_mutex.lock();
+    defer labels_mutex.unlock();
     const copy = alloc.alloc(u8, len) catch return;
     @memcpy(copy, data.?[0..len]);
-    labels.put(alloc, key, copy) catch {
+    const entry = labels.getOrPut(alloc, key) catch {
         alloc.free(copy);
+        return;
     };
+    if (entry.found_existing) alloc.free(entry.value_ptr.*);
+    entry.value_ptr.* = copy;
 }
 
 /// Retrieve the label for the given object handle.
 /// Returns the label slice, or an empty slice if no label is set.
 pub fn get(handle: ?*anyopaque) []const u8 {
     const key = @intFromPtr(handle orelse return "");
+    labels_mutex.lock();
+    defer labels_mutex.unlock();
     return labels.get(key) orelse "";
 }
 
 /// Remove the label for the given object handle (call on object release).
 pub fn remove(handle: ?*anyopaque) void {
     const key = @intFromPtr(handle orelse return);
+    labels_mutex.lock();
+    defer labels_mutex.unlock();
     if (labels.fetchRemove(key)) |old| {
         alloc.free(old.value);
     }

@@ -313,40 +313,40 @@ test "vertex: snorm8 formats" {
 }
 
 test "vertex: float32 formats" {
-    try testing.expectEqual(@as(u32, 41), try formats.wgpu_vertex_format_to_dxgi(0x19)); // R32_FLOAT
-    try testing.expectEqual(@as(u32, 16), try formats.wgpu_vertex_format_to_dxgi(0x1A)); // R32G32_FLOAT
-    try testing.expectEqual(@as(u32, 6), try formats.wgpu_vertex_format_to_dxgi(0x1B)); // R32G32B32_FLOAT
-    try testing.expectEqual(@as(u32, 2), try formats.wgpu_vertex_format_to_dxgi(0x1C)); // R32G32B32A32_FLOAT
+    try testing.expectEqual(@as(u32, 41), try formats.wgpu_vertex_format_to_dxgi(0x1C)); // R32_FLOAT
+    try testing.expectEqual(@as(u32, 16), try formats.wgpu_vertex_format_to_dxgi(0x1D)); // R32G32_FLOAT
+    try testing.expectEqual(@as(u32, 6), try formats.wgpu_vertex_format_to_dxgi(0x1E)); // R32G32B32_FLOAT
+    try testing.expectEqual(@as(u32, 2), try formats.wgpu_vertex_format_to_dxgi(0x1F)); // R32G32B32A32_FLOAT
 }
 
 test "vertex: float16 formats" {
-    try testing.expectEqual(@as(u32, 54), try formats.wgpu_vertex_format_to_dxgi(0x1D)); // R16_FLOAT
-    try testing.expectEqual(@as(u32, 34), try formats.wgpu_vertex_format_to_dxgi(0x1E)); // R16G16_FLOAT
-    try testing.expectEqual(@as(u32, 10), try formats.wgpu_vertex_format_to_dxgi(0x1F)); // R16G16B16A16_FLOAT
+    try testing.expectEqual(@as(u32, 54), try formats.wgpu_vertex_format_to_dxgi(0x19)); // R16_FLOAT
+    try testing.expectEqual(@as(u32, 34), try formats.wgpu_vertex_format_to_dxgi(0x1A)); // R16G16_FLOAT
+    try testing.expectEqual(@as(u32, 10), try formats.wgpu_vertex_format_to_dxgi(0x1B)); // R16G16B16A16_FLOAT
 }
 
 test "vertex: uint32 formats" {
-    try testing.expectEqual(@as(u32, 42), try formats.wgpu_vertex_format_to_dxgi(0x21)); // R32_UINT
-    try testing.expectEqual(@as(u32, 17), try formats.wgpu_vertex_format_to_dxgi(0x22)); // R32G32_UINT
-    try testing.expectEqual(@as(u32, 7), try formats.wgpu_vertex_format_to_dxgi(0x23)); // R32G32B32_UINT
-    try testing.expectEqual(@as(u32, 3), try formats.wgpu_vertex_format_to_dxgi(0x24)); // R32G32B32A32_UINT
+    try testing.expectEqual(@as(u32, 42), try formats.wgpu_vertex_format_to_dxgi(0x20)); // R32_UINT
+    try testing.expectEqual(@as(u32, 17), try formats.wgpu_vertex_format_to_dxgi(0x21)); // R32G32_UINT
+    try testing.expectEqual(@as(u32, 7), try formats.wgpu_vertex_format_to_dxgi(0x22)); // R32G32B32_UINT
+    try testing.expectEqual(@as(u32, 3), try formats.wgpu_vertex_format_to_dxgi(0x23)); // R32G32B32A32_UINT
 }
 
 test "vertex: sint32 formats" {
-    try testing.expectEqual(@as(u32, 43), try formats.wgpu_vertex_format_to_dxgi(0x25)); // R32_SINT
-    try testing.expectEqual(@as(u32, 18), try formats.wgpu_vertex_format_to_dxgi(0x26)); // R32G32_SINT
-    try testing.expectEqual(@as(u32, 8), try formats.wgpu_vertex_format_to_dxgi(0x27)); // R32G32B32_SINT
-    try testing.expectEqual(@as(u32, 4), try formats.wgpu_vertex_format_to_dxgi(0x28)); // R32G32B32A32_SINT
+    try testing.expectEqual(@as(u32, 43), try formats.wgpu_vertex_format_to_dxgi(0x24)); // R32_SINT
+    try testing.expectEqual(@as(u32, 18), try formats.wgpu_vertex_format_to_dxgi(0x25)); // R32G32_SINT
+    try testing.expectEqual(@as(u32, 8), try formats.wgpu_vertex_format_to_dxgi(0x26)); // R32G32B32_SINT
+    try testing.expectEqual(@as(u32, 4), try formats.wgpu_vertex_format_to_dxgi(0x27)); // R32G32B32A32_SINT
 }
 
 test "vertex: packed formats" {
-    try testing.expectEqual(@as(u32, 24), try formats.wgpu_vertex_format_to_dxgi(0x29)); // R10G10B10A2_UNORM
-    try testing.expectEqual(@as(u32, 87), try formats.wgpu_vertex_format_to_dxgi(0x2A)); // B8G8R8A8_UNORM
+    try testing.expectEqual(@as(u32, 24), try formats.wgpu_vertex_format_to_dxgi(0x28)); // R10G10B10A2_UNORM
+    try testing.expectEqual(@as(u32, 87), try formats.wgpu_vertex_format_to_dxgi(0x29)); // B8G8R8A8_UNORM
 }
 
 test "vertex: invalid formats return error" {
     try testing.expectError(error.UnsupportedFeature, formats.wgpu_vertex_format_to_dxgi(0x00));
-    try testing.expectError(error.UnsupportedFeature, formats.wgpu_vertex_format_to_dxgi(0x20));
+    try testing.expectError(error.UnsupportedFeature, formats.wgpu_vertex_format_to_dxgi(0x2A));
     try testing.expectError(error.UnsupportedFeature, formats.wgpu_vertex_format_to_dxgi(0x2B));
     try testing.expectError(error.UnsupportedFeature, formats.wgpu_vertex_format_to_dxgi(0xFF));
 }

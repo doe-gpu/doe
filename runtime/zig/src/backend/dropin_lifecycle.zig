@@ -8,3 +8,5 @@ pub const metal_bridge_create_default_device = metal_bridge_mod.metal_bridge_cre
 pub const metal_bridge_device_new_command_queue = metal_bridge_mod.metal_bridge_device_new_command_queue;
 pub const metal_bridge_device_new_shared_event = metal_bridge_mod.metal_bridge_device_new_shared_event;
 pub const metal_bridge_release = metal_bridge_mod.metal_bridge_release;
+
+pub const metal_bridge_retain = metal_bridge_mod.metal_bridge_retain;

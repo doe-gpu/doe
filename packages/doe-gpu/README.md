@@ -59,6 +59,18 @@ invalidates a program with resident buffers. `update()` reuses identical resourc
 and invalidates the prior recording only after replacement preparation succeeds.
 Always `await program.close()` before releasing its device.
 
+Descriptor version 3 requires `stateFormat` on every program-lifetime buffer.
+The application owns that format's meaning. A changed format, even at the same
+byte size, requires an explicit reset. `program.assessUpdate(next)` lists
+retained, replaced, discarded, and newly created state without changing it.
+Approve a particular reset with
+`program.update(next, { assessment, reset: 'approve' })`. The assessment expires
+when the program runs again; copied assessments and approvals for other edits
+are rejected. Declined resets and failed preparation preserve the old program.
+Versions 1 and 2 retain their existing update behavior. Shader edits that keep
+the declared state format promise compatible interpretation; Doe cannot infer
+the scientific meaning of bytes from WGSL.
+
 The recorded modes use the Node addon provider exported by `doe-gpu/native`,
 including Bun's Node addon support. `gpu-recorded` retains compiled Vulkan
 commands and their native pipeline/descriptor ownership. `native-recorded`

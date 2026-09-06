@@ -37,7 +37,7 @@ pub export fn doeNativeCommandEncoderClearBuffer(
     else
         size;
     if (fill_size == 0) return;
-    references.retainBuffer(&enc.references, buf);
+    references.retainBuffer(alloc, &enc.references, buf);
     enc.cmds.append(alloc, .{ .clear_buffer = .{
         .buffer = if (enc.dev.backend == .vulkan) toOpaque(buf) else buf.mtl,
         .offset = offset,
@@ -72,8 +72,8 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
     const src = cast(DoeTexture, src_texture_raw) orelse return;
     const dst = cast(DoeTexture, dst_texture_raw) orelse return;
     if (src.error_object or dst.error_object) return;
-    references.retainTexture(&enc.references, src);
-    references.retainTexture(&enc.references, dst);
+    references.retainTexture(alloc, &enc.references, src);
+    references.retainTexture(alloc, &enc.references, dst);
     enc.cmds.append(alloc, .{ .copy_texture_to_texture = .{
         .src_texture = if (enc.dev.backend == .vulkan) toOpaque(src) else src.mtl,
         .src_mip = src_mip,

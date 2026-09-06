@@ -193,6 +193,7 @@ const STORAGE_TEXTURE_ACCESS = Object.freeze({
 const MAX_COMPUTE_BIND_GROUPS = 4;
 const MAX_QUEUE_WRITE_BATCH_BYTES = 4 * 1024 * 1024;
 const SHADER_SOURCE_BYTES_CACHE_MAX_ENTRIES = 128;
+const SHADER_BINDING_BYTES = 5 * Uint32Array.BYTES_PER_ELEMENT;
 const HOT_U64_CACHE_MAX_ENTRIES = 4096;
 
 function envFlagEnabled(value) {
@@ -2410,13 +2411,19 @@ function shaderModuleBindings(shaderModule) {
     const fn = wgpu?.symbols?.doeNativeShaderModuleGetBindings;
     if (typeof fn !== "function" || !shaderModule?._native) return null;
     const count = Number(fn(shaderModule._native, null, 0n));
-    if (count <= 0) return [];
-    const raw = new ArrayBuffer(count * 20);
-    fn(shaderModule._native, new Uint8Array(raw), BigInt(count));
+    if (!Number.isSafeInteger(count) || count < 0) {
+        throw new Error(nativeFailureMessage('shader binding reflection failed'));
+    }
+    if (count === 0) return [];
+    const raw = new ArrayBuffer(count * SHADER_BINDING_BYTES);
+    const copied = Number(fn(shaderModule._native, new Uint8Array(raw), BigInt(count)));
+    if (copied !== count) {
+        throw new Error(nativeFailureMessage('shader binding reflection did not publish the expected interface'));
+    }
     const view = new DataView(raw);
     const bindings = [];
     for (let index = 0; index < count; index += 1) {
-        const offset = index * 20;
+        const offset = index * SHADER_BINDING_BYTES;
         const group = view.getUint32(offset + 0, true);
         const binding = view.getUint32(offset + 4, true);
         const kind = view.getUint32(offset + 8, true);

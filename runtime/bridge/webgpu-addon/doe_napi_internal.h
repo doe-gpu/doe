@@ -518,8 +518,8 @@ DECL_PFN(WGPUComputePassEncoder, wgpuCommandEncoderBeginComputePass, (WGPUComman
 DECL_PFN(void, wgpuCommandEncoderCopyBufferToBuffer, (WGPUCommandEncoder, WGPUBuffer, uint64_t, WGPUBuffer, uint64_t, uint64_t));
 DECL_PFN(void, wgpuCommandEncoderCopyBufferToTexture, (WGPUCommandEncoder, const WGPUTexelCopyBufferInfo*, const WGPUTexelCopyTextureInfo*, const WGPUExtent3D*));
 DECL_PFN(void, wgpuCommandEncoderCopyTextureToBuffer, (WGPUCommandEncoder, const WGPUTexelCopyTextureInfo*, const WGPUTexelCopyBufferInfo*, const WGPUExtent3D*));
-DECL_PFN(void, doeNativeCommandEncoderCopyBufferToTexture, (WGPUCommandEncoder, WGPUBuffer, uint64_t, uint32_t, uint32_t, WGPUTexture, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t));
-DECL_PFN(void, doeNativeCommandEncoderCopyTextureToBuffer, (WGPUCommandEncoder, WGPUTexture, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, WGPUBuffer, uint64_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t));
+DECL_PFN(void, doeNativeCommandEncoderCopyBufferToTexture, (WGPUCommandEncoder, WGPUBuffer, uint64_t, uint32_t, uint32_t, WGPUTexture, uint32_t, uint32_t, uint32_t, uint32_t));
+DECL_PFN(void, doeNativeCommandEncoderCopyTextureToBuffer, (WGPUCommandEncoder, WGPUTexture, uint32_t, WGPUBuffer, uint64_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t));
 DECL_PFN(WGPUCommandBuffer, wgpuCommandEncoderFinish, (WGPUCommandEncoder, const WGPUCommandBufferDescriptor*));
 DECL_PFN(void, wgpuComputePassEncoderSetPipeline, (WGPUComputePassEncoder, WGPUComputePipeline));
 DECL_PFN(void, wgpuComputePassEncoderSetBindGroup, (WGPUComputePassEncoder, uint32_t, WGPUBindGroup, size_t, const uint32_t*));

@@ -39,13 +39,18 @@ const DoePipelineLayout = native_types.DoePipelineLayout;
 const DoeBindGroupLayout = native_types.DoeBindGroupLayout;
 const CompilationMessageKind = native_shared.CompilationMessageKind;
 const ShaderDiagnostic = @import("shader_diagnostic.zig").ShaderDiagnostic;
+const device_lifecycle = @import("../lifecycle/doe_instance_device_native.zig");
 threadlocal var last_diagnostic = ShaderDiagnostic{};
+pub fn lastErrorSnapshot() ShaderDiagnostic {
+    return last_diagnostic;
+}
 const DIAGNOSTIC_DIRECTIVE_INFO: []const u8 =
     "WGSL diagnostic directives are parsed on this path and currently reported as advisory compilation info only.";
 fn tryCreateCachedWgslShaderModule(dev: *DoeDevice, wgsl: []const u8) error{OutOfMemory}!?*anyopaque {
-    var cached = (try dev.metal_libraries.lookup(alloc, wgsl, shader_translation_cache.metalLibraryConfiguration())) orelse return null;
+    const cache = if (dev.metal_libraries) |*value| value else return null;
+    var cached = (try cache.lookup(alloc, wgsl, shader_translation_cache.metalLibraryConfiguration())) orelse return null;
     var transferred = false;
-    defer if (!transferred) cached.deinit(alloc, dev.metal_libraries.ops);
+    defer if (!transferred) cached.deinit(alloc, cache.ops);
     const sm = make(DoeShaderModule) orelse return error.OutOfMemory;
     errdefer alloc.destroy(sm);
     const source = try alloc.dupe(u8, wgsl);
@@ -329,7 +334,7 @@ fn createFromWGSLOwned(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedSt
         return null;
     };
     sm.* = .{ .mtl_library = lib };
-    dev.metal_libraries.insert(alloc, wgsl, shader_translation_cache.metalLibraryConfiguration(), lib, &translation_info) catch |err| {
+    if (dev.metal_libraries) |*cache| cache.insert(alloc, wgsl, shader_translation_cache.metalLibraryConfiguration(), lib, &translation_info) catch |err| {
         doeNativeShaderModuleRelease(toOpaque(sm));
         diagnostic.capture_compile_error(err, "native_shader_create", "retaining Metal library cache entry failed");
         return null;
@@ -542,7 +547,9 @@ pub export fn doeNativeShaderModuleRelease(raw: ?*anyopaque) callconv(.c) void {
         if (sm.fragment_spirv_data) |s| alloc.free(s);
         if (sm.hlsl_source) |h| alloc.free(h);
         if (sm.wgsl_source) |w| alloc.free(w);
+        const device = sm.device;
         alloc.destroy(sm);
+        if (device) |owner| device_lifecycle.doeNativeDeviceRelease(toOpaque(owner));
     }
 }
 
@@ -701,15 +708,25 @@ fn doeNativeDeviceCreateComputePipelineOwned(dev_raw: ?*anyopaque, desc: ?*const
         return null;
     };
 
-    if (sm.compilation_message_kind == .@"error") {
+    if (sm.device != null and sm.device != dev) {
         diagnostic.set_last_error_stage_name("native_compile");
-        diagnostic.set_last_error_kind("InvalidShaderModule");
-        if (sm.compilation_message) |message| {
-            diagnostic.set_last_error_fmt("compute pipeline creation rejected invalid shader module: {s}", .{message});
-        } else {
-            diagnostic.set_last_error("compute pipeline creation rejected invalid shader module");
-        }
+        diagnostic.set_last_error_kind("ShaderDeviceMismatch");
+        diagnostic.set_last_error("compute pipeline requires a shader created by this device");
         return null;
+    }
+    {
+        sm.bindings_mutex.lock();
+        defer sm.bindings_mutex.unlock();
+        if (sm.compilation_message_kind == .@"error") {
+            diagnostic.set_last_error_stage_name("native_compile");
+            diagnostic.set_last_error_kind("InvalidShaderModule");
+            if (sm.compilation_message) |message| {
+                diagnostic.set_last_error_fmt("compute pipeline creation rejected invalid shader module: {s}", .{message});
+            } else {
+                diagnostic.set_last_error("compute pipeline creation rejected invalid shader module");
+            }
+            return null;
+        }
     }
     if (sm.wgsl_source != null) ensureShaderBindings(sm) catch |err| {
         diagnostic.capture_compile_error(err, "reflection", "compute pipeline binding extraction failed");
@@ -776,9 +793,7 @@ fn doeNativeDeviceCreateComputePipelineOwned(dev_raw: ?*anyopaque, desc: ?*const
 
     var err_buf: [ERR_CAP]u8 = undefined;
     const pso = blk: {
-        if (package_metal_pipeline_cache.get(dev)) |cache| {
-            if (cache.compile_or_serve_compute(func)) |cached_pso| break :blk cached_pso;
-        }
+        if (package_metal_pipeline_cache.compileCompute(dev, func)) |cached_pso| break :blk cached_pso;
         break :blk metal_bridge_device_new_compute_pipeline(dev.mtl_device, func, &err_buf, ERR_CAP);
     } orelse {
         if (override_lib) |ol| metal_bridge_release(ol);
@@ -803,12 +818,6 @@ fn doeNativeDeviceCreateComputePipelineOwned(dev_raw: ?*anyopaque, desc: ?*const
         return null;
     };
     cp.* = .{ .mtl_pso = pso };
-    if (cast(DoePipelineLayout, d.layout)) |pipeline_layout| {
-        native_helpers.object_add_ref(DoePipelineLayout, toOpaque(pipeline_layout));
-        cp.layout = pipeline_layout;
-    }
-    native_helpers.object_add_ref(DoeShaderModule, toOpaque(sm));
-    cp.shader_module = sm;
     cp.wg_x = sm.wg_x;
     cp.wg_y = sm.wg_y;
     cp.wg_z = sm.wg_z;
@@ -824,6 +833,12 @@ fn doeNativeDeviceCreateComputePipelineOwned(dev_raw: ?*anyopaque, desc: ?*const
         alloc.destroy(cp);
         return null;
     };
+    if (cast(DoePipelineLayout, d.layout)) |pipeline_layout| {
+        native_helpers.object_add_ref(DoePipelineLayout, toOpaque(pipeline_layout));
+        cp.layout = pipeline_layout;
+    }
+    native_helpers.object_add_ref(DoeShaderModule, toOpaque(sm));
+    cp.shader_module = sm;
     const result = toOpaque(cp);
     label_store.set(result, d.label.data, d.label.length);
     return result;
@@ -895,13 +910,22 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
 pub export fn doeNativeDeviceCreateShaderModuleWgsl(dev_raw: ?*anyopaque, code_ptr: ?[*]const u8, code_len: usize) callconv(.c) ?*anyopaque {
     var diagnostic = ShaderDiagnostic{};
     defer last_diagnostic = diagnostic;
-    return doeNativeDeviceCreateShaderModuleWgslOwned(dev_raw, code_ptr, code_len, &diagnostic);
+    return retainShaderDevice(dev_raw, doeNativeDeviceCreateShaderModuleWgslOwned(dev_raw, code_ptr, code_len, &diagnostic));
 }
 
 pub export fn doeNativeDeviceCreateShaderModule(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUShaderModuleDescriptor) callconv(.c) ?*anyopaque {
     var diagnostic = ShaderDiagnostic{};
     defer last_diagnostic = diagnostic;
-    return doeNativeDeviceCreateShaderModuleOwned(dev_raw, desc, &diagnostic);
+    return retainShaderDevice(dev_raw, doeNativeDeviceCreateShaderModuleOwned(dev_raw, desc, &diagnostic));
+}
+
+fn retainShaderDevice(dev_raw: ?*anyopaque, shader_raw: ?*anyopaque) ?*anyopaque {
+    const sm = cast(DoeShaderModule, shader_raw) orelse return shader_raw;
+    if (cast(DoeDevice, dev_raw)) |dev| {
+        native_helpers.object_add_ref(DoeDevice, dev_raw);
+        sm.device = dev;
+    }
+    return shader_raw;
 }
 
 pub export fn doeNativeDeviceCreateComputePipelineMain(dev_raw: ?*anyopaque, shader_raw: ?*anyopaque, layout_raw: ?*anyopaque) callconv(.c) ?*anyopaque {

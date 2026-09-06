@@ -10,6 +10,26 @@ The import fence and source-layout gates are the structural authority; this
 page records the lifecycle interpretation and follow-up decisions. The target
 structural roadmap lives in [`../runtime-hexagonal-architecture-plan.md`](../runtime-hexagonal-architecture-plan.md).
 
+## Source-edit build measurements
+
+Build measurement now distinguishes clean compilation, a no-change rebuild, and
+config-declared edits to a leaf backend function, shared contract, compiler
+stage, and public entry point. The tool copies source into a private snapshot;
+it restores and rebuilds the baseline between edits. Raw build time, per-build
+process memory, source fragments, and resulting artifact sizes live in
+`bench/out/shader-ownership/20260906-owned-diagnostics/build-measurements-v3.json`.
+The memory field is the largest process RSS reported by `wait4`, not simultaneous
+memory summed across the build tree. These behavior-preserving source edits
+measure edit-to-build work, not the complexity of every possible feature change.
+
+Receipt version 3 replaces the misleading `incrementalCompile` name with
+`noChangeCompile` and separate `editCompiles`. Historical version 2 receipts keep
+their original no-change meaning. Reproduce with
+`python3 runtime/zig/tools/capture_build_measurements.py`; the scenarios are
+owned by `config/zig-build-measurements.json` and receipt fields by its report
+schema. Generated architecture reports continue to reject a mismatched source
+fingerprint. This work does not change runtime behavior or import boundaries.
+
 ## Current quirk preparation boundary
 
 Quirk preparation retains the existing bucket and allocator interfaces while

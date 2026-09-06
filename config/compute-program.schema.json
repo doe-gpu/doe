@@ -16,7 +16,8 @@
       "type": "integer",
       "enum": [
         1,
-        2
+        2,
+        3
       ]
     },
     "id": {
@@ -95,6 +96,11 @@
             "program"
           ],
           "default": "invocation"
+        },
+        "stateFormat": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Application-owned interpretation of resident bytes; changing it requires a reset in descriptor version 3."
         }
       }
     },
@@ -205,6 +211,102 @@
           "default": "output"
         }
       }
+    },
+    "updateAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "previousProgramHash",
+        "nextProgramHash",
+        "revision",
+        "retained",
+        "replaced",
+        "discarded",
+        "created",
+        "requiresReset"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "previousProgramHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nextProgramHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "retained": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/buffer"
+          }
+        },
+        "discarded": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/buffer"
+          }
+        },
+        "created": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/buffer"
+          }
+        },
+        "replaced": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "before",
+              "after"
+            ],
+            "properties": {
+              "before": {
+                "$ref": "#/$defs/buffer"
+              },
+              "after": {
+                "$ref": "#/$defs/buffer"
+              }
+            }
+          }
+        },
+        "requiresReset": {
+          "type": "boolean"
+        }
+      }
+    },
+    "updateOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "$ref": "#/$defs/updateAssessment"
+        },
+        "reset": {
+          "type": "string",
+          "enum": [
+            "preserve",
+            "approve"
+          ],
+          "default": "preserve"
+        }
+      }
+    },
+    "nativeContractVersion": {
+      "type": "integer",
+      "const": 2,
+      "description": "Required native residency command contract. Descriptor version 3 adds host update policy without changing recorded commands."
     }
   },
   "allOf": [
@@ -224,6 +326,70 @@
                 "required": [
                   "lifetime"
                 ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              1,
+              2
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "buffers": {
+            "items": {
+              "not": {
+                "required": [
+                  "stateFormat"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 3
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "buffers": {
+            "items": {
+              "if": {
+                "required": [
+                  "lifetime"
+                ],
+                "properties": {
+                  "lifetime": {
+                    "const": "program"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "stateFormat"
+                ]
+              },
+              "else": {
+                "not": {
+                  "required": [
+                    "stateFormat"
+                  ]
+                }
               }
             }
           }

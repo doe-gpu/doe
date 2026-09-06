@@ -3,6 +3,14 @@ const generated = @import("../../src/core/abi/generated/webgpu_upstream.zig");
 const callbacks = @import("../../src/core/abi/wgpu_callback_descriptor_types.zig");
 const handles = @import("../../src/core/abi/wgpu_handle_types.zig");
 const pipeline = @import("../../src/core/abi/wgpu_pipeline_descriptor_types.zig");
+const vertex_formats = @import("../../src/contracts/vertex_format.zig");
+
+test "vertex formats match the pinned WebGPU header across every scalar and vector type" {
+    inline for (@typeInfo(vertex_formats.Format).@"enum".fields) |field| {
+        const suffix = comptime if (std.mem.eql(u8, field.name, "unorm8x4_bgra")) "Unorm8x4BGRA" else &[_]u8{std.ascii.toUpper(field.name[0])} ++ field.name[1..];
+        try std.testing.expectEqual(@as(u32, @field(generated.c, "WGPUVertexFormat_" ++ suffix)), field.value);
+    }
+}
 
 test "generated WebGPU procedure table and loader metadata cover the symbol contract" {
     try std.testing.expectEqual(generated.proc_names.len, generated.loader_metadata.len);

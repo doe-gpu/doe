@@ -18,6 +18,7 @@
 // actionable error rather than a silent misfire.
 
 const std = @import("std");
+const leases = @import("../../contracts/resource_lease.zig");
 const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
 const backend_contract = @import("../../contracts/backend.zig");
 
@@ -122,6 +123,8 @@ pub const DoeBundleEncoder = struct {
     pub const TYPE_MAGIC = MAGIC_BUNDLE_ENCODER;
     magic: u32 = TYPE_MAGIC,
     allocator: std.mem.Allocator,
+    ref_count: u32 = 1,
+    references: std.ArrayListUnmanaged(leases.ResourceLease) = .{},
     backend: backend_contract.NativeBackendKind = .metal,
     // Compatibility signature — validated against render pass at executeBundles time.
     color_format: abi_texture.WGPUTextureFormat,
@@ -141,6 +144,8 @@ pub const DoeRenderBundle = struct {
     pub const TYPE_MAGIC = MAGIC_BUNDLE;
     magic: u32 = TYPE_MAGIC,
     allocator: std.mem.Allocator,
+    ref_count: u32 = 1,
+    references: std.ArrayListUnmanaged(leases.ResourceLease) = .{},
     backend: backend_contract.NativeBackendKind = .metal,
     color_format: abi_texture.WGPUTextureFormat,
     depth_stencil_format: abi_texture.WGPUTextureFormat,
@@ -519,26 +524,14 @@ pub fn replay_bundle_d3d12(
 // C ABI helpers (cast / make shared with doe_wgpu_native.zig)
 // ============================================================
 
-// Global allocator injected at init time from doe_wgpu_native.
-// Using a pointer to the allocator allows zero-cost access without passing it everywhere.
-var g_alloc: ?std.mem.Allocator = null;
-
-pub fn set_allocator(a: std.mem.Allocator) void {
-    g_alloc = a;
-}
-
-fn alloc() std.mem.Allocator {
-    return g_alloc.?;
-}
-
 pub fn make_bundle_encoder(
+    a: std.mem.Allocator,
     color_format: abi_texture.WGPUTextureFormat,
     depth_stencil_format: abi_texture.WGPUTextureFormat,
     sample_count: u32,
     depth_read_only: bool,
     stencil_read_only: bool,
 ) ?*DoeBundleEncoder {
-    const a = alloc();
     const enc = a.create(DoeBundleEncoder) catch return null;
     enc.* = .{
         .allocator = a,
@@ -571,11 +564,19 @@ pub fn bundle_encoder_finish(enc: *DoeBundleEncoder) ?*DoeRenderBundle {
         .depth_stencil_format = enc.depth_stencil_format,
         .sample_count = enc.sample_count,
         .cmds = cmds_slice,
+        .references = enc.references,
     };
+    enc.references = .{};
     return bundle;
 }
 
 pub fn bundle_destroy(b: *DoeRenderBundle) void {
+    if (!leases.releaseCount(&b.ref_count)) return;
+    destroyReleasedBundle(b);
+}
+
+pub fn destroyReleasedBundle(b: *DoeRenderBundle) void {
+    leases.releaseAll(b.allocator, &b.references);
     const a = b.allocator;
     a.free(b.cmds);
     a.destroy(b);

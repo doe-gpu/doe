@@ -112,6 +112,27 @@ classified and cannot be promoted by benchmark results.
 - Queue-ordering repairs require a regression with a separate asynchronous
   producer submission and readback submission, plus the original external
   reproduction. Host-visible memory does not waive GPU execution dependencies.
+- Shader reflection must publish complete metadata or preserve a typed failure.
+  Allocation-failure and capacity regressions distinguish errors from valid empty
+  interfaces and verify subsequent valid compilation. Owned compiler diagnostics
+  must survive concurrent failed and successful requests. Legacy last-error
+  adapters have a per-thread boundary lifetime. Device-owned Metal library
+  caching requires independent shader leases, exact source/configuration checks,
+  rollback, and teardown tests; physical Metal qualification remains separate
+  from allocator and reference-accounting tests.
+- Rendering ownership regressions record work, release caller references, write
+  inputs after recording, and submit later. Direct and bundled draws must produce
+  the accepted pixels through native readback. Releasing a reference is distinct
+  from explicit resource destruction. Vertex-format ABI values must match the
+  pinned WebGPU header; backend conversion remains local. Render shader-code
+  retention must roll back each failed allocation before publishing the pipeline.
+  These regressions do not qualify untested attachment, query, or driver-loss
+  behavior.
+- Strict resident-state updates require an instance- and revision-bound reset
+  assessment before replacement allocation. Regressions must cover declined,
+  approved, stale and forged approvals, identical-size format changes, version
+  downgrade, and failed preparation with the original state still executable.
+  Earlier descriptor versions retain their documented update behavior.
 - Shader compilation failures preserve the responsible compiler stage, cause,
   and available WGSL source location through native wrappers and
   `getCompilationInfo()`. Regression coverage checks that subsequent compilations

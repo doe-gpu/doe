@@ -12,8 +12,8 @@ pub const ToolchainDiscovery = validation.ToolchainDiscovery;
 pub const CSLC_ENV_VAR = validation.CSLC_ENV_VAR;
 pub const CSLC_PATH_SENTINEL = validation.CSLC_PATH_SENTINEL;
 
-pub fn translateToCsl(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8) analysis.TranslateError!usize {
-    var module_ir = try analysis.analyzeToIr(allocator, wgsl);
+pub fn translateToCslWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, diagnostic: *analysis.Diagnostic) analysis.TranslateError!usize {
+    var module_ir = try analysis.analyzeToIrWithDiagnostic(allocator, wgsl, diagnostic);
     defer module_ir.deinit();
 
     return emitter.emit(&module_ir, out) catch |err| {
@@ -24,7 +24,7 @@ pub fn translateToCsl(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8)
             error.UnsupportedConstruct => analysis.TranslateError.UnsupportedConstruct,
             error.UnsupportedPattern => analysis.TranslateError.UnsupportedPattern,
         };
-        analysis.setLastError(.csl_emit, kind, null, null);
+        diagnostic.setLastError(.csl_emit, kind, null, null);
         return kind;
     };
 }
@@ -47,4 +47,8 @@ pub fn validateCslPatternWithToolchainConfig(
 
 pub fn validateCslToolchainConfig(config: validation.ToolchainConfig) validation.Error!void {
     return validation.validateToolchainConfig(config);
+}
+
+pub fn translateToCsl(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8) analysis.TranslateError!usize {
+    return translateToCslWithDiagnostic(allocator, wgsl, out, analysis.compatibilityDiagnostic());
 }

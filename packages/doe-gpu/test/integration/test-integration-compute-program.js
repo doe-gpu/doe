@@ -42,6 +42,37 @@ device.createBuffer = (declaration) => {
   return buffer;
 };
 try {
+  const backend = process.platform === 'darwin' ? 'metal' : 'vulkan';
+  const firstDevice = await (await requestAdapter({ backend })).requestDevice();
+  const secondDevice = await (await requestAdapter({ backend })).requestDevice();
+  const code = descriptor.shaders[0].code;
+  const firstShader = firstDevice.createShaderModule({ code });
+  const secondShader = secondDevice.createShaderModule({ code });
+  const cachedShader = secondDevice.createShaderModule({ code });
+  const firstProgram = await prepareComputeProgram(firstDevice, descriptor, { execution: 'webgpu' });
+  const secondProgram = await prepareComputeProgram(secondDevice, descriptor, { execution: 'webgpu' });
+  try {
+    assert.throws(() => secondDevice.createComputePipeline({ layout: 'auto',
+      compute: { module: firstShader, entryPoint: 'main' } }),
+    (error) => error.reason === 'validation' && /shader created by this device/.test(error.message));
+    firstDevice.destroy();
+    await firstProgram.close();
+    await assert.rejects(firstShader.getCompilationInfo(), /GPUDevice was destroyed/);
+    firstShader.destroy?.();
+    const result = await secondProgram.run({ input: new Uint32Array([2, 3, 5, 7]) });
+    assert.deepEqual([...new Uint32Array(result.output.buffer)], [2, 3, 5, 7]);
+    assert.equal((await secondShader.getCompilationInfo()).messages.length, 0);
+    assert.equal((await cachedShader.getCompilationInfo()).messages.length, 0);
+  } finally {
+    await firstProgram.close();
+    await secondProgram.close();
+    firstShader.destroy?.();
+    secondShader.destroy?.();
+    cachedShader.destroy?.();
+    firstDevice.destroy();
+    secondDevice.destroy();
+  }
+  console.log('ok: identical shaders on independent devices survive sibling teardown and reject foreign pipelines');
   const orderedArithmetic = {
     schemaVersion: 1, id: 'ordered_arithmetic',
     buffers: [{ id: 'output', size: 8, type: 'storage', role: 'output' }],
@@ -253,6 +284,63 @@ try {
     await assert.rejects(program.run({ input: new Uint32Array([1, 2, 3, 4]) }), /DOE_PROGRAM_INVALIDATED/);
     await program.close();
     console.log('ok: destroyed timestamp query invalidates GPU recording before submission');
+  }
+  for (const execution of modes) {
+    const strict = structuredClone(descriptor);
+    strict.schemaVersion = 3;
+    strict.buffers.forEach((buffer) => {
+      buffer.lifetime = 'program';
+      buffer.stateFormat = `${buffer.id}-u32-v1`;
+    });
+    const original = await prepareComputeProgram(device, strict, { execution, ...timingOptions });
+    const values = new Uint32Array([1, 2, 3, 4]);
+    await original.run({ input: values });
+    const interpretation = structuredClone(strict);
+    interpretation.buffers[1].stateFormat = 'output-u32-v2';
+    const initialAssessment = original.assessUpdate(interpretation);
+    assert.deepEqual(initialAssessment.retained.map((buffer) => buffer.id), ['input']);
+    assert.deepEqual(initialAssessment.replaced.map(({ before }) => before.id), ['output']);
+    assert.throws(() => original.update(interpretation), { code: 'DOE_PROGRAM_RESET_REQUIRED' });
+    assert.equal(original.state, 'ready');
+    assert.deepEqual([...new Uint32Array((await original.run()).output.buffer)], [2, 4, 6, 8]);
+    assert.throws(() => original.update(interpretation, { assessment: initialAssessment, reset: 'approve' }),
+      { code: 'DOE_PROGRAM_STALE_ASSESSMENT' });
+    const broken = structuredClone(interpretation);
+    broken.shaders[0].code = 'not WGSL';
+    const brokenAssessment = original.assessUpdate(broken);
+    await assert.rejects(original.update(broken, { assessment: brokenAssessment, reset: 'approve' }));
+    assert.equal(original.state, 'ready');
+    assert.deepEqual([...new Uint32Array((await original.run()).output.buffer)], [3, 6, 9, 12]);
+    const approved = original.assessUpdate(interpretation);
+    assert.throws(() => original.update(interpretation, { assessment: { ...approved }, reset: 'approve' }),
+      { code: 'DOE_PROGRAM_STALE_ASSESSMENT' });
+    assert.throws(() => original.update(strict, { assessment: approved, reset: 'approve' }),
+      { code: 'DOE_PROGRAM_STALE_ASSESSMENT' });
+    const reset = await original.update(interpretation, { assessment: approved, reset: 'approve' });
+    assert.equal(original.state, 'closed');
+    assert.deepEqual([...new Uint32Array((await reset.run()).output.buffer)], [1, 2, 3, 4]);
+    const edit = structuredClone(interpretation);
+    edit.shaders[0].code = edit.shaders[0].code.replace('b[id.x] + a[id.x]', 'b[id.x] + a[id.x] * 2u');
+    assert.equal(reset.assessUpdate(edit).requiresReset, false);
+    const continued = await reset.update(edit);
+    assert.deepEqual([...new Uint32Array((await continued.run()).output.buffer)], [3, 6, 9, 12]);
+    const smaller = structuredClone(edit);
+    smaller.buffers.forEach((buffer) => { buffer.size = 8; });
+    smaller.steps[0].workgroups[0] = 2;
+    const resize = continued.assessUpdate(smaller);
+    assert.equal(resize.replaced.length, 2);
+    const legacy = structuredClone(smaller);
+    legacy.schemaVersion = 2;
+    legacy.buffers.forEach((buffer) => { delete buffer.stateFormat; });
+    assert.throws(() => continued.update(legacy), { code: 'DOE_PROGRAM_RESET_REQUIRED' });
+    const resized = await continued.update(smaller, { assessment: resize, reset: 'approve' });
+    assert.throws(() => resized.run(), { code: 'DOE_PROGRAM_INPUT' });
+    assert.deepEqual([...new Uint32Array((await resized.run({ input: new Uint32Array([5, 7]) })).output.buffer)], [10, 14]);
+    await resized.close();
+    await continued.close();
+    await reset.close();
+    await original.close();
+    console.log(`ok: ${execution} strict update approval, state-format reset, stale approval and preparation rollback`);
   }
   for (const execution of modes) {
     const resident = structuredClone(descriptor);

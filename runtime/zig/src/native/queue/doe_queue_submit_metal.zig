@@ -9,6 +9,7 @@ const queue_flush_breakdown = @import("doe_queue_flush_breakdown.zig");
 const metal_browser_trace = @import("../diagnostics/doe_metal_browser_trace.zig");
 const emit_msl = @import("../../compiler/wgsl/emit/msl/emit_msl_ir.zig");
 const shared = @import("doe_queue_submit_shared.zig");
+const error_scope = @import("../../runtime/diagnostics/error_scope.zig");
 const render_state_native = @import("../render/doe_render_state_native.zig");
 
 const cast = native_helpers.cast;
@@ -747,6 +748,10 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
                         q.deferred_resolve_count += 1;
                     }
                     has_gpu_work = true;
+                },
+                .vulkan_render => {
+                    q.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "Metal submission received Vulkan render commands");
+                    return;
                 },
             }
             cmd_index += 1;

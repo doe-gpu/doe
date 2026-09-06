@@ -62,3 +62,13 @@ and current artifacts before making compatibility claims.
 
 Detailed tool invocations belong in focused runbooks and `zig build --help`,
 not this module entrypoint.
+
+## Build edit measurements
+
+Run `python3 runtime/zig/tools/capture_build_measurements.py` from the repository
+root. The tool measures a clean build, a no-change rebuild, and each exact source
+edit in `config/zig-build-measurements.json`, using a private source snapshot and
+cache. Every edit starts from a restored baseline. The report separates elapsed
+time, per-build process RSS, and artifact size; it does not modify active work.
+See the [architecture audit](../../docs/status/runtime-architecture-audit.md#source-edit-build-measurements)
+for receipt migration and memory scope.

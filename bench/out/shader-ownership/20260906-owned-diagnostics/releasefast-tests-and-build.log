@@ -1,0 +1,73 @@
+Zig source architecture review signals:
+src/backend/vulkan/native_runtime.zig: 1007 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_render.zig: 980 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_resources.zig: 1018 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_upload.zig: 843 lines exceeds advisory review signal 800
+src/backend/vulkan/vulkan_surface.zig: 808 lines exceeds advisory review signal 800
+src/compiler/tsir/digest.zig: 999 lines exceeds advisory review signal 800
+src/compiler/tsir/emit_kernel_body.zig: 895 lines exceeds advisory review signal 800
+src/compiler/tsir/frontend.zig: 885 lines exceeds advisory review signal 800
+src/compiler/tsir/reference_extended_ops.zig: 841 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig: 989 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig: 895 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig: 837 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig: 888 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_layout.zig: 911 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/msl/emit_msl_ir.zig: 973 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig: 839 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig: 1005 lines exceeds advisory review signal 800
+src/compiler/wgsl/frontend/parser_expr.zig: 851 lines exceeds advisory review signal 800
+src/compiler/wgsl/frontend/sema.zig: 805 lines exceeds advisory review signal 800
+src/compiler/wgsl/ir/ir_transform_robustness.zig: 984 lines exceeds advisory review signal 800
+src/compiler/wgsl/proof/dispatch_proof_match.zig: 890 lines exceeds advisory review signal 800
+src/compiler/wgsl/proof/dispatch_uniform_bounds.zig: 878 lines exceeds advisory review signal 800
+src/dropin/dropin_browser_shared_memory.zig: 806 lines exceeds advisory review signal 800
+src/native/compute/doe_compute_fast.zig: 1120 lines exceeds advisory review signal 800
+src/native/queue/doe_queue_submit_metal.zig: 824 lines exceeds advisory review signal 800
+src/native/resource/doe_texture_sampler_native.zig: 827 lines exceeds advisory review signal 800
+src/native/shader/doe_shader_native.zig: 933 lines exceeds advisory review signal 800
+src/native/vulkan/vulkan_compute_native.zig: 1039 lines exceeds advisory review signal 800
+src/runtime/trace/trace.zig: 879 lines exceeds advisory review signal 800
+src/spatial/csl/csl_host_plan_tool.zig: 828 lines exceeds advisory review signal 800
+test
++- run test stderr
+[default] (warn): doe: createShaderModule failed: unsupported sType 0xffffffff
+[default] (warn): doe: createComputePipeline failed: shader module is null or invalid. Ensure createShaderModule succeeded (check stderr for WGSL translation errors).
+[default] (warn): doe: createShaderModule failed: MTLLibrary creation returned null
+[default] (warn): doe_compute_preconditions: storage dispatch precondition failed: requiredBytes=3072 boundBytes=2047 kind=flat_index_2d_dispatch_x group=0 binding=1
+[default] (warn): doe_compute_preconditions: storage dispatch precondition failed: buffer missing group=0 binding=0
+
+Build Summary: 26/26 steps succeeded; 3237/3241 tests passed; 4 skipped
+test success
++- run python3 success 791ms MaxRSS:13M
++- run python3 success 417ms MaxRSS:28M
++- run python3 success 45ms MaxRSS:21M
++- run python3 success 51ms MaxRSS:20M
++- run python3 success 45ms MaxRSS:21M
++- run python3 success 87ms MaxRSS:12M
++- run test 2123 passed 4 skipped 797ms MaxRSS:69M
+   +- compile test ReleaseFast native success 1m MaxRSS:1G
+      +- options cached
+test-wgsl success
++- run python3 (reused)
++- run python3 (reused)
++- run python3 (reused)
++- run python3 (reused)
++- run test 1114 passed 326ms MaxRSS:7M
+   +- compile test ReleaseFast native success 45s MaxRSS:932M
+      +- options (reused)
+dropin success
++- install webgpu_doe success
+|  +- compile lib webgpu_doe ReleaseFast native success 33s MaxRSS:685M
+|     +- options (reused)
++- install generated to share/doe-build-metadata.json cached
+   +- WriteFile doe-build-metadata.json cached
+dropin-compute success
++- install webgpu_doe_compute success
+   +- compile lib webgpu_doe_compute ReleaseFast native success 33s MaxRSS:683M
+      +- options cached
+dropin-full success
++- install webgpu_doe_full success
+   +- compile lib webgpu_doe_full ReleaseFast native success 33s MaxRSS:684M
+      +- options cached
+

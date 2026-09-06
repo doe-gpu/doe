@@ -2,7 +2,10 @@
  * doe_napi_formats.c — Texture format, primitive topology, vertex format,
  * and other WebGPU enum string↔uint32 converters.
  */
-#include "doe_napi_internal.h"
+#include <node_api.h>
+#include <stdint.h>
+#include <string.h>
+#include "../../zig/vendor/webgpu-headers/webgpu.h"
 
 /* Texture / primitive format converters */
 
@@ -237,52 +240,52 @@ uint32_t vertex_format_from_value(napi_env env, napi_value val) {
     char buf[32] = {0}; size_t len = 0;
     napi_get_value_string_utf8(env, val, buf, sizeof(buf), &len);
     /* 8-bit formats */
-    if (strcmp(buf, "uint8") == 0)     return 0x00000001;
-    if (strcmp(buf, "uint8x2") == 0)   return 0x00000002;
-    if (strcmp(buf, "uint8x4") == 0)   return 0x00000003;
-    if (strcmp(buf, "sint8") == 0)     return 0x00000004;
-    if (strcmp(buf, "sint8x2") == 0)   return 0x00000005;
-    if (strcmp(buf, "sint8x4") == 0)   return 0x00000006;
-    if (strcmp(buf, "unorm8") == 0)    return 0x00000007;
-    if (strcmp(buf, "unorm8x2") == 0)  return 0x00000008;
-    if (strcmp(buf, "unorm8x4") == 0)  return 0x00000009;
-    if (strcmp(buf, "snorm8") == 0)    return 0x0000000A;
-    if (strcmp(buf, "snorm8x2") == 0)  return 0x0000000B;
-    if (strcmp(buf, "snorm8x4") == 0)  return 0x0000000C;
+    if (strcmp(buf, "uint8") == 0)     return WGPUVertexFormat_Uint8;
+    if (strcmp(buf, "uint8x2") == 0)   return WGPUVertexFormat_Uint8x2;
+    if (strcmp(buf, "uint8x4") == 0)   return WGPUVertexFormat_Uint8x4;
+    if (strcmp(buf, "sint8") == 0)     return WGPUVertexFormat_Sint8;
+    if (strcmp(buf, "sint8x2") == 0)   return WGPUVertexFormat_Sint8x2;
+    if (strcmp(buf, "sint8x4") == 0)   return WGPUVertexFormat_Sint8x4;
+    if (strcmp(buf, "unorm8") == 0)    return WGPUVertexFormat_Unorm8;
+    if (strcmp(buf, "unorm8x2") == 0)  return WGPUVertexFormat_Unorm8x2;
+    if (strcmp(buf, "unorm8x4") == 0)  return WGPUVertexFormat_Unorm8x4;
+    if (strcmp(buf, "snorm8") == 0)    return WGPUVertexFormat_Snorm8;
+    if (strcmp(buf, "snorm8x2") == 0)  return WGPUVertexFormat_Snorm8x2;
+    if (strcmp(buf, "snorm8x4") == 0)  return WGPUVertexFormat_Snorm8x4;
     /* 16-bit formats */
-    if (strcmp(buf, "uint16") == 0)    return 0x0000000D;
-    if (strcmp(buf, "uint16x2") == 0)  return 0x0000000E;
-    if (strcmp(buf, "uint16x4") == 0)  return 0x0000000F;
-    if (strcmp(buf, "sint16") == 0)    return 0x00000010;
-    if (strcmp(buf, "sint16x2") == 0)  return 0x00000011;
-    if (strcmp(buf, "sint16x4") == 0)  return 0x00000012;
-    if (strcmp(buf, "unorm16") == 0)   return 0x00000013;
-    if (strcmp(buf, "unorm16x2") == 0) return 0x00000014;
-    if (strcmp(buf, "unorm16x4") == 0) return 0x00000015;
-    if (strcmp(buf, "snorm16") == 0)   return 0x00000016;
-    if (strcmp(buf, "snorm16x2") == 0) return 0x00000017;
-    if (strcmp(buf, "snorm16x4") == 0) return 0x00000018;
+    if (strcmp(buf, "uint16") == 0)    return WGPUVertexFormat_Uint16;
+    if (strcmp(buf, "uint16x2") == 0)  return WGPUVertexFormat_Uint16x2;
+    if (strcmp(buf, "uint16x4") == 0)  return WGPUVertexFormat_Uint16x4;
+    if (strcmp(buf, "sint16") == 0)    return WGPUVertexFormat_Sint16;
+    if (strcmp(buf, "sint16x2") == 0)  return WGPUVertexFormat_Sint16x2;
+    if (strcmp(buf, "sint16x4") == 0)  return WGPUVertexFormat_Sint16x4;
+    if (strcmp(buf, "unorm16") == 0)   return WGPUVertexFormat_Unorm16;
+    if (strcmp(buf, "unorm16x2") == 0) return WGPUVertexFormat_Unorm16x2;
+    if (strcmp(buf, "unorm16x4") == 0) return WGPUVertexFormat_Unorm16x4;
+    if (strcmp(buf, "snorm16") == 0)   return WGPUVertexFormat_Snorm16;
+    if (strcmp(buf, "snorm16x2") == 0) return WGPUVertexFormat_Snorm16x2;
+    if (strcmp(buf, "snorm16x4") == 0) return WGPUVertexFormat_Snorm16x4;
     /* 16-bit float formats */
-    if (strcmp(buf, "float16") == 0)   return 0x00000019;
-    if (strcmp(buf, "float16x2") == 0) return 0x0000001A;
-    if (strcmp(buf, "float16x4") == 0) return 0x0000001B;
+    if (strcmp(buf, "float16") == 0)   return WGPUVertexFormat_Float16;
+    if (strcmp(buf, "float16x2") == 0) return WGPUVertexFormat_Float16x2;
+    if (strcmp(buf, "float16x4") == 0) return WGPUVertexFormat_Float16x4;
     /* 32-bit float formats */
-    if (strcmp(buf, "float32") == 0)   return 0x0000001C;
-    if (strcmp(buf, "float32x2") == 0) return 0x0000001D;
-    if (strcmp(buf, "float32x3") == 0) return 0x0000001E;
-    if (strcmp(buf, "float32x4") == 0) return 0x0000001F;
+    if (strcmp(buf, "float32") == 0)   return WGPUVertexFormat_Float32;
+    if (strcmp(buf, "float32x2") == 0) return WGPUVertexFormat_Float32x2;
+    if (strcmp(buf, "float32x3") == 0) return WGPUVertexFormat_Float32x3;
+    if (strcmp(buf, "float32x4") == 0) return WGPUVertexFormat_Float32x4;
     /* 32-bit integer formats */
-    if (strcmp(buf, "uint32") == 0)    return 0x00000020;
-    if (strcmp(buf, "uint32x2") == 0)  return 0x00000021;
-    if (strcmp(buf, "uint32x3") == 0)  return 0x00000022;
-    if (strcmp(buf, "uint32x4") == 0)  return 0x00000023;
-    if (strcmp(buf, "sint32") == 0)    return 0x00000024;
-    if (strcmp(buf, "sint32x2") == 0)  return 0x00000025;
-    if (strcmp(buf, "sint32x3") == 0)  return 0x00000026;
-    if (strcmp(buf, "sint32x4") == 0)  return 0x00000027;
+    if (strcmp(buf, "uint32") == 0)    return WGPUVertexFormat_Uint32;
+    if (strcmp(buf, "uint32x2") == 0)  return WGPUVertexFormat_Uint32x2;
+    if (strcmp(buf, "uint32x3") == 0)  return WGPUVertexFormat_Uint32x3;
+    if (strcmp(buf, "uint32x4") == 0)  return WGPUVertexFormat_Uint32x4;
+    if (strcmp(buf, "sint32") == 0)    return WGPUVertexFormat_Sint32;
+    if (strcmp(buf, "sint32x2") == 0)  return WGPUVertexFormat_Sint32x2;
+    if (strcmp(buf, "sint32x3") == 0)  return WGPUVertexFormat_Sint32x3;
+    if (strcmp(buf, "sint32x4") == 0)  return WGPUVertexFormat_Sint32x4;
     /* packed formats */
-    if (strcmp(buf, "unorm10-10-10-2") == 0) return 0x00000028;
-    if (strcmp(buf, "unorm8x4-bgra") == 0)   return 0x00000029;
+    if (strcmp(buf, "unorm10-10-10-2") == 0) return WGPUVertexFormat_Unorm10_10_10_2;
+    if (strcmp(buf, "unorm8x4-bgra") == 0)   return WGPUVertexFormat_Unorm8x4BGRA;
     napi_throw_error(env, "DOE_ERROR", "Unsupported vertex format"); return 0;
 }
 

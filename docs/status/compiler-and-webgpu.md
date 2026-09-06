@@ -3,6 +3,50 @@
 This is the live status front door for the non-TSIR WGSL compiler and WebGPU
 runtime path. Artifacts and executable tests own pass/fail state.
 
+## Deferred rendering and native ownership
+
+Vulkan draws are recorded as owned command snapshots and executed during queue
+submission. Render passes and bundles retain pipelines, bindings, attachments,
+vertex/index/indirect buffers, and their encoder/device dependencies. Caller
+reference release is distinct from explicit destruction. The native-addon
+regression writes vertex data after recording, releases caller references, and
+checks the submitted image for direct and bundled draws.
+
+Vertex-format ABI interpretation now has a shared typed owner checked against
+the pinned WebGPU header, with backend-specific conversions kept local. Vulkan
+render pipeline shader copies publish transactionally; allocator regressions
+cover partial construction. Metal pipeline publication preserves its retained
+layout and prepared vertex layouts. Native handle reference counts use atomic
+lease operations; this does not establish general concurrent queue safety.
+
+The acceptance checkpoint is indexed in
+`bench/out/shader-ownership/20260906-owned-diagnostics/README.md`, with retained
+package results at
+`bench/out/compute-program/20260906-render-ownership-qualified/summary.json`.
+This targeted image test does not establish full render-pass conformance,
+attachment load/store and resolve behavior across multiple draws, render query
+coverage, or physical Metal/D3D12 execution.
+
+## Explicit shader failures and owned diagnostics
+
+Reflection, required WGSL retention, and compiler diagnostics are repaired
+through their native and compiler owners. Focused regressions exercise valid
+empty interfaces, allocation failures, extraction capacity, source-context
+retention, and concurrent compiler requests. The migration contract lives in
+[shader compiler architecture](../shader-compiler-architecture.md).
+
+Metal library cache ownership now resides on individual devices, with separate
+shader leases and rollback of source and translation metadata. CPU reference
+accounting does not qualify physical Metal behavior. Zig tests and retained-package
+Vulkan regressions are indexed in
+`bench/out/shader-ownership/20260906-owned-diagnostics/README.md`.
+The same retained package passed Node, Bun, and Electron main-process qualification
+in `bench/out/compute-program/20260906-shader-ownership-qualified/summary.json`;
+independent image, heat, and simulation checks are retained in
+`bench/out/compute-program/20260906-shader-ownership-audits/`.
+Physical Metal validation is still required.
+
+
 ## Scalar compute fusion and allocation failures
 
 The SPIR-V compute pipeline has a versioned arithmetic policy and a typed IR

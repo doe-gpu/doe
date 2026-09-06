@@ -20,7 +20,11 @@ pub fn ensureShaderBindingsWithAllocator(allocator: std.mem.Allocator, sm: *DoeS
     defer sm.bindings_mutex.unlock();
     if (sm.bindings_ready) return;
     if (sm.bindings_error) |err| return err;
-    const wgsl = sm.wgsl_source orelse return error.UnsupportedWgsl;
+    const wgsl = sm.wgsl_source orelse {
+        sm.bindings_error = error.UnsupportedWgsl;
+        setCompilationMessage(sm, .@"error", "binding reflection requires retained WGSL source", 0, 0);
+        return error.UnsupportedWgsl;
+    };
     var diagnostic = wgsl_analysis.Diagnostic{};
     var bind_meta: [native_shared.MAX_SHADER_BINDINGS]wgsl_bindings.BindingMeta = undefined;
     const count = wgsl_bindings.extractBindingsWithDiagnostic(allocator, wgsl, &bind_meta, &diagnostic) catch |err| {

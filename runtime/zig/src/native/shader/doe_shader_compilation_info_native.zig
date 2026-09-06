@@ -10,9 +10,8 @@
 //   [{"message":"...","type":"error","lineNum":N,"linePos":N,"offset":0,"length":0}]
 // An empty array ("[]") is returned when there are no diagnostics.
 //
-// The returned JSON is a NUL-terminated C string backed by a static buffer
-// (single-threaded read; safe for synchronous N-API calls).  Callers must
-// NOT free this pointer; it remains valid until the next call.
+// The returned JSON is a per-thread C boundary snapshot. Callers must copy it
+// before their next compilation-info query on that thread.
 
 const std = @import("std");
 const native_types = @import("../support/doe_native_object_types.zig");
@@ -25,7 +24,7 @@ const DoeShaderModule = native_types.DoeShaderModule;
 // Imports from the WGSL compiler — error metadata query
 // ============================================================
 
-const wgsl_analysis = @import("../../compiler/wgsl/pipeline/analysis.zig");
+const shader_native = @import("doe_shader_native.zig");
 
 // ============================================================
 // Static output buffer
@@ -33,8 +32,10 @@ const wgsl_analysis = @import("../../compiler/wgsl/pipeline/analysis.zig");
 
 // Sufficient for one error message with reasonable length.
 // JSON schema: [{"message":"<msg>","type":"error","lineNum":<n>,"linePos":<n>,"offset":0,"length":0}]
-const OUT_CAP: usize = 1024;
-var out_buf: [OUT_CAP]u8 = undefined;
+const MAX_JSON_ESCAPE_BYTES: usize = 6;
+const JSON_METADATA_BYTES: usize = 256;
+const OUT_CAP: usize = @sizeOf(@FieldType(DoeShaderModule, "compilation_message_storage")) * MAX_JSON_ESCAPE_BYTES + JSON_METADATA_BYTES;
+threadlocal var out_buf: [OUT_CAP]u8 = undefined;
 
 // Static NUL-terminated empty-array result.
 const EMPTY_JSON: [*:0]const u8 = "[]";
@@ -170,6 +171,8 @@ pub export fn doeNativeShaderModuleGetCompilationInfo(
     module_raw: ?*anyopaque,
 ) callconv(.c) [*:0]const u8 {
     if (cast(DoeShaderModule, module_raw)) |module| {
+        module.bindings_mutex.lock();
+        defer module.bindings_mutex.unlock();
         if (module.compilation_message) |message| {
             var stream = std.io.fixedBufferStream(&out_buf);
             const writer = stream.writer();
@@ -202,52 +205,15 @@ pub export fn doeNativeShaderModuleGetCompilationInfo(
         return EMPTY_JSON;
     }
 
-    // Module is null: the creation call failed.  Surface the last WGSL error.
-    const msg = wgsl_analysis.lastErrorMessage();
-    if (msg.len == 0) {
-        return EMPTY_JSON;
-    }
-
-    const line = wgsl_analysis.lastErrorLine();
-    const col = wgsl_analysis.lastErrorColumn();
-
-    // Build escaped message: replace " with \", \ with \\, control chars with space.
-    var escaped: [OUT_CAP]u8 = undefined;
-    var ei: usize = 0;
-    for (msg) |c| {
-        if (ei + 2 >= escaped.len) break;
-        if (c == '"') {
-            escaped[ei] = '\\';
-            ei += 1;
-            escaped[ei] = '"';
-            ei += 1;
-        } else if (c == '\\') {
-            escaped[ei] = '\\';
-            ei += 1;
-            escaped[ei] = '\\';
-            ei += 1;
-        } else if (c < 0x20) {
-            escaped[ei] = ' ';
-            ei += 1;
-        } else {
-            escaped[ei] = c;
-            ei += 1;
-        }
-    }
-    const escaped_msg = escaped[0..ei];
-
-    const json = std.fmt.bufPrint(
-        &out_buf,
-        "[{{\"message\":\"{s}\",\"type\":\"error\",\"lineNum\":{d},\"linePos\":{d},\"offset\":0,\"length\":0}}]",
-        .{ escaped_msg, line, col },
-    ) catch {
-        return EMPTY_JSON;
-    };
-    // Ensure NUL termination.
-    if (json.len < out_buf.len) {
-        out_buf[json.len] = 0;
-    } else {
-        out_buf[OUT_CAP - 1] = 0;
-    }
+    const diagnostic = shader_native.lastErrorSnapshot();
+    const message = diagnostic.last_error_buf[0..diagnostic.last_error_len];
+    if (message.len == 0) return EMPTY_JSON;
+    var stream = std.io.fixedBufferStream(&out_buf);
+    const writer = stream.writer();
+    writer.writeByte('[') catch return EMPTY_JSON;
+    var first = true;
+    write_json_message(writer, &first, "error", message, diagnostic.last_error_line, diagnostic.last_error_col) catch return EMPTY_JSON;
+    writer.writeByte(']') catch return EMPTY_JSON;
+    out_buf[stream.pos] = 0;
     return @ptrCast(out_buf[0..].ptr);
 }

@@ -14,6 +14,11 @@ function validateProgramOptions(options) {
     readback: PROGRAM_SCHEMA.$defs.options.properties.readback.default, ...options };
 }
 
+function validateUpdateOptions(options) {
+  validateNode(options, PROGRAM_SCHEMA.$defs.updateOptions, 'update');
+  return { reset: PROGRAM_SCHEMA.$defs.updateOptions.properties.reset.default, ...options };
+}
+
 function programError(code, path, expected, received) {
   return Object.assign(new Error(`${path}: expected ${expected}; received ${String(received)}`), {
     code, path, expected, received,
@@ -73,6 +78,14 @@ function validateComputeProgram(descriptor) {
   if (descriptor.schemaVersion === 1 && descriptor.buffers.some((buffer) => buffer.lifetime !== undefined)) {
     throw programError('DOE_PROGRAM_INVALID', 'program.schemaVersion', 'version 2 for declared lifetimes', 1);
   }
+  for (const [index, buffer] of descriptor.buffers.entries()) {
+    const requiresFormat = descriptor.schemaVersion >= 3 && buffer.lifetime === 'program';
+    if (requiresFormat !== (buffer.stateFormat !== undefined)) {
+      throw programError('DOE_PROGRAM_INVALID', `program.buffers[${index}].stateFormat`,
+        requiresFormat ? 'explicit resident state format' : 'stateFormat only on version 3 program buffers',
+        buffer.stateFormat);
+    }
+  }
   const unique = (values, path) => {
     if (new Set(values).size !== values.length) {
       throw programError('DOE_PROGRAM_INVALID', path, 'unique identifiers', values.join(', '));
@@ -112,4 +125,7 @@ function validateComputeProgram(descriptor) {
   return { descriptor: snapshot, programHash: hashBytes(JSON.stringify(snapshot)) };
 }
 
-export { validateProgramOptions, BUFFER_ALIGNMENT, PROGRAM_SCHEMA, programError, hashBytes, validateComputeProgram };
+export {
+  validateProgramOptions, validateUpdateOptions, BUFFER_ALIGNMENT, PROGRAM_SCHEMA,
+  programError, hashBytes, freezeTree, validateComputeProgram,
+};
