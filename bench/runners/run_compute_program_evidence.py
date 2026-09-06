@@ -210,6 +210,7 @@ def main() -> int:
     source_paths += list((ROOT / 'config').glob('compute-program*.schema.json'))
     source_paths += [ROOT / reference['path'] for reference in policy.get('timestampSources', [])]
     source_paths += [ROOT / 'bench/lib/compute_program_package.py', ROOT / 'config/compute-program-package.schema.json']
+    source_paths += [ROOT / 'bench/package.json', ROOT / 'bench/package-lock.json']
     if args.package_qualification is not None:
         source_paths.append(args.package_qualification.resolve())
     original_sources = []
@@ -226,9 +227,7 @@ def main() -> int:
         package_root = None
         if args.package_qualification is not None:
             package_root = install_qualification(args.package_qualification.resolve(), output, ROOT, policy['processTimeoutMs'])
-            retained_qualification = output / 'package-qualification.json'
-            shutil.copyfile(args.package_qualification, retained_qualification)
-            args.package_qualification = retained_qualification
+            args.package_qualification = output / 'package-inputs/summary.json'
         native_library = args.native_library.resolve() if args.native_library is not None else None
         inventory_command = ['vulkaninfo', '--summary'] if args.backend == 'vulkan' else ['system_profiler', 'SPDisplaysDataType', '-json']
         inventory = subprocess.run(inventory_command, capture_output=True, text=True, check=True, timeout=policy['processTimeoutMs'] / 1000)

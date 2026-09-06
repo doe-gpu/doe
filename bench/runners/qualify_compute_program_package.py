@@ -31,7 +31,7 @@ def main() -> int:
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     shutil.copyfile(Path(__file__), output / 'qualifier.py')
-    report = {'schemaVersion': 1, 'kind': 'compute_program_package_qualification',
+    report = {'schemaVersion': 2, 'kind': 'compute_program_package_qualification',
               'status': 'running', 'error': None, 'packages': [], 'hosts': [], 'artifacts': [],
               'lifecycleCycles': args.lifecycle_cycles, 'timeoutMs': args.timeout_ms,
               'claimStatus': 'diagnostic', 'installation': 'retained-local-tarballs-with-install-scripts',
@@ -57,7 +57,7 @@ def main() -> int:
                                       ROOT / 'packages' / name, f'pack-{name}'))[0]
             path = output / manifest['filename']
             tarballs.append(str(path))
-            report['packages'].append({'path': str(path), 'hash': digest(path)})
+            report['packages'].append({'path': path.name, 'hash': digest(path)})
         fixtures = ROOT / 'packages/doe-gpu/test/fixtures'
         for host in ['node', 'bun', 'electron']:
             executable = Path(shutil.which(getattr(args, host)) or getattr(args, host)).resolve()
@@ -144,7 +144,7 @@ def main() -> int:
         report['status'] = 'failed'
         report['error'] = str(error)
     finally:
-        report['artifacts'] = [{'path': str(path), 'hash': digest(path)} for path in sorted(output.iterdir()) if path.is_file()]
+        report['artifacts'] = [{'path': path.name, 'hash': digest(path)} for path in sorted(output.iterdir()) if path.is_file()]
         schema = json.loads((ROOT / 'config/compute-program-package.schema.json').read_text())
         jsonschema.Draft202012Validator(schema).validate(report)
         (output / 'summary.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')

@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "onnxruntime-web": "^1.24.3"
+    "onnxruntime-web": "^1.24.3",
+    "webgpu": "0.4.0"
   }
 }

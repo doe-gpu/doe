@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import io
 import json
+import shutil
 import tarfile
 import tempfile
 import unittest
 from pathlib import Path
+
+import jsonschema
 
 from bench.lib.compute_program_package import load_qualification, validate_package_root
 from bench.lib.hash_utils import file_sha256
@@ -84,6 +87,39 @@ class ComputeProgramPackageTests(unittest.TestCase):
         self.report['packages'][1] = self.report['packages'][0]
         with self.assertRaisesRegex(ValueError, 'one wrapper and one native'):
             validate_package_root(self.package_root, self.report)
+
+    def test_portable_qualification_survives_relocation_without_rewriting_hashes(self) -> None:
+        self.report['schemaVersion'] = 2
+        witness = self.root / 'execution.json'
+        witness.write_bytes(b'{"unitFixture":true}')
+        self.report['artifacts'] = [{'path': witness.name, 'hash': file_sha256(witness)}]
+        for reference in self.report['packages']:
+            reference['path'] = Path(reference['path']).name
+        self.save()
+        original_hash = file_sha256(self.summary)
+        relocated = self.root / 'relocated'
+        relocated.mkdir()
+        for reference in [*self.report['packages'], *self.report['artifacts']]:
+            source = self.root / reference['path']
+            shutil.move(source, relocated / source.name)
+        shutil.move(self.summary, relocated / self.summary.name)
+        path = relocated / 'summary.json'
+        self.assertEqual(file_sha256(path), original_hash)
+        qualification = load_qualification(path, ROOT)
+        validate_package_root(self.package_root, qualification)
+        (relocated / witness.name).write_bytes(b'changed evidence')
+        with self.assertRaisesRegex(ValueError, 'Qualified artifact changed'):
+            load_qualification(path, ROOT)
+
+    def test_portable_qualification_rejects_absolute_and_escaping_paths(self) -> None:
+        self.report['schemaVersion'] = 2
+        for reference in self.report['packages']:
+            reference['path'] = Path(reference['path']).name
+        for value in ['/archive.tgz', '../archive.tgz', 'C:\\archive.tgz', '..']:
+            self.report['packages'][0]['path'] = value
+            self.save()
+            with self.assertRaises(jsonschema.ValidationError):
+                load_qualification(self.summary, ROOT)
 
 
 if __name__ == '__main__':

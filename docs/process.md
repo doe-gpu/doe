@@ -243,6 +243,9 @@ library identity, and common executor source are blocking checks. A workspace
 library run cannot substitute for that installation evidence. Evaluation
 artifact migration is documented in
 [`reusable-compute-programs.md`](reusable-compute-programs.md).
+Portable qualification records resolve archive and evidence filenames against
+their own retained directory. Relocation preserves hashes; it cannot rewrite
+provenance or accept escaping paths. Verification checks every recorded input.
 
 ## Refactor law
 

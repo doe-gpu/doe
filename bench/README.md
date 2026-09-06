@@ -29,6 +29,7 @@ Declared compute programs use `program prepare-lif`, `program evaluate`,
 `program qualify-package`, `program verify`, and `program verify-native`.
 Use `program evaluate --package-qualification <summary.json>` to compare
 applications using the exact archives retained by package qualification.
+Install the pinned comparator dependencies with `npm ci --prefix bench`.
 Their policy and evidence boundaries are documented in
 [`reusable-compute-programs.md`](../docs/reusable-compute-programs.md).
 

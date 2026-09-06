@@ -24,9 +24,18 @@ def load_qualification(path: Path, repository: Path) -> dict[str, Any]:
             or len({host['libraryHash'] for host in report['hosts']}) != 1
             or len(report['packages']) != 2):
         raise ValueError('Application evaluation requires the same qualified package on Node, Bun, and Electron')
-    for reference in report['packages']:
-        if file_sha256(Path(reference['path'])) != reference['hash']:
-            raise ValueError(f'Qualified archive changed: {reference["path"]}')
+    for collection in ['packages', 'artifacts']:
+        for reference in report[collection]:
+            original = Path(reference['path'])
+            resolved = original
+            if report['schemaVersion'] >= 2:
+                resolved = (path.parent / original).resolve()
+                if original.name != reference['path'] or not resolved.is_relative_to(path.parent.resolve()):
+                    raise ValueError(f'Qualification reference escapes its retained directory: {original}')
+                reference['path'] = str(resolved)
+            if file_sha256(resolved) != reference['hash']:
+                kind = 'archive' if collection == 'packages' else 'artifact'
+                raise ValueError(f'Qualified {kind} changed: {original}')
     return report
 
 
@@ -67,13 +76,23 @@ def install_qualification(path: Path, output: Path, repository: Path, timeout_ms
     project.mkdir()
     (project / 'package.json').write_text(json.dumps({'name': 'doe-retained-application-evaluation',
                                                     'private': True, 'type': 'module'}))
-    archives = output / 'package-archives'
+    archives = output / 'package-inputs'
     archives.mkdir()
-    retained = []
-    for index, reference in enumerate(report['packages']):
-        target = archives / f'{index}-{Path(reference["path"]).name}'
+    retained_names = {}
+    for reference in [*report['packages'], *report['artifacts']]:
+        target = archives / Path(reference['path']).name
+        if target.name in retained_names:
+            if retained_names[target.name] != reference['hash']:
+                raise ValueError(f'Conflicting retained package artifact: {target.name}')
+            continue
+        retained_names[target.name] = reference['hash']
         shutil.copyfile(reference['path'], target)
-        retained.append(str(target))
+        if file_sha256(target) != reference['hash']:
+            raise ValueError(f'Package artifact changed during retention: {target.name}')
+    if 'summary.json' in retained_names:
+        raise ValueError('Qualification artifacts conflict with the retained summary name')
+    shutil.copyfile(path, archives / 'summary.json')
+    retained = [str(archives / Path(reference['path']).name) for reference in report['packages']]
     environment = {key: value for key, value in os.environ.items()
                    if not key.startswith('DOE_') and key not in ('NODE_PATH', 'NODE_OPTIONS', 'ELECTRON_RUN_AS_NODE')}
     result = subprocess.run(['npm', 'install', '--offline', '--omit=optional', '--no-audit', '--no-fund', *retained],

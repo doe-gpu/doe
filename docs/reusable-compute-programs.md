@@ -272,6 +272,11 @@ in fresh directories, and exercise Node, Bun, and Electron. That harness runs
 the ordinary provider, repeated lifecycle, and plan regressions from the
 installed package. It grants neither registry publication nor release admission.
 
+Qualification artifact version 2 stores archive and evidence filenames relative
+to its own directory. Move that directory intact to reproduce elsewhere;
+recorded hashes do not change. The loader rejects escaping references and checks
+all retained artifacts. Version 1 preserves its original path semantics.
+
 Pass that retained summary to the existing evaluator with
 `program evaluate --package-qualification <summary.json>` instead of
 `--native-library`. The evaluator installs the same wrapper and platform
@@ -282,6 +287,11 @@ qualification's host/library agreement, and the actual loaded library. Changed
 package bytes and mixed package sources fail before comparisons are admitted.
 Installed files, archives, install logs, and execution artifacts remain in the
 evaluation directory.
+The evaluator also retains the complete qualification inputs under
+`package-inputs/`, so a version 2 qualification remains usable after its original
+directory is unavailable.
+The Dawn control is pinned in `bench/package.json` and `bench/package-lock.json`;
+`npm ci --prefix bench` installs that declared comparator dependency.
 
 Evaluation artifact version 5 adds `packageQualification` and `packageRoot`.
 Both are null for workspace-library evaluation; package evaluation binds the
