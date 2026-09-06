@@ -36,6 +36,15 @@ The matrix using a relocated copy is
 `bench/out/compute-program/20260905-portable-package-matrix/summary.json`.
 Earlier full-sequence installed-package reports remain under
 `bench/out/compute-program/20260905-installed-package-resident/`.
+The portable reproduction input archive is
+`bench/out/compute-program/doe-amd-vulkan-reproduction-c2c349d0f.tar.gz`;
+its checksum sidecar and the recipe under
+`bench/out/compute-program/20260905-independent-reproduction/` bind the package,
+frozen fixtures, controls, and source revision. Extracted-input runs from a
+separate clean checkout are retained under that directory in
+`clean-checkout-results/`. Tail stalls and observed unrelated GPU clients keep
+the application measurements diagnostic.
+
 These are repeated physical tests on the same AMD host, not independent
 reproduction or registry publication. The matrix retains raw outputs, native
 journals, SPIR-V, install records, source snapshots, and diagnostic comparisons.
