@@ -35,6 +35,9 @@
         },
         {
           "const": 4
+        },
+        {
+          "const": 5
         }
       ]
     },
@@ -184,6 +187,14 @@
       "items": {
         "$ref": "#/properties/fixtures/additionalProperties"
       }
+    },
+    "gpuActivity": {
+      "type": "string",
+      "enum": [
+        "off",
+        "reject-observed-linux-drm"
+      ],
+      "description": "Version 5 explicitly controls bracketed Linux DRM observations. Rejection detects visible foreign activity; it does not establish exclusive device access."
     }
   },
   "allOf": [
@@ -218,8 +229,17 @@
           "timestampPeriodRelativeTolerance",
           "timestampSources"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "maximum": 3
+          }
+        }
       },
-      "else": {
+      "then": {
         "not": {
           "anyOf": [
             {
@@ -252,6 +272,73 @@
                 "timestampSources"
               ]
             }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "anyOf": [
+          {
+            "required": [
+              "gpuTiming"
+            ]
+          },
+          {
+            "required": [
+              "dawnTimestampQuantization"
+            ]
+          },
+          {
+            "required": [
+              "wgpuTimestampUnits"
+            ]
+          },
+          {
+            "required": [
+              "vulkanDeviceIndex"
+            ]
+          },
+          {
+            "required": [
+              "timestampPeriodRelativeTolerance"
+            ]
+          },
+          {
+            "required": [
+              "timestampSources"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "gpuTiming",
+          "dawnTimestampQuantization",
+          "wgpuTimestampUnits",
+          "vulkanDeviceIndex",
+          "timestampPeriodRelativeTolerance",
+          "timestampSources"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 5
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "gpuActivity"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "gpuActivity"
           ]
         }
       }

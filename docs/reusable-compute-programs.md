@@ -301,6 +301,30 @@ evaluation artifacts, not public compute-program descriptors or run receipts.
 
 ## Migration and evidence boundaries
 
+Evaluation policy version 5 requires an explicit `gpuActivity` value. `off`
+preserves execution without host observations. `reject-observed-linux-drm`
+requires Vulkan on a Linux host with a single PCI DRM render device. The generic
+policy explicitly disables this platform-specific check; the AMD external
+policy enables it. Earlier policy versions retain their original behavior.
+Timestamp settings remain independent, with their existing grouped contract.
+
+The Python evaluator brackets each measured child process with raw DRM fdinfo
+snapshots outside the child's timing interval. The versioned
+`*.gpu-activity.json` sidecar binds these observations to the evaluation hash,
+policy hash, and physical device. Shared file descriptors are deduplicated by
+DRM client identity. Positive foreign engine activity, disappeared clients,
+missing counters, and counter regressions reject timing admission. Matrix
+verification recomputes admission from the raw sidecar and requires every run
+to use the matrix's policy. Numerical audit execution is unchanged.
+
+The observer covers readable clients at process boundaries. It records unreadable
+processes and cannot observe clients that start and exit between snapshots.
+Passing this check does not prove exclusive access or replace an isolated
+performance host. Rejected runs retain their numerical outputs and observations;
+they cannot produce comparison rows. Counter identity and units follow the
+[Linux DRM usage-statistics contract](https://docs.kernel.org/gpu/drm-usage-stats.html).
+No public program descriptor, receipt, or package ABI changes with this policy.
+
 The Vulkan pipeline cache now treats precomputed hashes as lookup hints, not
 identity proofs. Rebuild the native library to apply this correction; public
 descriptor, receipt, and ABI fields are unchanged. Earlier hash-only failures

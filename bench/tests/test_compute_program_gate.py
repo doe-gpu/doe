@@ -79,6 +79,13 @@ class ComputeProgramGateTests(unittest.TestCase):
         self.path.write_text(json.dumps(self.report))
         validate_run(self.path, ROOT, self.policy)
 
+    def test_measurement_requires_declared_gpu_activity_evidence(self) -> None:
+        self.policy['gpuActivity'] = 'reject-observed-linux-drm'
+        self.validate()
+        self.report['phase'] = 'measure'
+        with self.assertRaises(FileNotFoundError):
+            self.validate()
+
     def test_completion_receipt_migration_and_timing_scope_parity(self) -> None:
         receipt = copy.deepcopy(self.report['cold']['receipt'])
         receipt.update(schemaVersion=5, gpuTiming=None, completionMode='queue-and-map',

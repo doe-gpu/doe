@@ -63,6 +63,8 @@ def validate_gpu_timing(receipt: dict[str, Any], provider: str, policy: dict[str
 
 
 def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, Any]:
+    from bench.lib.compute_program_gpu_activity import validate_activity
+
     report = json.loads(path.read_text(encoding="utf-8"))
     schema = json.loads((root / "config/compute-program-run.schema.json").read_text())
     jsonschema.Draft202012Validator(schema).validate(report)
@@ -72,6 +74,7 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
         raise ValueError(f'{path}: run is outside the frozen evaluation policy')
     if report['adapter']['isFallbackAdapter'] is not False:
         raise ValueError(f'{path}: fallback state is not explicitly physical')
+    validate_activity(path, root, policy, report)
     calibration = None
     if report['schemaVersion'] >= 3 and report['backend'] == 'vulkan' and policy.get('gpuTiming', 'off') != 'off':
         reference = report.get('timestampCalibrationArtifact')
@@ -292,6 +295,8 @@ def validate_matrix(path: Path, root: Path, policy_path: Path) -> dict[str, Any]
     schema = json.loads((root / 'config/compute-program-matrix.schema.json').read_text())
     jsonschema.Draft202012Validator(schema).validate(summary)
     policy = json.loads(policy_path.read_text())
+    policy_schema = json.loads((root / 'config/compute-program-evaluation.schema.json').read_text())
+    jsonschema.Draft202012Validator(policy_schema).validate(policy)
     if summary['status'] != 'diagnostic' or summary['error'] is not None or digest(policy_path) != summary['policyHash']:
         raise ValueError(f'{path}: unsuccessful matrix or changed policy')
     for reference in [*summary['sources'], *summary['artifacts']]:
@@ -304,6 +309,8 @@ def validate_matrix(path: Path, root: Path, policy_path: Path) -> dict[str, Any]
             continue
         artifact = json.loads(artifact_path.read_text())
         if artifact.get('kind') == 'compute_program_evaluation':
+            if artifact['policyHash'] != summary['policyHash']:
+                raise ValueError(f'{artifact_path}: run belongs to a different matrix policy')
             reports.append((artifact_path, validate_run(artifact_path, root, policy)))
     for application in policy['applications']:
         for provider in policy['providers']:

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Compute program GPU activity observations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "scope",
+    "policyHash",
+    "evaluationHash",
+    "target",
+    "snapshots"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "compute_program_gpu_activity"
+    },
+    "scope": {
+      "const": "readable-clients-at-process-boundaries"
+    },
+    "policyHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "evaluationHash": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "renderNode",
+        "pciDevice",
+        "vendorId",
+        "deviceId"
+      ],
+      "properties": {
+        "renderNode": {
+          "type": "string",
+          "pattern": "^/dev/dri/renderD[0-9]+$"
+        },
+        "pciDevice": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\\.[0-7]$"
+        },
+        "vendorId": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deviceId": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "snapshots": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "monotonicNs",
+          "fdinfo",
+          "unreadableProcesses"
+        ],
+        "properties": {
+          "monotonicNs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fdinfo": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pid",
+                "fd",
+                "contents"
+              ],
+              "properties": {
+                "pid": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "fd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "contents": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "unreadableProcesses": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 5,
   "width": 256,
   "height": 256,
   "heatIterations": 32,
@@ -25,5 +25,6 @@
   "processTimeoutMs": 120000,
   "preparedExecution": "gpu-recorded",
   "percentileMethod": "nearest-rank",
-  "fixtures": {}
+  "fixtures": {},
+  "gpuActivity": "off"
 }

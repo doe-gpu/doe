@@ -15,6 +15,7 @@ import jsonschema
 
 from bench.gates.compute_program_gate import completion_mode, digest, validate_run
 from bench.lib.compute_program_fixture import fixture_references, load_fixture
+from bench.lib.compute_program_gpu_activity import capture_activity
 from bench.lib.compute_program_package import (
     install_qualification,
     load_qualification,
@@ -70,8 +71,9 @@ def run_child(
         command += [f'--package-root={package_root}', f'--package-qualification={package_qualification}']
     if policy.get('gpuTiming', 'off') != 'off' and backend == 'vulkan':
         command.append(f'--hardware={output.parent / "hardware-profile.json"}')
-    result = subprocess.run(command, cwd=ROOT, env=environment, capture_output=True,
-                            text=True, timeout=policy["processTimeoutMs"] / 1000, check=False)
+    with capture_activity(output, policy, digest(policy_path), backend, phase):
+        result = subprocess.run(command, cwd=ROOT, env=environment, capture_output=True,
+                                text=True, timeout=policy["processTimeoutMs"] / 1000, check=False)
     Path(f"{output}.stdout").write_text(result.stdout, encoding="utf-8")
     Path(f"{output}.stderr").write_text(result.stderr, encoding="utf-8")
     if result.returncode:
@@ -210,6 +212,7 @@ def main() -> int:
     source_paths += list((ROOT / 'config').glob('compute-program*.schema.json'))
     source_paths += [ROOT / reference['path'] for reference in policy.get('timestampSources', [])]
     source_paths += [ROOT / 'bench/lib/compute_program_package.py', ROOT / 'config/compute-program-package.schema.json']
+    source_paths.append(ROOT / 'bench/lib/compute_program_gpu_activity.py')
     source_paths += [ROOT / 'bench/package.json', ROOT / 'bench/package-lock.json']
     if args.package_qualification is not None:
         source_paths.append(args.package_qualification.resolve())

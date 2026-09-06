@@ -22,6 +22,18 @@ and general numerical improvement are not inferred.
 
 ## Qualification and reproduction
 
+The AMD external evaluation policy now rejects timing runs with observed
+unrelated DRM activity. Raw process-boundary observations are bound to each
+measured output and rechecked by the matrix gate. This detects visible
+contention without interrupting other clients; it does not establish exclusive
+access or cover clients absent from both snapshots. Numerical audits remain
+separate. The policy migration and visibility limits are documented in
+[reusable compute programs](../reusable-compute-programs.md).
+Guarded application records are in
+`bench/out/compute-program/20260906-gpu-activity-matrix/summary.json`;
+the controlled physical rejection and compatibility checks are retained in
+`bench/out/compute-program/20260906-gpu-activity-correction/`.
+
 `program qualify-package` retains the same archives for fresh Node, Bun, and
 Electron main-process installation. Qualification version 2 uses relative
 artifact filenames so the evidence directory can move without rewriting hashes.

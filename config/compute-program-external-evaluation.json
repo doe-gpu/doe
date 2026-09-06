@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 5,
   "width": 256,
   "height": 256,
   "heatIterations": 32,
@@ -36,5 +36,6 @@
       "path": "bench/out/compute-program/20260905-holoscript-resident-sequence-fixture/fixture.json",
       "hash": "9bae4395f9fcc58ae2832e8f42586ec8dbb661e31d2fbc42087e5d17ec7d68b9"
     }
-  }
+  },
+  "gpuActivity": "reject-observed-linux-drm"
 }

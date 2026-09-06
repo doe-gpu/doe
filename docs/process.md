@@ -247,6 +247,15 @@ Portable qualification records resolve archive and evidence filenames against
 their own retained directory. Relocation preserves hashes; it cannot rewrite
 provenance or accept escaping paths. Verification checks every recorded input.
 
+Application policies explicitly select host GPU activity observation. When
+`gpuActivity=reject-observed-linux-drm`, measured runs require hash-bound raw
+DRM observations and fail admission on observed foreign activity or lost counter
+continuity. The matrix gate recomputes this check and enforces common policy
+identity. Boundary observations do not establish exclusive device access;
+isolated-host qualification remains necessary. Numerical audits and historical
+policies retain their existing contracts. Migration and observation limits are
+documented in [`reusable-compute-programs.md`](reusable-compute-programs.md).
+
 ## Refactor law
 
 Behavior-preserving refactors follow this evidence sequence:
