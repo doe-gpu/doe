@@ -167,6 +167,7 @@ fn clamp_sized(
 
     // min(index, length - 1)
     const args = try function.append_expr_args(allocator, &.{ original_index, max_id });
+    try function.exprs.ensureUnusedCapacity(allocator, 1);
     const min_id = try function.append_expr(allocator, .{
         .ty = u32_ty,
         .category = .value,
@@ -208,6 +209,7 @@ fn clamp_runtime_sized(
     const base_ref = index_data.base;
 
     const al_args = try function.append_expr_args(allocator, &.{base_ref});
+    try function.exprs.ensureUnusedCapacity(allocator, 1);
     const array_length_id = try function.append_expr(allocator, .{
         .ty = u32_ty,
         .category = .value,
@@ -235,6 +237,7 @@ fn clamp_runtime_sized(
     });
 
     const min_args = try function.append_expr_args(allocator, &.{ original_index, sub_id });
+    try function.exprs.ensureUnusedCapacity(allocator, 1);
     const min_id = try function.append_expr(allocator, .{
         .ty = u32_ty,
         .category = .value,
@@ -824,6 +827,7 @@ fn clamp_texture_coords(
     const td_id = blk: {
         if (level_arg) |texture_level_arg| {
             const td_args = try function.append_expr_args(allocator, &.{ texture_arg, texture_level_arg });
+            try function.exprs.ensureUnusedCapacity(allocator, 1);
             break :blk try function.append_expr(allocator, .{
                 .ty = coord_ty,
                 .category = .value,
@@ -835,6 +839,7 @@ fn clamp_texture_coords(
             });
         } else {
             const td_args = try function.append_expr_args(allocator, &.{texture_arg});
+            try function.exprs.ensureUnusedCapacity(allocator, 1);
             break :blk try function.append_expr(allocator, .{
                 .ty = coord_ty,
                 .category = .value,
@@ -888,6 +893,7 @@ fn clamp_texture_coords(
 
     // clamp(coords, vec(0), textureDimensions - 1)
     const clamp_args = try function.append_expr_args(allocator, &.{ coord_arg, zero_vec, max_coord });
+    try function.exprs.ensureUnusedCapacity(allocator, 1);
     const clamped_coord = try function.append_expr(allocator, .{
         .ty = coord_ty,
         .category = .value,
@@ -921,6 +927,7 @@ fn clamp_texture_coords_scalar(
         if (is_load and texture_has_level(tex_ty) and call_data.args.len >= 3) {
             const level_arg = function.expr_args.items[call_data.args.start + 2];
             const td_args = try function.append_expr_args(allocator, &.{ texture_arg, level_arg });
+            try function.exprs.ensureUnusedCapacity(allocator, 1);
             break :blk try function.append_expr(allocator, .{
                 .ty = u32_ty,
                 .category = .value,
@@ -932,6 +939,7 @@ fn clamp_texture_coords_scalar(
             });
         } else {
             const td_args = try function.append_expr_args(allocator, &.{texture_arg});
+            try function.exprs.ensureUnusedCapacity(allocator, 1);
             break :blk try function.append_expr(allocator, .{
                 .ty = u32_ty,
                 .category = .value,
@@ -958,6 +966,7 @@ fn clamp_texture_coords_scalar(
 
     // min(coord, textureDimensions - 1)
     const min_args = try function.append_expr_args(allocator, &.{ coord_arg, max_coord });
+    try function.exprs.ensureUnusedCapacity(allocator, 1);
     const clamped_coord = try function.append_expr(allocator, .{
         .ty = coord_ty,
         .category = .value,

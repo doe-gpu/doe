@@ -1,5 +1,34 @@
 # Reusable compute programs
 
+## Resident numerical correction
+
+SPIR-V compute lowering now applies the versioned scalar arithmetic policy in
+`config/spirv-compute-arithmetic-policy.json`. Ordinary and recorded Doe pass the
+unchanged continuous HoloScript WGSL, initialization inputs, frozen sequence,
+membrane tolerances, and exact spike oracle. Validated full-sequence reports are
+under `bench/out/compute-program/20260905-resident-fusion-sequence/`; native
+recording and SPIR-V verification live with the correction evidence.
+
+The original identical failing provider bytes remain under
+`bench/out/compute-program/20260905-resident-sequence-numerical-controls/`.
+Host arithmetic localization and a deliberately rewritten-shader diagnostic are
+retained separately. Final acceptance uses the original shader and CPU twin;
+it does not substitute either diagnostic for the oracle.
+
+The canonical external matrix under
+`bench/out/compute-program/20260905-resident-fusion-external-matrix/` still fails
+because Dawn fails the resident oracle. The separately retained wgpu control
+also fails. Those failures exclude resident incumbent performance comparisons;
+provider agreement is not correctness. The correction is currently physical
+AMD Vulkan evidence, not Metal or Windows qualification.
+
+The allocation-failure regression also repaired semantic and IR name ownership,
+function publication, and robustness helper cleanup. Transform allocation
+failures retain their `OutOfMemory` cause. Original failures are under
+`bench/out/compute-program/20260905-fusion-sema-allocation-failure/`; full native,
+compiler, package, and replay checks are retained under
+`bench/out/compute-program/20260905-resident-fusion-correction/`.
+
 ## Concurrent completion and readback
 
 The shared executor requests queue completion and mapping together, waits for
@@ -35,26 +64,6 @@ under `bench/out/compute-program/20260905-pipeline-identity-failure/`;
 corrected physical execution and native replay verification live under
 `bench/out/compute-program/20260905-pipeline-identity-correction/`.
 
-## Resident numerical acceptance
-
-The external fixture generator now freezes continuous simulation oracles before
-GPU execution. Evaluation records warmups and lifecycle runs as part of the
-state history; the gate rejects reuploads, clears, stale generations, missing
-invocations, and reset outputs. The declared sequence is in
-`bench/out/compute-program/20260905-holoscript-resident-sequence-fixture/fixture.json`.
-The matrix under `bench/out/compute-program/20260905-resident-sequence-matrix/`
-failed its original upstream numerical tolerance on repeated resident work.
-Prepared Doe, ordinary Doe, Dawn, and wgpu produced identical failing output
-bytes; controls are retained under
-`bench/out/compute-program/20260905-resident-sequence-numerical-controls/`.
-This is an open continuous-simulation numerical acceptance issue, not a
-prepared-command speed result. The frozen oracle and tolerances remain intact. A CPU arithmetic diagnostic
-reproduces the retained GPU bytes with a captured decay approximation and fused
-integration; alternative evaluation orders are compared against the frozen CPU
-oracle under `bench/out/compute-program/20260905-resident-arithmetic-localization/`.
-That diagnostic localizes the discrepancy without replacing the acceptance
-oracle.
-
 ## Current boundary
 
 `doe-gpu/compute-program` is the declared fixed-shape execution interface.
@@ -82,7 +91,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-completion-overlap-package/summary.json`.
+`bench/out/compute-program/20260905-resident-fusion-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -90,14 +99,14 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-completion-overlap-matrix/summary.json`.
+`bench/out/compute-program/20260905-resident-fusion-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
-invocation-local work under the new receipt contract. It does not measure a
-resident application sequence. Performance remains diagnostic; large Deno host
+invocation-local work under the current arithmetic and receipt contracts.
+Resident acceptance and failing controls are recorded separately above. Performance remains diagnostic; large Deno host
 ratios remain suspicious and require fairness review.
 Native replay and SPIR-V verification for this matrix are retained with the
-completion overlap correction.
+resident fusion correction.
 
 ## Active acceptance gaps
 
@@ -108,8 +117,8 @@ descriptor state while retaining unchanged public resources and compatible
 live compute pipelines. Pipeline and descriptor sharing alone do not establish
 reduced useful-operation latency.
 
-The external portfolio, a measured application boundary crossing, resident
-sequence numerical qualification, and independent repeat use remain open.
+The external portfolio, a measured application boundary crossing, cross-backend
+resident sequence qualification, and independent repeat use remain open.
 Requested allocation accounting excludes internal query scratch and is not a
 measurement of peak GPU memory. Physical driver loss and recovery remain
 unevidenced; explicit device destruction is a separate lifecycle test.

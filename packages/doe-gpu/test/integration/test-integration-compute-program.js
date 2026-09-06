@@ -42,6 +42,31 @@ device.createBuffer = (declaration) => {
   return buffer;
 };
 try {
+  const orderedArithmetic = {
+    schemaVersion: 1, id: 'ordered_arithmetic',
+    buffers: [{ id: 'output', size: 8, type: 'storage', role: 'output' }],
+    shaders: [{ id: 'ordered', entryPoint: 'main', code: `
+      var<private> counter: u32;
+      @group(0) @binding(0) var<storage, read_write> output: array<f32>;
+      fn a() -> f32 { counter += 1u; return f32(counter); }
+      fn b() -> f32 { counter += 2u; return f32(counter); }
+      fn c() -> f32 { counter += 3u; return f32(counter); }
+      fn d() -> f32 { counter += 4u; return f32(counter); }
+      @compute @workgroup_size(1) fn main() {
+        output[0] = (a() + b() * c()) + d();
+        output[1] = f32(counter);
+      }` }],
+    steps: [{ shader: 'ordered', bindings: [{ binding: 0, buffer: 'output' }], workgroups: [1, 1, 1] }],
+    output: 'output',
+  };
+  for (const execution of ['webgpu', 'native-recorded', ...(process.platform === 'linux' ? ['gpu-recorded'] : [])]) {
+    const program = await prepareComputeProgram(device, orderedArithmetic, { execution });
+    try {
+      const result = await program.run();
+      assert.deepEqual([...new Float32Array(result.output.buffer)], [29, 10]);
+    } finally { await program.close(); }
+  }
+  console.log('ok: arithmetic transformation preserves dynamic operand order and evaluates each call once');
   for (const [code, kind] of [
     ['// source line one\nnot valid WGSL', 'UnexpectedToken'],
     ['@compute @workgroup_size(1) fn main() {\n let value: u32 = missing_value;\n}', 'UnknownIdentifier'],

@@ -763,6 +763,10 @@
         {
           "path": "tests/wgsl/emit_csl_exec_v1_test.zig",
           "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/ir_transform_float_fusion_test.zig",
+          "kind": "characterization"
         }
       ]
     }

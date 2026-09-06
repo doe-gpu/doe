@@ -3,6 +3,19 @@
 This is the live status front door for the non-TSIR WGSL compiler and WebGPU
 runtime path. Artifacts and executable tests own pass/fail state.
 
+## Scalar compute fusion and allocation failures
+
+The SPIR-V compute pipeline has a versioned arithmetic policy and a typed IR
+transform preserving operand order and ownership. Its physical continuous
+simulation correction, unchanged oracle, and remaining cross-backend boundary
+are recorded in [reusable compute programs](reusable-compute-programs.md).
+
+Allocation-failure regressions repair name publication in semantic analysis and
+IR building, ownership transfer for entry points, and robustness builtin names.
+Allocation errors now retain their original typed cause. Correction evidence is
+under `bench/out/compute-program/20260905-resident-fusion-correction/`; this does
+not establish general shader conformance or remove unrelated downstream gaps.
+
 ## Current boundary
 
 - Doe has source-preserving WGSL lowering and backend emit paths for Metal,

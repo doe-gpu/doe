@@ -269,6 +269,16 @@ fn configure_non_windows_graphics(artifact: *std.Build.Step.Compile, b: *std.Bui
     }
 }
 
+fn addCompilerArithmeticPolicy(options: *std.Build.Step.Options, allocator: std.mem.Allocator) void {
+    const bytes = std.fs.cwd().readFileAlloc(allocator, "../../config/spirv-compute-arithmetic-policy.json", 64 * 1024) catch
+        @panic("failed to read spirv-compute-arithmetic-policy.json");
+    const Policy = struct { schemaVersion: u32, offsetMultiplyAdd: enum { @"source-order", @"fuse-trailing-add" } };
+    const policy = std.json.parseFromSlice(Policy, allocator, bytes, .{}) catch
+        @panic("invalid SPIR-V compute arithmetic policy");
+    if (policy.value.schemaVersion != 1) @panic("unsupported SPIR-V compute arithmetic policy version");
+    options.addOption(bool, "spirv_compute_fuse_trailing_add", policy.value.offsetMultiplyAdd == .@"fuse-trailing-add");
+}
+
 fn addComputeProgramContract(options: *std.Build.Step.Options, allocator: std.mem.Allocator) void {
     const file = std.fs.cwd().openFile("../../config/compute-program.schema.json", .{}) catch
         @panic("config/compute-program.schema.json not found");
@@ -349,6 +359,7 @@ pub fn build(b: *std.Build) void {
     const lean_verified = b.option(bool, "lean-verified", "Embed Lean proof artifact and validate at comptime") orelse false;
     const build_options = b.addOptions();
     addComputeProgramContract(build_options, b.allocator);
+    addCompilerArithmeticPolicy(build_options, b.allocator);
     build_options.addOption(bool, "lean_verified", lean_verified);
     build_options.addOption(BuildTier, "build_tier", build_tier);
     addProofProvenanceOptions(build_options, proof_provenance);
@@ -1209,6 +1220,7 @@ pub fn build(b: *std.Build) void {
     // These named steps override tier for convenience.
     const compute_build_options = b.addOptions();
     addComputeProgramContract(compute_build_options, b.allocator);
+    addCompilerArithmeticPolicy(compute_build_options, b.allocator);
     compute_build_options.addOption(bool, "lean_verified", lean_verified);
     compute_build_options.addOption(BuildTier, "build_tier", .compute);
     addProofProvenanceOptions(compute_build_options, proof_provenance);
@@ -1284,6 +1296,7 @@ pub fn build(b: *std.Build) void {
     // Full Dawn drop-in variant (tier=full).
     const full_build_options = b.addOptions();
     addComputeProgramContract(full_build_options, b.allocator);
+    addCompilerArithmeticPolicy(full_build_options, b.allocator);
     full_build_options.addOption(bool, "lean_verified", lean_verified);
     full_build_options.addOption(BuildTier, "build_tier", .full);
     addProofProvenanceOptions(full_build_options, proof_provenance);

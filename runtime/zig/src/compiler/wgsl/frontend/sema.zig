@@ -173,10 +173,11 @@ const Analyzer = struct {
     fn register_struct(self: *Analyzer, node: Node) !void {
         const name = self.module.tree.tokenSlice(node.data.lhs);
         if (self.module.struct_map.contains(name)) return error.DuplicateSymbol;
-        const name_copy = try ir.dup_string(self.module.allocator, name);
         const struct_id: ir.StructId = @intCast(self.module.structs.items.len);
         const ty = try self.module.types.intern(.{ .struct_ = struct_id });
-        try self.module.structs.append(self.module.allocator, .{
+        try self.module.structs.ensureUnusedCapacity(self.module.allocator, 1);
+        const name_copy = try ir.dup_string(self.module.allocator, name);
+        self.module.structs.appendAssumeCapacity(.{
             .name = name_copy,
             .struct_id = struct_id,
             .ty = ty,
@@ -187,9 +188,10 @@ const Analyzer = struct {
     fn register_alias(self: *Analyzer, node: Node) !void {
         const name = self.module.tree.tokenSlice(node.main_token + 1);
         if (self.module.alias_map.contains(name)) return error.DuplicateSymbol;
+        try self.module.aliases.ensureUnusedCapacity(self.module.allocator, 1);
         const copy = try ir.dup_string(self.module.allocator, name);
         const idx: u32 = @intCast(self.module.aliases.items.len);
-        try self.module.aliases.append(self.module.allocator, .{ .name = copy, .ty = ir.INVALID_TYPE });
+        self.module.aliases.appendAssumeCapacity(.{ .name = copy, .ty = ir.INVALID_TYPE });
         try self.module.alias_map.put(self.module.allocator, copy, idx);
     }
 
@@ -201,9 +203,10 @@ const Analyzer = struct {
             else => return error.InvalidWgsl,
         };
         if (self.module.global_map.contains(name)) return error.DuplicateSymbol;
+        try self.module.globals.ensureUnusedCapacity(self.module.allocator, 1);
         const copy = try ir.dup_string(self.module.allocator, name);
         const idx: u32 = @intCast(self.module.globals.items.len);
-        try self.module.globals.append(self.module.allocator, .{
+        self.module.globals.appendAssumeCapacity(.{
             .name = copy,
             .node_idx = node_idx,
             .ty = ir.INVALID_TYPE,
@@ -220,9 +223,10 @@ const Analyzer = struct {
     fn register_function(self: *Analyzer, node: Node, node_idx: u32) !void {
         const name = self.module.tree.tokenSlice(self.module.tree.extra_data.items[node.data.lhs]);
         if (self.module.function_map.contains(name)) return error.DuplicateSymbol;
+        try self.module.functions.ensureUnusedCapacity(self.module.allocator, 1);
         const copy = try ir.dup_string(self.module.allocator, name);
         const idx: u32 = @intCast(self.module.functions.items.len);
-        try self.module.functions.append(self.module.allocator, .{
+        self.module.functions.appendAssumeCapacity(.{
             .name = copy,
             .node_idx = node_idx,
             .return_type = self.module.void_type,
@@ -242,9 +246,10 @@ const Analyzer = struct {
             const member_idx = self.module.tree.extra_data.items[member_start + i];
             const member = self.module.tree.nodes.items[member_idx];
             const field_ty = try self.resolve_type_node(member.data.lhs);
-            const field_name = try ir.dup_string(self.module.allocator, self.module.tree.tokenSlice(member.main_token));
             const io = try sema_attrs.parse_io_attr(self, member.data.rhs & 0xFFFF, member.data.rhs >> 16);
-            try struct_info.fields.append(self.module.allocator, .{
+            try struct_info.fields.ensureUnusedCapacity(self.module.allocator, 1);
+            const field_name = try ir.dup_string(self.module.allocator, self.module.tree.tokenSlice(member.main_token));
+            struct_info.fields.appendAssumeCapacity(.{
                 .name = field_name,
                 .ty = field_ty,
                 .io = io,
@@ -338,10 +343,11 @@ const Analyzer = struct {
         var i: u32 = 0;
         while (i < params_len) : (i += 1) {
             const param_extra_start = extra[params_start + i];
-            const param_name = try ir.dup_string(self.module.allocator, self.module.tree.tokenSlice(extra[param_extra_start + 0]));
             const param_ty = try self.resolve_type_node(extra[param_extra_start + 1]);
             const param_io = try sema_attrs.parse_io_attr(self, extra[param_extra_start + 2], extra[param_extra_start + 3]);
-            try function_info.params.append(self.module.allocator, .{
+            try function_info.params.ensureUnusedCapacity(self.module.allocator, 1);
+            const param_name = try ir.dup_string(self.module.allocator, self.module.tree.tokenSlice(extra[param_extra_start + 0]));
+            function_info.params.appendAssumeCapacity(.{
                 .name = param_name,
                 .ty = param_ty,
                 .io = param_io,
@@ -496,7 +502,8 @@ const Analyzer = struct {
             return error.TypeMismatch;
         }
         const local_index: u32 = @intCast(body.function().locals.items.len);
-        try body.function().locals.append(self.module.allocator, .{
+        try body.function().locals.ensureUnusedCapacity(self.module.allocator, 1);
+        body.function().locals.appendAssumeCapacity(.{
             .name = try ir.dup_string(self.module.allocator, name),
             .ty = resolved_type,
             .mutable = node.tag == .var_stmt,

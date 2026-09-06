@@ -175,6 +175,8 @@ def main() -> int:
                     ROOT / 'config/benchmark-methodology-thresholds.json',
                     ROOT / 'config/vulkan-buffer-memory-policy.json',
                     ROOT / 'config/vulkan-timestamp-policy.json',
+                    ROOT / 'config/spirv-compute-arithmetic-policy.json',
+                    ROOT / 'config/spirv-compute-arithmetic-policy.schema.json',
                     ROOT / 'runtime/zig/src/backend/vulkan/vk_timestamp_normalize.wgsl',
                     ROOT / 'runtime/zig/build.zig',
                     ROOT / 'packages/doe-gpu/examples/compute-programs.js']

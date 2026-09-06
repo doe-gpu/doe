@@ -2398,9 +2398,9 @@
       },
       "src/compiler/wgsl/frontend/sema.zig": {
         "decision": "Keep",
-        "moduleSha256": "41475b5bb7dbce2c6c33fa1c8d25216949d7f4bcde480e689e65b721eb35bd60",
-        "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-world-labs-compatibility/2026-08-16"
+        "moduleSha256": "5306ffcde5fdd1b2d0b6a1653c809147431b7b528eb4214e218bdadea8c49c07",
+        "reason": "Keep semantic registration and resolution together; reserve owners before allocating names so failed analysis releases every allocation.",
+        "reviewer": "codex-sema-allocation/2026-09-05"
       },
       "src/compiler/wgsl/frontend/sema_attrs.zig": {
         "decision": "Keep",
@@ -2458,9 +2458,9 @@
       },
       "src/compiler/wgsl/ir/ir_builder.zig": {
         "decision": "Keep",
-        "moduleSha256": "c0fa9b9cd46a74777972951322ca4a7fabbc0d8fad11afa75a147c9b2983efc7",
-        "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-doe-wgsl-correctness/2026-09-01"
+        "moduleSha256": "afc289b13c83c0b367058e9c179bcc7ee64707dcda5a3ba3a746531a0e00dce5",
+        "reason": "Keep typed IR construction and owned-name publication together; allocation failure cleans partial expressions and transfers functions only after entry-point allocation.",
+        "reviewer": "codex-ir-allocation/2026-09-05"
       },
       "src/compiler/wgsl/ir/ir_const_eval.zig": {
         "decision": "Keep",
@@ -2488,9 +2488,9 @@
       },
       "src/compiler/wgsl/ir/ir_transform_robustness.zig": {
         "decision": "Keep",
-        "moduleSha256": "d09abe76751391e7196217520ce91604c1dac9ec66983bf6473ac80051782880",
-        "reason": "Keep: one named WGSL IR robustness transform pass with proof-backed precondition emission.",
-        "reviewer": "codex-doe-completion/2026-08-24"
+        "moduleSha256": "a1d612678620e494bf80ee6f727991ee21d6e64c2e5dada0aad93dd8b85f30fd",
+        "reason": "Keep robustness transforms cohesive; reserve expression ownership before allocating builtin names, preserving guards on allocation failure.",
+        "reviewer": "codex-compute-fusion/2026-09-05"
       },
       "src/compiler/wgsl/ir/ir_validate.zig": {
         "decision": "Keep",
@@ -2512,9 +2512,9 @@
       },
       "src/compiler/wgsl/pipeline/analysis.zig": {
         "decision": "Keep",
-        "moduleSha256": "6d9db24f6fcf4204174ff20ae73e730e503fb9cf169b95bd409a4c1ff75cb502",
-        "reason": "Keep: compiler diagnostic state has an explicit reset at the native compilation boundary; typed causes and source locations remain compiler-owned.",
-        "reviewer": "codex-compiler-diagnostics/2026-09-05"
+        "moduleSha256": "8a3fca20ef3ac9b25c04ebe9467194bea7d6421f6949bc806a062a07564af6ee",
+        "reason": "Keep semantic analysis and IR error translation together; preserve allocation failures as OutOfMemory rather than misclassifying them as invalid source.",
+        "reviewer": "codex-compute-fusion/2026-09-05"
       },
       "src/compiler/wgsl/pipeline/binding_reflection.zig": {
         "decision": "Keep",
@@ -2554,9 +2554,9 @@
       },
       "src/compiler/wgsl/pipeline/translate_spirv.zig": {
         "decision": "Keep",
-        "moduleSha256": "38b658fe883a1358dd71a4a067f8d7dc8f22a547b5a61979984863583e6e173f",
-        "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "136e2f5a778e6dd2bbea35d168b5805bf62de433604e0d478830fa55ca1c64ba",
+        "reason": "Select versioned compute arithmetic before emission and preserve typed transform failures for both public and runtime translation.",
+        "reviewer": "codex-compute-fusion/2026-09-05"
       },
       "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig": {
         "decision": "Keep",
@@ -2596,9 +2596,9 @@
       },
       "src/compiler/wgsl/runtime/runtime_compute_translation.zig": {
         "decision": "Keep",
-        "moduleSha256": "48d70d5658e341283da33914e5dbfb84a63f8065b28f1304e8b9c2f6c1fe080c",
-        "reason": "Keep: runtime compute lowering policy and MSL/SPIR-V emission boundary shared by native backend consumers.",
-        "reviewer": "codex-runtime-correctness-review/2026-08-16"
+        "moduleSha256": "3659e5e607b8d7d99038d9430c13f982a5e2ff31a90a13660ea81d57c89db135",
+        "reason": "Preserve runtime robustness, provenance and timing while delegating arithmetic policy to the SPIR-V pipeline.",
+        "reviewer": "codex-compute-fusion/2026-09-05"
       },
       "src/compiler/wgsl/runtime/runtime_graphics_translation.zig": {
         "decision": "Keep",
@@ -4249,6 +4249,12 @@
         "moduleSha256": "8c2bea990c14e69e7d2bdc958d3881f56562c3d6ab273bff08deab5da88c84e1",
         "reason": "Keep: descriptor preparation owns resource resolution, exact cache selection, transactional pool publication, and binding validation separately from pipeline creation.",
         "reviewer": "codex-descriptor-identity/2026-09-05"
+      },
+      "src/compiler/wgsl/ir/ir_transform_float_fusion.zig": {
+        "decision": "Keep",
+        "moduleSha256": "2587d8e4d1184084a0c45ba03e4fc5faa4021c32455b0eea319d08c104702510",
+        "reason": "Own the scalar floating-point reassociation and fusion transform independently of emitters and runtime submission.",
+        "reviewer": "codex-compute-fusion/2026-09-05"
       }
     },
     "linePolicy": {

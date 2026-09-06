@@ -49,7 +49,8 @@ fn copy_structs(allocator: std.mem.Allocator, module: *ir.Module, semantic: *con
         var struct_def = ir.StructDef{ .name = try ir.dup_string(allocator, struct_info.name) };
         errdefer struct_def.deinit(allocator);
         for (struct_info.fields.items) |field| {
-            try struct_def.fields.append(allocator, .{
+            try struct_def.fields.ensureUnusedCapacity(allocator, 1);
+            struct_def.fields.appendAssumeCapacity(.{
                 .name = try ir.dup_string(allocator, field.name),
                 .ty = field.ty,
                 .io = field.io,
@@ -82,7 +83,8 @@ fn copy_globals(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Modu
         errdefer if (initializer_owned) {
             if (initializer) |*value| value.deinit(allocator);
         };
-        try module.globals.append(allocator, .{
+        try module.globals.ensureUnusedCapacity(allocator, 1);
+        module.globals.appendAssumeCapacity(.{
             .name = try ir.dup_string(allocator, global_info.name),
             .ty = global_info.ty,
             .class = global_info.class,
@@ -110,14 +112,16 @@ fn copy_functions(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Mo
         errdefer function.deinit(allocator);
 
         for (function_info.params.items) |param| {
-            try function.params.append(allocator, .{
+            try function.params.ensureUnusedCapacity(allocator, 1);
+            function.params.appendAssumeCapacity(.{
                 .name = try ir.dup_string(allocator, param.name),
                 .ty = param.ty,
                 .io = param.io,
             });
         }
         for (function_info.locals.items) |local| {
-            try function.locals.append(allocator, .{
+            try function.locals.ensureUnusedCapacity(allocator, 1);
+            function.locals.appendAssumeCapacity(.{
                 .name = try ir.dup_string(allocator, local.name),
                 .ty = local.ty,
                 .mutable = local.mutable,
@@ -134,7 +138,7 @@ fn copy_functions(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Mo
         function.root_stmt = try builder.lower_stmt(fn_node.data.rhs);
 
         const new_index: ir.FunctionId = @intCast(module.functions.items.len);
-        try module.functions.append(allocator, function);
+        try module.functions.ensureUnusedCapacity(allocator, 1);
         if (function_info.stage) |stage| {
             try module.entry_points.append(allocator, .{
                 .function = new_index,
@@ -142,6 +146,7 @@ fn copy_functions(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Mo
                 .workgroup_size = function_info.workgroup_size,
             });
         }
+        module.functions.appendAssumeCapacity(function);
         _ = function_index;
     }
 }
@@ -368,14 +373,19 @@ const FunctionBuilder = struct {
             .construct_expr => try self.lower_construct(node_idx, node),
             .member_expr => ir.Expr{ .member = .{
                 .base = if (category == .ref) try self.lower_ref_expr(node.data.lhs) else try self.lower_value_expr(node.data.lhs),
-                .field_name = try ir.dup_string(self.allocator, self.tree.tokenSlice(node.data.rhs)),
                 .field_index = try self.resolve_member_index(node.data.lhs, node.data.rhs),
+                .field_name = try ir.dup_string(self.allocator, self.tree.tokenSlice(node.data.rhs)),
             } },
             .index_expr => ir.Expr{ .index = .{
                 .base = if (category == .ref) try self.lower_ref_expr(node.data.lhs) else try self.lower_value_expr(node.data.lhs),
                 .index = try self.lower_value_expr(node.data.rhs),
             } },
             else => return error.UnsupportedConstruct,
+        };
+        errdefer switch (expr) {
+            .call => |call| self.allocator.free(call.name),
+            .member => |member| self.allocator.free(member.field_name),
+            else => {},
         };
         return try self.function.append_expr(self.allocator, .{
             .ty = ty,

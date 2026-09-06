@@ -229,6 +229,14 @@ with source/node location and reason. Semantic placeholders are forbidden.
 Artifacts containing rejections are diagnostic-only and cannot enter code
 generation, parity promotion, or claim-bearing workloads.
 
+Compute arithmetic changes follow the build policy in
+`config/spirv-compute-arithmetic-policy.json`. Validate its registered schema,
+typed IR, allocation failures, operand evaluation order, and original frozen
+application oracles on physical hardware. Retain source, library, and target
+artifact identities. A passing compiler suite or a numerically failing incumbent
+does not qualify an application comparison. Policy migration and target scope
+are documented in [`shader-compiler-architecture.md`](shader-compiler-architecture.md).
+
 ## Refactor law
 
 Behavior-preserving refactors follow this evidence sequence:

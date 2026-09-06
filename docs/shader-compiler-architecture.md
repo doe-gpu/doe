@@ -1,5 +1,31 @@
 # Shader compiler architecture
 
+## Compute arithmetic policy
+
+`config/spirv-compute-arithmetic-policy.json` selects scalar `f32` arithmetic
+for compute-only SPIR-V modules at build time. `fuse-trailing-add` transforms
+`(a + b*c) + d` into `a + fma(b,c,d)` in typed IR before emission. The operand
+evaluation order and multiplicity remain unchanged. Integer, vector, graphics,
+mixed-stage, and other target expressions retain their existing policy.
+
+This uses WGSL's permitted reassociation followed by fusion of the resulting
+multiply-add. It can reduce cancellation error in offset integration, but does
+not promise improved accuracy for every input. Frozen application numerical
+requirements remain blocking; agreement among providers is not an oracle.
+The transform owns no workload names, source hashes, or input-specific rules.
+
+Migration: the policy is an additive build contract; rebuild the native library
+and retain the new library and generated SPIR-V identities. The original WGSL,
+descriptor, and receipt fields keep their meanings. Existing pipeline reuse
+compares actual SPIR-V words, so differently lowered programs cannot share a
+pipeline merely because their source text matches. Changing the policy requires
+schema validation, allocator and operand-order regressions, and physical
+application evaluation before promotion. `source-order` retains the prior
+compiler expression graph and does not control driver contraction.
+
+The language permission is defined by the
+[WGSL reassociation and fusion specification](https://gpuweb.github.io/gpuweb/wgsl/#reassociation-and-fusion).
+
 ## Pipeline
 
 ```

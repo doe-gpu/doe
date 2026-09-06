@@ -315,12 +315,12 @@ pub fn analyzeToIrWithConfigTimedAndOverrides(
         };
     }
     ir_transform_robustness.apply(allocator, &module, config) catch |err| {
-        setLastErrorDetail(.ir_transform, TranslateError.InvalidIr, @errorName(err));
-        return TranslateError.InvalidIr;
+        setLastErrorDetail(.ir_transform, err, @errorName(err));
+        return err;
     };
     _ = ir_opt_rewrite.apply(allocator, &module) catch |err| {
-        setLastErrorDetail(.ir_transform, TranslateError.InvalidIr, @errorName(err));
-        return TranslateError.InvalidIr;
+        setLastErrorDetail(.ir_transform, err, @errorName(err));
+        return err;
     };
     const lower_end_ns = nowNs();
     return .{

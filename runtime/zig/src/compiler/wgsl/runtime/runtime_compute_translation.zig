@@ -5,6 +5,7 @@ const override_values = @import("../pipeline/overrides.zig");
 const robustness = @import("../ir/ir_transform_robustness.zig");
 const emit_msl = @import("../emit/msl/emit_msl.zig");
 const emit_spirv = @import("../emit/spirv/emit_spirv.zig");
+const translate_spirv = @import("../pipeline/translate_spirv.zig");
 const translation_info = @import("runtime_translation_info.zig");
 
 pub const TranslationInfo = translation_info.TranslationInfo;
@@ -53,7 +54,8 @@ pub fn vulkan_compute_runtime_robustness_config() robustness.Config {
     };
 }
 
-fn emitSpirv(module_ir: *const ir.Module, out: []u8) analysis.TranslateError!usize {
+fn emitSpirv(module_ir: *ir.Module, out: []u8) analysis.TranslateError!usize {
+    try translate_spirv.prepareComputeIr(module_ir);
     return emit_spirv.emit(module_ir, out) catch |err| {
         const kind: analysis.TranslateError = switch (err) {
             error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,

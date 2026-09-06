@@ -2,6 +2,10 @@
   "schemaVersion": 1,
   "targets": [
     {
+      "schema": "config/spirv-compute-arithmetic-policy.schema.json",
+      "data": "config/spirv-compute-arithmetic-policy.json"
+    },
+    {
       "schema": "config/schema-targets.schema.json",
       "data": "config/schema-targets.json"
     },

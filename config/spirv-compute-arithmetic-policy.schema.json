@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SPIR-V compute arithmetic policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "offsetMultiplyAdd"],
+  "properties": {
+    "schemaVersion": {"type": "integer", "const": 1},
+    "offsetMultiplyAdd": {
+      "type": "string",
+      "enum": ["source-order", "fuse-trailing-add"],
+      "description": "Build-time scalar f32 policy for compute-only SPIR-V modules. Fuse (a + b*c) + d as a + fma(b,c,d) while preserving operand evaluation order. Other emitters and mixed-stage modules retain their existing policy."
+    }
+  }
+}
