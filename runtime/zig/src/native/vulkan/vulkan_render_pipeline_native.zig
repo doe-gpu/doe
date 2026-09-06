@@ -219,12 +219,9 @@ pub fn probe_has_graphics_entry_points(wgsl: []const u8) bool {
         std.mem.indexOf(u8, wgsl, "@fragment") != null;
 }
 
-pub fn vulkan_create_graphics_shader_module(
-    sm: *shared.DoeShaderModule,
-    wgsl: []const u8,
-) wgsl_analysis.TranslateError!void {
+pub fn vulkan_create_graphics_shader_moduleWithDiagnostic(sm: *shared.DoeShaderModule, wgsl: []const u8, diagnostic: *wgsl_analysis.Diagnostic) wgsl_analysis.TranslateError!void {
     const alloc = native_helpers.alloc;
-    var result = try runtime_compile.translateToSpirvForGraphicsRuntime(alloc, wgsl);
+    var result = try runtime_compile.translateToSpirvForGraphicsRuntimeWithDiagnostic(alloc, wgsl, diagnostic);
     defer result.deinit(alloc);
     sm.vertex_spirv_data = result.vertex_spirv;
     sm.fragment_spirv_data = result.fragment_spirv;
@@ -236,4 +233,8 @@ pub fn vulkan_create_graphics_shader_module(
 
     result.vertex_spirv = null;
     result.fragment_spirv = null;
+}
+
+pub fn vulkan_create_graphics_shader_module(sm: *shared.DoeShaderModule, wgsl: []const u8) wgsl_analysis.TranslateError!void {
+    return vulkan_create_graphics_shader_moduleWithDiagnostic(sm, wgsl, wgsl_analysis.compatibilityDiagnostic());
 }

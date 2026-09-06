@@ -13,8 +13,9 @@ pub fn translateToDxilWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const
     defer arena.deinit();
     var module_ir = try analysis.analyzeToIrWithDiagnostic(arena.allocator(), wgsl, diagnostic);
 
-    return emitter.emit(&module_ir, out) catch |err| {
-        const detail = emitter.lastErrorMessage();
+    var emission = analysis.Diagnostic{};
+    return emitter.emitWithDiagnostic(&module_ir, out, &emission) catch |err| {
+        const detail = emission.lastErrorMessage();
         const kind = switch (err) {
             error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
             error.UnsupportedBuiltin => analysis.TranslateError.UnsupportedBuiltin,
@@ -35,8 +36,9 @@ pub fn translateToDxilWithToolchainConfigWithDiagnostic(allocator: std.mem.Alloc
     var module_ir = try analysis.analyzeToIrWithDiagnostic(allocator, wgsl, diagnostic);
     defer module_ir.deinit();
 
-    return emitter.emitWithToolchainConfig(&module_ir, out, config) catch |err| {
-        const detail = emitter.lastErrorMessage();
+    var emission = analysis.Diagnostic{};
+    return emitter.emitWithToolchainConfigWithDiagnostic(&module_ir, out, config, &emission) catch |err| {
+        const detail = emission.lastErrorMessage();
         const kind = switch (err) {
             error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
             error.UnsupportedBuiltin => analysis.TranslateError.UnsupportedBuiltin,

@@ -58,6 +58,7 @@ pub const DoeAdapter = struct {
 
 pub const DoeDevice = struct {
     pub const TYPE_MAGIC = MAGIC_DEVICE;
+    metal_libraries: @import("../cache/doe_metal_library_cache.zig").Cache = .{},
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     adapter: ?*DoeAdapter = null,

@@ -5,6 +5,7 @@ const texture = @import("vulkan_texture_native.zig");
 
 pub const probe_has_graphics_entry_points = pipeline.probe_has_graphics_entry_points;
 pub const vulkan_create_graphics_shader_module = pipeline.vulkan_create_graphics_shader_module;
+pub const vulkan_create_graphics_shader_moduleWithDiagnostic = pipeline.vulkan_create_graphics_shader_moduleWithDiagnostic;
 pub const vulkan_create_render_pipeline = pipeline.vulkan_create_render_pipeline;
 pub const vulkan_create_sampler = sampler.vulkan_create_sampler;
 pub const vulkan_create_texture = texture.vulkan_create_texture;

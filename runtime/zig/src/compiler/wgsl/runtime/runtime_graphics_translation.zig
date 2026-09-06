@@ -49,11 +49,8 @@ fn graphics_runtime_robustness_config() robustness.Config {
 /// separate per-stage SPIR-V binaries. Returns heap-allocated u32 word slices
 /// for each stage found, plus extracted vertex input and inter-stage interface
 /// metadata for pipeline reflection.
-pub fn translateToSpirvForGraphicsRuntime(
-    allocator: std.mem.Allocator,
-    wgsl: []const u8,
-) analysis.TranslateError!GraphicsTranslationResult {
-    var module_ir = try analysis.analyzeToIrWithConfig(allocator, wgsl, graphics_runtime_robustness_config());
+pub fn translateToSpirvForGraphicsRuntimeWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, diagnostic: *analysis.Diagnostic) analysis.TranslateError!GraphicsTranslationResult {
+    var module_ir = try analysis.analyzeToIrWithConfigWithDiagnostic(allocator, wgsl, graphics_runtime_robustness_config(), diagnostic);
     defer module_ir.deinit();
 
     var result = GraphicsTranslationResult{};
@@ -64,12 +61,12 @@ pub fn translateToSpirvForGraphicsRuntime(
             .vertex => {
                 if (result.has_vertex) continue;
                 result.has_vertex = true;
-                result.vertex_spirv = try emit_stage_spirv_words(allocator, &module_ir, .vertex);
+                result.vertex_spirv = try emit_stage_spirv_wordsWithDiagnostic(allocator, &module_ir, .vertex, diagnostic);
             },
             .fragment => {
                 if (result.has_fragment) continue;
                 result.has_fragment = true;
-                result.fragment_spirv = try emit_stage_spirv_words(allocator, &module_ir, .fragment);
+                result.fragment_spirv = try emit_stage_spirv_wordsWithDiagnostic(allocator, &module_ir, .fragment, diagnostic);
             },
             .compute => {},
         }
@@ -82,11 +79,7 @@ pub fn translateToSpirvForGraphicsRuntime(
 }
 
 /// Emit SPIR-V for a single stage and convert the byte output to heap-allocated u32 words.
-fn emit_stage_spirv_words(
-    allocator: std.mem.Allocator,
-    module_ir: *const ir.Module,
-    stage: ir.ShaderStage,
-) analysis.TranslateError![]const u32 {
+fn emit_stage_spirv_wordsWithDiagnostic(allocator: std.mem.Allocator, module_ir: *const ir.Module, stage: ir.ShaderStage, diagnostic: *analysis.Diagnostic) analysis.TranslateError![]const u32 {
     var spirv_buf = allocator.alloc(u8, emit_spirv.MAX_OUTPUT) catch return analysis.TranslateError.OutOfMemory;
     defer allocator.free(spirv_buf);
 
@@ -97,11 +90,11 @@ fn emit_stage_spirv_words(
             error.InvalidIr => error.InvalidIr,
             error.OutOfMemory => error.OutOfMemory,
         };
-        analysis.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
+        diagnostic.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
         return kind;
     };
     if (len == 0 or (len % @sizeOf(u32)) != 0) {
-        analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
+        diagnostic.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
         return error.InvalidIr;
     }
 
@@ -208,4 +201,8 @@ fn extract_inter_stage_vars(
 
     if (count == 0) return &.{};
     return allocator.dupe(InterStageVar, vars_buf[0..count]) catch return analysis.TranslateError.OutOfMemory;
+}
+
+pub fn translateToSpirvForGraphicsRuntime(allocator: std.mem.Allocator, wgsl: []const u8) analysis.TranslateError!GraphicsTranslationResult {
+    return translateToSpirvForGraphicsRuntimeWithDiagnostic(allocator, wgsl, analysis.compatibilityDiagnostic());
 }

@@ -9,6 +9,14 @@ pub const TranslationInfo = struct {
     dispatch_preconditions: []const ir.DispatchPrecondition = &.{},
     texture_dispatch_preconditions: []const ir.TextureDispatchPrecondition = &.{},
 
+    pub fn clone(self: *const TranslationInfo, allocator: std.mem.Allocator) error{OutOfMemory}!TranslationInfo {
+        var result = TranslationInfo{ .workgroup_size = self.workgroup_size, .needs_sizes_buf = self.needs_sizes_buf };
+        errdefer result.deinit(allocator);
+        if (self.dispatch_preconditions.len > 0) result.dispatch_preconditions = try allocator.dupe(ir.DispatchPrecondition, self.dispatch_preconditions);
+        if (self.texture_dispatch_preconditions.len > 0) result.texture_dispatch_preconditions = try allocator.dupe(ir.TextureDispatchPrecondition, self.texture_dispatch_preconditions);
+        return result;
+    }
+
     pub fn deinit(self: *TranslationInfo, allocator: std.mem.Allocator) void {
         if (self.dispatch_preconditions.len > 0) allocator.free(self.dispatch_preconditions);
         if (self.texture_dispatch_preconditions.len > 0) allocator.free(self.texture_dispatch_preconditions);
@@ -31,18 +39,13 @@ pub fn buildTranslationInfo(
     allocator: std.mem.Allocator,
     module_ir: *const ir.Module,
 ) analysis.TranslateError!TranslationInfo {
-    return .{
+    const borrowed = TranslationInfo{
         .workgroup_size = compute_workgroup_size(module_ir),
         .needs_sizes_buf = emit_msl.moduleNeedsSizesParam(module_ir),
-        .dispatch_preconditions = if (module_ir.dispatch_preconditions.items.len == 0)
-            &.{}
-        else
-            allocator.dupe(ir.DispatchPrecondition, module_ir.dispatch_preconditions.items) catch return analysis.TranslateError.OutOfMemory,
-        .texture_dispatch_preconditions = if (module_ir.texture_dispatch_preconditions.items.len == 0)
-            &.{}
-        else
-            allocator.dupe(ir.TextureDispatchPrecondition, module_ir.texture_dispatch_preconditions.items) catch return analysis.TranslateError.OutOfMemory,
+        .dispatch_preconditions = module_ir.dispatch_preconditions.items,
+        .texture_dispatch_preconditions = module_ir.texture_dispatch_preconditions.items,
     };
+    return borrowed.clone(allocator);
 }
 
 fn compute_workgroup_size(module_ir: *const ir.Module) [3]u32 {

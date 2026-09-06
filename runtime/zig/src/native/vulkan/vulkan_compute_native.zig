@@ -221,7 +221,7 @@ test "prepared binding cache retains identity and reloads state" {
 
 const shader_buffer_binding_type = shader_binding_reflection.shaderBufferBindingType;
 
-fn populate_pipeline_buffer_binding_types(pip: *DoeComputePipeline, shader_module: ?*DoeShaderModule) wgsl_analysis.TranslateError!void {
+fn populate_pipeline_buffer_binding_typesWithDiagnostic(pip: *DoeComputePipeline, shader_module: ?*DoeShaderModule, diagnostic: *wgsl_analysis.Diagnostic) wgsl_analysis.TranslateError!void {
     @memset(&pip.vk_flat_buffer_binding_types, model_binding_types.WGPUBufferBindingType_Storage);
     const sm = shader_module orelse {
         pip.vk_flat_buffer_binding_types_ready = true;
@@ -236,7 +236,7 @@ fn populate_pipeline_buffer_binding_types(pip: *DoeComputePipeline, shader_modul
         return;
     };
     var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_bindings.BindingMeta = undefined;
-    const count = try wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata);
+    const count = try wgsl_bindings.extractBindingsForEntryPointWithDiagnostic(alloc, wgsl, entry_point, &metadata, diagnostic);
     for (metadata[0..count]) |meta| {
         if (meta.group >= MAX_COMPUTE_BIND_GROUPS or meta.binding >= MAX_BIND) continue;
         const slot = (meta.group * MAX_BIND) + meta.binding;
@@ -318,27 +318,24 @@ fn precompute_pipeline_static_hashes(pip: *DoeComputePipeline) void {
 /// Translate WGSL source to SPIR-V words and store them in shader.spirv_data.
 /// Called from doe_shader_native.zig when dev.backend == .vulkan.
 /// Returns error on OOM or compilation failure.
-pub fn vulkan_create_shader_module(
-    shader: *DoeShaderModule,
-    wgsl: []const u8,
-) wgsl_analysis.TranslateError!void {
+pub fn vulkan_create_shader_moduleWithDiagnostic(shader: *DoeShaderModule, wgsl: []const u8, diagnostic: *wgsl_analysis.Diagnostic) wgsl_analysis.TranslateError!void {
     var cached_translation = shader_translation_cache.lookupComputeSpirvTranslation(alloc, wgsl);
     defer if (cached_translation) |*cached| cached.deinit(alloc);
 
     if (cached_translation) |*cached| {
         moveTranslationInfoToShader(shader, &cached.info);
-        try assignSpirvWords(shader, cached.spirv);
+        try assignSpirvWordsWithDiagnostic(shader, cached.spirv, diagnostic);
         return;
     }
 
     var spirv_buf = alloc.alloc(u8, spirv_translation.MAX_OUTPUT) catch return error.OutOfMemory;
     defer alloc.free(spirv_buf);
 
-    var translation = try runtime_compile.translateToSpirvForVulkanComputeRuntime(alloc, wgsl, spirv_buf);
+    var translation = try runtime_compile.translateToSpirvForVulkanComputeRuntimeWithDiagnostic(alloc, wgsl, spirv_buf, diagnostic);
     errdefer translation.info.deinit(alloc);
 
     if (translation.len == 0 or (translation.len % 4) != 0) {
-        wgsl_analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
+        diagnostic.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
         return error.InvalidIr;
     }
 
@@ -349,7 +346,7 @@ pub fn vulkan_create_shader_module(
         &translation.info,
     );
     moveTranslationInfoToShader(shader, &translation.info);
-    try assignSpirvWords(shader, spirv_buf[0..translation.len]);
+    try assignSpirvWordsWithDiagnostic(shader, spirv_buf[0..translation.len], diagnostic);
 }
 
 // ============================================================
@@ -359,11 +356,8 @@ pub fn vulkan_create_shader_module(
 /// Duplicate SPIR-V words from shader into pip.spirv_data.
 /// Called from doe_shader_native.zig for the Vulkan compute pipeline creation path.
 /// Returns error on OOM.
-pub fn vulkan_copy_pipeline_spirv(
-    pip: *DoeComputePipeline,
-    shader: *DoeShaderModule,
-) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
-    try populate_pipeline_buffer_binding_types(pip, shader);
+pub fn vulkan_copy_pipeline_spirvWithDiagnostic(pip: *DoeComputePipeline, shader: *DoeShaderModule, diagnostic: *wgsl_analysis.Diagnostic) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
+    try populate_pipeline_buffer_binding_typesWithDiagnostic(pip, shader, diagnostic);
     const src = shader.spirv_data orelse return error.InvalidShaderModule;
     pip.spirv_data = alloc.dupe(u32, src) catch return error.OutOfMemory;
     pip.vk_spirv_hash = std.hash.Wyhash.hash(0, std.mem.sliceAsBytes(src));
@@ -371,26 +365,16 @@ pub fn vulkan_copy_pipeline_spirv(
     precompute_pipeline_static_hashes(pip);
 }
 
-pub fn vulkan_compile_pipeline_spirv_with_overrides(
-    pip: *DoeComputePipeline,
-    shader: *DoeShaderModule,
-    overrides: []const wgsl_ir.OverrideEntry,
-) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
-    try populate_pipeline_buffer_binding_types(pip, shader);
+pub fn vulkan_compile_pipeline_spirv_with_overridesWithDiagnostic(pip: *DoeComputePipeline, shader: *DoeShaderModule, overrides: []const wgsl_ir.OverrideEntry, diagnostic: *wgsl_analysis.Diagnostic) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
+    try populate_pipeline_buffer_binding_typesWithDiagnostic(pip, shader, diagnostic);
     const wgsl = shader.wgsl_source orelse return error.InvalidShaderModule;
     var spirv_buf = alloc.alloc(u8, spirv_translation.MAX_OUTPUT) catch return error.OutOfMemory;
     defer alloc.free(spirv_buf);
 
-    var translation = try runtime_compile.translateToSpirvForVulkanComputeRuntimeWithOverrides(
-        alloc,
-        wgsl,
-        spirv_buf,
-        overrides.ptr,
-        overrides.len,
-    );
+    var translation = try runtime_compile.translateToSpirvForVulkanComputeRuntimeWithOverridesWithDiagnostic(alloc, wgsl, spirv_buf, overrides.ptr, overrides.len, diagnostic);
     defer translation.info.deinit(alloc);
     if (translation.len == 0 or (translation.len % @sizeOf(u32)) != 0) {
-        wgsl_analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
+        diagnostic.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid SPIR-V word extent");
         return error.InvalidIr;
     }
 
@@ -1026,12 +1010,9 @@ fn moveTranslationInfoToShader(
     info.texture_dispatch_preconditions = &.{};
 }
 
-fn assignSpirvWords(
-    shader: *DoeShaderModule,
-    spirv_bytes: []const u8,
-) wgsl_analysis.TranslateError!void {
+fn assignSpirvWordsWithDiagnostic(shader: *DoeShaderModule, spirv_bytes: []const u8, diagnostic: *wgsl_analysis.Diagnostic) wgsl_analysis.TranslateError!void {
     if (spirv_bytes.len == 0 or (spirv_bytes.len % @sizeOf(u32)) != 0) {
-        wgsl_analysis.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid cached SPIR-V word extent");
+        diagnostic.setLastErrorDetailPublic(.spirv_emit, error.InvalidIr, "invalid cached SPIR-V word extent");
         return error.InvalidIr;
     }
     const word_count = spirv_bytes.len / 4;
@@ -1043,4 +1024,16 @@ fn assignSpirvWords(
         word.* = std.mem.readInt(u32, chunk, .little);
     }
     shader.spirv_data = words;
+}
+
+pub fn vulkan_create_shader_module(shader: *DoeShaderModule, wgsl: []const u8) wgsl_analysis.TranslateError!void {
+    return vulkan_create_shader_moduleWithDiagnostic(shader, wgsl, wgsl_analysis.compatibilityDiagnostic());
+}
+
+pub fn vulkan_copy_pipeline_spirv(pip: *DoeComputePipeline, shader: *DoeShaderModule) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
+    return vulkan_copy_pipeline_spirvWithDiagnostic(pip, shader, wgsl_analysis.compatibilityDiagnostic());
+}
+
+pub fn vulkan_compile_pipeline_spirv_with_overrides(pip: *DoeComputePipeline, shader: *DoeShaderModule, overrides: []const wgsl_ir.OverrideEntry) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
+    return vulkan_compile_pipeline_spirv_with_overridesWithDiagnostic(pip, shader, overrides, wgsl_analysis.compatibilityDiagnostic());
 }

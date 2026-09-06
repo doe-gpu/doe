@@ -634,6 +634,7 @@ pub export fn doeNativeDeviceRelease(raw: ?*anyopaque) callconv(.c) void {
             return;
         }
         label_store.remove(raw);
+        d.metal_libraries.deinit(alloc);
         // Fire the device-lost callback with reason "destroyed" before teardown.
         const multi_adapter = @import("../../runtime/device/multi_adapter.zig");
         multi_adapter.notify_device_released(raw);

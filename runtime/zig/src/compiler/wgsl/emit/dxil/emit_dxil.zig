@@ -14,6 +14,7 @@
 const builtin = @import("builtin");
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const diagnostics = @import("../../pipeline/diagnostic.zig");
 const toolchain = @import("../toolchain.zig");
 const emit_hlsl = @import("../hlsl/emit_hlsl.zig");
 const emit_dxil_native = @import("emit_dxil_native.zig");
@@ -61,11 +62,9 @@ pub const Module = struct {
 pub const ToolchainDiscovery = toolchain.Discovery;
 pub const ToolchainConfig = toolchain.Config;
 
-var last_error_buf: [LAST_ERROR_CAP]u8 = undefined;
-var last_error_len: usize = 0;
-
+threadlocal var compatibility_diagnostic = diagnostics.Diagnostic{};
 pub fn lastErrorMessage() []const u8 {
-    return last_error_buf[0..last_error_len];
+    return compatibility_diagnostic.lastErrorMessage();
 }
 
 pub fn lower(module: *const ir.Module) Error!Module {
@@ -86,21 +85,18 @@ pub fn lower(module: *const ir.Module) Error!Module {
 }
 
 /// Primary DXIL emission path: generates DXIL natively from the Doe IR.
-pub fn emit(module: *const ir.Module, out: []u8) Error!usize {
-    clearLastError();
+pub fn emitWithDiagnostic(module: *const ir.Module, out: []u8, diagnostic: *diagnostics.Diagnostic) Error!usize {
+    diagnostic.clearLastError();
     const len = try emit_dxil_native.emit(module, out);
-    try validateOutput(out[0..len], "native emitter");
+    try validateOutputWithDiagnostic(out[0..len], "native emitter", diagnostic);
     return len;
 }
 
 /// DXC fallback path: generates HLSL, then invokes DXC to compile to DXIL.
-pub fn emitWithToolchainConfig(module: *const ir.Module, out: []u8, config: ToolchainConfig) Error!usize {
-    clearLastError();
+pub fn emitWithToolchainConfigWithDiagnostic(module: *const ir.Module, out: []u8, config: ToolchainConfig, diagnostic: *diagnostics.Diagnostic) Error!usize {
+    diagnostic.clearLastError();
     if (config.executable.len == 0) {
-        setLastErrorFmt(
-            "DXC executable path is empty; pass ToolchainConfig{{ .executable = ... }} or set {s} to a DXC path or {s}",
-            .{ DXC_ENV_VAR, DXC_PATH_SENTINEL },
-        );
+        setLastErrorFmt("DXC executable path is empty; pass ToolchainConfig{{ .executable = ... }} or set {s} to a DXC path or {s}", .{ DXC_ENV_VAR, DXC_PATH_SENTINEL }, diagnostic);
         return error.ShaderToolchainUnavailable;
     }
 
@@ -123,72 +119,63 @@ pub fn emitWithToolchainConfig(module: *const ir.Module, out: []u8, config: Tool
     defer std.fs.cwd().deleteFile(dxil_path) catch {};
 
     std.fs.cwd().writeFile(.{ .sub_path = hlsl_path, .data = hlsl_buf[0..hlsl_len] }) catch |err| {
-        setLastErrorFmt("failed to write temporary HLSL input `{s}`: {s}", .{ hlsl_path, @errorName(err) });
+        setLastErrorFmt("failed to write temporary HLSL input `{s}`: {s}", .{ hlsl_path, @errorName(err) }, diagnostic);
         return error.InvalidIr;
     };
-    try runDxc(alloc, hlsl_path, dxil_path, lowered, config);
+    try runDxcWithDiagnostic(alloc, hlsl_path, dxil_path, lowered, config, diagnostic);
 
     const bytes = std.fs.cwd().readFileAlloc(alloc, dxil_path, MAX_OUTPUT) catch |err| switch (err) {
         error.FileNotFound => {
-            setLastErrorFmt(
-                "DXC reported success via {s} `{s}` but did not write `{s}`",
-                .{ toolchain.discoveryLabel(config.discovery), config.executable, dxil_path },
-            );
+            setLastErrorFmt("DXC reported success via {s} `{s}` but did not write `{s}`", .{ toolchain.discoveryLabel(config.discovery), config.executable, dxil_path }, diagnostic);
             return error.InvalidIr;
         },
         error.FileTooBig => {
-            setLastErrorFmt("DXIL output `{s}` exceeded the {d}-byte contract", .{ dxil_path, MAX_OUTPUT });
+            setLastErrorFmt("DXIL output `{s}` exceeded the {d}-byte contract", .{ dxil_path, MAX_OUTPUT }, diagnostic);
             return error.OutputTooLarge;
         },
         else => {
-            setLastErrorFmt("failed to read DXIL output `{s}`: {s}", .{ dxil_path, @errorName(err) });
+            setLastErrorFmt("failed to read DXIL output `{s}`: {s}", .{ dxil_path, @errorName(err) }, diagnostic);
             return error.InvalidIr;
         },
     };
     defer alloc.free(bytes);
     if (bytes.len > out.len) return error.OutputTooLarge;
-    try validateOutput(bytes, "DXC");
+    try validateOutputWithDiagnostic(bytes, "DXC", diagnostic);
     @memcpy(out[0..bytes.len], bytes);
     return bytes.len;
 }
 
-fn validateOutput(bytes: []const u8, producer: []const u8) Error!void {
+fn validateOutputWithDiagnostic(bytes: []const u8, producer: []const u8, diagnostic: *diagnostics.Diagnostic) Error!void {
     const result = dxil_validate.validate(bytes);
     if (result.valid) return;
-    setLastErrorFmt(
-        "{s} produced a structurally invalid DXIL container: {s}",
-        .{ producer, result.error_message orelse "unknown validation failure" },
-    );
+    setLastErrorFmt("{s} produced a structurally invalid DXIL container: {s}", .{ producer, result.error_message orelse "unknown validation failure" }, diagnostic);
     return error.InvalidIr;
 }
 
-pub fn loadToolchainConfig(alloc: std.mem.Allocator) Error!ToolchainConfig {
-    clearLastError();
+pub fn loadToolchainConfigWithDiagnostic(alloc: std.mem.Allocator, diagnostic: *diagnostics.Diagnostic) Error!ToolchainConfig {
+    diagnostic.clearLastError();
     const env_value = std.process.getEnvVarOwned(alloc, DXC_ENV_VAR) catch |err| switch (err) {
         error.EnvironmentVariableNotFound => return .{
             .executable = defaultDxcExecutable(),
             .discovery = .implicit_path_lookup,
         },
         else => {
-            setLastErrorFmt("failed to read {s}: {s}", .{ DXC_ENV_VAR, @errorName(err) });
+            setLastErrorFmt("failed to read {s}: {s}", .{ DXC_ENV_VAR, @errorName(err) }, diagnostic);
             return error.ShaderToolchainUnavailable;
         },
     };
     errdefer alloc.free(env_value);
-    return toolchainConfigFromEnvValue(alloc, env_value);
+    return toolchainConfigFromEnvValueWithDiagnostic(alloc, env_value, diagnostic);
 }
 
-fn toolchainConfigFromEnvValue(alloc: std.mem.Allocator, raw_value: []const u8) Error!ToolchainConfig {
-    clearLastError();
+fn toolchainConfigFromEnvValueWithDiagnostic(alloc: std.mem.Allocator, raw_value: []const u8, diagnostic: *diagnostics.Diagnostic) Error!ToolchainConfig {
+    diagnostic.clearLastError();
     const owned = try alloc.dupe(u8, raw_value);
     errdefer alloc.free(owned);
 
     const trimmed = std.mem.trim(u8, owned, " \t\r\n");
     if (trimmed.len == 0) {
-        setLastErrorFmt(
-            "{s} is set but empty; set it to a DXC path or `{s}` to opt into PATH lookup explicitly",
-            .{ DXC_ENV_VAR, DXC_PATH_SENTINEL },
-        );
+        setLastErrorFmt("{s} is set but empty; set it to a DXC path or `{s}` to opt into PATH lookup explicitly", .{ DXC_ENV_VAR, DXC_PATH_SENTINEL }, diagnostic);
         return error.ShaderToolchainUnavailable;
     }
 
@@ -207,13 +194,7 @@ fn toolchainConfigFromEnvValue(alloc: std.mem.Allocator, raw_value: []const u8) 
     };
 }
 
-fn runDxc(
-    alloc: std.mem.Allocator,
-    input_path: []const u8,
-    output_path: []const u8,
-    lowered: Module,
-    config: ToolchainConfig,
-) Error!void {
+fn runDxcWithDiagnostic(alloc: std.mem.Allocator, input_path: []const u8, output_path: []const u8, lowered: Module, config: ToolchainConfig, diagnostic: *diagnostics.Diagnostic) Error!void {
     var profile_buf: [16]u8 = undefined;
     const profile = std.fmt.bufPrint(&profile_buf, "{s}_{d}_{d}", .{
         switch (lowered.entry_point.stage) {
@@ -240,14 +221,11 @@ fn runDxc(
         .max_output_bytes = MAX_DXC_OUTPUT_BYTES,
     }) catch |err| return switch (err) {
         error.FileNotFound => {
-            setMissingToolchainError(config);
+            setMissingToolchainErrorWithDiagnostic(config, diagnostic);
             return error.ShaderToolchainUnavailable;
         },
         else => {
-            setLastErrorFmt(
-                "failed to start DXC via {s} `{s}`: {s}",
-                .{ toolchain.discoveryLabel(config.discovery), config.executable, @errorName(err) },
-            );
+            setLastErrorFmt("failed to start DXC via {s} `{s}`: {s}", .{ toolchain.discoveryLabel(config.discovery), config.executable, @errorName(err) }, diagnostic);
             return error.ShaderToolchainUnavailable;
         },
     };
@@ -258,64 +236,54 @@ fn runDxc(
             if (code != 0) {
                 const detail = toolchain.diagnosticOutput(result.stderr, result.stdout);
                 if (detail.len == 0) {
-                    setLastErrorFmt(
-                        "DXC failed via {s} `{s}` with exit code {d} for profile `{s}` and entry `{s}`",
-                        .{ toolchain.discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name },
-                    );
+                    setLastErrorFmt("DXC failed via {s} `{s}` with exit code {d} for profile `{s}` and entry `{s}`", .{ toolchain.discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name }, diagnostic);
                 } else {
-                    setLastErrorFmt(
-                        "DXC failed via {s} `{s}` with exit code {d} for profile `{s}` and entry `{s}`: {s}",
-                        .{ toolchain.discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name, detail },
-                    );
+                    setLastErrorFmt("DXC failed via {s} `{s}` with exit code {d} for profile `{s}` and entry `{s}`: {s}", .{ toolchain.discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name, detail }, diagnostic);
                 }
                 return error.InvalidIr;
             }
         },
         else => {
-            setLastErrorFmt(
-                "DXC terminated unexpectedly via {s} `{s}` for profile `{s}` and entry `{s}`",
-                .{ toolchain.discoveryLabel(config.discovery), config.executable, profile, lowered.entry_point.name },
-            );
+            setLastErrorFmt("DXC terminated unexpectedly via {s} `{s}` for profile `{s}` and entry `{s}`", .{ toolchain.discoveryLabel(config.discovery), config.executable, profile, lowered.entry_point.name }, diagnostic);
             return error.InvalidIr;
         },
     }
 }
 
-fn setMissingToolchainError(config: ToolchainConfig) void {
+fn setMissingToolchainErrorWithDiagnostic(config: ToolchainConfig, diagnostic: *diagnostics.Diagnostic) void {
     switch (config.discovery) {
-        .explicit_config => setLastErrorFmt(
-            "DXC executable from explicit DXIL toolchain config was not found at `{s}`; pass a valid ToolchainConfig path or set {s} to a valid DXC path",
-            .{ config.executable, DXC_ENV_VAR },
-        ),
-        .env_path => setLastErrorFmt(
-            "{s} points to `{s}`, but that DXC executable was not found; fix {s} or use `{s}` to opt into PATH lookup",
-            .{ DXC_ENV_VAR, config.executable, DXC_ENV_VAR, DXC_PATH_SENTINEL },
-        ),
-        .env_path_lookup => setLastErrorFmt(
-            "{s}={s} requested explicit PATH lookup, but `{s}` was not found on PATH",
-            .{ DXC_ENV_VAR, DXC_PATH_SENTINEL, config.executable },
-        ),
-        .implicit_path_lookup => setLastErrorFmt(
-            "DXC was not found on PATH (`{s}`); set {s} to an absolute/workspace-relative DXC path or `{s}` to make PATH lookup explicit",
-            .{ config.executable, DXC_ENV_VAR, DXC_PATH_SENTINEL },
-        ),
+        .explicit_config => setLastErrorFmt("DXC executable from explicit DXIL toolchain config was not found at `{s}`; pass a valid ToolchainConfig path or set {s} to a valid DXC path", .{ config.executable, DXC_ENV_VAR }, diagnostic),
+        .env_path => setLastErrorFmt("{s} points to `{s}`, but that DXC executable was not found; fix {s} or use `{s}` to opt into PATH lookup", .{ DXC_ENV_VAR, config.executable, DXC_ENV_VAR, DXC_PATH_SENTINEL }, diagnostic),
+        .env_path_lookup => setLastErrorFmt("{s}={s} requested explicit PATH lookup, but `{s}` was not found on PATH", .{ DXC_ENV_VAR, DXC_PATH_SENTINEL, config.executable }, diagnostic),
+        .implicit_path_lookup => setLastErrorFmt("DXC was not found on PATH (`{s}`); set {s} to an absolute/workspace-relative DXC path or `{s}` to make PATH lookup explicit", .{ config.executable, DXC_ENV_VAR, DXC_PATH_SENTINEL }, diagnostic),
     }
 }
 
-fn clearLastError() void {
-    last_error_len = 0;
-}
-
-fn setLastErrorFmt(comptime fmt: []const u8, args: anytype) void {
-    const text = std.fmt.bufPrint(last_error_buf[0..], fmt, args) catch {
-        last_error_len = 0;
-        return;
-    };
-    last_error_len = text.len;
+fn setLastErrorFmt(comptime fmt: []const u8, args: anytype, diagnostic: *diagnostics.Diagnostic) void {
+    var storage: [LAST_ERROR_CAP]u8 = undefined;
+    var writer = std.Io.Writer.fixed(&storage);
+    writer.print(fmt, args) catch {};
+    diagnostic.setLastErrorDetailPublic(.dxil_emit, error.InvalidIr, writer.buffered());
 }
 
 fn defaultDxcExecutable() []const u8 {
     return if (builtin.os.tag == .windows) "dxc.exe" else "dxc";
+}
+
+pub fn emit(module: *const ir.Module, out: []u8) Error!usize {
+    return emitWithDiagnostic(module, out, &compatibility_diagnostic);
+}
+
+pub fn emitWithToolchainConfig(module: *const ir.Module, out: []u8, config: ToolchainConfig) Error!usize {
+    return emitWithToolchainConfigWithDiagnostic(module, out, config, &compatibility_diagnostic);
+}
+
+pub fn loadToolchainConfig(alloc: std.mem.Allocator) Error!ToolchainConfig {
+    return loadToolchainConfigWithDiagnostic(alloc, &compatibility_diagnostic);
+}
+
+fn toolchainConfigFromEnvValue(alloc: std.mem.Allocator, raw_value: []const u8) Error!ToolchainConfig {
+    return toolchainConfigFromEnvValueWithDiagnostic(alloc, raw_value, &compatibility_diagnostic);
 }
 
 test "toolchain config parses explicit env contract" {

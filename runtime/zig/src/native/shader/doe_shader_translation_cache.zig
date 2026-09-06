@@ -442,3 +442,7 @@ test "shader translation cache rejects stale contract digest" {
     payload[@offsetOf(Header, "contract_digest")] ^= 0xff;
     try std.testing.expect(decodePayload(std.testing.allocator, payload, .msl) == null);
 }
+
+pub fn metalLibraryConfiguration() [32]u8 {
+    return translationContractDigest(.msl);
+}

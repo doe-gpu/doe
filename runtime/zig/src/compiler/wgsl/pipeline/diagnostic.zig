@@ -103,15 +103,9 @@ pub const Diagnostic = struct {
         self.last_error_line = 0;
         self.last_error_column = 0;
         self.last_error_context_len = 0;
-        const text = std.fmt.bufPrint(&self.last_error_buf, "{s}: {s}: {s}", .{
-            @tagName(stage),
-            @errorName(kind),
-            detail,
-        }) catch {
-            self.last_error_len = 0;
-            return;
-        };
-        self.last_error_len = text.len;
+        var writer = std.Io.Writer.fixed(&self.last_error_buf);
+        writer.print("{s}: {s}: {s}", .{ @tagName(stage), @errorName(kind), detail }) catch {};
+        self.last_error_len = writer.buffered().len;
     }
 
     fn recordSourceContext(self: *Diagnostic, source: ?[]const u8, loc: ?token.Token.Loc) void {

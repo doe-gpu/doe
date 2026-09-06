@@ -459,21 +459,21 @@ test "DoeShaderModule: release of wrong-magic pointer is safe" {
 
 test "getBindings: zero-binding module returns 0" {
     // Allocate a DoeShaderModule with default (0 bindings).
-    var sm = native.DoeShaderModule{};
+    var sm = native.DoeShaderModule{ .bindings_ready = true };
     sm.binding_count = 0;
     const count = shader.doeNativeShaderModuleGetBindings(native.toOpaque(&sm), null, 0);
     try std.testing.expectEqual(@as(usize, 0), count);
 }
 
 test "getBindings: returns binding count even with null output pointer" {
-    var sm = native.DoeShaderModule{};
+    var sm = native.DoeShaderModule{ .bindings_ready = true };
     sm.binding_count = 3;
     const count = shader.doeNativeShaderModuleGetBindings(native.toOpaque(&sm), null, 0);
     try std.testing.expectEqual(@as(usize, 3), count);
 }
 
 test "getBindings: copies binding data to output buffer" {
-    var sm = native.DoeShaderModule{};
+    var sm = native.DoeShaderModule{ .bindings_ready = true };
     sm.binding_count = 2;
     sm.bindings[0] = .{ .group = 0, .binding = 0, .kind = 0, .addr_space = 0, .access = 0 };
     sm.bindings[1] = .{ .group = 0, .binding = 1, .kind = 1, .addr_space = 0, .access = 0 };
@@ -486,7 +486,7 @@ test "getBindings: copies binding data to output buffer" {
 }
 
 test "getBindings: output buffer smaller than binding count only copies partial" {
-    var sm = native.DoeShaderModule{};
+    var sm = native.DoeShaderModule{ .bindings_ready = true };
     sm.binding_count = 3;
     sm.bindings[0] = .{ .group = 0, .binding = 10, .kind = 0, .addr_space = 0, .access = 0 };
     sm.bindings[1] = .{ .group = 0, .binding = 20, .kind = 0, .addr_space = 0, .access = 0 };
@@ -750,4 +750,86 @@ test "Vulkan module failures preserve compiler cause and location across later c
         try std.testing.expectEqual(@as(u32, 2), module.compilation_message_line);
         try std.testing.expect(std.mem.indexOf(u8, module.compilation_message.?, case.kind) != null);
     }
+}
+
+const reflection = @import("../../src/native/shader/shader_binding_reflection.zig");
+const binding_reflection = @import("../../src/compiler/wgsl/pipeline/binding_reflection.zig");
+const ZERO_BINDING_SHADER = "@compute @workgroup_size(1) fn main() {}";
+const ONE_BINDING_SHADER = "@group(0) @binding(0) var<storage, read_write> data: array<u32>; @compute @workgroup_size(1) fn main() { data[0] = 1u; }";
+
+fn reflectionAllocationFailure(allocator: std.mem.Allocator) !void {
+    var module = native.DoeShaderModule{ .wgsl_source = ONE_BINDING_SHADER };
+    reflection.ensureShaderBindingsWithAllocator(allocator, &module) catch |err| {
+        try std.testing.expectEqual(error.OutOfMemory, err);
+        try std.testing.expect(!module.bindings_ready);
+        try std.testing.expectEqual(error.OutOfMemory, module.bindings_error.?);
+        try std.testing.expectEqual(native.CompilationMessageKind.@"error", module.compilation_message_kind);
+        try std.testing.expect(module.compilation_message.?.len > 0);
+        try std.testing.expectError(err, reflection.ensureShaderBindingsWithAllocator(std.testing.allocator, &module));
+        var valid = native.DoeShaderModule{ .wgsl_source = ZERO_BINDING_SHADER };
+        try reflection.ensureShaderBindingsWithAllocator(std.testing.allocator, &valid);
+        try std.testing.expect(valid.bindings_ready);
+        try std.testing.expectEqual(@as(u32, 0), valid.binding_count);
+        return err;
+    };
+    try std.testing.expect(module.bindings_ready);
+    try std.testing.expectEqual(@as(u32, 1), module.binding_count);
+}
+
+test "reflection failures never publish a successful empty interface and clean every allocation" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, reflectionAllocationFailure, .{});
+}
+
+test "reflection capacity failure is distinct from a zero binding shader" {
+    var output: [0]binding_reflection.BindingMeta = .{};
+    try std.testing.expectEqual(@as(usize, 0), try binding_reflection.extractBindings(std.testing.allocator, ZERO_BINDING_SHADER, &output));
+    try std.testing.expectError(error.OutputTooLarge, binding_reflection.extractBindings(std.testing.allocator, ONE_BINDING_SHADER, &output));
+    try std.testing.expectError(error.OutputTooLarge, binding_reflection.extractBindingsForEntryPoint(std.testing.allocator, ONE_BINDING_SHADER, "main", &output));
+}
+
+test "native reflection reports missing source and invalid entry point explicitly" {
+    var missing = native.DoeShaderModule{};
+    try std.testing.expectEqual(std.math.maxInt(usize), shader.doeNativeShaderModuleGetBindings(native.toOpaque(&missing), null, 0));
+    var module = native.DoeShaderModule{ .wgsl_source = ZERO_BINDING_SHADER };
+    const unknown = "unknown";
+    try std.testing.expectEqual(std.math.maxInt(usize), shader.doeNativeShaderModuleGetBindingsForEntryPoint(native.toOpaque(&module), unknown.ptr, unknown.len, null, 0));
+    var kind_buf: [64]u8 = undefined;
+    try std.testing.expectEqualStrings("UnknownIdentifier", readErrorKind(&kind_buf));
+    const main = "main";
+    try std.testing.expectEqual(@as(usize, 0), shader.doeNativeShaderModuleGetBindingsForEntryPoint(native.toOpaque(&module), main.ptr, main.len, null, 0));
+}
+
+const NativeDiagnosticWorker = struct {
+    source: []const u8,
+    expected_kind: []const u8,
+    failure: ?anyerror = null,
+    fn run(self: *NativeDiagnosticWorker) void {
+        self.check() catch |err| {
+            self.failure = err;
+        };
+    }
+    fn check(self: *NativeDiagnosticWorker) !void {
+        for (0..32) |_| {
+            try std.testing.expectEqual(@as(u32, 0), shader.doeNativeCheckShaderSource(self.source.ptr, self.source.len));
+            std.Thread.yield() catch {};
+            var kind: [64]u8 = undefined;
+            try std.testing.expectEqualStrings(self.expected_kind, readErrorKind(&kind));
+            try std.testing.expectEqual(@as(u32, 1), shader.doeNativeCheckShaderSource(ZERO_BINDING_SHADER.ptr, ZERO_BINDING_SHADER.len));
+            try std.testing.expectEqual(@as(usize, 0), shader.doeNativeCopyLastErrorKind(null, 0));
+        }
+    }
+};
+
+test "native last-error adapters isolate concurrent shader calls" {
+    var workers = [_]NativeDiagnosticWorker{
+        .{ .source = "fn broken(", .expected_kind = "UnexpectedToken" },
+        .{ .source = "@compute @workgroup_size(1) fn main() { let x: bool = 1u; }", .expected_kind = "TypeMismatch" },
+    };
+    {
+        const first = try std.Thread.spawn(.{}, NativeDiagnosticWorker.run, .{&workers[0]});
+        defer first.join();
+        const second = try std.Thread.spawn(.{}, NativeDiagnosticWorker.run, .{&workers[1]});
+        defer second.join();
+    }
+    for (workers) |worker| if (worker.failure) |err| return err;
 }

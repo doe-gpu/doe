@@ -38,243 +38,90 @@ const DoeComputePipeline = native_types.DoeComputePipeline;
 const DoePipelineLayout = native_types.DoePipelineLayout;
 const DoeBindGroupLayout = native_types.DoeBindGroupLayout;
 const CompilationMessageKind = native_shared.CompilationMessageKind;
-const LAST_ERROR_CAP: usize = 512;
-const LAST_ERROR_META_CAP: usize = 64;
+const ShaderDiagnostic = @import("shader_diagnostic.zig").ShaderDiagnostic;
+threadlocal var last_diagnostic = ShaderDiagnostic{};
 const DIAGNOSTIC_DIRECTIVE_INFO: []const u8 =
     "WGSL diagnostic directives are parsed on this path and currently reported as advisory compilation info only.";
-const WGSL_SHADER_MODULE_CACHE_MAX_ENTRIES: usize = 64;
-var last_error_buf: [LAST_ERROR_CAP]u8 = undefined;
-var last_error_len: usize = 0;
-var last_error_stage_buf: [LAST_ERROR_META_CAP]u8 = undefined;
-var last_error_stage_len: usize = 0;
-var last_error_kind_buf: [LAST_ERROR_META_CAP]u8 = undefined;
-var last_error_kind_len: usize = 0;
-var last_error_line: u32 = 0;
-var last_error_col: u32 = 0;
-
-const WgslShaderModuleCacheEntry = struct {
-    source_hash: [32]u8,
-    mtl_library: *anyopaque,
-    wg_x: u32,
-    wg_y: u32,
-    wg_z: u32,
-    needs_sizes_buf: bool,
-    dispatch_preconditions: []const wgsl_ir.DispatchPrecondition,
-};
-
-var wgsl_shader_module_cache_mutex = std.Thread.Mutex{};
-var wgsl_shader_module_cache: std.ArrayListUnmanaged(WgslShaderModuleCacheEntry) = .{};
-
-fn hash_wgsl_source(wgsl: []const u8) [32]u8 {
-    var digest: [32]u8 = undefined;
-    std.crypto.hash.sha2.Sha256.hash(wgsl, &digest, .{});
-    return digest;
-}
-
-fn clone_dispatch_preconditions(source: []const wgsl_ir.DispatchPrecondition) ?[]const wgsl_ir.DispatchPrecondition {
-    if (source.len == 0) return &.{};
-    return alloc.dupe(wgsl_ir.DispatchPrecondition, source) catch null;
-}
-
-fn tryCreateCachedWgslShaderModule(wgsl: []const u8, source_hash: [32]u8) ?*anyopaque {
-    var cached: ?WgslShaderModuleCacheEntry = null;
-    wgsl_shader_module_cache_mutex.lock();
-    for (wgsl_shader_module_cache.items) |entry| {
-        if (std.mem.eql(u8, entry.source_hash[0..], source_hash[0..])) {
-            cached = entry;
-            break;
-        }
-    }
-    wgsl_shader_module_cache_mutex.unlock();
-
-    const entry = cached orelse return null;
-    const source = retainWgslSource(wgsl) orelse return null;
-    var source_transferred = false;
-    defer if (!source_transferred) alloc.free(source);
-    const sm = make(DoeShaderModule) orelse return null;
-    const dispatch_preconditions = clone_dispatch_preconditions(entry.dispatch_preconditions) orelse {
-        alloc.destroy(sm);
-        return null;
-    };
-    sm.* = .{
-        .mtl_library = entry.mtl_library,
-        .wg_x = entry.wg_x,
-        .wg_y = entry.wg_y,
-        .wg_z = entry.wg_z,
-        .needs_sizes_buf = entry.needs_sizes_buf,
-        .dispatch_preconditions = dispatch_preconditions,
-        .wgsl_source = source,
-        .mtl_library_borrowed = true,
-    };
-    source_transferred = true;
+fn tryCreateCachedWgslShaderModule(dev: *DoeDevice, wgsl: []const u8) error{OutOfMemory}!?*anyopaque {
+    var cached = (try dev.metal_libraries.lookup(alloc, wgsl, shader_translation_cache.metalLibraryConfiguration())) orelse return null;
+    var transferred = false;
+    defer if (!transferred) cached.deinit(alloc, dev.metal_libraries.ops);
+    const sm = make(DoeShaderModule) orelse return error.OutOfMemory;
+    errdefer alloc.destroy(sm);
+    const source = try alloc.dupe(u8, wgsl);
+    sm.* = .{ .mtl_library = cached.library, .wgsl_source = source, .wg_x = cached.info.workgroup_size[0], .wg_y = cached.info.workgroup_size[1], .wg_z = cached.info.workgroup_size[2], .needs_sizes_buf = cached.info.needs_sizes_buf, .dispatch_preconditions = cached.info.dispatch_preconditions, .texture_dispatch_preconditions = cached.info.texture_dispatch_preconditions };
+    transferred = true;
     set_module_info_from_diagnostic_directive(sm, wgsl);
     return toOpaque(sm);
 }
 
-fn storeWgslShaderModuleCache(source_hash: [32]u8, lib: ?*anyopaque, info: *const wgsl_runtime_compile.TranslationInfo) void {
-    const library = lib orelse return;
-    const dispatch_preconditions = clone_dispatch_preconditions(info.dispatch_preconditions) orelse return;
-
-    wgsl_shader_module_cache_mutex.lock();
-    defer wgsl_shader_module_cache_mutex.unlock();
-
-    for (wgsl_shader_module_cache.items) |entry| {
-        if (std.mem.eql(u8, entry.source_hash[0..], source_hash[0..])) {
-            if (dispatch_preconditions.len > 0) alloc.free(dispatch_preconditions);
-            return;
-        }
-    }
-    if (wgsl_shader_module_cache.items.len >= WGSL_SHADER_MODULE_CACHE_MAX_ENTRIES) {
-        if (dispatch_preconditions.len > 0) alloc.free(dispatch_preconditions);
-        return;
-    }
-    const retained_library = metal_bridge_retain(library) orelse {
-        if (dispatch_preconditions.len > 0) alloc.free(dispatch_preconditions);
-        return;
-    };
-    wgsl_shader_module_cache.append(alloc, .{
-        .source_hash = source_hash,
-        .mtl_library = retained_library,
-        .wg_x = info.workgroup_size[0],
-        .wg_y = info.workgroup_size[1],
-        .wg_z = info.workgroup_size[2],
-        .needs_sizes_buf = info.needs_sizes_buf,
-        .dispatch_preconditions = dispatch_preconditions,
-    }) catch {
-        metal_bridge_release(retained_library);
-        if (dispatch_preconditions.len > 0) alloc.free(dispatch_preconditions);
-    };
-}
-
-fn clear_last_error() void {
-    wgsl_analysis.clearLastError();
-    last_error_len = 0;
-    last_error_stage_len = 0;
-    last_error_kind_len = 0;
-    last_error_line = 0;
-    last_error_col = 0;
-}
-
-fn set_last_error(message: []const u8) void {
-    const len = @min(message.len, last_error_buf.len - 1);
-    @memcpy(last_error_buf[0..len], message[0..len]);
-    last_error_buf[len] = 0;
-    last_error_len = len;
-}
-
-fn set_last_error_fmt(comptime fmt: []const u8, args: anytype) void {
-    const text = std.fmt.bufPrint(&last_error_buf, fmt, args) catch {
-        last_error_len = 0;
-        return;
-    };
-    last_error_len = text.len;
-}
-
-fn set_last_error_meta(buf: []u8, len_out: *usize, text: []const u8) void {
-    const len = @min(text.len, buf.len - 1);
-    @memcpy(buf[0..len], text[0..len]);
-    buf[len] = 0;
-    len_out.* = len;
-}
-
-fn set_last_error_stage_name(stage: []const u8) void {
-    set_last_error_meta(&last_error_stage_buf, &last_error_stage_len, stage);
-}
-
-fn set_last_error_stage(stage: wgsl_analysis.CompilationStage) void {
-    if (stage == .none) {
-        last_error_stage_len = 0;
-        return;
-    }
-    set_last_error_stage_name(@tagName(stage));
-}
-
-fn set_last_error_kind(kind: []const u8) void {
-    set_last_error_meta(&last_error_kind_buf, &last_error_kind_len, kind);
-}
-
-fn capture_wgsl_error_location() void {
-    last_error_line = wgsl_analysis.lastErrorLine();
-    last_error_col = wgsl_analysis.lastErrorColumn();
-}
-
-fn capture_compile_error(err: anyerror, stage: []const u8, context: []const u8) void {
-    set_last_error_kind(@errorName(err));
-    const compiler_error = if (wgsl_analysis.lastErrorKind()) |kind| kind == err else false;
-    if (compiler_error and wgsl_analysis.lastErrorStage() != .none) {
-        set_last_error_stage(wgsl_analysis.lastErrorStage());
-        capture_wgsl_error_location();
-        set_last_error_fmt("{s}: {s}", .{ context, wgsl_analysis.lastErrorMessage() });
-    } else {
-        set_last_error_stage_name(stage);
-        set_last_error_fmt("{s}: {s}", .{ context, @errorName(err) });
-    }
-}
-
 pub export fn doeNativeCopyLastErrorMessage(out_ptr: ?[*]u8, out_len: usize) callconv(.c) usize {
-    if (out_ptr == null or out_len == 0 or last_error_len == 0) return last_error_len;
+    if (out_ptr == null or out_len == 0 or last_diagnostic.last_error_len == 0) return last_diagnostic.last_error_len;
     const dst = out_ptr.?[0..out_len];
-    const copy_len = @min(last_error_len, out_len - 1);
-    @memcpy(dst[0..copy_len], last_error_buf[0..copy_len]);
+    const copy_len = @min(last_diagnostic.last_error_len, out_len - 1);
+    @memcpy(dst[0..copy_len], last_diagnostic.last_error_buf[0..copy_len]);
     dst[copy_len] = 0;
-    return last_error_len;
+    return last_diagnostic.last_error_len;
 }
 
 pub export fn doeNativeCopyLastErrorStage(out_ptr: ?[*]u8, out_len: usize) callconv(.c) usize {
-    if (out_ptr == null or out_len == 0 or last_error_stage_len == 0) return last_error_stage_len;
+    if (out_ptr == null or out_len == 0 or last_diagnostic.last_error_stage_len == 0) return last_diagnostic.last_error_stage_len;
     const dst = out_ptr.?[0..out_len];
-    const copy_len = @min(last_error_stage_len, out_len - 1);
-    @memcpy(dst[0..copy_len], last_error_stage_buf[0..copy_len]);
+    const copy_len = @min(last_diagnostic.last_error_stage_len, out_len - 1);
+    @memcpy(dst[0..copy_len], last_diagnostic.last_error_stage_buf[0..copy_len]);
     dst[copy_len] = 0;
-    return last_error_stage_len;
+    return last_diagnostic.last_error_stage_len;
 }
 
 pub export fn doeNativeCopyLastErrorKind(out_ptr: ?[*]u8, out_len: usize) callconv(.c) usize {
-    if (out_ptr == null or out_len == 0 or last_error_kind_len == 0) return last_error_kind_len;
+    if (out_ptr == null or out_len == 0 or last_diagnostic.last_error_kind_len == 0) return last_diagnostic.last_error_kind_len;
     const dst = out_ptr.?[0..out_len];
-    const copy_len = @min(last_error_kind_len, out_len - 1);
-    @memcpy(dst[0..copy_len], last_error_kind_buf[0..copy_len]);
+    const copy_len = @min(last_diagnostic.last_error_kind_len, out_len - 1);
+    @memcpy(dst[0..copy_len], last_diagnostic.last_error_kind_buf[0..copy_len]);
     dst[copy_len] = 0;
-    return last_error_kind_len;
+    return last_diagnostic.last_error_kind_len;
 }
 
 pub export fn doeNativeGetLastErrorLine() callconv(.c) u32 {
-    return last_error_line;
+    return last_diagnostic.last_error_line;
 }
 
 pub export fn doeNativeGetLastErrorColumn() callconv(.c) u32 {
-    return last_error_col;
+    return last_diagnostic.last_error_col;
 }
 
-pub export fn doeNativeCheckShaderSource(code_ptr: ?[*]const u8, code_len: usize) callconv(.c) u32 {
-    clear_last_error();
+fn doeNativeCheckShaderSourceOwned(code_ptr: ?[*]const u8, code_len: usize, diagnostic: *ShaderDiagnostic) u32 {
+    diagnostic.clear_last_error();
     const ptr = code_ptr orelse {
-        set_last_error_stage_name("native_check");
-        set_last_error_kind("InvalidInput");
-        set_last_error("shader check failed: WGSL source pointer is null");
+        diagnostic.set_last_error_stage_name("native_check");
+        diagnostic.set_last_error_kind("InvalidInput");
+        diagnostic.set_last_error("shader check failed: WGSL source pointer is null");
         return 0;
     };
     const wgsl = ptr[0..code_len];
     var msl_buf: [msl_translation.MAX_OUTPUT]u8 = undefined;
-    _ = msl_translation.translateToMsl(alloc, wgsl, &msl_buf) catch |err| {
-        set_last_error_stage(wgsl_analysis.lastErrorStage());
-        set_last_error_kind(@errorName(err));
-        capture_wgsl_error_location();
-        const detail = wgsl_analysis.lastErrorMessage();
+    _ = msl_translation.translateToMslWithDiagnostic(alloc, wgsl, &msl_buf, &diagnostic.compiler) catch |err| {
+        diagnostic.set_last_error_stage(diagnostic.compiler.lastErrorStage());
+        diagnostic.set_last_error_kind(@errorName(err));
+        diagnostic.capture_wgsl_error_location();
+        const detail = diagnostic.compiler.lastErrorMessage();
         if (detail.len > 0) {
-            set_last_error(detail);
+            diagnostic.set_last_error(detail);
         } else {
-            set_last_error_fmt("{s}: {s}", .{ @tagName(wgsl_analysis.lastErrorStage()), @errorName(err) });
+            diagnostic.set_last_error_fmt("{s}: {s}", .{ @tagName(diagnostic.compiler.lastErrorStage()), @errorName(err) });
         }
         return 0;
     };
     return 1;
 }
 
-pub export fn doeNativeShaderModuleGetBindings(raw: ?*anyopaque, out_ptr: ?[*]native_shared.BindingInfo, out_len: usize) callconv(.c) usize {
-    const sm = cast(DoeShaderModule, raw) orelse return 0;
+fn doeNativeShaderModuleGetBindingsOwned(raw: ?*anyopaque, out_ptr: ?[*]native_shared.BindingInfo, out_len: usize, diagnostic: *ShaderDiagnostic) usize {
+    const sm = cast(DoeShaderModule, raw) orelse {
+        diagnostic.capture_compile_error(error.InvalidShaderModule, "reflection", "expected a live shader module");
+        return std.math.maxInt(usize);
+    };
     ensureShaderBindings(sm) catch |err| {
-        capture_compile_error(err, "reflection", "shader binding extraction failed");
+        diagnostic.capture_compile_error(err, "reflection", "shader binding extraction failed");
         return std.math.maxInt(usize);
     };
     const count: usize = sm.binding_count;
@@ -285,19 +132,22 @@ pub export fn doeNativeShaderModuleGetBindings(raw: ?*anyopaque, out_ptr: ?[*]na
     return count;
 }
 
-pub export fn doeNativeShaderModuleGetBindingsForEntryPoint(
-    raw: ?*anyopaque,
-    entry_ptr: ?[*]const u8,
-    entry_len: usize,
-    out_ptr: ?[*]native_shared.BindingInfo,
-    out_len: usize,
-) callconv(.c) usize {
-    const sm = cast(DoeShaderModule, raw) orelse return 0;
-    const wgsl = sm.wgsl_source orelse return 0;
-    const entry_point = (entry_ptr orelse return 0)[0..entry_len];
+fn doeNativeShaderModuleGetBindingsForEntryPointOwned(raw: ?*anyopaque, entry_ptr: ?[*]const u8, entry_len: usize, out_ptr: ?[*]native_shared.BindingInfo, out_len: usize, diagnostic: *ShaderDiagnostic) usize {
+    const sm = cast(DoeShaderModule, raw) orelse {
+        diagnostic.capture_compile_error(error.InvalidShaderModule, "reflection", "expected a live shader module");
+        return std.math.maxInt(usize);
+    };
+    const wgsl = sm.wgsl_source orelse {
+        diagnostic.capture_compile_error(error.UnsupportedWgsl, "reflection", "WGSL source is unavailable for reflection");
+        return std.math.maxInt(usize);
+    };
+    const entry_point = (entry_ptr orelse {
+        diagnostic.capture_compile_error(error.UnknownIdentifier, "reflection", "expected an entry point name");
+        return std.math.maxInt(usize);
+    })[0..entry_len];
     var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_bindings.BindingMeta = undefined;
-    const count = wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch |err| {
-        capture_compile_error(err, "reflection", "entry point binding extraction failed");
+    const count = wgsl_bindings.extractBindingsForEntryPointWithDiagnostic(alloc, wgsl, entry_point, &metadata, &diagnostic.compiler) catch |err| {
+        diagnostic.capture_compile_error(err, "reflection", "entry point binding extraction failed");
         return std.math.maxInt(usize);
     };
     if (out_ptr) |out| for (metadata[0..@min(count, out_len)], 0..) |binding, index| {
@@ -356,22 +206,22 @@ fn set_module_info_from_diagnostic_directive(sm: *DoeShaderModule, wgsl: []const
 }
 
 pub const ensureShaderBindings = shader_binding_reflection.ensureShaderBindings;
-pub export fn doeNativeDeviceCreateShaderModule(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUShaderModuleDescriptor) callconv(.c) ?*anyopaque {
-    clear_last_error();
+fn doeNativeDeviceCreateShaderModuleOwned(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUShaderModuleDescriptor, diagnostic: *ShaderDiagnostic) ?*anyopaque {
+    diagnostic.clear_last_error();
     const dev = cast(DoeDevice, dev_raw) orelse return null;
     const d = desc orelse return null;
     if (d.nextInChain == null) return null;
     const chain: *const abi_callback.WGPUChainedStruct = @ptrCast(d.nextInChain);
 
     const result = switch (chain.sType) {
-        abi_core.WGPUSType_ShaderSourceWGSL => createFromWGSL(dev, chain),
-        abi_core.WGPUSType_ShaderSourceMSL => createFromMSL(dev, chain),
-        abi_core.WGPUSType_ShaderSourceSPIRV => createFromSPIRV(chain),
-        abi_core.WGPUSType_ShaderSourceHLSL => createFromHLSL(chain),
+        abi_core.WGPUSType_ShaderSourceWGSL => createFromWGSLOwned(dev, chain, diagnostic),
+        abi_core.WGPUSType_ShaderSourceMSL => createFromMSLOwned(dev, chain, diagnostic),
+        abi_core.WGPUSType_ShaderSourceSPIRV => createFromSPIRVOwned(chain, diagnostic),
+        abi_core.WGPUSType_ShaderSourceHLSL => createFromHLSLOwned(chain, diagnostic),
         else => blk: {
-            set_last_error_stage_name("native_shader_create");
-            set_last_error_kind("UnsupportedShaderFormat");
-            set_last_error_fmt("unsupported shader source sType: 0x{x:0>8}", .{chain.sType});
+            diagnostic.set_last_error_stage_name("native_shader_create");
+            diagnostic.set_last_error_kind("UnsupportedShaderFormat");
+            diagnostic.set_last_error_fmt("unsupported shader source sType: 0x{x:0>8}", .{chain.sType});
             std.log.warn("doe: createShaderModule failed: unsupported sType 0x{x:0>8}", .{chain.sType});
             break :blk null;
         },
@@ -381,16 +231,16 @@ pub export fn doeNativeDeviceCreateShaderModule(dev_raw: ?*anyopaque, desc: ?*co
     const handle = result orelse blk: {
         const err_sm = make(DoeShaderModule) orelse return null;
         err_sm.* = .{};
-        const message = if (last_error_len > 0)
-            last_error_buf[0..last_error_len]
+        const message = if (diagnostic.last_error_len > 0)
+            diagnostic.last_error_buf[0..diagnostic.last_error_len]
         else
             "shader module creation failed";
         set_module_compilation_message(
             err_sm,
             .@"error",
             message,
-            last_error_line,
-            last_error_col,
+            diagnostic.last_error_line,
+            diagnostic.last_error_col,
         );
         break :blk toOpaque(err_sm);
     };
@@ -398,12 +248,12 @@ pub export fn doeNativeDeviceCreateShaderModule(dev_raw: ?*anyopaque, desc: ?*co
     return handle;
 }
 
-pub export fn doeNativeDeviceCreateShaderModuleWgsl(dev_raw: ?*anyopaque, code_ptr: ?[*]const u8, code_len: usize) callconv(.c) ?*anyopaque {
+fn doeNativeDeviceCreateShaderModuleWgslOwned(dev_raw: ?*anyopaque, code_ptr: ?[*]const u8, code_len: usize, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     if (code_ptr == null) {
-        clear_last_error();
-        set_last_error_stage_name("native_shader_create");
-        set_last_error_kind("InvalidInput");
-        set_last_error("shader module creation failed: WGSL source pointer is null");
+        diagnostic.clear_last_error();
+        diagnostic.set_last_error_stage_name("native_shader_create");
+        diagnostic.set_last_error_kind("InvalidInput");
+        diagnostic.set_last_error("shader module creation failed: WGSL source pointer is null");
         return null;
     }
     var source = abi_pipeline.WGPUShaderSourceWGSL{
@@ -414,21 +264,23 @@ pub export fn doeNativeDeviceCreateShaderModuleWgsl(dev_raw: ?*anyopaque, code_p
         .nextInChain = &source.chain,
         .label = .{ .data = null, .length = 0 },
     };
-    return doeNativeDeviceCreateShaderModule(dev_raw, &desc);
+    return doeNativeDeviceCreateShaderModuleOwned(dev_raw, &desc, diagnostic);
 }
 
 // ============================================================
 // WGSL path (existing behavior, refactored into helper)
 // ============================================================
-fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
+fn createFromWGSLOwned(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     const wgsl_chain: *const abi_pipeline.WGPUShaderSourceWGSL = @ptrCast(@alignCast(chain));
     const wgsl = resolveStringView(wgsl_chain.code) orelse return null;
 
-    if (dev.backend == .vulkan) return createFromWGSLVulkan(dev, wgsl);
+    if (dev.backend == .vulkan) return createFromWGSLVulkanOwned(dev, wgsl, diagnostic);
 
-    const source_hash = hash_wgsl_source(wgsl);
-    if (tryCreateCachedWgslShaderModule(wgsl, source_hash)) |cached_module| return cached_module;
-    const source = retainWgslSource(wgsl) orelse return null;
+    if (tryCreateCachedWgslShaderModule(dev, wgsl) catch |err| {
+        diagnostic.capture_compile_error(err, "native_shader_create", "retaining cached Metal shader failed");
+        return null;
+    }) |cached_module| return cached_module;
+    const source = retainWgslSourceOwned(wgsl, diagnostic) orelse return null;
     var source_transferred = false;
     defer if (!source_transferred) alloc.free(source);
 
@@ -445,23 +297,17 @@ fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct)
         cached.info = .{};
         msl_source = cached.msl;
     } else {
-        var translation = wgsl_runtime_compile.translateToMslForComputeRuntime(
-            alloc,
-            wgsl,
-            &msl_buf,
-            null,
-            0,
-        ) catch |err| {
-            set_last_error_stage(wgsl_analysis.lastErrorStage());
-            set_last_error_kind(@errorName(err));
-            capture_wgsl_error_location();
-            const detail = wgsl_analysis.lastErrorMessage();
+        var translation = wgsl_runtime_compile.translateToMslForComputeRuntimeWithDiagnostic(alloc, wgsl, &msl_buf, null, 0, &diagnostic.compiler) catch |err| {
+            diagnostic.set_last_error_stage(diagnostic.compiler.lastErrorStage());
+            diagnostic.set_last_error_kind(@errorName(err));
+            diagnostic.capture_wgsl_error_location();
+            const detail = diagnostic.compiler.lastErrorMessage();
             if (detail.len > 0) {
-                set_last_error_fmt("WGSL→MSL translation failed: {s}", .{detail});
+                diagnostic.set_last_error_fmt("WGSL→MSL translation failed: {s}", .{detail});
             } else {
-                set_last_error_fmt("WGSL→MSL translation failed: {s}", .{@errorName(err)});
+                diagnostic.set_last_error_fmt("WGSL→MSL translation failed: {s}", .{@errorName(err)});
             }
-            std.log.warn("doe: createShaderModule failed: {s}", .{last_error_buf[0..last_error_len]});
+            std.log.warn("doe: createShaderModule failed: {s}", .{diagnostic.last_error_buf[0..diagnostic.last_error_len]});
             return null;
         };
         shader_translation_cache.storeComputeTranslation(
@@ -476,18 +322,24 @@ fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct)
     }
 
     var err_buf: [ERR_CAP]u8 = undefined;
-    const lib = compileMslToLibrary(dev, msl_source.ptr, msl_source.len, &err_buf) orelse return null;
+    const lib = compileMslToLibraryOwned(dev, msl_source.ptr, msl_source.len, &err_buf, diagnostic) orelse return null;
 
     const sm = make(DoeShaderModule) orelse {
         metal_bridge_release(lib);
         return null;
     };
     sm.* = .{ .mtl_library = lib };
-    storeWgslShaderModuleCache(source_hash, lib, &translation_info);
+    dev.metal_libraries.insert(alloc, wgsl, shader_translation_cache.metalLibraryConfiguration(), lib, &translation_info) catch |err| {
+        doeNativeShaderModuleRelease(toOpaque(sm));
+        diagnostic.capture_compile_error(err, "native_shader_create", "retaining Metal library cache entry failed");
+        return null;
+    };
     set_module_info_from_diagnostic_directive(sm, wgsl);
     sm.needs_sizes_buf = translation_info.needs_sizes_buf;
     sm.dispatch_preconditions = translation_info.dispatch_preconditions;
     translation_info.dispatch_preconditions = &.{};
+    sm.texture_dispatch_preconditions = translation_info.texture_dispatch_preconditions;
+    translation_info.texture_dispatch_preconditions = &.{};
     sm.wg_x = translation_info.workgroup_size[0];
     sm.wg_y = translation_info.workgroup_size[1];
     sm.wg_z = translation_info.workgroup_size[2];
@@ -499,13 +351,13 @@ fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct)
 // Vulkan WGSL path — WGSL → SPIR-V, no Metal library
 // ============================================================
 
-fn createFromWGSLVulkan(dev: *DoeDevice, wgsl: []const u8) ?*anyopaque {
+fn createFromWGSLVulkanOwned(dev: *DoeDevice, wgsl: []const u8, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     _ = dev;
     const sm = make(DoeShaderModule) orelse return null;
     sm.* = .{};
     var complete = false;
     defer if (!complete) doeNativeShaderModuleRelease(toOpaque(sm));
-    sm.wgsl_source = retainWgslSource(wgsl) orelse return null;
+    sm.wgsl_source = retainWgslSourceOwned(wgsl, diagnostic) orelse return null;
     set_module_info_from_diagnostic_directive(sm, wgsl);
     sm.binding_count = 0;
 
@@ -514,14 +366,14 @@ fn createFromWGSLVulkan(dev: *DoeDevice, wgsl: []const u8) ?*anyopaque {
     const has_graphics = vk_render.probe_has_graphics_entry_points(wgsl);
 
     if (has_graphics) {
-        vk_render.vulkan_create_graphics_shader_module(sm, wgsl) catch |err| {
-            capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V graphics compilation failed");
+        vk_render.vulkan_create_graphics_shader_moduleWithDiagnostic(sm, wgsl, &diagnostic.compiler) catch |err| {
+            diagnostic.capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V graphics compilation failed");
             return null;
         };
     } else {
         const vk_compute = @import("../vulkan/vulkan_compute_native.zig");
-        vk_compute.vulkan_create_shader_module(sm, wgsl) catch |err| {
-            capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V compilation failed");
+        vk_compute.vulkan_create_shader_moduleWithDiagnostic(sm, wgsl, &diagnostic.compiler) catch |err| {
+            diagnostic.capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V compilation failed");
             return null;
         };
     }
@@ -533,12 +385,12 @@ fn createFromWGSLVulkan(dev: *DoeDevice, wgsl: []const u8) ?*anyopaque {
 // MSL path — pre-translated Metal Shading Language source
 // ============================================================
 
-fn createFromMSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
+fn createFromMSLOwned(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     const msl_chain: *const abi_pipeline.WGPUShaderSourceMSL = @ptrCast(@alignCast(chain));
     const msl_src = resolveStringView(msl_chain.code) orelse {
-        set_last_error_stage_name("native_shader_create");
-        set_last_error_kind("InvalidInput");
-        set_last_error("pre-translated MSL source pointer is null");
+        diagnostic.set_last_error_stage_name("native_shader_create");
+        diagnostic.set_last_error_kind("InvalidInput");
+        diagnostic.set_last_error("pre-translated MSL source pointer is null");
         return null;
     };
 
@@ -552,13 +404,13 @@ fn createFromMSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct) 
         ERR_CAP,
     ) orelse {
         const err_msg = std.mem.sliceTo(&err_buf, 0);
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("MSLCompilationFailed");
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("MSLCompilationFailed");
         if (err_msg.len > 0) {
-            set_last_error_fmt("pre-translated MSL compilation failed: {s}", .{err_msg});
+            diagnostic.set_last_error_fmt("pre-translated MSL compilation failed: {s}", .{err_msg});
             std.log.err("doe: createShaderModule (MSL) failed: {s}", .{err_msg});
         } else {
-            set_last_error("pre-translated MSL compilation failed: MTLLibrary creation returned null");
+            diagnostic.set_last_error("pre-translated MSL compilation failed: MTLLibrary creation returned null");
             std.log.err("doe: createShaderModule (MSL) failed: MTLLibrary returned null", .{});
         }
         return null;
@@ -582,21 +434,21 @@ fn createFromMSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct) 
 // SPIR-V path — store binary for Vulkan pipeline creation
 // ============================================================
 
-fn createFromSPIRV(chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
+fn createFromSPIRVOwned(chain: *const abi_callback.WGPUChainedStruct, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     const spirv_chain: *const abi_pipeline.WGPUShaderSourceSPIRV = @ptrCast(@alignCast(chain));
 
     if (spirv_chain.codeSize == 0 or spirv_chain.code == null) {
-        set_last_error_stage_name("native_shader_create");
-        set_last_error_kind("InvalidSPIRV");
-        set_last_error("SPIR-V codeSize and code must describe at least one word");
+        diagnostic.set_last_error_stage_name("native_shader_create");
+        diagnostic.set_last_error_kind("InvalidSPIRV");
+        diagnostic.set_last_error("SPIR-V codeSize and code must describe at least one word");
         return null;
     }
 
     const word_count = spirv_chain.codeSize;
     const spirv_copy = alloc.alloc(u32, word_count) catch {
-        set_last_error_stage_name("native_shader_create");
-        set_last_error_kind("OutOfMemory");
-        set_last_error("failed to allocate SPIR-V storage");
+        diagnostic.set_last_error_stage_name("native_shader_create");
+        diagnostic.set_last_error_kind("OutOfMemory");
+        diagnostic.set_last_error("failed to allocate SPIR-V storage");
         return null;
     };
     @memcpy(spirv_copy, spirv_chain.code[0..word_count]);
@@ -619,19 +471,19 @@ fn createFromSPIRV(chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
 // HLSL path — store source for D3D12 DXC compilation
 // ============================================================
 
-fn createFromHLSL(chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
+fn createFromHLSLOwned(chain: *const abi_callback.WGPUChainedStruct, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     const hlsl_chain: *const abi_pipeline.WGPUShaderSourceHLSL = @ptrCast(@alignCast(chain));
     const hlsl_src = resolveStringView(hlsl_chain.code) orelse {
-        set_last_error_stage_name("native_shader_create");
-        set_last_error_kind("InvalidInput");
-        set_last_error("HLSL source pointer is null");
+        diagnostic.set_last_error_stage_name("native_shader_create");
+        diagnostic.set_last_error_kind("InvalidInput");
+        diagnostic.set_last_error("HLSL source pointer is null");
         return null;
     };
 
     const hlsl_copy = alloc.alloc(u8, hlsl_src.len) catch {
-        set_last_error_stage_name("native_shader_create");
-        set_last_error_kind("OutOfMemory");
-        set_last_error("failed to allocate HLSL storage");
+        diagnostic.set_last_error_stage_name("native_shader_create");
+        diagnostic.set_last_error_kind("OutOfMemory");
+        diagnostic.set_last_error("failed to allocate HLSL storage");
         return null;
     };
     @memcpy(hlsl_copy, hlsl_src);
@@ -654,7 +506,7 @@ fn createFromHLSL(chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
 // Shared MSL compilation helper
 // ============================================================
 
-fn compileMslToLibrary(dev: *DoeDevice, msl_buf: [*]const u8, msl_len: usize, err_buf: *[ERR_CAP]u8) ?*anyopaque {
+fn compileMslToLibraryOwned(dev: *DoeDevice, msl_buf: [*]const u8, msl_len: usize, err_buf: *[ERR_CAP]u8, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     return metal_bridge_device_new_library_msl(
         dev.mtl_device,
         msl_buf,
@@ -663,13 +515,13 @@ fn compileMslToLibrary(dev: *DoeDevice, msl_buf: [*]const u8, msl_len: usize, er
         ERR_CAP,
     ) orelse {
         const err_msg = std.mem.sliceTo(err_buf, 0);
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("MSLCompilationFailed");
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("MSLCompilationFailed");
         if (err_msg.len > 0) {
-            set_last_error_fmt("MSL compilation failed: {s}", .{err_msg});
+            diagnostic.set_last_error_fmt("MSL compilation failed: {s}", .{err_msg});
             std.log.warn("doe: createShaderModule failed: MSL compilation error: {s}", .{err_msg});
         } else {
-            set_last_error("MSL compilation failed: MTLLibrary creation returned null");
+            diagnostic.set_last_error("MSL compilation failed: MTLLibrary creation returned null");
             std.log.warn("doe: createShaderModule failed: MTLLibrary creation returned null", .{});
         }
         return null;
@@ -698,12 +550,7 @@ pub export fn doeNativeShaderModuleRelease(raw: ?*anyopaque) callconv(.c) void {
 // Compute Pipeline
 // ============================================================
 
-fn createComputePipelineVulkan(
-    sm: *DoeShaderModule,
-    layout: ?*DoePipelineLayout,
-    entry_point: ?[]const u8,
-    overrides: []const wgsl_ir.OverrideEntry,
-) ?*anyopaque {
+fn createComputePipelineVulkanOwned(sm: *DoeShaderModule, layout: ?*DoePipelineLayout, entry_point: ?[]const u8, overrides: []const wgsl_ir.OverrideEntry, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     const cp = make(DoeComputePipeline) orelse return null;
     cp.* = .{};
     if (layout) |pipeline_layout| {
@@ -737,9 +584,9 @@ fn createComputePipelineVulkan(
     if (entry_point) |ep| {
         if (ep.len > 0) {
             cp.vk_entry_point_owned = alloc.dupeZ(u8, ep) catch {
-                set_last_error_stage_name("native_compile");
-                set_last_error_kind("OutOfMemory");
-                set_last_error("Vulkan compute pipeline creation failed: OOM duplicating entry point name");
+                diagnostic.set_last_error_stage_name("native_compile");
+                diagnostic.set_last_error_kind("OutOfMemory");
+                diagnostic.set_last_error("Vulkan compute pipeline creation failed: OOM duplicating entry point name");
                 if (cp.dispatch_preconditions.len > 0) alloc.free(cp.dispatch_preconditions);
                 if (cp.texture_dispatch_preconditions.len > 0) alloc.free(cp.texture_dispatch_preconditions);
                 alloc.destroy(cp);
@@ -749,11 +596,11 @@ fn createComputePipelineVulkan(
     }
     const vk_compute = @import("../vulkan/vulkan_compute_native.zig");
     const compile_result = if (overrides.len > 0)
-        vk_compute.vulkan_compile_pipeline_spirv_with_overrides(cp, sm, overrides)
+        vk_compute.vulkan_compile_pipeline_spirv_with_overridesWithDiagnostic(cp, sm, overrides, &diagnostic.compiler)
     else
-        vk_compute.vulkan_copy_pipeline_spirv(cp, sm);
+        vk_compute.vulkan_copy_pipeline_spirvWithDiagnostic(cp, sm, &diagnostic.compiler);
     compile_result catch |err| {
-        capture_compile_error(err, "native_compile", "Vulkan compute pipeline creation failed");
+        diagnostic.capture_compile_error(err, "native_compile", "Vulkan compute pipeline creation failed");
         if (cp.dispatch_preconditions.len > 0) alloc.free(cp.dispatch_preconditions);
         if (cp.texture_dispatch_preconditions.len > 0) alloc.free(cp.texture_dispatch_preconditions);
         vk_compute.vulkan_release_compute_pipeline(cp);
@@ -806,86 +653,75 @@ fn buildOverrideEntries(
 
 /// Re-translate WGSL source with override constants applied, compile to MTLLibrary.
 /// Returns a new MTLLibrary handle (caller must release), or null on failure.
-fn recompileWithOverrides(
-    dev: *DoeDevice,
-    sm: *DoeShaderModule,
-    constants: [*]const abi_pipeline.WGPUConstantEntry,
-    count: usize,
-) ?*anyopaque {
+fn recompileWithOverridesOwned(dev: *DoeDevice, sm: *DoeShaderModule, constants: [*]const abi_pipeline.WGPUConstantEntry, count: usize, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     const wgsl = sm.wgsl_source orelse {
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("OverrideConstantsUnavailable");
-        set_last_error("pipeline override constants require WGSL source (not pre-translated MSL/SPIR-V)");
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("OverrideConstantsUnavailable");
+        diagnostic.set_last_error("pipeline override constants require WGSL source (not pre-translated MSL/SPIR-V)");
         return null;
     };
 
     var entries: [MAX_OVERRIDE_ENTRIES]wgsl_ir.OverrideEntry = undefined;
     const override_slice = buildOverrideEntries(constants, count, &entries) orelse {
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("InvalidOverrideConstants");
-        set_last_error("pipeline override constants: invalid key pointer or too many entries");
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("InvalidOverrideConstants");
+        diagnostic.set_last_error("pipeline override constants: invalid key pointer or too many entries");
         return null;
     };
 
     var msl_buf: [msl_translation.MAX_OUTPUT]u8 = undefined;
-    var translation = wgsl_runtime_compile.translateToMslForComputeRuntime(
-        alloc,
-        wgsl,
-        &msl_buf,
-        override_slice.ptr,
-        override_slice.len,
-    ) catch |err| {
-        set_last_error_stage(wgsl_analysis.lastErrorStage());
-        set_last_error_kind(@errorName(err));
-        capture_wgsl_error_location();
-        const detail = wgsl_analysis.lastErrorMessage();
+    var translation = wgsl_runtime_compile.translateToMslForComputeRuntimeWithDiagnostic(alloc, wgsl, &msl_buf, override_slice.ptr, override_slice.len, &diagnostic.compiler) catch |err| {
+        diagnostic.set_last_error_stage(diagnostic.compiler.lastErrorStage());
+        diagnostic.set_last_error_kind(@errorName(err));
+        diagnostic.capture_wgsl_error_location();
+        const detail = diagnostic.compiler.lastErrorMessage();
         if (detail.len > 0) {
-            set_last_error_fmt("WGSL→MSL re-translation with overrides failed: {s}", .{detail});
+            diagnostic.set_last_error_fmt("WGSL→MSL re-translation with overrides failed: {s}", .{detail});
         } else {
-            set_last_error_fmt("WGSL→MSL re-translation with overrides failed: {s}", .{@errorName(err)});
+            diagnostic.set_last_error_fmt("WGSL→MSL re-translation with overrides failed: {s}", .{@errorName(err)});
         }
         return null;
     };
     defer translation.info.deinit(alloc);
 
     var err_buf: [ERR_CAP]u8 = undefined;
-    return compileMslToLibrary(dev, &msl_buf, translation.len, &err_buf);
+    return compileMslToLibraryOwned(dev, &msl_buf, translation.len, &err_buf, diagnostic);
 }
 
-pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUComputePipelineDescriptor) callconv(.c) ?*anyopaque {
-    clear_last_error();
+fn doeNativeDeviceCreateComputePipelineOwned(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUComputePipelineDescriptor, diagnostic: *ShaderDiagnostic) ?*anyopaque {
+    diagnostic.clear_last_error();
     const dev = cast(DoeDevice, dev_raw) orelse return null;
     const d = desc orelse return null;
     const sm = cast(DoeShaderModule, d.compute.module) orelse {
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("InvalidShaderModule");
-        set_last_error("compute pipeline creation failed: shader module is null or invalid");
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("InvalidShaderModule");
+        diagnostic.set_last_error("compute pipeline creation failed: shader module is null or invalid");
         std.log.warn("doe: createComputePipeline failed: shader module is null or invalid. " ++
             "Ensure createShaderModule succeeded (check stderr for WGSL translation errors).", .{});
         return null;
     };
 
     if (sm.compilation_message_kind == .@"error") {
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("InvalidShaderModule");
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("InvalidShaderModule");
         if (sm.compilation_message) |message| {
-            set_last_error_fmt("compute pipeline creation rejected invalid shader module: {s}", .{message});
+            diagnostic.set_last_error_fmt("compute pipeline creation rejected invalid shader module: {s}", .{message});
         } else {
-            set_last_error("compute pipeline creation rejected invalid shader module");
+            diagnostic.set_last_error("compute pipeline creation rejected invalid shader module");
         }
         return null;
     }
     if (sm.wgsl_source != null) ensureShaderBindings(sm) catch |err| {
-        capture_compile_error(err, "reflection", "compute pipeline binding extraction failed");
+        diagnostic.capture_compile_error(err, "reflection", "compute pipeline binding extraction failed");
         return null;
     };
 
     var entries: [MAX_OVERRIDE_ENTRIES]wgsl_ir.OverrideEntry = undefined;
     const override_slice = if (d.compute.constantCount > 0 and d.compute.constants != null)
         buildOverrideEntries(d.compute.constants.?, d.compute.constantCount, &entries) orelse {
-            set_last_error_stage_name("native_compile");
-            set_last_error_kind("InvalidOverrideConstants");
-            set_last_error("pipeline override constants: invalid key pointer or too many entries");
+            diagnostic.set_last_error_stage_name("native_compile");
+            diagnostic.set_last_error_kind("InvalidOverrideConstants");
+            diagnostic.set_last_error("pipeline override constants: invalid key pointer or too many entries");
             return null;
         }
     else
@@ -896,7 +732,7 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
         // Vulkan submit path can match against the SPIR-V's actual
         // OpEntryPoint. Null/empty descriptor → default to "main".
         const entry_slice = stringViewSlice(d.compute.entryPoint);
-        const result = createComputePipelineVulkan(sm, cast(DoePipelineLayout, d.layout), entry_slice, override_slice);
+        const result = createComputePipelineVulkanOwned(sm, cast(DoePipelineLayout, d.layout), entry_slice, override_slice, diagnostic);
         if (result != null) label_store.set(result, d.label.data, d.label.length);
         return result;
     }
@@ -905,7 +741,7 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
     const has_overrides = override_slice.len > 0;
     var override_lib: ?*anyopaque = null;
     if (has_overrides) {
-        override_lib = recompileWithOverrides(dev, sm, d.compute.constants.?, d.compute.constantCount);
+        override_lib = recompileWithOverridesOwned(dev, sm, d.compute.constants.?, d.compute.constantCount, diagnostic);
         if (override_lib == null) return null;
     }
     const active_lib = override_lib orelse sm.mtl_library;
@@ -918,9 +754,9 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
             if (std.mem.eql(u8, ep_slice, "main")) break :blk "main_kernel";
             entry_owned = alloc.dupeZ(u8, ep_slice) catch {
                 if (override_lib) |ol| metal_bridge_release(ol);
-                set_last_error_stage_name("native_compile");
-                set_last_error_kind("OutOfMemory");
-                set_last_error("compute pipeline creation failed: OOM duplicating entry point");
+                diagnostic.set_last_error_stage_name("native_compile");
+                diagnostic.set_last_error_kind("OutOfMemory");
+                diagnostic.set_last_error("compute pipeline creation failed: OOM duplicating entry point");
                 return null;
             };
             break :blk entry_owned.?.ptr;
@@ -930,9 +766,9 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
 
     const func = metal_bridge_library_new_function(active_lib, entry) orelse {
         if (override_lib) |ol| metal_bridge_release(ol);
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("EntryPointNotFound");
-        set_last_error_fmt("compute pipeline creation failed: entry point '{s}' not found", .{std.mem.span(entry)});
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("EntryPointNotFound");
+        diagnostic.set_last_error_fmt("compute pipeline creation failed: entry point '{s}' not found", .{std.mem.span(entry)});
         std.log.err("doe: createComputePipeline failed: entry point '{s}' not found in shader module", .{std.mem.span(entry)});
         return null;
     };
@@ -947,13 +783,13 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
     } orelse {
         if (override_lib) |ol| metal_bridge_release(ol);
         const err_msg = std.mem.sliceTo(&err_buf, 0);
-        set_last_error_stage_name("native_compile");
-        set_last_error_kind("ComputePipelineCreationFailed");
+        diagnostic.set_last_error_stage_name("native_compile");
+        diagnostic.set_last_error_kind("ComputePipelineCreationFailed");
         if (err_msg.len > 0) {
-            set_last_error_fmt("compute pipeline creation failed: {s}", .{err_msg});
+            diagnostic.set_last_error_fmt("compute pipeline creation failed: {s}", .{err_msg});
             std.log.err("doe: createComputePipeline failed: {s}", .{err_msg});
         } else {
-            set_last_error("compute pipeline creation failed: MTLComputePipelineState creation returned null");
+            diagnostic.set_last_error("compute pipeline creation failed: MTLComputePipelineState creation returned null");
             std.log.err("doe: createComputePipeline failed: MTLComputePipelineState creation returned null", .{});
         }
         return null;
@@ -993,7 +829,7 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
     return result;
 }
 
-pub export fn doeNativeDeviceCreateComputePipelineMain(dev_raw: ?*anyopaque, shader_raw: ?*anyopaque, layout_raw: ?*anyopaque) callconv(.c) ?*anyopaque {
+fn doeNativeDeviceCreateComputePipelineMainOwned(dev_raw: ?*anyopaque, shader_raw: ?*anyopaque, layout_raw: ?*anyopaque, diagnostic: *ShaderDiagnostic) ?*anyopaque {
     const main_entry = "main";
     var desc = abi_pipeline.WGPUComputePipelineDescriptor{
         .nextInChain = null,
@@ -1007,7 +843,7 @@ pub export fn doeNativeDeviceCreateComputePipelineMain(dev_raw: ?*anyopaque, sha
             .constants = null,
         },
     };
-    return doeNativeDeviceCreateComputePipeline(dev_raw, &desc);
+    return doeNativeDeviceCreateComputePipelineOwned(dev_raw, &desc, diagnostic);
 }
 
 pub export fn doeNativeComputePipelineRelease(raw: ?*anyopaque) callconv(.c) void {
@@ -1025,11 +861,72 @@ pub export fn doeNativeComputePipelineRelease(raw: ?*anyopaque) callconv(.c) voi
     }
 }
 
-fn retainWgslSource(wgsl: []const u8) ?[]const u8 {
-    return alloc.dupe(u8, wgsl) catch {
-        set_last_error_stage_name("native_shader_create");
-        set_last_error_kind("OutOfMemory");
-        set_last_error("retaining required WGSL source failed: OutOfMemory");
+fn retainWgslSourceOwned(wgsl: []const u8, diagnostic: *ShaderDiagnostic) ?[]const u8 {
+    return retainWgslSourceWithAllocator(alloc, wgsl, diagnostic);
+}
+
+fn retainWgslSourceWithAllocator(allocator: std.mem.Allocator, wgsl: []const u8, diagnostic: *ShaderDiagnostic) ?[]const u8 {
+    return allocator.dupe(u8, wgsl) catch {
+        diagnostic.set_last_error_stage_name("native_shader_create");
+        diagnostic.set_last_error_kind("OutOfMemory");
+        diagnostic.set_last_error("retaining required WGSL source failed: OutOfMemory");
         return null;
     };
+}
+
+pub export fn doeNativeCheckShaderSource(code_ptr: ?[*]const u8, code_len: usize) callconv(.c) u32 {
+    var diagnostic = ShaderDiagnostic{};
+    defer last_diagnostic = diagnostic;
+    return doeNativeCheckShaderSourceOwned(code_ptr, code_len, &diagnostic);
+}
+
+pub export fn doeNativeShaderModuleGetBindings(raw: ?*anyopaque, out_ptr: ?[*]native_shared.BindingInfo, out_len: usize) callconv(.c) usize {
+    var diagnostic = ShaderDiagnostic{};
+    defer last_diagnostic = diagnostic;
+    return doeNativeShaderModuleGetBindingsOwned(raw, out_ptr, out_len, &diagnostic);
+}
+
+pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUComputePipelineDescriptor) callconv(.c) ?*anyopaque {
+    var diagnostic = ShaderDiagnostic{};
+    defer last_diagnostic = diagnostic;
+    return doeNativeDeviceCreateComputePipelineOwned(dev_raw, desc, &diagnostic);
+}
+
+pub export fn doeNativeDeviceCreateShaderModuleWgsl(dev_raw: ?*anyopaque, code_ptr: ?[*]const u8, code_len: usize) callconv(.c) ?*anyopaque {
+    var diagnostic = ShaderDiagnostic{};
+    defer last_diagnostic = diagnostic;
+    return doeNativeDeviceCreateShaderModuleWgslOwned(dev_raw, code_ptr, code_len, &diagnostic);
+}
+
+pub export fn doeNativeDeviceCreateShaderModule(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUShaderModuleDescriptor) callconv(.c) ?*anyopaque {
+    var diagnostic = ShaderDiagnostic{};
+    defer last_diagnostic = diagnostic;
+    return doeNativeDeviceCreateShaderModuleOwned(dev_raw, desc, &diagnostic);
+}
+
+pub export fn doeNativeDeviceCreateComputePipelineMain(dev_raw: ?*anyopaque, shader_raw: ?*anyopaque, layout_raw: ?*anyopaque) callconv(.c) ?*anyopaque {
+    var diagnostic = ShaderDiagnostic{};
+    defer last_diagnostic = diagnostic;
+    return doeNativeDeviceCreateComputePipelineMainOwned(dev_raw, shader_raw, layout_raw, &diagnostic);
+}
+
+pub export fn doeNativeShaderModuleGetBindingsForEntryPoint(raw: ?*anyopaque, entry_ptr: ?[*]const u8, entry_len: usize, out_ptr: ?[*]native_shared.BindingInfo, out_len: usize) callconv(.c) usize {
+    var diagnostic = ShaderDiagnostic{};
+    defer last_diagnostic = diagnostic;
+    return doeNativeShaderModuleGetBindingsForEntryPointOwned(raw, entry_ptr, entry_len, out_ptr, out_len, &diagnostic);
+}
+
+fn sourceRetentionFailure(allocator: std.mem.Allocator) !void {
+    var diagnostic = ShaderDiagnostic{};
+    const source = retainWgslSourceWithAllocator(allocator, "shader source", &diagnostic) orelse {
+        try std.testing.expectEqualStrings("OutOfMemory", diagnostic.last_error_kind_buf[0..diagnostic.last_error_kind_len]);
+        try std.testing.expect(diagnostic.last_error_len > 0);
+        return error.OutOfMemory;
+    };
+    defer allocator.free(source);
+    try std.testing.expectEqualStrings("shader source", source);
+}
+
+test "required shader source retention propagates allocation failure" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, sourceRetentionFailure, .{});
 }
