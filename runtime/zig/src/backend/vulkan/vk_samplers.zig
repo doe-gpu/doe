@@ -1,4 +1,6 @@
 const std = @import("std");
+const identity = @import("vk_descriptor_identity.zig");
+const upload = @import("vk_upload.zig");
 const c = @import("vk_constants.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 
@@ -57,6 +59,9 @@ fn wgpu_compare_to_vk(compare: u32) u32 {
 }
 
 pub fn create_sampler(self: anytype, cmd: model_render_types.SamplerCreateCommand) !c.VkSampler {
+    try self.samplers.ensureUnusedCapacity(self.allocator, 1);
+    const generation = try identity.nextGeneration(self);
+    if (self.samplers.contains(cmd.handle) and self.has_deferred_submissions) _ = try upload.flush_queue(self);
     var create_info = c.VkSamplerCreateInfo{
         .sType = c.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .pNext = null,
@@ -81,18 +86,18 @@ pub fn create_sampler(self: anytype, cmd: model_render_types.SamplerCreateComman
     var vk_sampler: c.VkSampler = c.VK_NULL_U64;
     try c.check_vk(c.vkCreateSampler(self.device, &create_info, null, &vk_sampler));
 
-    const gop = try self.samplers.getOrPut(self.allocator, cmd.handle);
-    if (gop.found_existing and gop.value_ptr.* != c.VK_NULL_U64) {
-        c.vkDestroySampler(self.device, gop.value_ptr.*, null);
+    const gop = self.samplers.getOrPutAssumeCapacity(cmd.handle);
+    if (gop.found_existing and gop.value_ptr.handle != c.VK_NULL_U64) {
+        c.vkDestroySampler(self.device, gop.value_ptr.handle, null);
     }
-    gop.value_ptr.* = vk_sampler;
+    gop.value_ptr.* = .{ .handle = vk_sampler, .generation = generation };
     return vk_sampler;
 }
 
 pub fn destroy_sampler(self: anytype, handle: u64) void {
     if (self.samplers.fetchRemove(handle)) |entry| {
-        if (entry.value != c.VK_NULL_U64) {
-            c.vkDestroySampler(self.device, entry.value, null);
+        if (entry.value.handle != c.VK_NULL_U64) {
+            c.vkDestroySampler(self.device, entry.value.handle, null);
         }
     }
 }
@@ -100,8 +105,8 @@ pub fn destroy_sampler(self: anytype, handle: u64) void {
 pub fn release_samplers(self: anytype) void {
     var iterator = self.samplers.valueIterator();
     while (iterator.next()) |vk_sampler| {
-        if (vk_sampler.* != c.VK_NULL_U64) {
-            c.vkDestroySampler(self.device, vk_sampler.*, null);
+        if (vk_sampler.handle != c.VK_NULL_U64) {
+            c.vkDestroySampler(self.device, vk_sampler.handle, null);
         }
     }
     self.samplers.deinit(self.allocator);

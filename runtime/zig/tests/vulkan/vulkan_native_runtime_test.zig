@@ -18,6 +18,230 @@ const REUSE_SHADER =
 ;
 const REUSE_BUFFER_BYTES = 4 * @sizeOf(u32);
 const DEVICE_LOCAL_FAILURE_BYTES = 64 * 1024;
+const ALIGNED_STORAGE_BINDING_OFFSET: u64 = 256;
+
+test "Vulkan descriptor collisions preserve distinct recorded resources" {
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const words = std.mem.bytesAsSlice(u32, output[0..length]);
+    const bindings = [_]compute.KernelBinding{
+        .{ .binding = 0, .resource_kind = .buffer, .resource_handle = 601, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage },
+        .{ .binding = 0, .resource_kind = .buffer, .resource_handle = 602, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage },
+    };
+    for (bindings) |binding| _ = try resources.ensure_compute_buffer_for_binding(&rt, binding, true);
+    var program = compute_program.ComputeProgram{};
+    defer program.deinit(&rt);
+    try program.begin(&rt);
+    for ([_]usize{ 0, 1, 0 }) |index| {
+        try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 0, "main", bindings[index..][0..1], false);
+        try rt.record_prepared_dispatch_replay_on(program.command_buffer, 4, 1, 1);
+    }
+    try program.finish(&rt);
+    try program.submit(&rt);
+    try expect_reuse_output(&rt, 601, &.{ 14, 16, 18, 20 });
+    try expect_reuse_output(&rt, 602, &.{ 7, 8, 9, 10 });
+    try program.submit(&rt);
+    try expect_reuse_output(&rt, 601, &.{ 28, 32, 36, 40 });
+    try expect_reuse_output(&rt, 602, &.{ 14, 16, 18, 20 });
+}
+
+test "Vulkan descriptor identity survives collision spill and allocation failure without changing recorded bindings" {
+    const descriptor_cache = @import("../../src/backend/vulkan/vk_pipeline_cache.zig");
+    const descriptors = @import("../../src/backend/vulkan/vk_descriptors.zig");
+    const variant_count = descriptor_cache.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY + 2;
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const words = std.mem.bytesAsSlice(u32, output[0..length]);
+    var bindings: [variant_count]compute.KernelBinding = undefined;
+    for (&bindings, 0..) |*binding, index| {
+        binding.* = .{ .binding = 0, .resource_kind = .buffer, .resource_handle = 701 + index, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage };
+        _ = try resources.ensure_compute_buffer_for_binding(&rt, binding.*, true);
+    }
+    var program = compute_program.ComputeProgram{};
+    defer program.deinit(&rt);
+    try program.begin(&rt);
+    for (0..variant_count - 1) |index| {
+        try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, std.math.maxInt(u64), "main", bindings[index..][0..1], false);
+        try rt.record_prepared_dispatch_replay_on(program.command_buffer, 4, 1, 1);
+    }
+    const previous_pool = rt.descriptor_pool;
+    // Each scratch allocation and the first overflow-map allocation must roll back.
+    const prepare_allocation_count = 7;
+    for (0..prepare_allocation_count) |failure| {
+        var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = failure });
+        rt.allocator = failing.allocator();
+        const result = descriptors.prepare(&rt, bindings[variant_count - 1 ..], false, std.math.maxInt(u64));
+        rt.allocator = std.testing.allocator;
+        try std.testing.expectError(error.OutOfMemory, result);
+        try std.testing.expectEqual(previous_pool, rt.descriptor_pool);
+        try std.testing.expectEqual(failing.allocated_bytes, failing.freed_bytes);
+    }
+    try descriptors.prepare(&rt, bindings[variant_count - 1 ..], false, std.math.maxInt(u64));
+    try rt.record_prepared_dispatch_replay_on(program.command_buffer, 4, 1, 1);
+    try std.testing.expect(rt.current_descriptor_state_cache.count() > 0);
+    var no_allocations = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 0 });
+    rt.allocator = no_allocations.allocator();
+    const hit = descriptors.prepare(&rt, bindings[variant_count - 1 ..], false, std.math.maxInt(u64));
+    rt.allocator = std.testing.allocator;
+    try hit;
+    for ([_]usize{ 0, variant_count - 2, variant_count - 1 }) |index| {
+        try descriptors.prepare(&rt, bindings[index..][0..1], false, std.math.maxInt(u64));
+        try rt.record_prepared_dispatch_replay_on(program.command_buffer, 4, 1, 1);
+    }
+    try program.finish(&rt);
+    try program.submit(&rt);
+    for (bindings, 0..) |binding, index| {
+        if (index == 0 or index >= variant_count - 2) {
+            try expect_reuse_output(&rt, binding.resource_handle, &.{ 14, 16, 18, 20 });
+        } else {
+            try expect_reuse_output(&rt, binding.resource_handle, &.{ 7, 8, 9, 10 });
+        }
+    }
+}
+
+test "Vulkan descriptor identity rejects replaced buffers and rebuilds ordinary bindings" {
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const words = std.mem.bytesAsSlice(u32, output[0..length]);
+    const bindings = [_]compute.KernelBinding{.{ .binding = 0, .resource_kind = .buffer, .resource_handle = 801, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage }};
+    var program = try prepare_reuse_program(&rt, words, &bindings, 4);
+    defer program.deinit(&rt);
+    try program.submit(&rt);
+    try expect_reuse_output(&rt, 801, &.{ 7, 8, 9, 10 });
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    const previous_pool = rt.descriptor_pool;
+    const previous_generation = rt.compute_buffers.get(801).?.generation;
+    _ = try resources.ensure_compute_buffer(&rt, 801, REUSE_BUFFER_BYTES * 2, true);
+    try std.testing.expect(rt.compute_buffers.get(801).?.generation != previous_generation);
+    try std.testing.expectError(error.InvalidState, program.submit(&rt));
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    try std.testing.expect(previous_pool != rt.descriptor_pool);
+    _ = try rt.run_dispatch(4, 1, 1, .per_command, .wait_any, .off);
+    try expect_reuse_output(&rt, 801, &.{ 7, 8, 9, 10 });
+    const removed = rt.compute_buffers.fetchRemove(801).?;
+    resources.release_compute_buffer(&rt, removed.value);
+    try std.testing.expectError(error.InvalidState, program.submit(&rt));
+    _ = try resources.ensure_compute_buffer_for_binding(&rt, bindings[0], true);
+    try std.testing.expect(rt.compute_buffers.get(801).?.generation != previous_generation);
+    try std.testing.expectError(error.InvalidState, program.submit(&rt));
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    _ = try rt.run_dispatch(4, 1, 1, .per_command, .wait_any, .off);
+    try expect_reuse_output(&rt, 801, &.{ 7, 8, 9, 10 });
+}
+
+test "Vulkan descriptor aliases retain final buffer extent and offset" {
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const words = std.mem.bytesAsSlice(u32, output[0..length]);
+    var bindings = [_]compute.KernelBinding{
+        .{ .binding = 0, .resource_kind = .buffer, .resource_handle = 851, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage },
+        .{ .binding = 1, .resource_kind = .buffer, .resource_handle = 851, .buffer_size = REUSE_BUFFER_BYTES * 2, .buffer_type = binding_types.WGPUBufferBindingType_Storage },
+    };
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, true);
+    try std.testing.expectEqual(rt.current_descriptor_identity[0].handle, rt.current_descriptor_identity[1].handle);
+    _ = try rt.run_dispatch(4, 1, 1, .per_command, .wait_any, .off);
+    try expect_reuse_output(&rt, 851, &.{ 7, 8, 9, 10 });
+    // Use a device-supported storage offset; the hash remains deliberately unchanged.
+    const offset = ALIGNED_STORAGE_BINDING_OFFSET;
+    _ = try resources.ensure_compute_buffer(&rt, 851, offset + REUSE_BUFFER_BYTES, true);
+    bindings[0].buffer_offset = offset;
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    _ = try rt.run_dispatch(4, 1, 1, .per_command, .wait_any, .off);
+    try expect_reuse_output(&rt, 851, &.{ 0, 0, 0, 0 });
+    const bytes = try resources.capture_compute_buffer(&rt, std.testing.allocator, rt.compute_buffers.get(851).?, offset, REUSE_BUFFER_BYTES);
+    defer std.testing.allocator.free(bytes);
+    try std.testing.expectEqualSlices(u8, std.mem.sliceAsBytes(&[_]u32{ 7, 8, 9, 10 }), bytes);
+}
+
+test "Vulkan descriptor identity rejects replaced images samplers and orphaned native views" {
+    const texture_types = @import("../../src/contracts/model/model_texture_value_types.zig");
+    const resource_types = @import("../../src/contracts/model/model_resource_types.zig");
+    const descriptor_identity = @import("../../src/backend/vulkan/vk_descriptor_identity.zig");
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const words = std.mem.bytesAsSlice(u32, output[0..length]);
+    var texture_description = resource_types.CopyTextureResource{
+        .handle = 901,
+        .kind = .texture,
+        .width = 4,
+        .height = 4,
+        .format = texture_types.WGPUTextureFormat_RGBA8Unorm,
+        .usage = texture_types.WGPUTextureUsage_TextureBinding,
+    };
+    _ = try resources.ensure_texture_resource(&rt, texture_description);
+    _ = try resources.create_sampler(&rt, .{ .handle = 902 });
+    var bindings = [_]compute.KernelBinding{
+        .{ .binding = 0, .resource_kind = .buffer, .resource_handle = 903, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage },
+        .{ .binding = 1, .resource_kind = .texture, .resource_handle = 901, .texture_format = texture_types.WGPUTextureFormat_RGBA8Unorm },
+        .{ .binding = 2, .resource_kind = .sampler, .resource_handle = 902 },
+    };
+    _ = try resources.ensure_compute_buffer_for_binding(&rt, bindings[0], true);
+    var program = compute_program.ComputeProgram{};
+    defer program.deinit(&rt);
+    try program.begin(&rt);
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    try rt.record_prepared_dispatch_replay_on(program.command_buffer, 4, 1, 1);
+    try program.finish(&rt);
+    try program.submit(&rt);
+    try expect_reuse_output(&rt, 903, &.{ 7, 8, 9, 10 });
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    var previous_pool = rt.descriptor_pool;
+    _ = try resources.create_sampler(&rt, .{ .handle = 902, .mag_filter = 2 });
+    try std.testing.expectError(error.InvalidState, program.submit(&rt));
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    try std.testing.expect(previous_pool != rt.descriptor_pool);
+    previous_pool = rt.descriptor_pool;
+    texture_description.width = 8;
+    _ = try resources.ensure_texture_resource(&rt, texture_description);
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    try std.testing.expect(previous_pool != rt.descriptor_pool);
+    _ = try rt.run_dispatch(4, 1, 1, .per_command, .wait_any, .off);
+    try expect_reuse_output(&rt, 903, &.{ 14, 16, 18, 20 });
+
+    const parent = rt.textures.get(901).?;
+    const view = try resources.create_texture_view(&rt, parent, parent.format, parent.view_dimension, 0, 1, 0, 1, parent.aspect, 0, 0, 0, 0);
+    var borrowed = parent;
+    borrowed.generation = try rt.next_resource_generation();
+    borrowed.parent_handle = 901;
+    borrowed.parent_generation = parent.generation;
+    borrowed.view = view;
+    borrowed.memory = 0;
+    borrowed.owns_image = false;
+    borrowed.owns_memory = false;
+    try rt.textures.put(std.testing.allocator, 904, borrowed);
+    bindings[1].resource_handle = 904;
+    const retained_view = try descriptor_identity.snapshot(&rt, bindings[1]);
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false);
+    texture_description.width = 16;
+    _ = try resources.ensure_texture_resource(&rt, texture_description);
+    try std.testing.expectError(error.InvalidState, descriptor_identity.validate(&rt, &.{retained_view}));
+    try std.testing.expectError(error.InvalidState, rt.set_compute_shader_spirv_with_hashes(words, 1, 1, 1, "main", &bindings, false));
+}
 
 test "Vulkan pipeline hash collisions preserve every recorded shader and reject invalid entry points" {
     var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {

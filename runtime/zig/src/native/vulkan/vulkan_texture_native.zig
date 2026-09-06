@@ -67,6 +67,7 @@ pub fn vulkan_create_texture_view(tex: *shared.DoeTexture, tv: *shared.DoeTextur
     const resolved_dimension = if (desc.dimension != 0) desc.dimension else if (tex.texture_binding_view_dimension != 0) tex.texture_binding_view_dimension else tex.dimension;
     const resolved_mip_level_count = if (desc.mipLevelCount != 0) desc.mipLevelCount else tex.mip_level_count - desc.baseMipLevel;
     const resolved_array_layer_count = if (desc.arrayLayerCount != 0) desc.arrayLayerCount else if (tex.dimension == model_gpu_types.WGPUTextureDimension_3D) 1 else tex.depth_or_array_layers - desc.baseArrayLayer;
+    const generation = rt.next_resource_generation() catch return false;
     const vk_view = shared.vk_resources.create_texture_view(
         rt,
         texture,
@@ -90,6 +91,9 @@ pub fn vulkan_create_texture_view(tex: *shared.DoeTexture, tv: *shared.DoeTextur
         return false;
     };
     result.value_ptr.* = .{
+        .generation = generation,
+        .parent_handle = tex.vk_id,
+        .parent_generation = texture.generation,
         .image = texture.image,
         .memory = shared.c.VK_NULL_U64,
         .view = vk_view,

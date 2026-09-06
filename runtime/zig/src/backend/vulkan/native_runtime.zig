@@ -17,6 +17,7 @@ const vk_sync = @import("vk_sync.zig");
 const vk_upload = @import("vk_upload.zig");
 const vk_pipeline = @import("vk_pipeline.zig");
 const shared = @import("vk_shared_pipeline.zig");
+const descriptor_identity = @import("vk_descriptor_identity.zig");
 const vk_shader_source = @import("vk_shader_source.zig");
 const vk_pipeline_cache_persistent = @import("vk_pipeline_cache_persistent.zig");
 const vk_resources = @import("vk_resources.zig");
@@ -46,6 +47,10 @@ pub const AdapterIdentity = struct {
 };
 
 pub const NativeVulkanRuntime = struct {
+    pub fn next_resource_generation(self: *NativeVulkanRuntime) !u64 {
+        return descriptor_identity.nextGeneration(self);
+    }
+
     allocator: std.mem.Allocator,
     kernel_root: ?[]const u8,
     pipeline_cache: vk_pipeline_cache_persistent.VulkanPipelineCache =
@@ -94,6 +99,7 @@ pub const NativeVulkanRuntime = struct {
     current_pipeline_hash: u64 = 0,
     current_layout_hash: u64 = 0,
     current_descriptor_bindings_hash: u64 = 0,
+    current_descriptor_identity: []const descriptor_identity.Binding = &.{},
     bound_compute_pipeline: c.VkPipeline = VK_NULL_U64,
     bound_compute_pipeline_layout: c.VkPipelineLayout = VK_NULL_U64,
     bound_descriptor_bindings_hash: u64 = 0,
@@ -128,12 +134,13 @@ pub const NativeVulkanRuntime = struct {
     hot_src_pool_size: u64 = 0,
     hot_dst_pool_entry: ?vk_upload.VkPoolEntry = null,
     hot_dst_pool_size: u64 = 0,
+    next_native_resource_generation: u64 = 1,
     compute_buffers: std.AutoHashMapUnmanaged(u64, vk_resources.ComputeBuffer) = .{},
     /// Stable buffer identity used by descriptor and hazard caches. Object
     /// addresses are allocator-reusable and must not serve as resource IDs.
     next_buffer_resource_handle: u64 = 1,
     textures: std.AutoHashMapUnmanaged(u64, vk_resources.TextureResource) = .{},
-    samplers: std.AutoHashMapUnmanaged(u64, c.VkSampler) = .{},
+    samplers: std.AutoHashMapUnmanaged(u64, descriptor_identity.Sampler) = .{},
 
     has_instance: bool = false,
     has_device: bool = false,

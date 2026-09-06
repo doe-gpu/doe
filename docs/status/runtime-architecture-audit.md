@@ -87,6 +87,9 @@ The latest source-layout evidence incorporates two boundary corrections:
   compilation, and the owned kernel-source cache now live in
   `src/backend/vulkan/vk_shader_source.zig`; compute pipeline and descriptor
   lifetime management no longer owns repository-path or compiler concerns.
+  Descriptor preparation and validation live in `vk_descriptors.zig`;
+  `vk_descriptor_identity.zig` owns exact native resource snapshots. Pipeline
+  creation and active/hot/spilled cache ownership remain separate responsibilities.
 - Metal kernel dispatch no longer writes CSL and HostPlan files under
   `bench/out/` or silently ignores generation failures. HostPlan creation stays
   in the explicit spatial, plan-executor, and benchmark lanes; the shared

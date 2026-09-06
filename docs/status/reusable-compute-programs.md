@@ -1,5 +1,18 @@
 # Reusable compute programs
 
+## Exact descriptor cache identity
+
+Vulkan descriptor reuse checks complete bindings and actual native allocation
+identity. Recorded programs reject replaced buffers, images, samplers, and
+orphaned texture views. Collision entries retain separate descriptor pools;
+allocation failure preserves the previous owner. Descriptor preparation now
+lives in `vk_descriptors.zig`, with native identity in
+`vk_descriptor_identity.zig`; pipeline and cache ownership retain their existing
+boundaries. The original wrong-buffer execution is retained under
+`bench/out/compute-program/20260905-descriptor-identity-failure/`.
+Correction evidence lives under
+`bench/out/compute-program/20260905-descriptor-identity-correction/`.
+
 ## Exact pipeline cache identity
 
 Active, hot, and spilled Vulkan compute cache hits check complete shader,
@@ -52,7 +65,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-pipeline-identity-package/summary.json`.
+`bench/out/compute-program/20260905-descriptor-identity-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -60,14 +73,14 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-pipeline-identity-matrix/summary.json`.
+`bench/out/compute-program/20260905-descriptor-identity-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the new receipt contract. It does not measure a
 resident application sequence. Performance remains diagnostic; large Deno host
 ratios remain suspicious and require fairness review.
 Native replay and SPIR-V verification for this matrix are retained with the
-pipeline identity correction.
+descriptor identity correction.
 
 ## Active acceptance gaps
 
@@ -75,9 +88,8 @@ Metal GPU recording and physical transfer remain open; the known Mac host is
 currently unreachable from this workspace. Windows requires an approved
 physical D3D12 lane. Changed plans still rebuild command recordings and private
 descriptor state while retaining unchanged public resources and compatible
-live compute pipelines. Descriptor caches still need an exact native-resource
-identity audit. Pipeline sharing alone does not establish reduced
-useful-operation latency.
+live compute pipelines. Pipeline and descriptor sharing alone do not establish
+reduced useful-operation latency.
 
 The external portfolio, a measured application boundary crossing, resident
 sequence numerical qualification, and independent repeat use remain open.

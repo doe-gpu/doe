@@ -37,6 +37,15 @@ const ComputeCache = struct {
         pipeline.reset_bound_compute_state(rt);
     }
 
+    fn validate(self: *const ComputeCache, rt: *Runtime) !void {
+        try cache.validate_compute_resources(rt, self.active);
+        for (self.hashes, 0..) |hash, index| {
+            if (hash != 0) try cache.validate_compute_resources(rt, self.states[index]);
+        }
+        var values = self.remaining.valueIterator();
+        while (values.next()) |state| try cache.validate_compute_resources(rt, state.*);
+    }
+
     fn deinit(self: *ComputeCache, rt: *Runtime) void {
         cache.destroy_cached_compute_state(rt, self.active);
         for (self.hashes, 0..) |hash, index| {
@@ -50,6 +59,7 @@ const ComputeCache = struct {
 };
 
 pub const ComputeProgram = struct {
+    owner_device: c.VkDevice = null,
     command_pool: c.VkCommandPool = c.VK_NULL_U64,
     command_buffer: c.VkCommandBuffer = null,
     previous: ComputeCache = .{},
@@ -59,6 +69,8 @@ pub const ComputeProgram = struct {
     submitted: bool = false,
 
     pub fn begin(self: *ComputeProgram, rt: *Runtime) !void {
+        if (self.command_pool != c.VK_NULL_U64 or self.capturing or self.ready) return error.InvalidState;
+        self.owner_device = rt.device;
         _ = try rt.flush_queue();
         try upload.flush_streaming_copy_before_dispatch(rt, false, .per_command);
         try device.ensure_submission_state(rt);
@@ -94,7 +106,14 @@ pub const ComputeProgram = struct {
     }
 
     pub fn finish(self: *ComputeProgram, rt: *Runtime) !void {
-        if (!self.capturing) return error.InvalidState;
+        if (!self.capturing or rt.device != self.owner_device) return error.InvalidState;
+        const recording = ComputeCache{
+            .active = cache.capture_active_compute_state(rt),
+            .hashes = rt.hot_compute_state_hashes,
+            .states = rt.hot_compute_states,
+            .remaining = rt.cached_compute_states,
+        };
+        try recording.validate(rt);
         barrier(self.command_buffer);
         try c.check_vk(c.vkEndCommandBuffer(self.command_buffer));
         self.restore(rt);
@@ -111,7 +130,8 @@ pub const ComputeProgram = struct {
     }
 
     pub fn submit(self: *ComputeProgram, rt: *Runtime) !void {
-        if (!self.ready) return error.InvalidState;
+        if (!self.ready or rt.device != self.owner_device) return error.InvalidState;
+        try self.owned.validate(rt);
         if (self.submitted and rt.has_deferred_submissions) _ = try rt.flush_queue();
         if (rt.replay_recording_active) try rt.submit_recorded_replay();
         if (rt.hot_pending_upload != null or rt.pending_uploads.items.len != 0) _ = try rt.flush_queue();

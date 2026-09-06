@@ -3,6 +3,7 @@
 
 const std = @import("std");
 const c = @import("vk_constants.zig");
+const identity = @import("vk_descriptor_identity.zig");
 const vk_device = @import("vk_device.zig");
 const vk_samplers = @import("vk_samplers.zig");
 const vk_upload = @import("vk_upload.zig");
@@ -33,6 +34,7 @@ pub const ComputeBufferMemoryKind = enum { host_visible, readback, device_local 
 const memory_policy = @import("vk_memory_policy.zig");
 
 pub const ComputeBuffer = struct {
+    generation: u64 = 0,
     buffer: VkBuffer,
     memory: VkDeviceMemory,
     mapped: ?*anyopaque,
@@ -46,6 +48,9 @@ pub const ComputeBufferPromotion = struct {
 };
 
 pub const TextureResource = struct {
+    generation: u64 = 0,
+    parent_handle: u64 = 0,
+    parent_generation: u64 = 0,
     image: VkImage,
     memory: VkDeviceMemory,
     view: VkImageView,
@@ -228,6 +233,7 @@ fn create_compute_buffer_with_kind(
     initialize_buffers_on_create: bool,
     memory_kind: ComputeBufferMemoryKind,
 ) !ComputeBuffer {
+    const generation = try identity.nextGeneration(self);
     var buffer: VkBuffer = VK_NULL_U64;
     var memory: VkDeviceMemory = VK_NULL_U64;
     var mapped: ?*anyopaque = null;
@@ -288,6 +294,7 @@ fn create_compute_buffer_with_kind(
     }
 
     return .{
+        .generation = generation,
         .buffer = buffer,
         .memory = memory,
         .mapped = mapped,
@@ -435,6 +442,7 @@ pub fn release_compute_buffers(self: anytype) void {
 }
 
 pub fn create_host_visible_buffer(self: anytype, bytes: u64, usage: u32) !ComputeBuffer {
+    const generation = try identity.nextGeneration(self);
     var buffer: VkBuffer = VK_NULL_U64;
     var memory: VkDeviceMemory = VK_NULL_U64;
     var mapped: ?*anyopaque = null;
@@ -473,6 +481,7 @@ pub fn create_host_visible_buffer(self: anytype, bytes: u64, usage: u32) !Comput
     errdefer if (mapped != null) c.vkUnmapMemory(self.device, memory);
 
     return .{
+        .generation = generation,
         .buffer = buffer,
         .memory = memory,
         .mapped = mapped,
@@ -540,12 +549,16 @@ pub fn ensure_texture_resource(self: anytype, texture: model_resource_types.Copy
             return existing;
         }
         if (self.has_deferred_submissions) _ = try vk_upload.flush_queue(self);
-        release_texture_resource(self, existing.*);
-        existing.* = try create_texture_resource(self, texture, mip_levels);
+        const replacement = try create_texture_resource(self, texture, mip_levels);
+        const previous = existing.*;
+        existing.* = replacement;
+        release_texture_resource(self, previous);
         return existing;
     }
 
-    try self.textures.put(self.allocator, texture.handle, try create_texture_resource(self, texture, mip_levels));
+    try self.textures.ensureUnusedCapacity(self.allocator, 1);
+    const resource = try create_texture_resource(self, texture, mip_levels);
+    self.textures.putAssumeCapacity(texture.handle, resource);
     return self.textures.getPtr(texture.handle).?;
 }
 
@@ -636,6 +649,7 @@ pub fn create_texture_resource_full(
     format: model_gpu_types.WGPUTextureFormat,
     usage: model_gpu_types.WGPUFlags,
 ) !TextureResource {
+    const generation = try identity.nextGeneration(self);
     var image: VkImage = VK_NULL_U64;
     var memory: VkDeviceMemory = VK_NULL_U64;
     var view: VkImageView = VK_NULL_U64;
@@ -715,6 +729,7 @@ pub fn create_texture_resource_full(
     errdefer if (view != VK_NULL_U64) c.vkDestroyImageView(self.device, view, null);
 
     return .{
+        .generation = generation,
         .image = image,
         .memory = memory,
         .view = view,

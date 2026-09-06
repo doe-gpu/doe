@@ -1228,9 +1228,9 @@
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "0583cfe0dac7a9dd9846b6475017873da611334d1082e625ce02133603b64998",
-        "reason": "Keep: Vulkan device runtime owns the shared live-pipeline registry and destroys it after all compute owners release their references.",
-        "reviewer": "codex-execution-ownership/2026-09-05"
+        "moduleSha256": "6fc0f003f059a2163d92e1a056157134fab22cd5ad676b058961f1486b3944f2",
+        "reason": "Keep: device owner retains native resource generations and exact active descriptor identity alongside compute cache ownership.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_adapter_probe.zig": {
         "decision": "Keep",
@@ -1330,15 +1330,15 @@
       },
       "src/backend/vulkan/vk_pipeline.zig": {
         "decision": "Keep",
-        "moduleSha256": "cd45cbdf54f299dd263baff5baacc9e0076872ce986b82391434723b153f09fd",
-        "reason": "Keep: compute preparation resolves subgroup policy once and validates exact pipeline/layout identity before selecting reusable state; failed construction cleans partial descriptor ownership.",
-        "reviewer": "codex-pipeline-identity/2026-09-05"
+        "moduleSha256": "750006a42629b0fb390adb76f7f836a3073915ff96a4ac5d200d0db56d78a7ba",
+        "reason": "Keep: pipeline and layout ownership retain descriptor preparation through its dedicated module and release identity snapshots with native state.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_pipeline_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "2709e4de63eac3246c4dd0f6be2a5de9fe64997c25e1a3b42cd199f032ab4ccc",
-        "reason": "Keep: local compute cache resolves colliding hash hints without discarding independently retained pipeline owners.",
-        "reviewer": "codex-pipeline-identity/2026-09-05"
+        "moduleSha256": "1d1d4f6c93798dcb9158404c571246e683a35ae14e4cd10dc7db57393fcf9da8",
+        "reason": "Keep: compute and descriptor caches own exact identities across active, hot, and map storage; collision probing and rollback preserve recorded state.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_pipeline_cache_persistent.zig": {
         "decision": "Keep",
@@ -1354,15 +1354,15 @@
       },
       "src/backend/vulkan/vk_render_pipeline.zig": {
         "decision": "Keep",
-        "moduleSha256": "3c3a7cdb6300fb4c8917e8a0a44b72eb2ad7b0b96b1eb8445c4d4e21c208b9a9",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-architecture-refactor/2026-08-23"
+        "moduleSha256": "517cddff11aa6450af58a5a73ba327be2868408d3062832ff3877e59da837f37",
+        "reason": "Keep: render descriptors consume sampler native handles from the generation-bearing resource registry.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_resources.zig": {
         "decision": "Keep",
-        "moduleSha256": "faa675a2790b201ac1df225cc1458664312679a4872ef1a1ac3b3326f615d39b",
-        "reason": "Keep: Vulkan resource owner reserves publication before GPU initialization and preserves existing allocation ownership until replacement succeeds.",
-        "reviewer": "codex-resource-ownership/2026-09-05"
+        "moduleSha256": "c8de4a7b4ad99cae9a46d038d2a26abab57a9e591b31e94df88470acc0b05327",
+        "reason": "Keep: native buffer and image creation assign generations; texture replacement reserves ownership and creates the successor before destroying the predecessor.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_runtime_probe_ops.zig": {
         "decision": "Keep",
@@ -1378,9 +1378,9 @@
       },
       "src/backend/vulkan/vk_samplers.zig": {
         "decision": "Keep",
-        "moduleSha256": "bb967bb30e861024028a35ca82a5a2bbb305eac44112c92be51da423d66ee550",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "d69660a49a4d143b1fddbd59a8140c424f598ff37ce020553ea9f5b15c641caf",
+        "reason": "Keep: native sampler lifecycle reserves registry capacity before allocation and publishes generation-bearing resources.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_shader_source.zig": {
         "decision": "Keep",
@@ -3772,9 +3772,9 @@
       },
       "src/native/surface/doe_surface_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "a2f8510e64dbcd1fadfd014e156959c399969761fe8736abec09197c0468cc45",
-        "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "6f68b414c9a848cdbdfd9ebc4a4bfc0f53440b8e651a55b6e3b7072faffa5d16",
+        "reason": "Keep: acquired surface images receive native resource identity when published through the existing Vulkan surface integration.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/native/vulkan/vulkan_compute_bindings.zig": {
         "decision": "Keep",
@@ -3832,15 +3832,15 @@
       },
       "src/native/vulkan/vulkan_sampler_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "be2f902796e3cfbb08f0d8af6e51f0e99b720b053c02fc2200951390da7b3f7f",
-        "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "48322dce6574c12035411ec9e342c321013a54146c740a1cb9e3c0ce9fa86f99",
+        "reason": "Keep: public sampler creation publishes native identity only after registry reservation and reports allocation failure without false success.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/native/vulkan/vulkan_texture_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "5aaa3d6ce067c364a3b1bd67556a120b5f50691d7a51c5a5c0f1949ff5d75599",
-        "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-gigi-compatibility/2026-08-15"
+        "moduleSha256": "d46396ee8187983b773214f1995c48b70133aeeed922cdb190e8b6ef0c68c67e",
+        "reason": "Keep: public image and view lifecycle publishes unique allocation generations through the Vulkan resource owner.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/plan/dawn_plan_types.zig": {
         "decision": "Keep",
@@ -4222,9 +4222,9 @@
       },
       "src/backend/vulkan/vk_compute_program.zig": {
         "decision": "Keep",
-        "moduleSha256": "e32c08ebf3440c5c1f96485f685387abd64481eb4beb786ffa7f9d82eb7bd6c3",
-        "reason": "Keep: prepared command buffers retain private descriptor state and shared pipeline references independently of the ordinary cache.",
-        "reviewer": "codex-execution-ownership/2026-09-05"
+        "moduleSha256": "f0416074d583b5803ac9111cf39e7d97cda84942b1c5225a0a5ba6e151e48bcb",
+        "reason": "Keep: recorded compute programs own private caches and reject resources replaced since recording before native submission.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       },
       "src/native/compute/doe_compute_program_native.zig": {
         "decision": "Keep",
@@ -4237,6 +4237,18 @@
         "moduleSha256": "fb5ddf4288af5f1065c187937aa86d76fd0ebdea970d053b2e5c0fa9ba529b00",
         "reason": "Keep: immutable pipeline and layout identity checks have one owner shared by device interning and local compute-state selection.",
         "reviewer": "codex-pipeline-identity/2026-09-05"
+      },
+      "src/backend/vulkan/vk_descriptor_identity.zig": {
+        "decision": "Keep",
+        "moduleSha256": "33c4e40b0796d5121dff4100cfc2da6d2126370b41688d7943cfe5d2d8eb9c6f",
+        "reason": "Keep: leaf resource identity snapshots compare binding declarations and native allocation generations without owning execution or cache policy.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
+      },
+      "src/backend/vulkan/vk_descriptors.zig": {
+        "decision": "Keep",
+        "moduleSha256": "8c2bea990c14e69e7d2bdc958d3881f56562c3d6ab273bff08deab5da88c84e1",
+        "reason": "Keep: descriptor preparation owns resource resolution, exact cache selection, transactional pool publication, and binding validation separately from pipeline creation.",
+        "reviewer": "codex-descriptor-identity/2026-09-05"
       }
     },
     "linePolicy": {

@@ -194,7 +194,7 @@ fn register_acquired_surface_texture(
     if (image == 0) return false;
 
     const handle: u64 = @intFromPtr(tex);
-    const resource = vk_resources.borrowed_texture_resource(
+    var resource = vk_resources.borrowed_texture_resource(
         image,
         surface_state.swapchain_extent.width,
         surface_state.swapchain_extent.height,
@@ -208,6 +208,7 @@ fn register_acquired_surface_texture(
         surface_state.usage,
         vk_constants.VK_IMAGE_LAYOUT_UNDEFINED,
     );
+    resource.generation = rt.next_resource_generation() catch return false;
     const result = rt.textures.getOrPut(rt.allocator, handle) catch return false;
     if (result.found_existing) {
         vk_resources.release_texture_resource(rt, result.value_ptr.*);

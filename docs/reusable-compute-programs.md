@@ -56,6 +56,15 @@ Local active and cached pipeline selection applies the same exact identity
 checks. Hashes locate candidates; collisions retain distinct owning entries,
 including pipelines already referenced by recorded commands. Effective subgroup
 policy is resolved before lookup. Layout reuse also checks the layout definition.
+Descriptor caches compare complete binding declarations, native resource handles,
+allocation generations, buffer extents, and image layouts. New native resources
+receive distinct generations even if a driver recycles a handle; image views
+also require their original parent image. Collisions retain independent pools,
+and failed preparation restores the previous descriptor owner. Buffer aliases
+resolve their final allocation before descriptors capture handles. Prepared
+programs validate retained resources before submission. These are internal
+correctness checks; public descriptor, native ABI, and receipt versions remain
+unchanged.
 Compatible descriptor layouts permit sharing the compiled pipeline while
 keeping descriptor sets independent, as specified by
 [Vulkan layout compatibility](https://docs.vulkan.org/spec/latest/chapters/descriptorsets.html#descriptorsets-compatibility).

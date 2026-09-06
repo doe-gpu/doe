@@ -737,7 +737,7 @@ fn createRenderDescriptorState(
     while (si < samp_count) : (si += 1) {
         const sampler_handle = cmd.bind_sampler_handles[si];
         const sampler_vk: u64 = if (sampler_handle != 0)
-            self.samplers.get(sampler_handle) orelse VK_NULL_U64
+            if (self.samplers.get(sampler_handle)) |sampler| sampler.handle else VK_NULL_U64
         else
             VK_NULL_U64;
         const fallback_binding = buffer_count + tex_count + si;

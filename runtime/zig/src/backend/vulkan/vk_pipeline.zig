@@ -1,22 +1,17 @@
-// Compute pipeline, shader module, and descriptor set management.
-//
-// Handles SPIR-V loading, WGSL-to-SPIR-V compilation, pipeline/layout
-// creation, descriptor set allocation, and binding.
+// Compute pipeline/layout ownership and command binding.
 
 const std = @import("std");
 const c = @import("vk_constants.zig");
 const shared = @import("vk_shared_pipeline.zig");
+const descriptors = @import("vk_descriptors.zig");
 const build_options = @import("build_options");
 const vk_device = @import("vk_device.zig");
-const vk_formats = @import("vk_formats.zig");
 const vk_pipeline_cache = @import("vk_pipeline_cache.zig");
 const vk_compute_sync = @import("vk_compute_sync.zig");
 const vk_upload = @import("vk_upload.zig");
 const vk_resources = @import("vk_resources.zig");
 const vk_spirv_inspect = @import("vk_spirv_inspect.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
-const model_texture_types = @import("../../contracts/model/model_texture_value_types.zig");
-const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
 const hash_contract = @import("../../native/vulkan/vulkan_pipeline_hash.zig");
 const common_errors = @import("../../contracts/execution.zig");
 
@@ -100,19 +95,6 @@ fn entry_name_matches(name_words: []const u32, target: []const u8) bool {
 }
 const MAIN_ENTRY: [*:0]const u8 = "main";
 
-pub const DescriptorInfoKind = enum {
-    buffer,
-    image,
-};
-
-pub const PendingDescriptorWrite = struct {
-    set_index: u32,
-    binding: u32,
-    descriptor_type: u32,
-    kind: DescriptorInfoKind,
-    info_index: usize,
-};
-
 pub const RetiredPipelineState = struct {
     shared_pipeline: ?*shared.Pipeline = null,
     pipeline: c.VkPipeline = VK_NULL_U64,
@@ -130,12 +112,10 @@ pub const HOT_COMPUTE_STATE_CACHE_CAPACITY = vk_pipeline_cache.HOT_COMPUTE_STATE
 pub const HOT_DESCRIPTOR_STATE_CACHE_CAPACITY = vk_pipeline_cache.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY;
 
 const activate_cached_compute_state = vk_pipeline_cache.activate_cached_compute_state;
-const activate_cached_descriptor_state = vk_pipeline_cache.activate_cached_descriptor_state;
 const has_active_compute_state = vk_pipeline_cache.has_active_compute_state;
 pub const release_cached_compute_states = vk_pipeline_cache.release_cached_compute_states;
 pub const release_descriptor_state_cache = vk_pipeline_cache.release_descriptor_state_cache;
 const stash_active_compute_state = vk_pipeline_cache.stash_active_compute_state;
-const stash_active_descriptor_state = vk_pipeline_cache.stash_active_descriptor_state;
 
 fn submitted_work_may_reference_compute_state(self: anytype) bool {
     return self.recorded_submit_replay_active or
@@ -175,6 +155,8 @@ fn retire_pipeline_objects(self: anytype) void {
 }
 
 fn retire_descriptor_state(self: anytype) void {
+    self.allocator.free(self.current_descriptor_identity);
+    self.current_descriptor_identity = &.{};
     if (!self.has_descriptor_pool and !self.has_pipeline_layout) {
         release_descriptor_state_cache(self);
         self.current_layout_hash = 0;
@@ -197,27 +179,6 @@ fn retire_descriptor_state(self: anytype) void {
     self.has_pipeline_layout = false;
     self.pipeline_layout = VK_NULL_U64;
     self.current_layout_hash = 0;
-    self.current_descriptor_bindings_hash = 0;
-    self.has_current_descriptor_bindings_hash = false;
-}
-
-fn retire_descriptor_pool_only(self: anytype) void {
-    if (!self.has_descriptor_pool) {
-        release_descriptor_state_cache(self);
-        self.descriptor_sets = [_]c.VkDescriptorSet{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS;
-        self.current_descriptor_bindings_hash = 0;
-        self.has_current_descriptor_bindings_hash = false;
-        return;
-    }
-    release_descriptor_state_cache(self);
-    self.retired_descriptor_states.append(self.allocator, .{
-        .descriptor_pool = self.descriptor_pool,
-        .descriptor_set_layouts = [_]c.VkDescriptorSetLayout{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS,
-        .pipeline_layout = VK_NULL_U64,
-    }) catch std.debug.panic("vk_pipeline: OOM retiring descriptor pool", .{});
-    self.has_descriptor_pool = false;
-    self.descriptor_pool = VK_NULL_U64;
-    self.descriptor_sets = [_]c.VkDescriptorSet{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS;
     self.current_descriptor_bindings_hash = 0;
     self.has_current_descriptor_bindings_hash = false;
 }
@@ -294,7 +255,7 @@ pub fn set_compute_shader_spirv_with_hashes(
             try build_pipeline_for_request(self, request, cache_hash, layout_hash);
         }
     }
-    try prepare_descriptor_sets(self, bindings, initialize_buffers_on_create, descriptor_bindings_hash);
+    try descriptors.prepare(self, bindings, initialize_buffers_on_create, descriptor_bindings_hash);
     vk_compute_sync.capture_current_compute_bindings(self, bindings);
     stage_spirv_for_artifact(self, words);
 }
@@ -436,6 +397,11 @@ pub fn destroy_pipeline_objects(self: anytype) void {
 }
 
 pub fn destroy_descriptor_state(self: anytype) void {
+    self.allocator.free(self.current_descriptor_identity);
+    self.current_descriptor_identity = &.{};
+    self.current_descriptor_bindings_hash = 0;
+    self.has_current_descriptor_bindings_hash = false;
+    self.has_bound_descriptor_bindings_hash = false;
     release_descriptor_state_cache(self);
     if (self.has_descriptor_pool) {
         c.vkDestroyDescriptorPool(self.device, self.descriptor_pool, null);
@@ -570,313 +536,6 @@ fn ensure_pipeline_layout_with_hash(
     self.current_layout_hash = layout_hash;
 }
 
-fn prepare_descriptor_sets(
-    self: anytype,
-    bindings: ?[]const model_compute_types.KernelBinding,
-    initialize_buffers_on_create: bool,
-    precomputed_descriptor_bindings_hash: ?u64,
-) !void {
-    if (self.descriptor_set_count == 0) return;
-    const bs = bindings orelse return error.InvalidArgument;
-    const descriptor_bindings_hash = precomputed_descriptor_bindings_hash orelse compute_descriptor_bindings_hash(bs);
-    if (self.has_descriptor_pool and self.has_current_descriptor_bindings_hash and descriptor_bindings_hash == self.current_descriptor_bindings_hash) {
-        return;
-    }
-    if (self.has_descriptor_pool and self.has_current_descriptor_bindings_hash) {
-        try stash_active_descriptor_state(self);
-        if (activate_cached_descriptor_state(self, descriptor_bindings_hash)) {
-            return;
-        }
-    }
-    if (!self.recorded_submit_replay_active and (self.has_deferred_submissions or self.pending_uploads.items.len > 0)) {
-        _ = try vk_upload.flush_queue(self);
-    }
-    try ensure_descriptor_pool(self, bindings);
-    var buffer_infos = std.ArrayListUnmanaged(c.VkDescriptorBufferInfo){};
-    defer buffer_infos.deinit(self.allocator);
-    var image_infos = std.ArrayListUnmanaged(c.VkDescriptorImageInfo){};
-    defer image_infos.deinit(self.allocator);
-    var retired_promoted_buffers = std.ArrayListUnmanaged(vk_resources.ComputeBuffer){};
-    defer {
-        for (retired_promoted_buffers.items) |buffer| {
-            vk_resources.release_compute_buffer(self, buffer);
-        }
-        retired_promoted_buffers.deinit(self.allocator);
-    }
-    var pending_writes = std.ArrayListUnmanaged(PendingDescriptorWrite){};
-    defer pending_writes.deinit(self.allocator);
-    var writes = std.ArrayListUnmanaged(c.VkWriteDescriptorSet){};
-    defer writes.deinit(self.allocator);
-
-    for (bs) |binding| {
-        const descriptor_type = try descriptor_type_for_binding(binding);
-        switch (binding.resource_kind) {
-            .buffer => {
-                const promotion = try vk_resources.ensure_compute_buffer_for_binding(
-                    self,
-                    binding,
-                    initialize_buffers_on_create,
-                );
-                if (promotion.retired_source) |retired_source| {
-                    try retired_promoted_buffers.append(self.allocator, retired_source);
-                }
-                const compute_buffer = promotion.buffer;
-                try buffer_infos.append(self.allocator, .{
-                    .buffer = compute_buffer.buffer,
-                    .offset = binding.buffer_offset,
-                    .range = try descriptor_range(binding, compute_buffer.size),
-                });
-                try pending_writes.append(self.allocator, .{
-                    .set_index = binding.group,
-                    .binding = binding.binding,
-                    .descriptor_type = descriptor_type,
-                    .kind = .buffer,
-                    .info_index = buffer_infos.items.len - 1,
-                });
-            },
-            .texture, .storage_texture => {
-                const texture = self.textures.getPtr(binding.resource_handle) orelse return error.InvalidState;
-                try validate_texture_binding(binding, texture.*);
-                try vk_resources.ensure_texture_shader_layout(self, texture);
-                try image_infos.append(self.allocator, .{
-                    .sampler = 0,
-                    .imageView = texture.view,
-                    .imageLayout = texture.layout,
-                });
-                try pending_writes.append(self.allocator, .{
-                    .set_index = binding.group,
-                    .binding = binding.binding,
-                    .descriptor_type = descriptor_type,
-                    .kind = .image,
-                    .info_index = image_infos.items.len - 1,
-                });
-            },
-            .sampler => {
-                const vk_sampler = self.samplers.get(binding.resource_handle) orelse return error.InvalidState;
-                try image_infos.append(self.allocator, .{
-                    .sampler = vk_sampler,
-                    .imageView = VK_NULL_U64,
-                    .imageLayout = 0,
-                });
-                try pending_writes.append(self.allocator, .{
-                    .set_index = binding.group,
-                    .binding = binding.binding,
-                    .descriptor_type = descriptor_type,
-                    .kind = .image,
-                    .info_index = image_infos.items.len - 1,
-                });
-            },
-        }
-    }
-
-    for (pending_writes.items) |pending| {
-        try writes.append(self.allocator, .{
-            .sType = c.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .pNext = null,
-            .dstSet = self.descriptor_sets[@intCast(pending.set_index)],
-            .dstBinding = pending.binding,
-            .dstArrayElement = 0,
-            .descriptorCount = 1,
-            .descriptorType = pending.descriptor_type,
-            .pImageInfo = if (pending.kind == .image) @ptrCast(&image_infos.items[pending.info_index]) else null,
-            .pBufferInfo = if (pending.kind == .buffer) @ptrCast(&buffer_infos.items[pending.info_index]) else null,
-            .pTexelBufferView = null,
-        });
-    }
-
-    if (writes.items.len > 0) {
-        c.vkUpdateDescriptorSets(self.device, @intCast(writes.items.len), writes.items.ptr, 0, null);
-    }
-    self.current_descriptor_bindings_hash = descriptor_bindings_hash;
-    self.has_current_descriptor_bindings_hash = true;
-}
-
-fn ensure_descriptor_pool(self: anytype, bindings: ?[]const model_compute_types.KernelBinding) !void {
-    if (self.has_descriptor_pool) return;
-    if (self.descriptor_set_count == 0) return;
-
-    var uniform_count: u32 = 0;
-    var storage_count: u32 = 0;
-    var sampled_image_count: u32 = 0;
-    var storage_image_count: u32 = 0;
-    var sampler_count: u32 = 0;
-    if (bindings) |bs| {
-        for (bs) |binding| {
-            switch (try descriptor_type_for_binding(binding)) {
-                c.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER => uniform_count += 1,
-                c.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER => storage_count += 1,
-                c.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE => sampled_image_count += 1,
-                c.VK_DESCRIPTOR_TYPE_STORAGE_IMAGE => storage_image_count += 1,
-                c.VK_DESCRIPTOR_TYPE_SAMPLER => sampler_count += 1,
-                else => return error.UnsupportedFeature,
-            }
-        }
-    }
-
-    var pool_sizes: [5]c.VkDescriptorPoolSize = undefined;
-    var pool_size_count: usize = 0;
-    if (uniform_count > 0) {
-        pool_sizes[pool_size_count] = .{ .type = c.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = uniform_count };
-        pool_size_count += 1;
-    }
-    if (storage_count > 0) {
-        pool_sizes[pool_size_count] = .{ .type = c.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = storage_count };
-        pool_size_count += 1;
-    }
-    if (sampled_image_count > 0) {
-        pool_sizes[pool_size_count] = .{ .type = c.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, .descriptorCount = sampled_image_count };
-        pool_size_count += 1;
-    }
-    if (storage_image_count > 0) {
-        pool_sizes[pool_size_count] = .{ .type = c.VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = storage_image_count };
-        pool_size_count += 1;
-    }
-    if (sampler_count > 0) {
-        pool_sizes[pool_size_count] = .{ .type = c.VK_DESCRIPTOR_TYPE_SAMPLER, .descriptorCount = sampler_count };
-        pool_size_count += 1;
-    }
-
-    var pool_info = c.VkDescriptorPoolCreateInfo{
-        .sType = c.VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-        .pNext = null,
-        .flags = 0,
-        .maxSets = self.descriptor_set_count,
-        .poolSizeCount = @intCast(pool_size_count),
-        .pPoolSizes = if (pool_size_count > 0) pool_sizes[0..pool_size_count].ptr else null,
-    };
-    try c.check_vk(c.vkCreateDescriptorPool(self.device, &pool_info, null, &self.descriptor_pool));
-    errdefer {
-        c.vkDestroyDescriptorPool(self.device, self.descriptor_pool, null);
-        self.descriptor_pool = VK_NULL_U64;
-    }
-
-    var alloc_info = c.VkDescriptorSetAllocateInfo{
-        .sType = c.VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-        .pNext = null,
-        .descriptorPool = self.descriptor_pool,
-        .descriptorSetCount = self.descriptor_set_count,
-        .pSetLayouts = self.descriptor_set_layouts[0..@intCast(self.descriptor_set_count)].ptr,
-    };
-    try c.check_vk(c.vkAllocateDescriptorSets(self.device, &alloc_info, self.descriptor_sets[0..@intCast(self.descriptor_set_count)].ptr));
-    self.has_descriptor_pool = true;
-}
-
-// --- Pure helpers ---
-
-pub const descriptor_type_for_binding = shared.descriptorType;
-
-pub fn validate_texture_binding(binding: model_compute_types.KernelBinding, texture: vk_resources.TextureResource) !void {
-    if (binding.texture_view_dimension != model_texture_types.WGPUTextureViewDimension_Undefined and
-        binding.texture_view_dimension != texture.view_dimension) return error.InvalidState;
-    if (binding.texture_multisampled != (texture.sample_count > 1)) return error.InvalidState;
-    try validate_texture_binding_aspect(binding.texture_aspect, texture);
-    if (binding.texture_format != model_texture_types.WGPUTextureFormat_Undefined and
-        binding.texture_format != texture.format) return error.InvalidState;
-
-    switch (binding.resource_kind) {
-        .buffer, .sampler => return error.InvalidArgument,
-        .texture => {
-            if ((texture.usage & model_texture_types.WGPUTextureUsage_TextureBinding) == 0) return error.InvalidState;
-            switch (binding.texture_sample_type) {
-                model_binding_types.WGPUTextureSampleType_Undefined,
-                model_binding_types.WGPUTextureSampleType_Float,
-                model_binding_types.WGPUTextureSampleType_UnfilterableFloat,
-                model_binding_types.WGPUTextureSampleType_Depth,
-                model_binding_types.WGPUTextureSampleType_Sint,
-                model_binding_types.WGPUTextureSampleType_Uint,
-                => {},
-                else => return error.UnsupportedFeature,
-            }
-        },
-        .storage_texture => {
-            if ((texture.usage & model_texture_types.WGPUTextureUsage_StorageBinding) == 0) return error.InvalidState;
-            switch (binding.storage_texture_access) {
-                model_binding_types.WGPUStorageTextureAccess_Undefined,
-                model_binding_types.WGPUStorageTextureAccess_WriteOnly,
-                model_binding_types.WGPUStorageTextureAccess_ReadOnly,
-                model_binding_types.WGPUStorageTextureAccess_ReadWrite,
-                => {},
-                else => return error.UnsupportedFeature,
-            }
-        },
-    }
-}
-
-fn validate_texture_binding_aspect(binding_aspect: u32, texture: vk_resources.TextureResource) !void {
-    if (binding_aspect == model_texture_types.WGPUTextureAspect_Undefined or
-        binding_aspect == model_texture_types.WGPUTextureAspect_All) return;
-
-    const full_mask = vk_formats.aspect_mask_for_format(texture.format);
-    const requested_mask = switch (binding_aspect) {
-        model_texture_types.WGPUTextureAspect_DepthOnly => vk_formats.VK_IMAGE_ASPECT_DEPTH_BIT,
-        model_texture_types.WGPUTextureAspect_StencilOnly => vk_formats.VK_IMAGE_ASPECT_STENCIL_BIT,
-        else => return error.UnsupportedFeature,
-    };
-    if (requested_mask != full_mask) return error.UnsupportedFeature;
-}
-
-pub fn descriptor_range(binding: model_compute_types.KernelBinding, buffer_size: u64) !u64 {
-    if (binding.resource_kind != .buffer) return error.UnsupportedFeature;
-    if (binding.buffer_size == model_texture_types.WGPUWholeSize) {
-        if (binding.buffer_offset > buffer_size) return error.InvalidArgument;
-        return c.VK_WHOLE_SIZE;
-    }
-    if (binding.buffer_size == 0) return error.InvalidArgument;
-    const end = std.math.add(u64, binding.buffer_offset, binding.buffer_size) catch return error.InvalidArgument;
-    if (end > buffer_size) return error.InvalidArgument;
-    return binding.buffer_size;
-}
-
-test "validate_texture_binding accepts matching array texture metadata" {
-    const binding = model_compute_types.KernelBinding{
-        .binding = 0,
-        .resource_kind = .texture,
-        .resource_handle = 1,
-        .texture_view_dimension = model_texture_types.WGPUTextureViewDimension_2DArray,
-        .texture_sample_type = model_binding_types.WGPUTextureSampleType_Float,
-    };
-    const texture = vk_resources.TextureResource{
-        .image = VK_NULL_U64,
-        .memory = VK_NULL_U64,
-        .view = VK_NULL_U64,
-        .width = 32,
-        .height = 32,
-        .depth_or_array_layers = 4,
-        .mip_levels = 1,
-        .sample_count = 1,
-        .dimension = model_texture_types.WGPUTextureDimension_2D,
-        .view_dimension = model_texture_types.WGPUTextureViewDimension_2DArray,
-        .aspect = model_texture_types.WGPUTextureAspect_All,
-        .format = model_texture_types.WGPUTextureFormat_RGBA8Unorm,
-        .usage = model_texture_types.WGPUTextureUsage_TextureBinding,
-        .layout = 0,
-    };
-    try validate_texture_binding(binding, texture);
-}
-
-test "validate_texture_binding rejects multisample mismatch" {
-    const binding = model_compute_types.KernelBinding{
-        .binding = 0,
-        .resource_kind = .texture,
-        .resource_handle = 1,
-        .texture_multisampled = true,
-        .texture_sample_type = model_binding_types.WGPUTextureSampleType_Float,
-    };
-    const texture = vk_resources.TextureResource{
-        .image = VK_NULL_U64,
-        .memory = VK_NULL_U64,
-        .view = VK_NULL_U64,
-        .width = 16,
-        .height = 16,
-        .depth_or_array_layers = 1,
-        .mip_levels = 1,
-        .sample_count = 1,
-        .dimension = model_texture_types.WGPUTextureDimension_2D,
-        .view_dimension = model_texture_types.WGPUTextureViewDimension_2D,
-        .aspect = model_texture_types.WGPUTextureAspect_All,
-        .format = model_texture_types.WGPUTextureFormat_RGBA8Unorm,
-        .usage = model_texture_types.WGPUTextureUsage_TextureBinding,
-        .layout = 0,
-    };
-    try std.testing.expectError(error.InvalidState, validate_texture_binding(binding, texture));
-}
+pub const descriptor_type_for_binding = descriptors.descriptor_type_for_binding;
+pub const validate_texture_binding = descriptors.validate_texture_binding;
+pub const descriptor_range = descriptors.descriptor_range;

@@ -141,8 +141,12 @@ classified and cannot be promoted by benchmark results.
   fails the evidence gate. Failed numerical outputs and receipts remain retained.
 - Vulkan compute and descriptor cache transitions retain the active owner if a
   cache allocation fails. An allocation-fault regression must preserve the old
-  handles and allow a later successful insertion and activation. This changes
-  failure-path ownership without changing the cache key or execution contract.
+  handles and allow a later successful insertion and activation. Hashes only
+  locate cache candidates: descriptor reuse must also match complete bindings
+  and native allocation generations. Physical regressions cover collisions,
+  spill, buffer aliases, resource replacement, and orphaned image views.
+  Prepared programs reject changed resources before native submission. These
+  internal identities preserve the public descriptor and receipt contracts.
 - Program GPU timing is an explicit evaluation policy. Timestamp pass markers
   must bracket equivalent completion stages, and counter precision must be
   disclosed. The gate recomputes calibrated durations, percentile statistics,

@@ -8,6 +8,14 @@ pub fn vulkan_create_sampler(dev: *shared.DoeDevice, sampler: *shared.DoeSampler
         return false;
     };
 
+    const generation = rt.next_resource_generation() catch {
+        shared.deliverInternalError(dev, "doe_vulkan_render_native: sampler resource generation exhausted", .{});
+        return false;
+    };
+    rt.samplers.ensureUnusedCapacity(rt.allocator, 1) catch {
+        shared.deliverInternalError(dev, "doe_vulkan_render_native: sampler map reservation failed", .{});
+        return false;
+    };
     var create_info = shared.c.VkSamplerCreateInfo{
         .sType = shared.c.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .pNext = null,
@@ -39,11 +47,7 @@ pub fn vulkan_create_sampler(dev: *shared.DoeDevice, sampler: *shared.DoeSampler
     sampler.vk_runtime_ref = @ptrCast(rt);
 
     const handle: u64 = @intFromPtr(sampler);
-    const gop = rt.samplers.getOrPut(rt.allocator, handle) catch {
-        shared.deliverInternalError(dev, "doe_vulkan_render_native: sampler map put failed", .{});
-        return true;
-    };
-    gop.value_ptr.* = vk_sampler;
+    rt.samplers.putAssumeCapacity(handle, .{ .handle = vk_sampler, .generation = generation });
     return true;
 }
 
