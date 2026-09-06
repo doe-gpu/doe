@@ -250,7 +250,9 @@ pub const DoeCommandEncoder = struct {
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     dev: *DoeDevice,
+    device_ref: ?*DoeDevice = null,
     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},
+    references: std.ArrayListUnmanaged(command_types.CommandReference) = .{},
 };
 
 pub const DoeComputePass = struct {
@@ -258,6 +260,7 @@ pub const DoeComputePass = struct {
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     enc: *DoeCommandEncoder,
+    owns_encoder: bool = false,
     pipeline: ?*DoeComputePipeline = null,
     bind_groups: [4]?*DoeBindGroup = [_]?*DoeBindGroup{null} ** 4,
     state_generation: u64 = INITIAL_COMPUTE_PASS_STATE_GENERATION,
@@ -276,7 +279,9 @@ pub const DoeCommandBuffer = struct {
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     dev: *DoeDevice,
+    device_ref: ?*DoeDevice = null,
     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},
+    references: std.ArrayListUnmanaged(command_types.CommandReference) = .{},
 };
 
 pub const DoeTexture = struct {

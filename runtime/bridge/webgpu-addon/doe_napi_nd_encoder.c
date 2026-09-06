@@ -131,6 +131,7 @@ napi_value native_direct_command_encoder_finish(napi_env env, napi_callback_info
     };
     WGPUCommandBuffer command_buffer = pfn_wgpuCommandEncoderFinish(encoder, &desc);
     if (!command_buffer) NAPI_THROW(env, "commandEncoderFinish failed");
+    pfn_wgpuCommandEncoderRelease(encoder);
     native_direct_set_external_prop(env, this_arg, DOE_DIRECT_NATIVE, NULL);
     if (encoder_cache) encoder_cache->native = NULL;
     return create_native_direct_command_buffer_object(env, command_buffer);
@@ -408,6 +409,7 @@ napi_value native_direct_compute_pass_end(napi_env env, napi_callback_info info)
     NativeDirectHandleCache* pass_cache = native_direct_get_handle_cache(env, this_arg);
     WGPUComputePassEncoder pass = pass_cache ? (WGPUComputePassEncoder)pass_cache->native : native_direct_unwrap_external_prop(env, this_arg, DOE_DIRECT_NATIVE);
     pfn_wgpuComputePassEncoderEnd(pass);
+    pfn_wgpuComputePassEncoderRelease(pass);
     native_direct_set_external_prop(env, this_arg, DOE_DIRECT_NATIVE, NULL);
     if (pass_cache) pass_cache->native = NULL;
     napi_value undefined_value;

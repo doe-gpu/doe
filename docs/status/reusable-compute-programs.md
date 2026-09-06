@@ -1,5 +1,18 @@
 # Reusable compute programs
 
+## Native recorded command ownership
+
+The native lifetime audit reproduced a lost copy and a crash when callers
+released resources before deferred submission. Compute and copy recording now
+retain native dependencies through encoder-to-command-buffer transfer; pass and
+device ownership protect cleanup, including abandoned and failed construction.
+The original failing probes, repaired output, runtime checks, and package
+qualification are indexed under
+`bench/out/compute-program/20260906-command-ownership/README.md`.
+Public declaration and receipt schemas are unchanged. Rendering dependency
+ownership, general object garbage collection, and physical driver loss remain
+outside this acceptance evidence.
+
 ## Evidence schema routing
 
 The schema gate now distinguishes package qualification from application

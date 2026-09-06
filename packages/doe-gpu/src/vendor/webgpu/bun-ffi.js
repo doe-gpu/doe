@@ -3428,6 +3428,7 @@ const bunEncoderBackend = {
         encoder._finished = true;
         if (encoder._native) {
             const cmd = wgpu.symbols.wgpuCommandEncoderFinish(encoder._native, null);
+            wgpu.symbols.wgpuCommandEncoderRelease(encoder._native);
             encoder._native = null;
             return { _native: cmd, _batched: false };
         }

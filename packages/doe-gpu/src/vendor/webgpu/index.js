@@ -2580,6 +2580,7 @@ const nodeEncoderBackend = {
     }
     const cmd = addon.commandEncoderFinish(encoder._native);
     if (encodedBufferWrites.has(encoder)) recordedBufferWrites.set(cmd, encodedBufferWrites.get(encoder));
+    addon.commandEncoderRelease(encoder._native);
     encoder._native = null;
     return { _native: cmd, _batched: false };
   },

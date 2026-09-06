@@ -1,6 +1,7 @@
 const abi_pipeline = @import("../../core/abi/wgpu_pipeline_descriptor_types.zig");
 
 pub extern fn doeNativeBufferRelease(raw: ?*anyopaque) callconv(.c) void;
+pub extern fn doeNativeBindGroupRelease(raw: ?*anyopaque) callconv(.c) void;
 pub extern fn doeNativeComputePipelineRelease(raw: ?*anyopaque) callconv(.c) void;
 pub extern fn doeNativeDeviceRelease(raw: ?*anyopaque) callconv(.c) void;
 pub extern fn doeNativeInstanceRelease(raw: ?*anyopaque) callconv(.c) void;

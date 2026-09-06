@@ -347,6 +347,7 @@ test "doeNativeCommandEncoderBeginRenderPass preserves D3D12 attachment extras" 
     var dev = native.DoeDevice{ .backend = .d3d12 };
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     defer enc.cmds.deinit(native.alloc);
+    defer @import("../../src/native/command/doe_command_references.zig").releaseAll(&enc.references);
 
     var color_texture = native.DoeTexture{
         .backend = .d3d12,
@@ -448,6 +449,7 @@ test "doeNativeRenderPassDraw records D3D12 attachment view metadata" {
     var dev = native.DoeDevice{ .backend = .d3d12 };
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     defer enc.cmds.deinit(native.alloc);
+    defer @import("../../src/native/command/doe_command_references.zig").releaseAll(&enc.references);
 
     var pipeline = native.DoeRenderPipeline{
         .mtl_pso = @ptrFromInt(0x1111),
@@ -515,6 +517,7 @@ test "Metal render pass records one encoder boundary across multiple draws" {
     var dev = native.DoeDevice{ .backend = .metal };
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     defer enc.cmds.deinit(native.alloc);
+    defer @import("../../src/native/command/doe_command_references.zig").releaseAll(&enc.references);
     var pipeline = native.DoeRenderPipeline{
         .mtl_pso = @ptrFromInt(0x1111),
         .topology = 0x00000004,
@@ -552,6 +555,7 @@ test "Metal empty render pass records attachment operations" {
     var dev = native.DoeDevice{ .backend = .metal };
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     defer enc.cmds.deinit(native.alloc);
+    defer @import("../../src/native/command/doe_command_references.zig").releaseAll(&enc.references);
     var pass = native.DoeRenderPass{
         .enc = &enc,
         .target = @ptrFromInt(0x3333),
@@ -612,6 +616,7 @@ test "doeNativeCommandEncoderWriteTimestamp records a metal timestamp command" {
     var dev = native.DoeDevice{};
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     defer enc.cmds.deinit(native.alloc);
+    defer @import("../../src/native/command/doe_command_references.zig").releaseAll(&enc.references);
 
     var qs = query.DoeQuerySet{
         .count = 4,
@@ -639,6 +644,7 @@ test "doeNativeCommandEncoderResolveQuerySet records a metal resolve command" {
     var dev = native.DoeDevice{};
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     defer enc.cmds.deinit(native.alloc);
+    defer @import("../../src/native/command/doe_command_references.zig").releaseAll(&enc.references);
 
     var qs = query.DoeQuerySet{
         .count = 4,

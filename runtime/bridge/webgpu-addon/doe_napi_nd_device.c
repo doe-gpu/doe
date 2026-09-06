@@ -28,7 +28,10 @@ napi_value native_direct_device_create_buffer(napi_env env, napi_callback_info i
 
     WGPUBuffer buffer = pfn_wgpuDeviceCreateBuffer(device, &desc);
     if (!buffer) NAPI_THROW(env, "createBuffer failed");
-    return create_native_direct_buffer_object(env, inst, queue_obj, buffer, desc.size, desc.usage);
+    napi_value result = create_native_direct_buffer_object(env, inst, queue_obj, buffer, desc.size, desc.usage);
+    NativeDirectBufferCache* cache = native_direct_get_buffer_cache(env, result);
+    if (cache && desc.mappedAtCreation) cache->map_mode = WGPUMapMode_Write;
+    return result;
 }
 
 napi_value native_direct_device_create_shader_module(napi_env env, napi_callback_info info) {

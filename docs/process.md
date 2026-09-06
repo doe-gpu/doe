@@ -156,6 +156,12 @@ classified and cannot be promoted by benchmark results.
   resource references must keep required backend cleanup valid.
   Linux retained-package qualification executes the DRM regression in every
   controlled host, covering timestamp scratch allocations and labeled queues.
+- Native command lifetime tests release caller-owned compute state and copy
+  resources before deferred use. Recording must preserve those references
+  through finish and submission, release abandoned state, and unwind failed
+  fused construction. Compute passes and command buffers retain the encoder or
+  device needed for cleanup. Explicit destruction remains a separate invalidation
+  boundary; this does not admit automatic garbage collection of other objects.
 - Program receipt version 5 overlaps queue completion with readback mapping and
   waits for both. Failure and cancellation tests must preserve ownership until
   both settle, including either callback order and a rejected mapping. Mapping

@@ -2,6 +2,11 @@ const std = @import("std");
 const shared = @import("doe_native_shared_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
 
+pub const CommandReference = struct {
+    handle: ?*anyopaque,
+    release: *const fn (?*anyopaque) callconv(.c) void,
+};
+
 pub const DeferredCopy = struct {
     src: [*]const u8,
     dst: [*]u8,

@@ -8,6 +8,7 @@
 
 const std = @import("std");
 const builtin = @import("builtin");
+const references = @import("../command/doe_command_references.zig");
 const has_vulkan = (builtin.os.tag == .linux);
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 const backend_contract = @import("../../contracts/backend.zig");
@@ -162,7 +163,7 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     const dst = native_helpers.cast(native_types.DoeBuffer, dst_raw) orelse return;
-    if (qs.destroyed or dst.error_object) return;
+    if (qs.destroyed or dst.error_object or dst.destroyed) return;
 
     if (first_query + query_count > qs.count) return;
 
@@ -170,6 +171,8 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
     const d_off: usize = @intCast(dst_offset);
     if (d_off + copy_bytes > @as(usize, @intCast(dst.size))) return;
     native_helpers.object_add_ref(DoeQuerySet, qs_raw);
+
+    references.retainBuffer(&enc.references, dst);
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {

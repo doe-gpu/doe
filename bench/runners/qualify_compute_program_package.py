@@ -90,7 +90,8 @@ def main() -> int:
                     shutil.copyfile(ROOT / source, scratch / Path(source).name)
                     shutil.copyfile(ROOT / source, output / Path(source).name)
                     replacements[f'../../../../{source}'] = f'./{Path(source).name}'
-                regressions = [('plans', 'compute-program'), ('timestamps', 'timestamp-query'),
+                regressions = [('commands', 'native-command-ownership'),
+                               ('plans', 'compute-program'), ('timestamps', 'timestamp-query'),
                                ('normalization', 'timestamp-normalization')]
                 if args.platform_package == 'doe-gpu-linux-x64':
                     regressions.append(('resources', 'native-resource-retention'))

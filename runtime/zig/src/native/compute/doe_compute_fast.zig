@@ -2,6 +2,8 @@ const std = @import("std");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const native_cmds = @import("../support/doe_native_command_types.zig");
+const references = @import("../command/doe_command_references.zig");
+const native_exports = @import("../support/doe_native_exports.zig");
 const vulkan_fast = @import("doe_compute_fast_vulkan.zig");
 const compute_bind_groups = @import("doe_compute_bind_groups.zig");
 const compute_preconditions = @import("doe_compute_preconditions_native.zig");
@@ -332,7 +334,7 @@ fn encodeDispatchBatchToComputeEncoder(
 }
 
 fn appendRecordedDispatch(
-    cmds: *std.ArrayListUnmanaged(RecordedCmd),
+    cb: *DoeCommandBuffer,
     pipe: *DoeComputePipeline,
     bg_ptrs: [*]const ?*anyopaque,
     bg_count: u32,
@@ -380,12 +382,16 @@ fn appendRecordedDispatch(
         cmd.dispatch.bind_groups[index] = if (maybe_bg) |bg| toOpaque(bg) else null;
     }
     vulkan_fast.populateRecordedDispatchBindingState(pipe, bind_groups[0..], &cmd.dispatch);
-    if (native_cmds.tryMergeDispatchIntoLast(cmds, &cmd)) return true;
-    cmds.append(alloc, cmd) catch std.debug.panic("doe_compute_fast: OOM recording dispatch command", .{});
+    if (native_cmds.tryMergeDispatchIntoLast(&cb.cmds, &cmd)) return true;
+    references.retainPipeline(&cb.references, pipe);
+    for (bind_groups) |maybe_bg| if (maybe_bg) |bg| {
+        references.retainBindGroup(&cb.references, bg);
+    };
+    cb.cmds.append(alloc, cmd) catch std.debug.panic("doe_compute_fast: OOM recording dispatch command", .{});
     return true;
 }
 fn appendCopyIfPresent(
-    cmds: *std.ArrayListUnmanaged(RecordedCmd),
+    cb: *DoeCommandBuffer,
     copy_src: ?*anyopaque,
     copy_src_off: u64,
     copy_dst: ?*anyopaque,
@@ -393,8 +399,12 @@ fn appendCopyIfPresent(
     copy_size: u64,
 ) bool {
     if (copy_size == 0) return true;
-    if (copy_src == null or copy_dst == null) return false;
-    cmds.append(alloc, .{ .copy_buf = .{
+    const source = native_helpers.cast(native_types.DoeBuffer, copy_src) orelse return false;
+    const destination = native_helpers.cast(native_types.DoeBuffer, copy_dst) orelse return false;
+    if (source.error_object or source.destroyed or destination.error_object or destination.destroyed) return false;
+    references.retainBuffer(&cb.references, source);
+    references.retainBuffer(&cb.references, destination);
+    cb.cmds.append(alloc, .{ .copy_buf = .{
         .src = copy_src,
         .src_off = copy_src_off,
         .dst = copy_dst,
@@ -405,8 +415,54 @@ fn appendCopyIfPresent(
 }
 
 fn destroyPendingCommandBuffer(cb: *DoeCommandBuffer) void {
-    cb.cmds.deinit(alloc);
-    alloc.destroy(cb);
+    native_exports.doeNativeCommandBufferRelease(toOpaque(cb));
+}
+
+test "fused command constructor retains inputs and unwinds invalid copy" {
+    var device = DoeDevice{};
+    var pipeline = DoeComputePipeline{};
+    var group = native_types.DoeBindGroup{};
+    var source = native_types.DoeBuffer{ .size = 16 };
+    var destination = native_types.DoeBuffer{ .size = 16 };
+    const command = doeNativeCreateComputeDispatchCopyCommandBufferOneBindGroup(
+        toOpaque(&device),
+        toOpaque(&pipeline),
+        toOpaque(&group),
+        1,
+        1,
+        1,
+        toOpaque(&source),
+        0,
+        toOpaque(&destination),
+        0,
+        16,
+    ).?;
+    try std.testing.expectEqual(@as(u32, 2), pipeline.ref_count);
+    try std.testing.expectEqual(@as(u32, 2), group.ref_count);
+    try std.testing.expectEqual(@as(u32, 2), source.ref_count);
+    native_exports.doeNativeCommandBufferRelease(command);
+    try std.testing.expectEqual(@as(u32, 1), pipeline.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), group.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), source.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), destination.ref_count);
+    const invalid = doeNativeCreateComputeDispatchCopyCommandBufferOneBindGroup(
+        toOpaque(&device),
+        toOpaque(&pipeline),
+        toOpaque(&group),
+        1,
+        1,
+        1,
+        toOpaque(&source),
+        0,
+        null,
+        0,
+        16,
+    );
+    try std.testing.expectEqual(@as(?*anyopaque, null), invalid);
+    try std.testing.expectEqual(@as(u32, 1), pipeline.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), group.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), source.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), device.ref_count);
 }
 
 pub export fn doeNativeCreateComputeDispatchCopyCommandBuffer(
@@ -426,12 +482,13 @@ pub export fn doeNativeCreateComputeDispatchCopyCommandBuffer(
     const dev = native_helpers.cast(DoeDevice, dev_raw) orelse return null;
     const pipe = native_helpers.cast(DoeComputePipeline, pipe_raw) orelse return null;
     const cb = make(DoeCommandBuffer) orelse return null;
-    cb.* = .{ .dev = dev };
-    if (!appendRecordedDispatch(&cb.cmds, pipe, bg_ptrs, bg_count, dx, dy, dz)) {
+    native_helpers.object_add_ref(DoeDevice, dev_raw);
+    cb.* = .{ .dev = dev, .device_ref = dev };
+    if (!appendRecordedDispatch(cb, pipe, bg_ptrs, bg_count, dx, dy, dz)) {
         destroyPendingCommandBuffer(cb);
         return null;
     }
-    if (!appendCopyIfPresent(&cb.cmds, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) {
+    if (!appendCopyIfPresent(cb, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) {
         destroyPendingCommandBuffer(cb);
         return null;
     }
@@ -484,7 +541,8 @@ pub export fn doeNativeCreateComputeDispatchBatchCopyCommandBuffer(
     const dev = native_helpers.cast(DoeDevice, dev_raw) orelse return null;
     if (dispatch_count == 0) return null;
     const cb = make(DoeCommandBuffer) orelse return null;
-    cb.* = .{ .dev = dev };
+    native_helpers.object_add_ref(DoeDevice, dev_raw);
+    cb.* = .{ .dev = dev, .device_ref = dev };
     for (0..dispatch_count) |index| {
         const pipe = native_helpers.cast(DoeComputePipeline, pipe_ptrs[index]) orelse {
             destroyPendingCommandBuffer(cb);
@@ -493,7 +551,7 @@ pub export fn doeNativeCreateComputeDispatchBatchCopyCommandBuffer(
         const bg_offset = index * MAX_COMPUTE_BIND_GROUPS;
         const dim_offset = index * 3;
         if (!appendRecordedDispatch(
-            &cb.cmds,
+            cb,
             pipe,
             bg_ptrs + bg_offset,
             bg_counts[index],
@@ -505,7 +563,7 @@ pub export fn doeNativeCreateComputeDispatchBatchCopyCommandBuffer(
             return null;
         }
     }
-    if (!appendCopyIfPresent(&cb.cmds, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) {
+    if (!appendCopyIfPresent(cb, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) {
         destroyPendingCommandBuffer(cb);
         return null;
     }

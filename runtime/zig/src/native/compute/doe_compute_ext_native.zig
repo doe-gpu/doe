@@ -11,6 +11,8 @@ const compute_preconditions = @import("doe_compute_preconditions_native.zig");
 const vulkan_compute = @import("../vulkan/vulkan_compute_native.zig");
 const shader_native = @import("../shader/doe_shader_native.zig");
 const query_native = @import("../resource/doe_query_native.zig");
+const references = @import("../command/doe_command_references.zig");
+const native_exports = @import("../support/doe_native_exports.zig");
 const binding_contract = @import("../../contracts/binding.zig");
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 const bridge = resource_ops.metal_bridge;
@@ -131,6 +133,7 @@ fn bumpPassState(pass: *DoeComputePass) void {
 
 fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
     if (pass.pipeline == pip) return;
+    if (pip) |pipeline| references.retainPipeline(&pass.enc.references, pipeline);
     pass.pipeline = pip;
     bumpPassState(pass);
 }
@@ -138,6 +141,7 @@ fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
 fn setPassBindGroup(pass: *DoeComputePass, index: usize, bg: ?*DoeBindGroup) void {
     if (index >= pass.bind_groups.len) return;
     if (pass.bind_groups[index] == bg) return;
+    if (bg) |group| references.retainBindGroup(&pass.enc.references, group);
     pass.bind_groups[index] = bg;
     bumpPassState(pass);
 }
@@ -289,6 +293,7 @@ pub export fn doeNativeComputePassRelease(raw: ?*anyopaque) callconv(.c) void {
             query_native.doeNativeQuerySetRelease(query_set);
         }
         native_helpers.label_store.remove(raw);
+        if (p.owns_encoder) native_exports.doeNativeCommandEncoderRelease(toOpaque(p.enc));
         alloc.destroy(p);
     }
 }
@@ -342,7 +347,7 @@ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_ra
     const pass = cast(DoeComputePass, pass_raw) orelse return;
     const pip = pass.pipeline orelse return;
     const indirect_buf = cast(DoeBuffer, buf_raw) orelse return;
-    if (indirect_buf.error_object) return;
+    if (indirect_buf.error_object or indirect_buf.destroyed) return;
     if (pip.dispatch_preconditions.len > 0) {
         const counts = read_indirect_dispatch_counts(indirect_buf, offset) orelse {
             std.log.err("doe_compute_ext_native: indirect dispatch preconditions require readable counts", .{});
@@ -379,6 +384,7 @@ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_ra
             pass.bind_groups[0..],
         );
     }
+    references.retainBuffer(&pass.enc.references, indirect_buf);
     pass.enc.cmds.append(alloc, cmd) catch
         std.debug.panic("doe_compute_ext_native: OOM recording indirect dispatch command", .{});
 }

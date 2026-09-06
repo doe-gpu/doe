@@ -80,6 +80,15 @@ in Node, Bun, and Electron. It retains closed programs while checking DRM
 allocation totals and device teardown, including timestamp scratch storage and
 labeled queues. This adds acceptance evidence within qualification version 2;
 it does not change its schema or establish another platform's resource behavior.
+Native compute command recording owns pipelines, bind groups, indirect buffers,
+copy resources, and query-resolution destinations until command buffer release.
+Finishing transfers those references from the encoder; abandoning the encoder
+releases them. Compute passes pin their encoder, and encoders and command
+buffers retain their cleanup device. Fused compute/copy constructors follow the
+same ownership rule, including failed preparation. This corrects caller-release
+lifetimes without changing public declarations or receipts. Explicit resource
+destruction still invalidates its backing storage. General JavaScript garbage
+collection and rendering dependency ownership require separate qualification.
 Compatible descriptor layouts permit sharing the compiled pipeline while
 keeping descriptor sets independent, as specified by
 [Vulkan layout compatibility](https://docs.vulkan.org/spec/latest/chapters/descriptorsets.html#descriptorsets-compatibility).

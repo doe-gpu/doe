@@ -4,6 +4,7 @@
 const std = @import("std");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
+const references = @import("../command/doe_command_references.zig");
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 const bridge = resource_ops.metal_bridge;
 
@@ -29,13 +30,14 @@ pub export fn doeNativeCommandEncoderClearBuffer(
 ) callconv(.c) void {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
     const buf = cast(DoeBuffer, buffer_raw) orelse return;
-    if (buf.error_object) return;
+    if (buf.error_object or buf.destroyed) return;
     // Resolve WGPU_WHOLE_SIZE sentinel: if size is u64 max, fill to end of buffer.
     const fill_size: u64 = if (size == std.math.maxInt(u64))
         buf.size -| offset
     else
         size;
     if (fill_size == 0) return;
+    references.retainBuffer(&enc.references, buf);
     enc.cmds.append(alloc, .{ .clear_buffer = .{
         .buffer = if (enc.dev.backend == .vulkan) toOpaque(buf) else buf.mtl,
         .offset = offset,
@@ -70,6 +72,8 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
     const src = cast(DoeTexture, src_texture_raw) orelse return;
     const dst = cast(DoeTexture, dst_texture_raw) orelse return;
     if (src.error_object or dst.error_object) return;
+    references.retainTexture(&enc.references, src);
+    references.retainTexture(&enc.references, dst);
     enc.cmds.append(alloc, .{ .copy_texture_to_texture = .{
         .src_texture = if (enc.dev.backend == .vulkan) toOpaque(src) else src.mtl,
         .src_mip = src_mip,

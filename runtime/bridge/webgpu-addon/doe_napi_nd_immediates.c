@@ -320,6 +320,20 @@ napi_value native_direct_queue_write_texture(napi_env env, napi_callback_info in
     return undefined_value;
 }
 
+static WGPUCommandBuffer native_direct_command_buffer(napi_env env, napi_value object) {
+    NativeDirectHandleCache* cache = native_direct_get_handle_cache(env, object);
+    return cache ? (WGPUCommandBuffer)cache->native
+        : native_direct_unwrap_external_prop(env, object, DOE_DIRECT_NATIVE);
+}
+
+static void native_direct_consume_command_buffer(napi_env env, napi_value object) {
+    WGPUCommandBuffer command = native_direct_command_buffer(env, object);
+    NativeDirectHandleCache* cache = native_direct_get_handle_cache(env, object);
+    native_direct_set_external_prop(env, object, DOE_DIRECT_NATIVE, NULL);
+    if (cache) cache->native = NULL;
+    pfn_wgpuCommandBufferRelease(command);
+}
+
 napi_value native_direct_queue_submit(napi_env env, napi_callback_info info) {
     size_t argc = 1;
     napi_value argv[1];
@@ -333,25 +347,35 @@ napi_value native_direct_queue_submit(napi_env env, napi_callback_info info) {
     napi_get_array_length(env, argv[0], &cmd_count);
     if (cmd_count == 1) {
         napi_value elem;
-        WGPUCommandBuffer cmd = NULL;
         napi_get_element(env, argv[0], 0, &elem);
-        {
-            NativeDirectHandleCache* command_buffer_cache = native_direct_get_handle_cache(env, elem);
-            cmd = command_buffer_cache ? (WGPUCommandBuffer)command_buffer_cache->native : native_direct_unwrap_external_prop(env, elem, DOE_DIRECT_NATIVE);
-        }
+        WGPUCommandBuffer cmd = native_direct_command_buffer(env, elem);
+        if (!cmd) NAPI_THROW(env, "queue.submit requires an unsubmitted command buffer");
         pfn_wgpuQueueSubmit(queue, 1, &cmd);
+        native_direct_consume_command_buffer(env, elem);
     } else {
         WGPUCommandBuffer* cmds = (WGPUCommandBuffer*)calloc(cmd_count, sizeof(WGPUCommandBuffer));
         if (!cmds && cmd_count > 0) NAPI_THROW(env, "queue.submit: out of memory");
         for (uint32_t i = 0; i < cmd_count; i++) {
             napi_value elem;
             napi_get_element(env, argv[0], i, &elem);
-            {
-                NativeDirectHandleCache* command_buffer_cache = native_direct_get_handle_cache(env, elem);
-                cmds[i] = command_buffer_cache ? (WGPUCommandBuffer)command_buffer_cache->native : native_direct_unwrap_external_prop(env, elem, DOE_DIRECT_NATIVE);
+            cmds[i] = native_direct_command_buffer(env, elem);
+            if (!cmds[i]) {
+                free(cmds);
+                NAPI_THROW(env, "queue.submit requires unsubmitted command buffers");
+            }
+            for (uint32_t prior = 0; prior < i; prior++) {
+                if (cmds[prior] == cmds[i]) {
+                    free(cmds);
+                    NAPI_THROW(env, "queue.submit cannot submit the same command buffer twice");
+                }
             }
         }
         pfn_wgpuQueueSubmit(queue, cmd_count, cmds);
+        for (uint32_t i = 0; i < cmd_count; i++) {
+            napi_value elem;
+            napi_get_element(env, argv[0], i, &elem);
+            native_direct_consume_command_buffer(env, elem);
+        }
         free(cmds);
     }
     native_direct_queue_mark_submitted(env, this_arg);
@@ -504,7 +528,20 @@ napi_value native_direct_buffer_map_async(napi_env env, napi_callback_info info)
     }
     native_direct_set_double_prop(env, this_arg, DOE_DIRECT_DIAG_MAP_QUEUE_FLUSH_MS, map_queue_flush_ms);
     native_direct_set_double_prop(env, this_arg, DOE_DIRECT_DIAG_MAP_ASYNC_MS, native_direct_elapsed_ms(map_started_ns));
+    if (buffer_cache) buffer_cache->map_mode = mode;
     return native_direct_resolved_undefined_promise(env);
+}
+
+static bool native_direct_flush_mapped_range(napi_env env, NativeDirectBufferCache* cache) {
+    if (!cache || !cache->mapped_range_ref || cache->map_mode != WGPUMapMode_Write) return true;
+    napi_value range;
+    void* bytes = NULL;
+    size_t size = 0;
+    if (napi_get_reference_value(env, cache->mapped_range_ref, &range) != napi_ok ||
+        napi_get_arraybuffer_info(env, range, &bytes, &size) != napi_ok ||
+        size != cache->mapped_size || (size && !bytes)) return false;
+    if (size) memcpy(cache->mapped_ptr, bytes, size);
+    return true;
 }
 
 napi_value native_direct_buffer_get_mapped_range(napi_env env, napi_callback_info info) {
@@ -533,15 +570,19 @@ napi_value native_direct_buffer_get_mapped_range(napi_env env, napi_callback_inf
         napi_get_reference_value(env, buffer_cache->mapped_range_ref, &cached);
         return cached;
     }
-    if (buffer_cache) native_direct_invalidate_buffer_mapped_range_cache(env, buffer_cache);
+    if (!buffer_cache) NAPI_THROW(env, "getMappedRange requires buffer ownership metadata");
+    if (!native_direct_flush_mapped_range(env, buffer_cache)) NAPI_THROW(env, "getMappedRange: invalid prior mapped range");
+    native_direct_invalidate_buffer_mapped_range_cache(env, buffer_cache);
     napi_value array_buffer;
-    napi_create_external_arraybuffer(env, data, (size_t)size, NULL, NULL, &array_buffer);
-    if (buffer_cache) {
-        napi_create_reference(env, array_buffer, 1, &buffer_cache->mapped_range_ref);
-        buffer_cache->mapped_offset = (size_t)offset;
-        buffer_cache->mapped_size = (size_t)size;
-        buffer_cache->mapped_ptr = data;
-    }
+    void* copy = NULL;
+    if (napi_create_arraybuffer(env, (size_t)size, &copy, &array_buffer) != napi_ok)
+        NAPI_THROW(env, "getMappedRange: host allocation failed");
+    if (size > 0) memcpy(copy, data, (size_t)size);
+    if (napi_create_reference(env, array_buffer, 1, &buffer_cache->mapped_range_ref) != napi_ok)
+        NAPI_THROW(env, "getMappedRange: retaining host allocation failed");
+    buffer_cache->mapped_offset = (size_t)offset;
+    buffer_cache->mapped_size = (size_t)size;
+    buffer_cache->mapped_ptr = data;
     native_direct_set_double_prop(env, this_arg, DOE_DIRECT_DIAG_GET_MAPPED_RANGE_MS, native_direct_elapsed_ms(get_mapped_range_started_ns));
     return array_buffer;
 }
@@ -739,7 +780,9 @@ napi_value native_direct_buffer_unmap(napi_env env, napi_callback_info info) {
     napi_get_cb_info(env, info, &argc, NULL, &this_arg, NULL);
     NativeDirectBufferCache* buffer_cache = native_direct_get_buffer_cache(env, this_arg);
     WGPUBuffer buffer = buffer_cache ? buffer_cache->buffer : native_direct_unwrap_external_prop(env, this_arg, DOE_DIRECT_NATIVE);
+    if (!native_direct_flush_mapped_range(env, buffer_cache)) NAPI_THROW(env, "unmap: invalid mapped range");
     native_direct_invalidate_buffer_mapped_range_cache(env, buffer_cache);
+    if (buffer_cache) buffer_cache->map_mode = 0;
     if (buffer) pfn_wgpuBufferUnmap(buffer);
     napi_value undefined_value;
     napi_get_undefined(env, &undefined_value);

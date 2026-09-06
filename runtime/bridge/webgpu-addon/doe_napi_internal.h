@@ -759,6 +759,7 @@ typedef struct { WGPUInstance instance; WGPUQueue queue; uint32_t submitted_seri
 typedef struct {
     WGPUInstance instance; WGPUBuffer buffer; uint64_t size; uint64_t usage;
     napi_ref queue_ref; napi_ref mapped_range_ref; size_t mapped_offset; size_t mapped_size; void* mapped_ptr;
+    uint32_t map_mode;
 } NativeDirectBufferCache;
 
 /* Native-direct method refs (one per cached method) */
