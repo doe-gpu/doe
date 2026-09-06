@@ -23,6 +23,69 @@ HoloScript LIF fixture preserves an external shader and CPU twin while adapting
 orchestration to a prepared program. These diagnostic cases do not complete the
 external-application portfolio or general WebGPU conformance requirements.
 
+## Bounded candidate jobs
+
+`python3 bench/cli.py program candidate --help` is the repository front door
+for evaluating candidate WGSL. The acceptance job is independent of the candidate:
+[`program-candidate.schema.json`](../config/program-candidate.schema.json) binds
+the original descriptor, replaceable shader, trusted CPU reference, declared
+dependencies, input bytes, float64 expected results, numerical tolerances,
+process/resource limits, sampling, and required performance. Pin the job hash
+before candidate development. Changing an acceptance file requires a new job;
+changing the candidate cannot silently change its acceptance.
+
+Reproduce the included search fixtures with
+`python3 bench/fixtures/program-candidate/prepare.py`, then
+`python3 bench/fixtures/program-candidate/prepare-batched.py`. Each prints its
+job hash. The batch is a distinct useful operation; it does not overwrite the
+single-query result or make a slower single query acceptable.
+
+```bash
+python3 bench/cli.py program candidate \
+  --job bench/fixtures/program-candidate/batched-job.json \
+  --job-sha256 <independently-pinned-job-hash> \
+  --candidate bench/fixtures/program-candidate/batched-distance.wgsl \
+  --package-qualification <retained-package-summary.json> \
+  --output bench/out/compute-program/<new-run> \
+  --node /usr/bin/node --backend vulkan --execution gpu-recorded
+```
+
+The runner installs the exact qualified packages, snapshots acceptance inputs,
+and runs the trusted reference and candidate in separate processes. It retains
+every first, warmup, and timed output. Independent verification recomputes
+numerical acceptance and timing summaries, then checks native shader identities,
+dispatch geometry, submissions, and SPIR-V. Worker timing includes input cloning
+through float32 output, including GPU upload, completion, and readback; parent
+IPC time, process preparation, device initialization, CPU time, sampled process
+RSS, and teardown are reported separately. The same prepared program survives
+between cases; each case's first invocation is identified separately. Preparation
+recovery includes process creation and the first-invocation difference.
+Native journaling remains enabled and contributes to GPU
+path cost. Acceptance requires correct outputs and the job's performance and
+preparation-recovery criteria on every case. Results remain diagnostic; a CPU
+reference comparison is neither incumbent-provider qualification nor production
+promotion.
+
+Use `--previous <summary.json>` to check environment changes. It verifies prior
+artifact hashes and compares adapter/driver identity, OS/kernel, Node binary,
+and file-backed loaded runtime/driver hashes. Kernel-provided virtual objects
+are identified separately. Every invocation reruns acceptance regardless of
+whether the environment changed; previous acceptance never substitutes for
+fresh execution. Raw outputs, sources, inputs, package archives, and manifests
+are retained under the output directory.
+
+Migration: the job, execution, and report schemas are additive repository-only
+contracts. Public compute-program semantics and `run()` completion are unchanged.
+The initial candidate executor accepts fixed invocation-lifetime buffer programs
+on Vulkan and explicitly selected execution modes. Resident jobs, texture jobs,
+Metal/D3D12 qualification, and automatic candidate generation are outside this
+executor. References are trusted code; declared dependency hashes do not create
+an OS sandbox or prove complete dependency closure. Heap and requested-buffer
+limits do not measure or cap peak native/GPU memory. Deadlines terminate the
+declared process scope but cannot preempt a GPU kernel or establish driver-loss
+recovery. Independent external applications and physical platform acceptance
+remain necessary before broader claims.
+
 ## Execution and lifetime
 
 The shipped Node example at

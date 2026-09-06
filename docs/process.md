@@ -317,6 +317,17 @@ isolated-host qualification remains necessary. Numerical audits and historical
 policies retain their existing contracts. Migration and observation limits are
 documented in [`reusable-compute-programs.md`](reusable-compute-programs.md).
 
+Bounded WGSL candidate jobs use `bench/cli.py program candidate`. Admission
+requires the independently pinned acceptance job, unchanged reference/input
+hashes, valid declared resource budgets, exact qualified package bytes, every
+numerical oracle, native execution identities, and completed cleanup. Timings
+cannot rescue a failed oracle. Candidate acceptance applies only to the frozen
+job's criteria and remains diagnostic; promotion still follows the normal
+blocking gates and physical backend requirements. An environment change forces
+fresh execution; unchanged identity also reruns acceptance. Additive job and
+receipt contracts and migration are documented in
+[`reusable-compute-programs.md`](reusable-compute-programs.md#bounded-candidate-jobs).
+
 ## Refactor law
 
 Behavior-preserving refactors follow this evidence sequence:

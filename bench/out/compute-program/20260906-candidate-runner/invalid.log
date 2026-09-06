@@ -1,0 +1,1 @@
+{"status": "rejected", "error": "shaders.distance: expected valid WGSL; received Vulkan WGSL\u2192SPIR-V compilation failed: parser: UnexpectedToken at 1:27 near `@compute fn main( invalid source`", "summary": "/home/x/deco/doe/bench/out/compute-program/20260906-candidate-runner/invalid/summary.json"}

@@ -25,13 +25,17 @@ External application reproduction starts at
 build identity, policy gates, workload execution, and receipt routing; a
 passing command is still not a public claim.
 
-Declared compute programs use `program prepare-lif`, `program evaluate`,
+Declared compute programs use `program candidate`, `program prepare-lif`, `program evaluate`,
 `program qualify-package`, `program verify`, and `program verify-native`.
 Use `program evaluate --package-qualification <summary.json>` to compare
 applications using the exact archives retained by package qualification.
 Install the pinned comparator dependencies with `npm ci --prefix bench`.
 Their policy and evidence boundaries are documented in
 [`reusable-compute-programs.md`](../docs/reusable-compute-programs.md).
+
+`program candidate` evaluates WGSL against an independently pinned job containing
+a trusted CPU reference, frozen numerical oracles, input files, resource limits,
+and performance acceptance. See the [candidate workflow](../docs/reusable-compute-programs.md#bounded-candidate-jobs).
 
 ## First benchmark matrix
 

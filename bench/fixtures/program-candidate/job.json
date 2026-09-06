@@ -1,0 +1,127 @@
+{
+  "candidateShaderId": "distance",
+  "cases": [
+    {
+      "expected": {
+        "hash": "c35020473aed1b4642cd726cad727b63fff2824ad68cedd7ffb73c7cbd890479",
+        "path": "data/zero.expected.f64"
+      },
+      "id": "zero",
+      "inputs": {
+        "database": {
+          "hash": "bb9f8df61474d25e71fa00722318cd387396ca1736605e1248821cc0de3d3af8",
+          "path": "data/zero.database.f32"
+        },
+        "parameters": {
+          "hash": "c4bca57adcd9a25b4258723e33aa4975df37363267d521a5b98838a5f54bd286",
+          "path": "data/parameters.u32"
+        },
+        "query": {
+          "hash": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "path": "data/zero.query.f32"
+        }
+      }
+    },
+    {
+      "expected": {
+        "hash": "47e949bb76149cc5c29b31c5952c02f8d5b2299c1637422f01ca741bd6cc4948",
+        "path": "data/signed.expected.f64"
+      },
+      "id": "signed",
+      "inputs": {
+        "database": {
+          "hash": "16f58f546c4f29a1609b95537921f6acc6157e0b493df38957ce2bc6bf30edca",
+          "path": "data/signed.database.f32"
+        },
+        "parameters": {
+          "hash": "c4bca57adcd9a25b4258723e33aa4975df37363267d521a5b98838a5f54bd286",
+          "path": "data/parameters.u32"
+        },
+        "query": {
+          "hash": "5690661e968928cf959446ee427304ed891a822f3097b64bb838c0a2425a99ed",
+          "path": "data/signed.query.f32"
+        }
+      }
+    },
+    {
+      "expected": {
+        "hash": "9a25fdf4a5d6387607b9b10b1ab35f6274cb27959db24768039050693b4fd2cd",
+        "path": "data/ramp.expected.f64"
+      },
+      "id": "ramp",
+      "inputs": {
+        "database": {
+          "hash": "4cb3bc4119e6b5b01b9a9b02162cf57b72daff8917c93adb87a02fe6d61733f9",
+          "path": "data/ramp.database.f32"
+        },
+        "parameters": {
+          "hash": "c4bca57adcd9a25b4258723e33aa4975df37363267d521a5b98838a5f54bd286",
+          "path": "data/parameters.u32"
+        },
+        "query": {
+          "hash": "5690661e968928cf959446ee427304ed891a822f3097b64bb838c0a2425a99ed",
+          "path": "data/ramp.query.f32"
+        }
+      }
+    },
+    {
+      "expected": {
+        "hash": "22b95f62e679f9f6c4f2e0de9920e9394e4d14a81e3f75a89c39d3b9ef033942",
+        "path": "data/mixed_scale.expected.f64"
+      },
+      "id": "mixed_scale",
+      "inputs": {
+        "database": {
+          "hash": "0751872d87ae85ea6fe90675fba352ed705dc9cc09e0c34d71a9ed2d0f5ca7f5",
+          "path": "data/mixed_scale.database.f32"
+        },
+        "parameters": {
+          "hash": "c4bca57adcd9a25b4258723e33aa4975df37363267d521a5b98838a5f54bd286",
+          "path": "data/parameters.u32"
+        },
+        "query": {
+          "hash": "5690661e968928cf959446ee427304ed891a822f3097b64bb838c0a2425a99ed",
+          "path": "data/mixed_scale.query.f32"
+        }
+      }
+    }
+  ],
+  "dependencies": [],
+  "id": "vector_distance",
+  "limits": {
+    "jobTimeoutMs": 120000,
+    "maximumDeclaredBufferBytes": 8388608,
+    "maximumDispatches": 1,
+    "maximumFixtureBytes": 33554432,
+    "maximumHeapMiB": 128,
+    "maximumProcessOutputBytes": 1048576,
+    "maximumShaderBytes": 65536,
+    "maximumWorkgroups": 4096,
+    "requestTimeoutMs": 10000
+  },
+  "oracle": {
+    "absoluteTolerance": 1e-05,
+    "expectedFormat": "float64-le",
+    "outputFormat": "float32-le",
+    "relativeTolerance": 2e-05
+  },
+  "performance": {
+    "maximumPreparationRecoveryRuns": 1000,
+    "minimumP50Ratio": 1.05,
+    "minimumP95Ratio": 1.05
+  },
+  "program": {
+    "hash": "8083fe48508c3a2f2b05998347c77d09f8f10c83683447184f61b4bcb0cda2f9",
+    "path": "program.json"
+  },
+  "reference": {
+    "hash": "7d75016231e76874f42b53f84838888fb8996b851d7dbe2bf1b9f0e69d78d4df",
+    "path": "reference.mjs"
+  },
+  "sampling": {
+    "percentileMethod": "nearest-rank",
+    "timedRuns": 30,
+    "warmupRuns": 5
+  },
+  "schemaVersion": 1
+}

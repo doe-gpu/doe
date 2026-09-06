@@ -1,0 +1,7 @@
+single 1
+batched-gpu 0
+batched-repeat 0
+batched-webgpu 0
+batched-native 0
+invalid 1
+wrong 1

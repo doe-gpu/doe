@@ -1,5 +1,28 @@
 # Reusable compute programs
 
+## Bounded candidate development
+
+`bench/cli.py program candidate` accepts candidate WGSL against a separately
+pinned reference job. It retains numerical outputs, validates native shader and
+submission identity, enforces declared resource/process limits, and requires
+fresh acceptance when comparing execution environments. The candidate can change
+its declared shader; acceptance inputs and policy remain hash-bound. The live
+simulation and candidate evaluator share the same process deadline/termination
+implementation without adding another public package API.
+
+The job, execution, and report contracts and migration are described in
+[reusable compute programs](../reusable-compute-programs.md#bounded-candidate-jobs).
+Qualification of the exact package is retained at
+`bench/out/compute-program/20260906-candidate-qualified/summary.json`.
+Search results, rejected candidates, environment comparisons, raw outputs,
+native journals, and reproduction commands are indexed by
+`bench/out/compute-program/20260906-candidate-runner/README.md`.
+These CPU-reference jobs remain diagnostic. They do not establish an incumbent
+GPU-provider advantage, general acceleration of unfamiliar routines, complete
+dependency isolation, peak GPU memory, or physical driver-loss recovery.
+Physical Metal/D3D12, prolonged simulation resource behavior, and composed
+program submission/copy measurements remain execution work.
+
 ## Live simulation editing
 
 The shipped Node terminal example has a resident heat simulation, parameter

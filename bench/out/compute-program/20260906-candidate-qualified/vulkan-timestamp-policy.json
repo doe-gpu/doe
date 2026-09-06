@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "resolveUnits": "nanoseconds",
+  "conversion": "exact-f32-period-floor-modulo-u64",
+  "workgroupSize": 64
+}

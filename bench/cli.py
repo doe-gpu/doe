@@ -26,6 +26,10 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROGRAM_COMMANDS = {
+    "candidate": (
+        [sys.executable, "-m", "bench.runners.run_program_candidate"],
+        "Evaluate candidate WGSL against a pinned reference job and retained package",
+    ),
     "evaluate": (
         [sys.executable, "-m", "bench.runners.run_compute_program_evidence"],
         "Audit and measure declared programs on a physical backend",

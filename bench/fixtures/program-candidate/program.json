@@ -1,0 +1,66 @@
+{
+  "buffers": [
+    {
+      "id": "database",
+      "role": "input",
+      "size": 4194304,
+      "type": "storage"
+    },
+    {
+      "id": "query",
+      "role": "input",
+      "size": 1024,
+      "type": "storage"
+    },
+    {
+      "id": "parameters",
+      "role": "input",
+      "size": 16,
+      "type": "uniform"
+    },
+    {
+      "id": "output",
+      "role": "output",
+      "size": 16384,
+      "type": "storage"
+    }
+  ],
+  "id": "vector_distance",
+  "output": "output",
+  "schemaVersion": 1,
+  "shaders": [
+    {
+      "code": "struct Parameters { rows: u32, dimensions: u32, pad0: u32, pad1: u32 }\n@group(0) @binding(0) var<storage, read> database: array<f32>;\n@group(0) @binding(1) var<storage, read> query: array<f32>;\n@group(0) @binding(2) var<uniform> parameters: Parameters;\n@group(0) @binding(3) var<storage, read_write> output: array<f32>;\nvar<workgroup> partial: array<f32, 64>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(workgroup_id) group: vec3<u32>, @builtin(local_invocation_id) local: vec3<u32>) {\n  let row = group.x;\n  let lane = local.x;\n  var distance = 0.0;\n  for (var column = lane; column < parameters.dimensions; column += 64u) {\n    let difference = database[row * parameters.dimensions + column] - query[column];\n    distance += difference * difference;\n  }\n  partial[lane] = distance;\n  workgroupBarrier();\n  for (var stride = 32u; stride > 0u; stride /= 2u) {\n    if (lane < stride) { partial[lane] += partial[lane + stride]; }\n    workgroupBarrier();\n  }\n  if (lane == 0u) { output[row] = partial[0]; }\n}\n",
+      "entryPoint": "main",
+      "id": "distance"
+    }
+  ],
+  "steps": [
+    {
+      "bindings": [
+        {
+          "binding": 0,
+          "buffer": "database"
+        },
+        {
+          "binding": 1,
+          "buffer": "query"
+        },
+        {
+          "binding": 2,
+          "buffer": "parameters"
+        },
+        {
+          "binding": 3,
+          "buffer": "output"
+        }
+      ],
+      "shader": "distance",
+      "workgroups": [
+        4096,
+        1,
+        1
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+PASS omitted acceptance case: Native submissions differ from accepted invocation work
+PASS changed timing summary: Latency summary differs from raw samples
+PASS skipped native dispatch in receipt: Candidate receipt differs from declared useful work
+PASS forged output identity: Retained output bytes changed

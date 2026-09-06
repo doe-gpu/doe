@@ -2,12 +2,12 @@
 import { requestAdapter } from '../../src/native.js';
 import { prepareComputeProgram } from '../../src/compute-program.js';
 import { descriptor, parameters } from './program.js';
+import { serveRequests } from '../../src/node-process-requests.js';
 
 let adapter;
 let device;
 let program;
 let pending;
-let chain = Promise.resolve();
 
 async function command(type, input) {
   switch (type) {
@@ -52,16 +52,4 @@ async function command(type, input) {
   }
 }
 
-process.on('message', (message) => {
-  chain = chain.then(async () => {
-    try {
-      const result = await command(message.type, message.input);
-      process.send({ id: message.id, result }, (error) => {
-        if (error) process.exitCode = 1;
-        if (message.type === 'close') process.disconnect();
-      });
-    } catch (error) {
-      process.send({ id: message.id, error: { code: error.code ?? 'DOE_LIVE_WORKER', message: error.message } });
-    }
-  }).catch(() => { process.exitCode = 1; process.disconnect(); });
-});
+serveRequests(command);

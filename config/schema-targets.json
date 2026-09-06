@@ -2,6 +2,22 @@
   "schemaVersion": 2,
   "targets": [
     {
+      "schema": "config/compute-program.schema.json",
+      "data": "bench/fixtures/program-candidate/batched-program.json"
+    },
+    {
+      "schema": "config/compute-program.schema.json",
+      "data": "bench/fixtures/program-candidate/program.json"
+    },
+    {
+      "schema": "config/program-candidate.schema.json",
+      "data": "bench/fixtures/program-candidate/batched-job.json"
+    },
+    {
+      "schema": "config/program-candidate.schema.json",
+      "data": "bench/fixtures/program-candidate/job.json"
+    },
+    {
       "schema": "config/live-simulation.schema.json",
       "data": "config/live-simulation.json"
     },
@@ -1448,7 +1464,8 @@
     {
       "schemasByKind": {
         "compute_program_matrix": "config/compute-program-matrix.schema.json",
-        "compute_program_package_qualification": "config/compute-program-package.schema.json"
+        "compute_program_package_qualification": "config/compute-program-package.schema.json",
+        "program_candidate_acceptance": "config/program-candidate-report.schema.json"
       },
       "glob": "bench/out/compute-program/*-final/summary.json",
       "allowEmpty": true
@@ -1466,6 +1483,11 @@
     {
       "schema": "config/compute-program-gpu-activity.schema.json",
       "glob": "bench/out/compute-program/*/*.gpu-activity.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/program-candidate-report.schema.json",
+      "glob": "bench/out/compute-program/*-candidate-runner/*/summary.json",
       "allowEmpty": true
     }
   ]

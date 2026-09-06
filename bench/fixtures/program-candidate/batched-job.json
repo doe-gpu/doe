@@ -1,0 +1,132 @@
+{
+  "candidateShaderId": "distance",
+  "cases": [
+    {
+      "expected": {
+        "hash": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+        "path": "data/zero.batched-expected.f64"
+      },
+      "id": "zero",
+      "inputs": {
+        "database": {
+          "hash": "bb9f8df61474d25e71fa00722318cd387396ca1736605e1248821cc0de3d3af8",
+          "path": "data/zero.database.f32"
+        },
+        "parameters": {
+          "hash": "b8cf287ad14d3c396fd95bc0da5d56cca6f7e767eef57c6f571e458a3fea0fbd",
+          "path": "data/batched-parameters.u32"
+        },
+        "query": {
+          "hash": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+          "path": "data/zero.batched-query.f32"
+        }
+      }
+    },
+    {
+      "expected": {
+        "hash": "c2c4a5c03900e3ac2cd06e95932bc7c239777185c2f3aa12e49b5836a3e337e6",
+        "path": "data/signed.batched-expected.f64"
+      },
+      "id": "signed",
+      "inputs": {
+        "database": {
+          "hash": "16f58f546c4f29a1609b95537921f6acc6157e0b493df38957ce2bc6bf30edca",
+          "path": "data/signed.database.f32"
+        },
+        "parameters": {
+          "hash": "b8cf287ad14d3c396fd95bc0da5d56cca6f7e767eef57c6f571e458a3fea0fbd",
+          "path": "data/batched-parameters.u32"
+        },
+        "query": {
+          "hash": "7f57d9a994d15cee6ca2527f6b8407c13255f3093de84e5cd51b18f59bac0ebb",
+          "path": "data/signed.batched-query.f32"
+        }
+      }
+    },
+    {
+      "expected": {
+        "hash": "109dcf0d7023805a6d64531f373aeb0edf373d6f9a8e069c3654a5df09c4ad97",
+        "path": "data/ramp.batched-expected.f64"
+      },
+      "id": "ramp",
+      "inputs": {
+        "database": {
+          "hash": "4cb3bc4119e6b5b01b9a9b02162cf57b72daff8917c93adb87a02fe6d61733f9",
+          "path": "data/ramp.database.f32"
+        },
+        "parameters": {
+          "hash": "b8cf287ad14d3c396fd95bc0da5d56cca6f7e767eef57c6f571e458a3fea0fbd",
+          "path": "data/batched-parameters.u32"
+        },
+        "query": {
+          "hash": "7f57d9a994d15cee6ca2527f6b8407c13255f3093de84e5cd51b18f59bac0ebb",
+          "path": "data/ramp.batched-query.f32"
+        }
+      }
+    },
+    {
+      "expected": {
+        "hash": "e46dcbde10d9847602683164c5a143a7c2aa02f746f1ccea82c921b427590f58",
+        "path": "data/mixed_scale.batched-expected.f64"
+      },
+      "id": "mixed_scale",
+      "inputs": {
+        "database": {
+          "hash": "0751872d87ae85ea6fe90675fba352ed705dc9cc09e0c34d71a9ed2d0f5ca7f5",
+          "path": "data/mixed_scale.database.f32"
+        },
+        "parameters": {
+          "hash": "b8cf287ad14d3c396fd95bc0da5d56cca6f7e767eef57c6f571e458a3fea0fbd",
+          "path": "data/batched-parameters.u32"
+        },
+        "query": {
+          "hash": "7f57d9a994d15cee6ca2527f6b8407c13255f3093de84e5cd51b18f59bac0ebb",
+          "path": "data/mixed_scale.batched-query.f32"
+        }
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "hash": "7d75016231e76874f42b53f84838888fb8996b851d7dbe2bf1b9f0e69d78d4df",
+      "path": "reference.mjs"
+    }
+  ],
+  "id": "batched_vector_distance",
+  "limits": {
+    "jobTimeoutMs": 120000,
+    "maximumDeclaredBufferBytes": 8388608,
+    "maximumDispatches": 1,
+    "maximumFixtureBytes": 33554432,
+    "maximumHeapMiB": 128,
+    "maximumProcessOutputBytes": 1048576,
+    "maximumShaderBytes": 65536,
+    "maximumWorkgroups": 65536,
+    "requestTimeoutMs": 10000
+  },
+  "oracle": {
+    "absoluteTolerance": 1e-05,
+    "expectedFormat": "float64-le",
+    "outputFormat": "float32-le",
+    "relativeTolerance": 2e-05
+  },
+  "performance": {
+    "maximumPreparationRecoveryRuns": 1000,
+    "minimumP50Ratio": 1.05,
+    "minimumP95Ratio": 1.05
+  },
+  "program": {
+    "hash": "1efb748d92c12e70c517aa6877af8cb68c0458d410876c206daec7c125b2cf62",
+    "path": "batched-program.json"
+  },
+  "reference": {
+    "hash": "051a2bbb669429e71c1f530b019683e9db97d753ae7606389b06c383b0127e32",
+    "path": "batched-reference.mjs"
+  },
+  "sampling": {
+    "percentileMethod": "nearest-rank",
+    "timedRuns": 30,
+    "warmupRuns": 5
+  },
+  "schemaVersion": 1
+}

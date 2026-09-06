@@ -3,6 +3,7 @@
 const contracts = [
   './unit/compute-program.test.js',
   './unit/live-simulation.test.js',
+  './unit/node-process-requests.test.js',
   './unit/browser-runtime-identity.test.js',
   './unit/node-webgpu-provider-v1.test.js',
   './unit/node-webgpu-governed-execution.test.js',
