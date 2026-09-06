@@ -12,6 +12,14 @@ qualification are indexed under
 Public declaration and receipt schemas are unchanged. Rendering dependency
 ownership, general object garbage collection, and physical driver loss remain
 outside this acceptance evidence.
+Qualification exposed unreleased finished encoder handles and an Electron crash
+from unchecked external ArrayBuffer creation. Consumed command handles now
+release; native-direct mapping uses host-owned storage with writable copy-back
+and range detachment. The same retained-package regression exercises those
+paths across the controlled hosts. Earlier native-direct mapping timings do not
+measure the same host-copy work.
+The exact-package application oracles and native SPIR-V checks are retained in
+`bench/out/compute-program/20260906-command-ownership-audits/`.
 
 ## Evidence schema routing
 

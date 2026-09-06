@@ -162,6 +162,9 @@ classified and cannot be promoted by benchmark results.
   fused construction. Compute passes and command buffers retain the encoder or
   device needed for cleanup. Explicit destruction remains a separate invalidation
   boundary; this does not admit automatic garbage collection of other objects.
+  Native-direct package tests also reject duplicate and consumed submissions,
+  verify writable mapping copy-back and read-only mapping isolation, and require
+  mapped-range detachment on unmap. Run the same test in every qualified host.
 - Program receipt version 5 overlaps queue completion with readback mapping and
   waits for both. Failure and cancellation tests must preserve ownership until
   both settle, including either callback order and a rejected mapping. Mapping

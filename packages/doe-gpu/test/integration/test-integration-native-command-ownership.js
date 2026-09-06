@@ -22,11 +22,16 @@ const adapter = await gpu.requestAdapter();
 const device = await adapter.requestDevice();
 const usage = globals.GPUBufferUsage;
 const input = new Uint32Array([17, 29, 43, 71]);
-const source = device.createBuffer({ size: input.byteLength, usage: usage.COPY_SRC | usage.COPY_DST });
+const source = device.createBuffer({
+  size: input.byteLength, usage: usage.MAP_WRITE | usage.COPY_SRC, mappedAtCreation: true,
+});
 const output = device.createBuffer({ size: input.byteLength, usage: usage.MAP_READ | usage.COPY_DST });
 const commands = [];
 try {
-  device.queue.writeBuffer(source, 0, input);
+  const creationRange = source.getMappedRange();
+  new Uint32Array(creationRange).set(input);
+  source.unmap();
+  assert.equal(creationRange.byteLength, 0);
   for (let index = 0; index < 3; index += 1) {
     const encoder = device.createCommandEncoder();
     encoder.copyBufferToBuffer(source, 0, output, 0, input.byteLength);
@@ -40,7 +45,26 @@ try {
   device.queue.submit(commands.slice(1));
   await device.queue.onSubmittedWorkDone();
   await output.mapAsync(globals.GPUMapMode.READ);
-  assert.deepEqual(new Uint32Array(output.getMappedRange()).slice(), input);
+  const readRange = output.getMappedRange();
+  assert.deepEqual(new Uint32Array(readRange).slice(), input);
+  new Uint32Array(readRange).fill(0);
+  output.unmap();
+  assert.equal(readRange.byteLength, 0);
+  await output.mapAsync(globals.GPUMapMode.READ);
+  assert.deepEqual(new Uint32Array(output.getMappedRange()).slice(), input,
+    'read mapping changes must not write back to the GPU buffer');
+  output.unmap();
+  await source.mapAsync(globals.GPUMapMode.WRITE);
+  const writeRange = source.getMappedRange();
+  const updated = Uint32Array.from(input, value => value + 1);
+  new Uint32Array(writeRange).set(updated);
+  source.unmap();
+  assert.equal(writeRange.byteLength, 0);
+  const encoder = device.createCommandEncoder();
+  encoder.copyBufferToBuffer(source, 0, output, 0, input.byteLength);
+  device.queue.submit([encoder.finish()]);
+  await output.mapAsync(globals.GPUMapMode.READ);
+  assert.deepEqual(new Uint32Array(output.getMappedRange()).slice(), updated);
   output.unmap();
 } finally {
   source.destroy();
@@ -50,4 +74,4 @@ try {
 }
 assert.deepEqual(drmClients(), before, 'consumed commands must not retain a device client');
 assert.equal(commands.length, 3);
-console.log('ok: consumed command ownership, rejected resubmission, and complete device cleanup');
+console.log('ok: consumed commands, rejected resubmission, mapping write-back and detachment, device cleanup');

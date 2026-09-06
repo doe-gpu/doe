@@ -89,6 +89,16 @@ same ownership rule, including failed preparation. This corrects caller-release
 lifetimes without changing public declarations or receipts. Explicit resource
 destruction still invalidates its backing storage. General JavaScript garbage
 collection and rendering dependency ownership require separate qualification.
+Native-direct JavaScript submission consumes command buffers and rejects reused
+or duplicate buffers before submission. Finished encoders and ended compute
+passes release their native handles. Native-direct mapped ranges use host-owned
+ArrayBuffers on every host; writable mappings copy back before unmap, read
+mappings do not, and unmap or destruction detaches the returned range. This
+replaces external ArrayBuffers that Electron cannot create. The existing
+mapped-range timing includes the host copy, so older native-direct measurements
+do not establish the same readback cost. Package qualification checks command
+consumption, mapped-at-creation writes, write remapping, and detachment in each
+controlled host. These corrections add no public fields or fallback mode.
 Compatible descriptor layouts permit sharing the compiled pipeline while
 keeping descriptor sets independent, as specified by
 [Vulkan layout compatibility](https://docs.vulkan.org/spec/latest/chapters/descriptorsets.html#descriptorsets-compatibility).

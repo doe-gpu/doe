@@ -533,7 +533,7 @@ napi_value native_direct_buffer_map_async(napi_env env, napi_callback_info info)
 }
 
 static bool native_direct_flush_mapped_range(napi_env env, NativeDirectBufferCache* cache) {
-    if (!cache || !cache->mapped_range_ref || cache->map_mode != WGPUMapMode_Write) return true;
+    if (!cache || !cache->mapped_range_ref || cache->map_mode != DOE_GPU_MAP_WRITE) return true;
     napi_value range;
     void* bytes = NULL;
     size_t size = 0;

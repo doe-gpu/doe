@@ -3,6 +3,10 @@
   "targets": [
     {
       "schema": "config/compute-program-package.schema.json",
+      "data": "bench/out/compute-program/20260906-command-ownership-qualified-mapping/summary.json"
+    },
+    {
+      "schema": "config/compute-program-package.schema.json",
       "data": "bench/out/compute-program/20260906-resource-lifetime-qualified/summary.json"
     },
     {
