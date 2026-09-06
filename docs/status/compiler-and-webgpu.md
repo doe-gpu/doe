@@ -3,6 +3,27 @@
 This is the live status front door for the non-TSIR WGSL compiler and WebGPU
 runtime path. Artifacts and executable tests own pass/fail state.
 
+## Transactional fused command construction
+
+The native fused compute entrypoints now use a typed recording builder that
+reserves storage before taking resource references. Failed construction releases
+all earlier commands and dependencies; only a completed command buffer is
+published. Its allocator remains attached through final cleanup. The C boundary
+reports the original failure through the device's existing error scopes.
+
+Allocation-fault tests exercise object allocation, command/reference list growth,
+aliased copy buffers, ownership transfer, and abandoned construction. Native
+scope tests check failed-copy diagnostics and cleanup. A direct C regression
+executes the single and batched native constructors after rejected construction,
+releases caller state before submission, and checks independent integer outputs.
+It uses the same library bytes as retained-package qualification; the addon's
+similarly named helper uses ordinary encoding and is separate evidence.
+The implementation, canonical tests, and retained-package regressions are indexed at
+`bench/out/compute-program/20260906-recorded-allocation/README.md`.
+Ordinary encoder, render bundle, and query recording still contain allocation
+failure paths requiring repair; this checkpoint does not qualify those paths or
+physical non-Vulkan execution.
+
 ## Depth attachment ownership
 
 Native Vulkan execution binds the application's retained depth texture and view

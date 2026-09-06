@@ -202,6 +202,16 @@ classified and cannot be promoted by benchmark results.
   fused construction. Compute passes and command buffers retain the encoder or
   device needed for cleanup. Explicit destruction remains a separate invalidation
   boundary; this does not admit automatic garbage collection of other objects.
+  Fused compute constructors reserve command/reference storage before retaining
+  dependencies and publish only after successful construction. Allocation-fault
+  tests cover the command-buffer object, list growth after earlier commands,
+  aliased copy buffers, abandoned builders, and allocator ownership after finish.
+  Native error scopes preserve allocation versus validation failures. These are
+  repairs to existing native entrypoints; no public fields or trace schemas change.
+  Direct C execution in `runtime/zig/tests/native_recorded_compute.c` must check
+  single and batched constructor outputs after caller release. Its library hash
+  must match the retained package. The addon's ordinary encoding helper is a
+  different path and cannot stand in for this native-constructor check.
   Native-direct package tests also reject duplicate and consumed submissions,
   verify writable mapping copy-back and read-only mapping isolation, and require
   mapped-range detachment on unmap. Run the same test in every qualified host.

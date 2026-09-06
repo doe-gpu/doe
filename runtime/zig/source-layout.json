@@ -3490,9 +3490,9 @@
       },
       "src/native/command/doe_encoder_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "f410cec26854695978a79d1c38242a82affd53180a14b7a1a22bbe23cbc66455",
-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
-        "reviewer": "codex-render-ownership/2026-09-06"
+        "moduleSha256": "46951f4f059864627f6e2db777eae94138d7280a6c0ddbf961c1bf3e19b4b56e",
+        "reason": "Keep: native command buffers release all command storage through their explicit owning allocator.",
+        "reviewer": "codex-recorded-allocation/2026-09-06"
       },
       "src/native/command/doe_immediates_external_native.zig": {
         "decision": "Keep",
@@ -3514,9 +3514,9 @@
       },
       "src/native/compute/doe_compute_fast.zig": {
         "decision": "Keep",
-        "moduleSha256": "b50b9632456d64a6403cffdf69afd77a4668923597392ba9ed7a3d11ca1bfeaa",
-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
-        "reviewer": "codex-render-ownership/2026-09-06"
+        "moduleSha256": "854a6193877a8ffd3a8dc27195a75a2bc20adb6e0abf5046a5c9f156c3345530",
+        "reason": "Keep: native fused C entrypoints adapt to the transactional recorded-compute owner; direct submission remains local.",
+        "reviewer": "codex-recorded-allocation/2026-09-06"
       },
       "src/native/compute/doe_compute_fast_vulkan.zig": {
         "decision": "Keep",
@@ -3754,9 +3754,9 @@
       },
       "src/native/support/doe_native_object_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "bcc5dd06f96e5f9062bb37d2dba8b82878aa4180e8f0a965a6754605eaa30ffd",
-        "reason": "Keep: native render-pass state owns whether attachments have actually been recorded, independently of API draw accounting.",
-        "reviewer": "codex-depth-ownership/2026-09-06"
+        "moduleSha256": "0301f5ba72a450f94bdf6bcb9b6a4607f9a2937e3d057badfb752943f22dd756",
+        "reason": "Keep: command buffers carry the allocator that owns their object and recorded storage through release.",
+        "reviewer": "codex-recorded-allocation/2026-09-06"
       },
       "src/native/support/doe_native_runtime_helpers.zig": {
         "decision": "Keep",
@@ -4297,6 +4297,12 @@
         "moduleSha256": "9a030fbd3207e2266c6ebaa1345655a2eb4a97f323a296a5848edf63d06f57d5",
         "reviewer": "codex-render-submission/2026-09-06",
         "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
+      },
+      "src/native/compute/doe_compute_recorded.zig": {
+        "decision": "Keep",
+        "moduleSha256": "76c82a35457e448fc2db1bba410c60111f135b3601ddccf0adc0dabd6856f887",
+        "reason": "Keep: private command construction owns allocation, retained dependencies, rollback, and publication for fused compute entrypoints.",
+        "reviewer": "codex-recorded-allocation/2026-09-06"
       }
     },
     "linePolicy": {

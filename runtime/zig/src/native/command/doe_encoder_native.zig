@@ -186,6 +186,7 @@ pub export fn doeNativeCommandEncoderFinish(enc_raw: ?*anyopaque, desc: ?*const 
     const cb = make(DoeCommandBuffer) orelse return null;
     native_helpers.object_add_ref(DoeDevice, toOpaque(enc.dev));
     cb.* = .{
+        .allocator = alloc,
         .dev = enc.dev,
         .device_ref = enc.dev,
         .cmds = enc.cmds,
@@ -203,10 +204,11 @@ pub export fn doeNativeCommandBufferRelease(raw: ?*anyopaque) callconv(.c) void 
         if (!native_helpers.object_should_destroy(cb)) return;
         label_store.remove(raw);
         query_native.releaseRecordedCommandReferences(cb.cmds.items);
-        cb.cmds.deinit(alloc);
-        references.releaseAll(&cb.references);
+        cb.cmds.deinit(cb.allocator);
+        @import("../../contracts/resource_lease.zig").releaseAll(cb.allocator, &cb.references);
         if (cb.device_ref) |dev| native_exports.doeNativeDeviceRelease(toOpaque(dev));
-        alloc.destroy(cb);
+        const allocator = cb.allocator;
+        allocator.destroy(cb);
     }
 }
 

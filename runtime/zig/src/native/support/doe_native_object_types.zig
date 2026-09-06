@@ -284,6 +284,7 @@ pub const DoeCommandBuffer = struct {
     pub const TYPE_MAGIC = MAGIC_CMD_BUFFER;
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
+    allocator: std.mem.Allocator,
     dev: *DoeDevice,
     device_ref: ?*DoeDevice = null,
     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},

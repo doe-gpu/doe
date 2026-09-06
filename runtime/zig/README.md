@@ -63,6 +63,17 @@ and current artifacts before making compatibility claims.
 Detailed tool invocations belong in focused runbooks and `zig build --help`,
 not this module entrypoint.
 
+## Native command ownership
+
+Canonical Zig tests inject allocation failures into private fused-command
+construction and check cleanup and publication. The direct C fixture at
+[`tests/native_recorded_compute.c`](tests/native_recorded_compute.c) exercises
+the exported constructors on AMD Vulkan after caller references are released.
+Build, execution, and retained-library reproduction commands are in the
+[allocation checkpoint](../../bench/out/compute-program/20260906-recorded-allocation/README.md).
+Package qualification separately verifies ordinary command ownership across
+the JavaScript/native boundary.
+
 ## Build edit measurements
 
 Run `python3 runtime/zig/tools/capture_build_measurements.py` from the repository

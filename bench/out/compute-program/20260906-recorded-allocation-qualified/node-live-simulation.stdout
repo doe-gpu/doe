@@ -1,0 +1,7 @@
+ok: invalid shader leaves the running state usable
+ok: independent acceptance rejects compiling but incorrect edits
+ok: obsolete edits cancel while the simulation advances during preflight
+ok: stale and declined reset decisions preserve the previous state
+ok: exact reset approval initializes and checks the replacement state
+ok: closing cancels candidate work and releases the live worker
+ok: a closed workspace reopens with independently checked initial state

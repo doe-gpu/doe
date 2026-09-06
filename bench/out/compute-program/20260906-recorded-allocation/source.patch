@@ -1,0 +1,802 @@
+diff --git a/docs/process.md b/docs/process.md
+index 0165feb8f..1a3c25449 100644
+--- a/docs/process.md
++++ b/docs/process.md
+@@ -202,6 +202,16 @@ classified and cannot be promoted by benchmark results.
+   fused construction. Compute passes and command buffers retain the encoder or
+   device needed for cleanup. Explicit destruction remains a separate invalidation
+   boundary; this does not admit automatic garbage collection of other objects.
++  Fused compute constructors reserve command/reference storage before retaining
++  dependencies and publish only after successful construction. Allocation-fault
++  tests cover the command-buffer object, list growth after earlier commands,
++  aliased copy buffers, abandoned builders, and allocator ownership after finish.
++  Native error scopes preserve allocation versus validation failures. These are
++  repairs to existing native entrypoints; no public fields or trace schemas change.
++  Direct C execution in `runtime/zig/tests/native_recorded_compute.c` must check
++  single and batched constructor outputs after caller release. Its library hash
++  must match the retained package. The addon's ordinary encoding helper is a
++  different path and cannot stand in for this native-constructor check.
+   Native-direct package tests also reject duplicate and consumed submissions,
+   verify writable mapping copy-back and read-only mapping isolation, and require
+   mapped-range detachment on unmap. Run the same test in every qualified host.
+diff --git a/docs/status/compiler-and-webgpu.md b/docs/status/compiler-and-webgpu.md
+index 5e0aeec01..102fbae00 100644
+--- a/docs/status/compiler-and-webgpu.md
++++ b/docs/status/compiler-and-webgpu.md
+@@ -3,6 +3,27 @@
+ This is the live status front door for the non-TSIR WGSL compiler and WebGPU
+ runtime path. Artifacts and executable tests own pass/fail state.
+ 
++## Transactional fused command construction
++
++The native fused compute entrypoints now use a typed recording builder that
++reserves storage before taking resource references. Failed construction releases
++all earlier commands and dependencies; only a completed command buffer is
++published. Its allocator remains attached through final cleanup. The C boundary
++reports the original failure through the device's existing error scopes.
++
++Allocation-fault tests exercise object allocation, command/reference list growth,
++aliased copy buffers, ownership transfer, and abandoned construction. Native
++scope tests check failed-copy diagnostics and cleanup. A direct C regression
++executes the single and batched native constructors after rejected construction,
++releases caller state before submission, and checks independent integer outputs.
++It uses the same library bytes as retained-package qualification; the addon's
++similarly named helper uses ordinary encoding and is separate evidence.
++The implementation, canonical tests, and retained-package regressions are indexed at
++`bench/out/compute-program/20260906-recorded-allocation/README.md`.
++Ordinary encoder, render bundle, and query recording still contain allocation
++failure paths requiring repair; this checkpoint does not qualify those paths or
++physical non-Vulkan execution.
++
+ ## Depth attachment ownership
+ 
+ Native Vulkan execution binds the application's retained depth texture and view
+diff --git a/runtime/zig/README.md b/runtime/zig/README.md
+index 1e15d650c..b2d729509 100644
+--- a/runtime/zig/README.md
++++ b/runtime/zig/README.md
+@@ -63,6 +63,17 @@ and current artifacts before making compatibility claims.
+ Detailed tool invocations belong in focused runbooks and `zig build --help`,
+ not this module entrypoint.
+ 
++## Native command ownership
++
++Canonical Zig tests inject allocation failures into private fused-command
++construction and check cleanup and publication. The direct C fixture at
++[`tests/native_recorded_compute.c`](tests/native_recorded_compute.c) exercises
++the exported constructors on AMD Vulkan after caller references are released.
++Build, execution, and retained-library reproduction commands are in the
++[allocation checkpoint](../../bench/out/compute-program/20260906-recorded-allocation/README.md).
++Package qualification separately verifies ordinary command ownership across
++the JavaScript/native boundary.
++
+ ## Build edit measurements
+ 
+ Run `python3 runtime/zig/tools/capture_build_measurements.py` from the repository
+diff --git a/runtime/zig/source-layout.json b/runtime/zig/source-layout.json
+index 7de48ccc6..2d95bbf83 100644
+--- a/runtime/zig/source-layout.json
++++ b/runtime/zig/source-layout.json
+@@ -3490,9 +3490,9 @@
+       },
+       "src/native/command/doe_encoder_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "f410cec26854695978a79d1c38242a82affd53180a14b7a1a22bbe23cbc66455",
+-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+-        "reviewer": "codex-render-ownership/2026-09-06"
++        "moduleSha256": "46951f4f059864627f6e2db777eae94138d7280a6c0ddbf961c1bf3e19b4b56e",
++        "reason": "Keep: native command buffers release all command storage through their explicit owning allocator.",
++        "reviewer": "codex-recorded-allocation/2026-09-06"
+       },
+       "src/native/command/doe_immediates_external_native.zig": {
+         "decision": "Keep",
+@@ -3514,9 +3514,9 @@
+       },
+       "src/native/compute/doe_compute_fast.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "b50b9632456d64a6403cffdf69afd77a4668923597392ba9ed7a3d11ca1bfeaa",
+-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+-        "reviewer": "codex-render-ownership/2026-09-06"
++        "moduleSha256": "854a6193877a8ffd3a8dc27195a75a2bc20adb6e0abf5046a5c9f156c3345530",
++        "reason": "Keep: native fused C entrypoints adapt to the transactional recorded-compute owner; direct submission remains local.",
++        "reviewer": "codex-recorded-allocation/2026-09-06"
+       },
+       "src/native/compute/doe_compute_fast_vulkan.zig": {
+         "decision": "Keep",
+@@ -3754,9 +3754,9 @@
+       },
+       "src/native/support/doe_native_object_types.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "bcc5dd06f96e5f9062bb37d2dba8b82878aa4180e8f0a965a6754605eaa30ffd",
+-        "reason": "Keep: native render-pass state owns whether attachments have actually been recorded, independently of API draw accounting.",
+-        "reviewer": "codex-depth-ownership/2026-09-06"
++        "moduleSha256": "0301f5ba72a450f94bdf6bcb9b6a4607f9a2937e3d057badfb752943f22dd756",
++        "reason": "Keep: command buffers carry the allocator that owns their object and recorded storage through release.",
++        "reviewer": "codex-recorded-allocation/2026-09-06"
+       },
+       "src/native/support/doe_native_runtime_helpers.zig": {
+         "decision": "Keep",
+@@ -4297,6 +4297,12 @@
+         "moduleSha256": "9a030fbd3207e2266c6ebaa1345655a2eb4a97f323a296a5848edf63d06f57d5",
+         "reviewer": "codex-render-submission/2026-09-06",
+         "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
++      },
++      "src/native/compute/doe_compute_recorded.zig": {
++        "decision": "Keep",
++        "moduleSha256": "76c82a35457e448fc2db1bba410c60111f135b3601ddccf0adc0dabd6856f887",
++        "reason": "Keep: private command construction owns allocation, retained dependencies, rollback, and publication for fused compute entrypoints.",
++        "reviewer": "codex-recorded-allocation/2026-09-06"
+       }
+     },
+     "linePolicy": {
+diff --git a/runtime/zig/src/native/command/doe_encoder_native.zig b/runtime/zig/src/native/command/doe_encoder_native.zig
+index d8e5a3737..5b26dfb6e 100644
+--- a/runtime/zig/src/native/command/doe_encoder_native.zig
++++ b/runtime/zig/src/native/command/doe_encoder_native.zig
+@@ -186,6 +186,7 @@ pub export fn doeNativeCommandEncoderFinish(enc_raw: ?*anyopaque, desc: ?*const
+     const cb = make(DoeCommandBuffer) orelse return null;
+     native_helpers.object_add_ref(DoeDevice, toOpaque(enc.dev));
+     cb.* = .{
++        .allocator = alloc,
+         .dev = enc.dev,
+         .device_ref = enc.dev,
+         .cmds = enc.cmds,
+@@ -203,10 +204,11 @@ pub export fn doeNativeCommandBufferRelease(raw: ?*anyopaque) callconv(.c) void
+         if (!native_helpers.object_should_destroy(cb)) return;
+         label_store.remove(raw);
+         query_native.releaseRecordedCommandReferences(cb.cmds.items);
+-        cb.cmds.deinit(alloc);
+-        references.releaseAll(&cb.references);
++        cb.cmds.deinit(cb.allocator);
++        @import("../../contracts/resource_lease.zig").releaseAll(cb.allocator, &cb.references);
+         if (cb.device_ref) |dev| native_exports.doeNativeDeviceRelease(toOpaque(dev));
+-        alloc.destroy(cb);
++        const allocator = cb.allocator;
++        allocator.destroy(cb);
+     }
+ }
+ 
+diff --git a/runtime/zig/src/native/compute/doe_compute_fast.zig b/runtime/zig/src/native/compute/doe_compute_fast.zig
+index 84b09a36e..7ef7a9014 100644
+--- a/runtime/zig/src/native/compute/doe_compute_fast.zig
++++ b/runtime/zig/src/native/compute/doe_compute_fast.zig
+@@ -1,8 +1,8 @@
+ const std = @import("std");
+ const native_types = @import("../support/doe_native_object_types.zig");
+ const native_helpers = @import("../support/doe_native_object_helpers.zig");
+-const native_cmds = @import("../support/doe_native_command_types.zig");
+-const references = @import("../command/doe_command_references.zig");
++const recorded = @import("doe_compute_recorded.zig");
++const error_scope = @import("../../runtime/diagnostics/error_scope.zig");
+ const native_exports = @import("../support/doe_native_exports.zig");
+ const vulkan_fast = @import("doe_compute_fast_vulkan.zig");
+ const compute_bind_groups = @import("doe_compute_bind_groups.zig");
+@@ -43,12 +43,9 @@ const DIRECT_DISPATCH_FLUSH_COMMAND_REPLAY_PREPARE_INDEX: usize = 9;
+ const DIRECT_DISPATCH_FLUSH_COMMAND_REPLAY_RECORD_INDEX: usize = 10;
+ const DIRECT_DISPATCH_FLUSH_COMMAND_REPLAY_COPY_INDEX: usize = 11;
+ const MAX_DIRECT_BATCH_DISPATCHES: usize = 64;
+-const RecordedCmd = native_cmds.RecordedCmd;
+-const DoeCommandBuffer = native_types.DoeCommandBuffer;
+ const DoeComputePipeline = native_types.DoeComputePipeline;
+ const DoeDevice = native_types.DoeDevice;
+ const alloc = native_helpers.alloc;
+-const make = native_helpers.make;
+ const toOpaque = native_helpers.toOpaque;
+ 
+ fn bindMetalResourcesFromRaw(
+@@ -333,92 +330,47 @@ fn encodeDispatchBatchToComputeEncoder(
+     return true;
+ }
+ 
+-fn appendRecordedDispatch(
+-    cb: *DoeCommandBuffer,
+-    pipe: *DoeComputePipeline,
+-    bg_ptrs: [*]const ?*anyopaque,
+-    bg_count: u32,
+-    dx: u32,
+-    dy: u32,
+-    dz: u32,
+-) bool {
+-    var bind_groups: [MAX_COMPUTE_BIND_GROUPS]?*native_types.DoeBindGroup = [_]?*native_types.DoeBindGroup{null} ** MAX_COMPUTE_BIND_GROUPS;
+-    for (0..@min(bg_count, MAX_COMPUTE_BIND_GROUPS)) |i| {
+-        bind_groups[i] = native_helpers.cast(native_types.DoeBindGroup, bg_ptrs[i]);
+-    }
+-    compute_preconditions.validate_bind_groups(
+-        pipe.dispatch_preconditions,
+-        pipe.texture_dispatch_preconditions,
+-        bind_groups[0..],
+-        .{ dx, dy, dz },
+-        .{ pipe.wg_x, pipe.wg_y, pipe.wg_z },
+-    ) catch {
+-        std.log.err("doe_compute_fast: command buffer dispatch precondition failed for proof-elided shader", .{});
+-        return false;
+-    };
++fn recordedDispatch(pipeline: *DoeComputePipeline, groups: [*]const ?*anyopaque, count: u32, workgroups: [3]u32) recorded.Dispatch {
++    var request = recorded.Dispatch{ .pipeline = pipeline, .workgroups = workgroups };
++    for (0..@min(count, MAX_COMPUTE_BIND_GROUPS)) |index|
++        request.bind_groups[index] = native_helpers.cast(native_types.DoeBindGroup, groups[index]);
++    return request;
++}
+ 
+-    var cmd = RecordedCmd{ .dispatch = .{
+-        .compute_pipeline = toOpaque(pipe),
+-        .pso = pipe.mtl_pso,
+-        .needs_sizes_buf = pipe.needs_sizes_buf,
+-        .bufs = [_]?*anyopaque{null} ** MAX_FLAT_BIND,
+-        .buf_offsets = [_]u64{0} ** MAX_FLAT_BIND,
+-        .buf_sizes = [_]u64{0} ** MAX_FLAT_BIND,
+-        .buf_count = 0,
+-        .x = dx,
+-        .y = dy,
+-        .z = dz,
+-        .wg_x = pipe.wg_x,
+-        .wg_y = pipe.wg_y,
+-        .wg_z = pipe.wg_z,
+-    } };
+-    cmd.dispatch.buf_count = compute_bind_groups.populateFlatBindings(
+-        bind_groups[0..],
+-        &cmd.dispatch.bufs,
+-        &cmd.dispatch.buf_offsets,
+-        &cmd.dispatch.buf_sizes,
+-    );
+-    for (bind_groups, 0..) |maybe_bg, index| {
+-        cmd.dispatch.bind_groups[index] = if (maybe_bg) |bg| toOpaque(bg) else null;
+-    }
+-    vulkan_fast.populateRecordedDispatchBindingState(pipe, bind_groups[0..], &cmd.dispatch);
+-    if (native_cmds.tryMergeDispatchIntoLast(&cb.cmds, &cmd)) return true;
+-    references.retainPipeline(alloc, &cb.references, pipe);
+-    for (bind_groups) |maybe_bg| if (maybe_bg) |bg| {
+-        references.retainBindGroup(alloc, &cb.references, bg);
++fn recordedCopy(source: ?*anyopaque, source_offset: u64, destination: ?*anyopaque, destination_offset: u64, size: u64) recorded.Copy {
++    return .{
++        .source = native_helpers.cast(native_types.DoeBuffer, source),
++        .source_offset = source_offset,
++        .destination = native_helpers.cast(native_types.DoeBuffer, destination),
++        .destination_offset = destination_offset,
++        .size = size,
+     };
+-    cb.cmds.append(alloc, cmd) catch std.debug.panic("doe_compute_fast: OOM recording dispatch command", .{});
+-    return true;
+-}
+-fn appendCopyIfPresent(
+-    cb: *DoeCommandBuffer,
+-    copy_src: ?*anyopaque,
+-    copy_src_off: u64,
+-    copy_dst: ?*anyopaque,
+-    copy_dst_off: u64,
+-    copy_size: u64,
+-) bool {
+-    if (copy_size == 0) return true;
+-    const source = native_helpers.cast(native_types.DoeBuffer, copy_src) orelse return false;
+-    const destination = native_helpers.cast(native_types.DoeBuffer, copy_dst) orelse return false;
+-    if (source.error_object or source.destroyed or destination.error_object or destination.destroyed) return false;
+-    references.retainBuffer(alloc, &cb.references, source);
+-    references.retainBuffer(alloc, &cb.references, destination);
+-    cb.cmds.append(alloc, .{ .copy_buf = .{
+-        .src = copy_src,
+-        .src_off = copy_src_off,
+-        .dst = copy_dst,
+-        .dst_off = copy_dst_off,
+-        .size = copy_size,
+-    } }) catch std.debug.panic("doe_compute_fast: OOM recording copy command", .{});
+-    return true;
+ }
+ 
+-fn destroyPendingCommandBuffer(cb: *DoeCommandBuffer) void {
+-    native_exports.doeNativeCommandBufferRelease(toOpaque(cb));
++fn constructionFailure(device: *DoeDevice, err: recorded.ConstructionError) ?*anyopaque {
++    var message: [128]u8 = undefined;
++    const text = std.fmt.bufPrint(&message, "compute command construction failed: {s}", .{@errorName(err)}) catch unreachable;
++    const error_type = switch (err) {
++        error.DispatchPreconditionFailed, error.Overflow => error_scope.ERROR_TYPE_VALIDATION,
++        else => error_scope.zig_error_to_type(err),
++    };
++    device.error_scopes.deliver(error_type, text);
++    return null;
+ }
+ 
+ test "fused command constructor retains inputs and unwinds invalid copy" {
++    const Capture = struct {
++        error_type: u32 = error_scope.ERROR_TYPE_NO_ERROR,
++        invalid_argument: bool = false,
++        fn receive(error_type: u32, message: @import("../../core/abi/wgpu_handle_types.zig").WGPUStringView, userdata: ?*anyopaque, _: ?*anyopaque) callconv(.c) void {
++            const self: *@This() = @ptrCast(@alignCast(userdata.?));
++            self.error_type = error_type;
++            self.invalid_argument = if (message.data) |data|
++                std.mem.endsWith(u8, data[0..message.length], "InvalidArgument")
++            else
++                false;
++        }
++    };
+     var device = DoeDevice{};
+     var pipeline = DoeComputePipeline{};
+     var group = native_types.DoeBindGroup{};
+@@ -445,6 +397,7 @@ test "fused command constructor retains inputs and unwinds invalid copy" {
+     try std.testing.expectEqual(@as(u32, 1), group.ref_count);
+     try std.testing.expectEqual(@as(u32, 1), source.ref_count);
+     try std.testing.expectEqual(@as(u32, 1), destination.ref_count);
++    device.error_scopes.push(error_scope.FILTER_VALIDATION);
+     const invalid = doeNativeCreateComputeDispatchCopyCommandBufferOneBindGroup(
+         toOpaque(&device),
+         toOpaque(&pipeline),
+@@ -463,6 +416,10 @@ test "fused command constructor retains inputs and unwinds invalid copy" {
+     try std.testing.expectEqual(@as(u32, 1), group.ref_count);
+     try std.testing.expectEqual(@as(u32, 1), source.ref_count);
+     try std.testing.expectEqual(@as(u32, 1), device.ref_count);
++    var capture = Capture{};
++    try std.testing.expect(device.error_scopes.pop(.{ .callback = Capture.receive, .userdata1 = &capture }));
++    try std.testing.expectEqual(error_scope.ERROR_TYPE_VALIDATION, capture.error_type);
++    try std.testing.expect(capture.invalid_argument);
+ }
+ 
+ pub export fn doeNativeCreateComputeDispatchCopyCommandBuffer(
+@@ -481,18 +438,13 @@ pub export fn doeNativeCreateComputeDispatchCopyCommandBuffer(
+ ) callconv(.c) ?*anyopaque {
+     const dev = native_helpers.cast(DoeDevice, dev_raw) orelse return null;
+     const pipe = native_helpers.cast(DoeComputePipeline, pipe_raw) orelse return null;
+-    const cb = make(DoeCommandBuffer) orelse return null;
+-    native_helpers.object_add_ref(DoeDevice, dev_raw);
+-    cb.* = .{ .dev = dev, .device_ref = dev };
+-    if (!appendRecordedDispatch(cb, pipe, bg_ptrs, bg_count, dx, dy, dz)) {
+-        destroyPendingCommandBuffer(cb);
+-        return null;
+-    }
+-    if (!appendCopyIfPresent(cb, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) {
+-        destroyPendingCommandBuffer(cb);
+-        return null;
+-    }
+-    return toOpaque(cb);
++    var builder = recorded.Builder.init(alloc, dev) catch |err| return constructionFailure(dev, err);
++    defer builder.deinit();
++    builder.appendDispatch(recordedDispatch(pipe, bg_ptrs, bg_count, .{ dx, dy, dz })) catch |err|
++        return constructionFailure(dev, err);
++    builder.appendCopy(recordedCopy(copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) catch |err|
++        return constructionFailure(dev, err);
++    return toOpaque(builder.finish() catch |err| return constructionFailure(dev, err));
+ }
+ 
+ pub export fn doeNativeCreateComputeDispatchCopyCommandBufferOneBindGroup(
+@@ -540,34 +492,23 @@ pub export fn doeNativeCreateComputeDispatchBatchCopyCommandBuffer(
+ ) callconv(.c) ?*anyopaque {
+     const dev = native_helpers.cast(DoeDevice, dev_raw) orelse return null;
+     if (dispatch_count == 0) return null;
+-    const cb = make(DoeCommandBuffer) orelse return null;
+-    native_helpers.object_add_ref(DoeDevice, dev_raw);
+-    cb.* = .{ .dev = dev, .device_ref = dev };
++    var builder = recorded.Builder.init(alloc, dev) catch |err| return constructionFailure(dev, err);
++    defer builder.deinit();
+     for (0..dispatch_count) |index| {
+-        const pipe = native_helpers.cast(DoeComputePipeline, pipe_ptrs[index]) orelse {
+-            destroyPendingCommandBuffer(cb);
+-            return null;
+-        };
++        const pipe = native_helpers.cast(DoeComputePipeline, pipe_ptrs[index]) orelse
++            return constructionFailure(dev, error.InvalidArgument);
+         const bg_offset = index * MAX_COMPUTE_BIND_GROUPS;
+         const dim_offset = index * 3;
+-        if (!appendRecordedDispatch(
+-            cb,
++        builder.appendDispatch(recordedDispatch(
+             pipe,
+             bg_ptrs + bg_offset,
+             bg_counts[index],
+-            dispatch_dims[dim_offset],
+-            dispatch_dims[dim_offset + 1],
+-            dispatch_dims[dim_offset + 2],
+-        )) {
+-            destroyPendingCommandBuffer(cb);
+-            return null;
+-        }
+-    }
+-    if (!appendCopyIfPresent(cb, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) {
+-        destroyPendingCommandBuffer(cb);
+-        return null;
++            .{ dispatch_dims[dim_offset], dispatch_dims[dim_offset + 1], dispatch_dims[dim_offset + 2] },
++        )) catch |err| return constructionFailure(dev, err);
+     }
+-    return toOpaque(cb);
++    builder.appendCopy(recordedCopy(copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size)) catch |err|
++        return constructionFailure(dev, err);
++    return toOpaque(builder.finish() catch |err| return constructionFailure(dev, err));
+ }
+ 
+ /// Single-call compute dispatch + optional same-submit copy + event signal + commit.
+diff --git a/runtime/zig/src/native/compute/doe_compute_recorded.zig b/runtime/zig/src/native/compute/doe_compute_recorded.zig
+new file mode 100644
+index 000000000..ec2ba603c
+--- /dev/null
++++ b/runtime/zig/src/native/compute/doe_compute_recorded.zig
+@@ -0,0 +1,205 @@
++const std = @import("std");
++const objects = @import("../support/doe_native_object_types.zig");
++const helpers = @import("../support/doe_native_object_helpers.zig");
++const commands = @import("../support/doe_native_command_types.zig");
++const exports = @import("../support/doe_native_exports.zig");
++const references = @import("../command/doe_command_references.zig");
++const trace = @import("../diagnostics/doe_program_identity_trace.zig");
++const bindings = @import("doe_compute_bind_groups.zig");
++const preconditions = @import("doe_compute_preconditions_native.zig");
++const vulkan = @import("doe_compute_fast_vulkan.zig");
++
++pub const ConstructionError = std.mem.Allocator.Error || preconditions.ValidationError || error{ InvalidArgument, InvalidState };
++
++pub const Dispatch = struct {
++    pipeline: *objects.DoeComputePipeline,
++    bind_groups: [bindings.MAX_COMPUTE_BIND_GROUPS]?*objects.DoeBindGroup =
++        [_]?*objects.DoeBindGroup{null} ** bindings.MAX_COMPUTE_BIND_GROUPS,
++    workgroups: [3]u32,
++};
++
++pub const Copy = struct {
++    source: ?*objects.DoeBuffer,
++    source_offset: u64,
++    destination: ?*objects.DoeBuffer,
++    destination_offset: u64,
++    size: u64,
++};
++
++pub const Builder = struct {
++    pending: ?*objects.DoeCommandBuffer,
++
++    pub fn init(allocator: std.mem.Allocator, device: *objects.DoeDevice) ConstructionError!Builder {
++        const buffer = try allocator.create(objects.DoeCommandBuffer);
++        buffer.* = .{ .allocator = allocator, .dev = device, .device_ref = device };
++        helpers.object_add_ref(objects.DoeDevice, helpers.toOpaque(device));
++        trace.recordNativeObjectCreate(objects.DoeCommandBuffer, buffer);
++        return .{ .pending = buffer };
++    }
++
++    pub fn deinit(self: *Builder) void {
++        if (self.pending) |buffer| exports.doeNativeCommandBufferRelease(helpers.toOpaque(buffer));
++        self.pending = null;
++    }
++
++    pub fn finish(self: *Builder) ConstructionError!*objects.DoeCommandBuffer {
++        const buffer = self.pending orelse return error.InvalidState;
++        self.pending = null;
++        return buffer;
++    }
++
++    pub fn appendDispatch(self: *Builder, request: Dispatch) ConstructionError!void {
++        const buffer = self.pending orelse return error.InvalidState;
++        const pipeline = request.pipeline;
++        try preconditions.validate_bind_groups(
++            pipeline.dispatch_preconditions,
++            pipeline.texture_dispatch_preconditions,
++            &request.bind_groups,
++            request.workgroups,
++            .{ pipeline.wg_x, pipeline.wg_y, pipeline.wg_z },
++        );
++        var command = commands.RecordedCmd{ .dispatch = .{
++            .compute_pipeline = helpers.toOpaque(pipeline),
++            .pso = pipeline.mtl_pso,
++            .needs_sizes_buf = pipeline.needs_sizes_buf,
++            .bufs = [_]?*anyopaque{null} ** bindings.MAX_FLAT_BIND,
++            .buf_offsets = [_]u64{0} ** bindings.MAX_FLAT_BIND,
++            .buf_sizes = [_]u64{0} ** bindings.MAX_FLAT_BIND,
++            .buf_count = 0,
++            .x = request.workgroups[0],
++            .y = request.workgroups[1],
++            .z = request.workgroups[2],
++            .wg_x = pipeline.wg_x,
++            .wg_y = pipeline.wg_y,
++            .wg_z = pipeline.wg_z,
++        } };
++        command.dispatch.buf_count = bindings.populateFlatBindings(
++            &request.bind_groups,
++            &command.dispatch.bufs,
++            &command.dispatch.buf_offsets,
++            &command.dispatch.buf_sizes,
++        );
++        var reference_count: usize = 1;
++        for (request.bind_groups, 0..) |maybe_group, index| {
++            command.dispatch.bind_groups[index] = if (maybe_group) |group| helpers.toOpaque(group) else null;
++            if (maybe_group != null) reference_count += 1;
++        }
++        vulkan.populateRecordedDispatchBindingState(pipeline, &request.bind_groups, &command.dispatch);
++        if (commands.tryMergeDispatchIntoLast(&buffer.cmds, &command)) return;
++        try reserve(buffer, reference_count);
++        references.retainPipeline(buffer.allocator, &buffer.references, pipeline);
++        for (request.bind_groups) |maybe_group| if (maybe_group) |group| {
++            references.retainBindGroup(buffer.allocator, &buffer.references, group);
++        };
++        buffer.cmds.appendAssumeCapacity(command);
++    }
++
++    pub fn appendCopy(self: *Builder, request: Copy) ConstructionError!void {
++        const buffer = self.pending orelse return error.InvalidState;
++        if (request.size == 0) return;
++        const source = request.source orelse return error.InvalidArgument;
++        const destination = request.destination orelse return error.InvalidArgument;
++        if (source.error_object or source.destroyed or destination.error_object or destination.destroyed)
++            return error.InvalidArgument;
++        try reserve(buffer, 2);
++        references.retainBuffer(buffer.allocator, &buffer.references, source);
++        references.retainBuffer(buffer.allocator, &buffer.references, destination);
++        buffer.cmds.appendAssumeCapacity(.{ .copy_buf = .{
++            .src = helpers.toOpaque(source),
++            .src_off = request.source_offset,
++            .dst = helpers.toOpaque(destination),
++            .dst_off = request.destination_offset,
++            .size = request.size,
++        } });
++    }
++
++    fn reserve(buffer: *objects.DoeCommandBuffer, reference_count: usize) !void {
++        // No resource ownership changes until both lists can publish without allocation.
++        try buffer.cmds.ensureUnusedCapacity(buffer.allocator, 1);
++        try buffer.references.ensureUnusedCapacity(buffer.allocator, reference_count);
++    }
++};
++
++fn allocationFailureScenario(allocator: std.mem.Allocator) !void {
++    var device = objects.DoeDevice{};
++    var pipeline = objects.DoeComputePipeline{};
++    var group = objects.DoeBindGroup{};
++    var source = objects.DoeBuffer{ .size = 16 };
++    var destination = objects.DoeBuffer{ .size = 16 };
++    defer {
++        for ([_]u32{ device.ref_count, pipeline.ref_count, group.ref_count, source.ref_count, destination.ref_count }) |count|
++            std.testing.expectEqual(@as(u32, 1), count) catch @panic("fused recording leaked a caller reference");
++    }
++    var builder = try Builder.init(allocator, &device);
++    defer builder.deinit();
++    var request = Dispatch{ .pipeline = &pipeline, .workgroups = .{ 1, 1, 1 } };
++    request.bind_groups[0] = &group;
++    // Distinct dispatches force later list growth after earlier dependencies are retained.
++    const distinct_dispatch_count = 17;
++    for (0..distinct_dispatch_count) |index| {
++        request.workgroups[0] = @intCast(index + 1);
++        try builder.appendDispatch(request);
++    }
++    try builder.appendCopy(.{ .source = &source, .source_offset = 0, .destination = &destination, .destination_offset = 0, .size = 16 });
++    const buffer = try builder.finish();
++    defer exports.doeNativeCommandBufferRelease(helpers.toOpaque(buffer));
++    builder.deinit();
++    try std.testing.expectEqual(@as(usize, distinct_dispatch_count + 1), buffer.cmds.items.len);
++    try std.testing.expectEqual(@as(u32, 2), source.ref_count);
++    try std.testing.expectEqual(@as(u32, 2), device.ref_count);
++}
++
++test "fused recording rolls back every allocation failure and transfers complete ownership" {
++    try std.testing.checkAllAllocationFailures(std.testing.allocator, allocationFailureScenario, .{});
++    try std.testing.checkAllAllocationFailures(std.testing.allocator, copyAllocationFailureScenario, .{});
++}
++
++fn copyAllocationFailureScenario(allocator: std.mem.Allocator) !void {
++    var device = objects.DoeDevice{};
++    var buffer = objects.DoeBuffer{ .size = 32 };
++    defer {
++        std.testing.expectEqual(@as(u32, 1), device.ref_count) catch @panic("copy recording leaked its device");
++        std.testing.expectEqual(@as(u32, 1), buffer.ref_count) catch @panic("copy recording leaked an aliased buffer");
++    }
++    var builder = try Builder.init(allocator, &device);
++    defer builder.deinit();
++    const copy_count = 17;
++    for (0..copy_count) |_| try builder.appendCopy(.{
++        .source = &buffer,
++        .source_offset = 0,
++        .destination = &buffer,
++        .destination_offset = 16,
++        .size = 16,
++    });
++    const commands_buffer = try builder.finish();
++    defer exports.doeNativeCommandBufferRelease(helpers.toOpaque(commands_buffer));
++    try std.testing.expectEqual(@as(u32, 1 + 2 * copy_count), buffer.ref_count);
++}
++
++test "merged dispatches reuse storage and invalid copies leave retained work owned" {
++    var device = objects.DoeDevice{};
++    var pipeline = objects.DoeComputePipeline{};
++    var group = objects.DoeBindGroup{};
++    var builder = try Builder.init(std.testing.allocator, &device);
++    defer builder.deinit();
++    var request = Dispatch{ .pipeline = &pipeline, .workgroups = .{ 1, 1, 1 } };
++    request.bind_groups[0] = &group;
++    try builder.appendDispatch(request);
++    const references_before = builder.pending.?.references.items.len;
++    try builder.appendDispatch(request);
++    try std.testing.expectEqual(@as(usize, 1), builder.pending.?.cmds.items.len);
++    try std.testing.expectEqual(references_before, builder.pending.?.references.items.len);
++    try std.testing.expectEqual(@as(u32, 2), pipeline.ref_count);
++    try std.testing.expectError(error.InvalidArgument, builder.appendCopy(.{
++        .source = null,
++        .source_offset = 0,
++        .destination = null,
++        .destination_offset = 0,
++        .size = 16,
++    }));
++    builder.deinit();
++    try std.testing.expectEqual(@as(u32, 1), pipeline.ref_count);
++    try std.testing.expectEqual(@as(u32, 1), group.ref_count);
++    try std.testing.expectEqual(@as(u32, 1), device.ref_count);
++    try std.testing.expectError(error.InvalidState, builder.finish());
++}
+diff --git a/runtime/zig/src/native/support/doe_native_object_types.zig b/runtime/zig/src/native/support/doe_native_object_types.zig
+index 6d17e2de4..e4ea033b1 100644
+--- a/runtime/zig/src/native/support/doe_native_object_types.zig
++++ b/runtime/zig/src/native/support/doe_native_object_types.zig
+@@ -284,6 +284,7 @@ pub const DoeCommandBuffer = struct {
+     pub const TYPE_MAGIC = MAGIC_CMD_BUFFER;
+     magic: u32 = TYPE_MAGIC,
+     ref_count: u32 = 1,
++    allocator: std.mem.Allocator,
+     dev: *DoeDevice,
+     device_ref: ?*DoeDevice = null,
+     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},
+diff --git a/runtime/zig/tests/native_recorded_compute.c b/runtime/zig/tests/native_recorded_compute.c
+new file mode 100644
+index 000000000..0ad16b9aa
+--- /dev/null
++++ b/runtime/zig/tests/native_recorded_compute.c
+@@ -0,0 +1,170 @@
++#include "webgpu.h"
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++
++extern WGPUCommandBuffer doeNativeCreateComputeDispatchCopyCommandBuffer(
++    WGPUDevice, WGPUComputePipeline, WGPUBindGroup*, uint32_t, uint32_t, uint32_t, uint32_t,
++    WGPUBuffer, uint64_t, WGPUBuffer, uint64_t, uint64_t);
++extern WGPUCommandBuffer doeNativeCreateComputeDispatchBatchCopyCommandBuffer(
++    WGPUDevice, size_t, WGPUComputePipeline*, WGPUBindGroup*, const uint32_t*, const uint32_t*,
++    WGPUBuffer, uint64_t, WGPUBuffer, uint64_t, uint64_t);
++
++enum { ELEMENT_COUNT = 4, NATIVE_BIND_GROUP_STRIDE = 4, AMD_PCI_VENDOR_ID = 0x1002 };
++
++static void adapter_ready(WGPURequestAdapterStatus status, WGPUAdapter adapter,
++                          WGPUStringView message, void* result, void* unused) {
++    (void)message; (void)unused;
++    if (status == WGPURequestAdapterStatus_Success) *(WGPUAdapter*)result = adapter;
++}
++
++static void device_ready(WGPURequestDeviceStatus status, WGPUDevice device,
++                         WGPUStringView message, void* result, void* unused) {
++    (void)message; (void)unused;
++    if (status == WGPURequestDeviceStatus_Success) *(WGPUDevice*)result = device;
++}
++
++static void map_ready(WGPUMapAsyncStatus status, WGPUStringView message, void* result, void* unused) {
++    (void)message; (void)unused;
++    *(bool*)result = status == WGPUMapAsyncStatus_Success;
++}
++
++static bool execute(WGPUInstance instance, WGPUDevice device, WGPUQueue queue, bool batch) {
++    bool success = false, mapped = false;
++    WGPUShaderModule shader = NULL;
++    WGPUComputePipeline pipeline = NULL;
++    WGPUBindGroupLayout layout = NULL;
++    WGPUBindGroup group = NULL;
++    WGPUBuffer storage = NULL, readback = NULL;
++    WGPUCommandBuffer commands = NULL;
++    const uint32_t input[ELEMENT_COUNT] = {17, 29, 43, 71};
++    static const char wgsl[] =
++        "@group(0) @binding(0) var<storage, read_write> values: array<u32>;"
++        "@compute @workgroup_size(1) fn main(@builtin(global_invocation_id) id: vec3<u32>) {"
++        "values[id.x] = values[id.x] + 1u; }";
++#define REQUIRE(condition) do { if (!(condition)) { \
++    fprintf(stderr, "native recorded compute failed at line %d: %s\n", __LINE__, #condition); \
++    goto cleanup; } } while (0)
++    WGPUShaderSourceWGSL source = WGPU_SHADER_SOURCE_WGSL_INIT;
++    source.code = (WGPUStringView){wgsl, sizeof(wgsl) - 1};
++    WGPUShaderModuleDescriptor shader_desc = WGPU_SHADER_MODULE_DESCRIPTOR_INIT;
++    shader_desc.nextInChain = &source.chain;
++    shader = wgpuDeviceCreateShaderModule(device, &shader_desc);
++    REQUIRE(shader);
++    WGPUComputePipelineDescriptor pipeline_desc = WGPU_COMPUTE_PIPELINE_DESCRIPTOR_INIT;
++    pipeline_desc.compute.module = shader;
++    pipeline_desc.compute.entryPoint = (WGPUStringView){"main", 4};
++    pipeline = wgpuDeviceCreateComputePipeline(device, &pipeline_desc);
++    REQUIRE(pipeline);
++    layout = wgpuComputePipelineGetBindGroupLayout(pipeline, 0);
++    REQUIRE(layout);
++    WGPUBufferDescriptor buffer_desc = WGPU_BUFFER_DESCRIPTOR_INIT;
++    buffer_desc.size = sizeof(input);
++    buffer_desc.usage = WGPUBufferUsage_Storage | WGPUBufferUsage_CopySrc | WGPUBufferUsage_CopyDst;
++    storage = wgpuDeviceCreateBuffer(device, &buffer_desc);
++    buffer_desc.usage = WGPUBufferUsage_MapRead | WGPUBufferUsage_CopyDst;
++    readback = wgpuDeviceCreateBuffer(device, &buffer_desc);
++    REQUIRE(storage && readback);
++    wgpuQueueWriteBuffer(queue, storage, 0, input, sizeof(input));
++    WGPUBindGroupEntry entry = WGPU_BIND_GROUP_ENTRY_INIT;
++    entry.buffer = storage;
++    entry.size = sizeof(input);
++    WGPUBindGroupDescriptor group_desc = WGPU_BIND_GROUP_DESCRIPTOR_INIT;
++    group_desc.layout = layout;
++    group_desc.entryCount = 1;
++    group_desc.entries = &entry;
++    group = wgpuDeviceCreateBindGroup(device, &group_desc);
++    REQUIRE(group);
++
++    WGPUCommandBuffer invalid = doeNativeCreateComputeDispatchCopyCommandBuffer(
++        device, pipeline, &group, 1, ELEMENT_COUNT, 1, 1, storage, 0, NULL, 0, sizeof(input));
++    if (invalid) wgpuCommandBufferRelease(invalid);
++    REQUIRE(!invalid);
++    if (batch) {
++        WGPUComputePipeline pipelines[] = {pipeline, pipeline};
++        WGPUBindGroup groups[2 * NATIVE_BIND_GROUP_STRIDE] = {0};
++        groups[0] = group;
++        groups[NATIVE_BIND_GROUP_STRIDE] = group;
++        const uint32_t counts[] = {1, 1};
++        const uint32_t dimensions[] = {ELEMENT_COUNT, 1, 1, ELEMENT_COUNT, 1, 1};
++        commands = doeNativeCreateComputeDispatchBatchCopyCommandBuffer(
++            device, 2, pipelines, groups, counts, dimensions, storage, 0, readback, 0, sizeof(input));
++    } else {
++        commands = doeNativeCreateComputeDispatchCopyCommandBuffer(
++            device, pipeline, &group, 1, ELEMENT_COUNT, 1, 1, storage, 0, readback, 0, sizeof(input));
++    }
++    REQUIRE(commands);
++    wgpuBindGroupRelease(group); group = NULL;
++    wgpuComputePipelineRelease(pipeline); pipeline = NULL;
++    wgpuShaderModuleRelease(shader); shader = NULL;
++    wgpuBindGroupLayoutRelease(layout); layout = NULL;
++    wgpuBufferRelease(storage); storage = NULL;
++    wgpuQueueSubmit(queue, 1, &commands);
++    wgpuCommandBufferRelease(commands); commands = NULL;
++    WGPUBufferMapCallbackInfo mapping = WGPU_BUFFER_MAP_CALLBACK_INFO_INIT;
++    mapping.mode = WGPUCallbackMode_AllowSpontaneous;
++    mapping.callback = map_ready;
++    mapping.userdata1 = &mapped;
++    wgpuBufferMapAsync(readback, WGPUMapMode_Read, 0, sizeof(input), mapping);
++    wgpuInstanceProcessEvents(instance);
++    REQUIRE(mapped);
++    const uint32_t* output = wgpuBufferGetConstMappedRange(readback, 0, sizeof(input));
++    REQUIRE(output);
++    for (size_t index = 0; index < ELEMENT_COUNT; ++index)
++        REQUIRE(output[index] == input[index] + (batch ? 2u : 1u));
++    printf("passed: %s native constructor, failed construction, caller release, dispatch/copy/readback\n", batch ? "batch" : "single");
++    success = true;
++cleanup:
++    if (mapped && readback) wgpuBufferUnmap(readback);
++    if (commands) wgpuCommandBufferRelease(commands);
++    if (group) wgpuBindGroupRelease(group);
++    if (layout) wgpuBindGroupLayoutRelease(layout);
++    if (pipeline) wgpuComputePipelineRelease(pipeline);
++    if (shader) wgpuShaderModuleRelease(shader);
++    if (storage) wgpuBufferRelease(storage);
++    if (readback) wgpuBufferRelease(readback);
++    return success;
++#undef REQUIRE
++}
++
++int main(void) {
++    int result = 1;
++    WGPUInstance instance = wgpuCreateInstance(NULL);
++    WGPUAdapter adapter = NULL;
++    WGPUDevice device = NULL;
++    WGPUQueue queue = NULL;
++    if (!instance) goto cleanup;
++    WGPURequestAdapterOptions options = WGPU_REQUEST_ADAPTER_OPTIONS_INIT;
++    options.backendType = WGPUBackendType_Vulkan;
++    WGPURequestAdapterCallbackInfo adapter_callback = WGPU_REQUEST_ADAPTER_CALLBACK_INFO_INIT;
++    adapter_callback.mode = WGPUCallbackMode_AllowSpontaneous;
++    adapter_callback.callback = adapter_ready;
++    adapter_callback.userdata1 = &adapter;
++    wgpuInstanceRequestAdapter(instance, &options, adapter_callback);
++    wgpuInstanceProcessEvents(instance);
++    if (!adapter) goto cleanup;
++    WGPUAdapterInfo info = WGPU_ADAPTER_INFO_INIT;
++    if (wgpuAdapterGetInfo(adapter, &info) != WGPUStatus_Success) goto cleanup;
++    const bool hardware_vulkan = info.backendType == WGPUBackendType_Vulkan &&
++        info.adapterType != WGPUAdapterType_CPU && info.vendorID == AMD_PCI_VENDOR_ID;
++    printf("backend=%u adapter=%u vendor=%u device=%u GPU=%.*s description=%.*s\n",
++        info.backendType, info.adapterType, info.vendorID, info.deviceID,
++        (int)info.device.length, info.device.data, (int)info.description.length, info.description.data);
++    wgpuAdapterInfoFreeMembers(info);
++    if (!hardware_vulkan) goto cleanup;
++    WGPURequestDeviceCallbackInfo device_callback = WGPU_REQUEST_DEVICE_CALLBACK_INFO_INIT;
++    device_callback.mode = WGPUCallbackMode_AllowSpontaneous;
++    device_callback.callback = device_ready;
++    device_callback.userdata1 = &device;
++    wgpuAdapterRequestDevice(adapter, NULL, device_callback);
++    wgpuInstanceProcessEvents(instance);
++    if (!device) goto cleanup;
++    queue = wgpuDeviceGetQueue(device);
++    if (queue && execute(instance, device, queue, false) && execute(instance, device, queue, true)) result = 0;
++cleanup:
++    if (queue) wgpuQueueRelease(queue);
++    if (device) { wgpuDeviceDestroy(device); wgpuDeviceRelease(device); }
++    if (adapter) wgpuAdapterRelease(adapter);
++    if (instance) wgpuInstanceRelease(instance);
++    return result;
++}
