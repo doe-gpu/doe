@@ -147,6 +147,15 @@ classified and cannot be promoted by benchmark results.
   spill, buffer aliases, resource replacement, and orphaned image views.
   Prepared programs reject changed resources before native submission. These
   internal identities preserve the public descriptor and receipt contracts.
+- Program close must release native bindings and pipelines as well as buffers.
+  Resource-retention regressions keep closed program objects reachable, repeat
+  preparation and execution on the same device, and distinguish driver-reported
+  allocation totals from residency and peak memory. Destroyed-buffer descriptor
+  retirement must preserve unrelated bindings and compatible pipelines. Tests
+  also close each recording mode after explicit device destruction; native
+  resource references must keep required backend cleanup valid.
+  Linux retained-package qualification executes the DRM regression in every
+  controlled host, covering timestamp scratch allocations and labeled queues.
 - Program receipt version 5 overlaps queue completion with readback mapping and
   waits for both. Failure and cancellation tests must preserve ownership until
   both settle, including either callback order and a rejected mapping. Mapping

@@ -54,6 +54,7 @@ pub const device_vk_runtime = m0.device_vk_runtime;
 pub const device_d3d12_runtime = m0.device_d3d12_runtime;
 pub const doeNativeDeviceCreateBuffer = m0.doeNativeDeviceCreateBuffer;
 pub const doeNativeBufferRelease = m0.doeNativeBufferRelease;
+pub const doeNativeBufferDestroy = m0.doeNativeBufferDestroy;
 pub const doeNativeBufferUnmap = m0.doeNativeBufferUnmap;
 pub const doeNativeBufferGetMapState = m0.doeNativeBufferGetMapState;
 pub const doeNativeBufferMapAsync = m0.doeNativeBufferMapAsync;

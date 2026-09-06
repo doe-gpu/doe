@@ -57,6 +57,7 @@ const buffer_ops = @import("../resource/doe_buffer_ops_native.zig");
 pub const doeNativeDeviceCreateBuffer = buffer_ops.doeNativeDeviceCreateBuffer;
 pub const doeNativeDeviceCreateBufferFlat = buffer_ops.doeNativeDeviceCreateBufferFlat;
 pub const doeNativeBufferRelease = buffer_ops.doeNativeBufferRelease;
+pub const doeNativeBufferDestroy = buffer_ops.doeNativeBufferDestroy;
 pub const doeNativeBufferUnmap = buffer_ops.doeNativeBufferUnmap;
 pub const doeNativeBufferGetMapState = buffer_ops.doeNativeBufferGetMapState;
 pub const doeNativeBufferMapAsync = buffer_ops.doeNativeBufferMapAsync;

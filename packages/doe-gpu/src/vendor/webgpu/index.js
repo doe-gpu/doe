@@ -2826,8 +2826,15 @@ const fullSurfaceBackend = {
   },
   bufferDestroy(native) {
     nodeBufferWrappers.delete(native);
+    addon.bufferDestroy(native);
     addon.bufferRelease(native);
   },
+  computePipelineRelease(native) {
+    if (!native?.[NODE_FALLBACK_PIPELINE]) addon.computePipelineRelease(native);
+  },
+  bindGroupLayoutRelease(native) { addon.bindGroupLayoutRelease(native); },
+  bindGroupRelease(native) { addon.bindGroupRelease(native); },
+  pipelineLayoutRelease(native) { addon.pipelineLayoutRelease(native); },
   initQueueState(queue) {
     queue._submittedSerial = 0;
     queue._completedSerial = 0;
@@ -3560,7 +3567,8 @@ const fullSurfaceBackend = {
       throw error;
     }
   },
-  deviceDestroy(native) {
+  deviceDestroy(native, wrapper) {
+    destroyResource(wrapper.queue, (queue) => addon.queueRelease(queue));
     addon.deviceRelease(native);
   },
   adapterGetInfo(_adapter, native) {

@@ -337,6 +337,7 @@ function openLibrary(path) {
         wgpuDeviceCreateBuffer:   { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.ptr },
         doeNativeDeviceCreateBufferFlat: { args: [FFIType.ptr, FFIType.u64, FFIType.u64, FFIType.u32], returns: FFIType.ptr },
         wgpuBufferRelease:        { args: [FFIType.ptr], returns: FFIType.void },
+        wgpuBufferDestroy:        { args: [FFIType.ptr], returns: FFIType.void },
         wgpuBufferUnmap:          { args: [FFIType.ptr], returns: FFIType.void },
         wgpuBufferGetConstMappedRange: { args: [FFIType.ptr, FFIType.u64, FFIType.u64], returns: FFIType.ptr },
         wgpuBufferGetMappedRange: { args: [FFIType.ptr, FFIType.u64, FFIType.u64], returns: FFIType.ptr },
@@ -3622,8 +3623,13 @@ const fullSurfaceBackend = {
         wrapper._mappedWriteRanges = [];
     },
     bufferDestroy(native) {
+        wgpu.symbols.wgpuBufferDestroy(native);
         wgpu.symbols.wgpuBufferRelease(native);
     },
+    computePipelineRelease(native) { wgpu.symbols.wgpuComputePipelineRelease(native); },
+    bindGroupLayoutRelease(native) { wgpu.symbols.wgpuBindGroupLayoutRelease(native); },
+    bindGroupRelease(native) { wgpu.symbols.wgpuBindGroupRelease(native); },
+    pipelineLayoutRelease(native) { wgpu.symbols.wgpuPipelineLayoutRelease(native); },
     initQueueState(queue) {
         queue._pendingSubmissions = 0;
         queue._submitBreakdownNs = zeroQueueSubmitBreakdown();
@@ -4389,7 +4395,8 @@ const fullSurfaceBackend = {
     deviceSetOnUncapturedError(wrapper, native, handler) {
         setBunDeviceUncapturedErrorHandler(wrapper, native, handler);
     },
-    deviceDestroy(native) {
+    deviceDestroy(native, wrapper) {
+        destroyResource(wrapper.queue, (queue) => wgpu.symbols.wgpuQueueRelease(queue));
         wgpu.symbols.wgpuDeviceRelease(native);
     },
     adapterGetInfo(_adapter, native) {

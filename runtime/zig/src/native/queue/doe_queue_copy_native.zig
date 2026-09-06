@@ -140,7 +140,7 @@ fn writeMetalBufferThroughStaging(q: *DoeQueue, buf: *DoeBuffer, offset: u64, da
 }
 
 fn writeBufferValidated(q: *DoeQueue, buf: *DoeBuffer, offset: u64, data: [*]const u8, size: usize) bool {
-    if (buf.error_object) {
+    if (buf.error_object or buf.destroyed) {
         q.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "wgpuQueueWriteBuffer cannot write an error buffer");
         return false;
     }

@@ -391,6 +391,99 @@ pub fn destroy_active_descriptor_pool(self: anytype) void {
     self.has_bound_descriptor_bindings_hash = false;
 }
 
+fn references_buffer(bindings: []const identity.Binding, resource_handle: u64) bool {
+    for (bindings) |binding| {
+        if (binding.declaration.resource_kind == .buffer and binding.declaration.resource_handle == resource_handle) return true;
+    }
+    return false;
+}
+
+fn discard_buffer_descriptors(self: anytype, state: *CachedComputeState, resource_handle: u64) void {
+    if (references_buffer(state.current_descriptor_identity, resource_handle)) {
+        destroy_cached_descriptor_state(self, .{
+            .descriptor_pool = state.descriptor_pool,
+            .current_descriptor_identity = state.current_descriptor_identity,
+        });
+        state.descriptor_pool = VK_NULL_U64;
+        state.descriptor_sets = [_]c.VkDescriptorSet{VK_NULL_U64} ** c.MAX_DESCRIPTOR_SETS;
+        state.current_descriptor_identity = &.{};
+        state.current_descriptor_bindings_hash = 0;
+        state.has_descriptor_pool = false;
+        state.has_current_descriptor_bindings_hash = false;
+    }
+    for (&state.hot_descriptor_state_hashes, &state.hot_descriptor_states) |*hash, *descriptor| {
+        if (hash.* == 0 or !references_buffer(descriptor.current_descriptor_identity, resource_handle)) continue;
+        destroy_cached_descriptor_state(self, descriptor.*);
+        descriptor.* = .{};
+        hash.* = 0;
+    }
+    var entries = state.descriptor_state_cache.iterator();
+    while (entries.next()) |entry| {
+        if (!references_buffer(entry.value_ptr.current_descriptor_identity, resource_handle)) continue;
+        destroy_cached_descriptor_state(self, entry.value_ptr.*);
+        state.descriptor_state_cache.removeByPtr(entry.key_ptr);
+    }
+}
+
+/// The caller drains submitted work before invalidating descriptors. Shared
+/// pipelines and descriptors for unrelated live buffers remain reusable.
+pub fn discard_buffer(self: anytype, resource_handle: u64) void {
+    var active = capture_active_compute_state(self);
+    discard_buffer_descriptors(self, &active, resource_handle);
+    restore_active_compute_state(self, active);
+    for (self.hot_compute_state_hashes, &self.hot_compute_states) |hash, *state| {
+        if (hash != 0) discard_buffer_descriptors(self, state, resource_handle);
+    }
+    var states = self.cached_compute_states.valueIterator();
+    while (states.next()) |state| discard_buffer_descriptors(self, state, resource_handle);
+}
+
+test "buffer destruction retires only matching descriptors across cache tiers" {
+    const ResourceIds = struct {
+        const destroyed = 51;
+        const live = 52;
+    };
+    var context = struct {
+        allocator: std.mem.Allocator = std.testing.allocator,
+        device: c.VkDevice = null,
+        shared_pipelines: shared.Registry = .{},
+    }{};
+    const destroyed = identity.Binding{
+        .declaration = .{ .binding = 0, .resource_kind = .buffer, .resource_handle = ResourceIds.destroyed },
+        .generation = 1,
+        .handle = 0,
+    };
+    var live = destroyed;
+    live.declaration.resource_handle = ResourceIds.live;
+    var state = CachedComputeState{
+        .current_pipeline_hash = 91,
+        .current_layout_hash = 92,
+        .current_descriptor_identity = try context.allocator.dupe(identity.Binding, &.{destroyed}),
+        .has_current_descriptor_bindings_hash = true,
+    };
+    defer destroy_cached_compute_state(&context, state);
+    for ([_]identity.Binding{ destroyed, live }, 0..) |binding, index| {
+        state.hot_descriptor_state_hashes[index] = index + 1;
+        state.hot_descriptor_states[index] = .{
+            .current_descriptor_identity = try context.allocator.dupe(identity.Binding, &.{binding}),
+        };
+        try state.descriptor_state_cache.put(context.allocator, index + 1, .{
+            .current_descriptor_identity = try context.allocator.dupe(identity.Binding, &.{binding}),
+        });
+    }
+    discard_buffer_descriptors(&context, &state, ResourceIds.destroyed);
+    try std.testing.expectEqual(@as(usize, 0), state.current_descriptor_identity.len);
+    try std.testing.expect(!state.has_current_descriptor_bindings_hash);
+    try std.testing.expectEqual(@as(u64, 0), state.hot_descriptor_state_hashes[0]);
+    try std.testing.expectEqual(@as(u64, 2), state.hot_descriptor_state_hashes[1]);
+    try std.testing.expectEqual(@as(u32, 1), state.descriptor_state_cache.count());
+    try std.testing.expect(state.descriptor_state_cache.contains(2));
+    try std.testing.expectEqual(@as(u64, 91), state.current_pipeline_hash);
+    try std.testing.expectEqual(@as(u64, 92), state.current_layout_hash);
+    discard_buffer_descriptors(&context, &state, ResourceIds.destroyed);
+    try std.testing.expectEqual(@as(u32, 1), state.descriptor_state_cache.count());
+}
+
 fn take_hot_descriptor_state(self: anytype, descriptor_bindings_hash: u64) ?CachedDescriptorState {
     if (descriptor_bindings_hash == 0) return null;
     for (self.hot_descriptor_state_hashes, 0..) |hash, index| {

@@ -425,6 +425,12 @@ pub fn capture_compute_buffer(
     return try allocator.dupe(u8, @as([*]u8, @ptrCast(mapped))[0..@intCast(size)]);
 }
 
+pub fn destroy_compute_buffer(self: anytype, resource_handle: u64) void {
+    const cache = @import("vk_pipeline_cache.zig");
+    cache.discard_buffer(self, resource_handle);
+    if (self.compute_buffers.fetchRemove(resource_handle)) |entry| release_compute_buffer(self, entry.value);
+}
+
 pub fn release_compute_buffer(self: anytype, compute_buffer: ComputeBuffer) void {
     if (compute_buffer.mapped != null) {
         c.vkUnmapMemory(self.device, compute_buffer.memory);

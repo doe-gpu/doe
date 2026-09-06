@@ -349,7 +349,7 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
         }
         if (cast(DoeBuffer, e.buffer)) |doe_buf| {
             if (e.binding < MAX_BIND) {
-                if (doe_buf.error_object) {
+                if (doe_buf.error_object or doe_buf.destroyed) {
                     alloc.destroy(bg);
                     return null;
                 }
@@ -481,7 +481,7 @@ pub export fn doeNativeDeviceCreateBufferBindGroupFlat4(
             doeNativeBindGroupRelease(toOpaque(bg));
             return null;
         };
-        if (doe_buf.error_object) {
+        if (doe_buf.error_object or doe_buf.destroyed) {
             doeNativeBindGroupRelease(toOpaque(bg));
             return null;
         }

@@ -471,9 +471,11 @@ napi_value native_direct_device_destroy(napi_env env, napi_callback_info info) {
     if (has_prop(env, this_arg, "queue")) {
         napi_value queue_obj = get_prop(env, this_arg, "queue");
         NativeDirectQueueCache* queue_cache = native_direct_get_queue_cache(env, queue_obj);
+        WGPUQueue queue = queue_cache ? queue_cache->queue : native_direct_unwrap_external_prop(env, queue_obj, DOE_DIRECT_NATIVE);
         native_direct_set_external_prop(env, queue_obj, DOE_DIRECT_NATIVE, NULL);
         native_direct_set_external_prop(env, queue_obj, DOE_DIRECT_QUEUE_NATIVE, NULL);
         if (queue_cache) queue_cache->queue = NULL;
+        if (queue) pfn_wgpuQueueRelease(queue);
     }
     napi_value undefined_value;
     napi_get_undefined(env, &undefined_value);

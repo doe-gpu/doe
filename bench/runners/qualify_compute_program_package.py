@@ -90,13 +90,16 @@ def main() -> int:
                     shutil.copyfile(ROOT / source, scratch / Path(source).name)
                     shutil.copyfile(ROOT / source, output / Path(source).name)
                     replacements[f'../../../../{source}'] = f'./{Path(source).name}'
-                for fixture, name in [('plans', 'compute-program'), ('timestamps', 'timestamp-query'),
-                                      ('normalization', 'timestamp-normalization')]:
+                regressions = [('plans', 'compute-program'), ('timestamps', 'timestamp-query'),
+                               ('normalization', 'timestamp-normalization')]
+                if args.platform_package == 'doe-gpu-linux-x64':
+                    regressions.append(('resources', 'native-resource-retention'))
+                for fixture, name in regressions:
                     regression = (ROOT / f'packages/doe-gpu/test/integration/test-integration-{name}.js').read_text()
                     for before, after in replacements.items():
                         regression = regression.replace(before, after)
                     (scratch / f'{fixture}.mjs').write_text(regression)
-                for fixture in ['candidate', 'lifecycle', 'plans', 'timestamps', 'normalization']:
+                for fixture in ['candidate', 'lifecycle', *(fixture for fixture, _ in regressions)]:
                     entry = f"await import('./{fixture}.mjs');\n"
                     if host == 'electron':
                         entry = "try {\n" + entry + "(await import('electron')).app.exit(0);\n} catch (error) { console.error(error); (await import('electron')).app.exit(1); }\n"

@@ -1,5 +1,24 @@
 # Reusable compute programs
 
+## Resource lifetime correction
+
+The physical retained-package image probe exposed buffer and descriptor
+retention across program close, plus an unreleased queue reference at device
+teardown. The correction releases program-owned native handles, destroys buffer
+backing storage after queued work completes, and retires only affected Vulkan
+descriptors. Native resources retain their cleanup device. Original failures,
+intermediate diagnoses, and raw DRM checkpoint records are preserved under
+`bench/out/compute-program/20260906-resource-retention-diagnostic/`.
+The accepted package qualification, including DRM retention checks on each
+controlled host, is
+`bench/out/compute-program/20260906-resource-lifetime-qualified/summary.json`.
+The image probe's raw timed/untimed checkpoints and CSV are under
+`bench/out/compute-program/20260906-resource-lifetime-scratch/`.
+Reproduction commands, checksums, and intermediate failures are indexed in
+`bench/out/compute-program/20260906-resource-lifetime-correction/README.md`.
+This work does not establish peak GPU memory, arbitrary-object garbage
+collection, physical driver-loss recovery, or another platform's behavior.
+
 ## Current boundary
 
 `doe-gpu/compute-program` is the declared fixed-shape interface. Programs retain

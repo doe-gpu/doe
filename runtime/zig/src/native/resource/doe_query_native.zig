@@ -15,6 +15,7 @@ const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const native_cmds = @import("../support/doe_native_command_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
+const native_exports = @import("../support/doe_native_exports.zig");
 const native_rt_helpers = @import("../support/doe_native_runtime_helpers.zig");
 const vulkan_lifetime = @import("../vulkan/vulkan_lifetime.zig");
 const bridge = resource_ops.metal_bridge;
@@ -35,6 +36,7 @@ pub const DoeQuerySet = struct {
     pub const TYPE_MAGIC = MAGIC_QUERY_SET;
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
+    device_ref: ?*native_types.DoeDevice = null,
     destroyed: bool = false,
     count: u32 = 0,
     query_type: u32 = WGPU_QUERY_TYPE_TIMESTAMP,
@@ -66,6 +68,13 @@ pub export fn doeNativeDeviceCreateQuerySet(
     query_type: u32,
     count: u32,
 ) callconv(.c) ?*anyopaque {
+    const raw = createQuerySet(dev_raw, query_type, count) orelse return null;
+    native_helpers.cast(DoeQuerySet, raw).?.device_ref = native_helpers.cast(native_types.DoeDevice, dev_raw).?;
+    native_helpers.object_add_ref(native_types.DoeDevice, dev_raw);
+    return raw;
+}
+
+fn createQuerySet(dev_raw: ?*anyopaque, query_type: u32, count: u32) ?*anyopaque {
     if (query_type != WGPU_QUERY_TYPE_TIMESTAMP and query_type != WGPU_QUERY_TYPE_OCCLUSION) return null;
     if (count == 0) return null;
 
@@ -274,6 +283,8 @@ pub export fn doeNativeQuerySetDestroy(qs_raw: ?*anyopaque) callconv(.c) void {
 pub export fn doeNativeQuerySetRelease(qs_raw: ?*anyopaque) callconv(.c) void {
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     if (!native_helpers.object_should_destroy(qs)) return;
+    const device = qs.device_ref;
+    defer if (device) |dev| native_exports.doeNativeDeviceRelease(native_helpers.toOpaque(dev));
     releaseQuerySetResources(qs);
     native_helpers.label_store.remove(qs_raw);
     native_helpers.alloc.destroy(qs);

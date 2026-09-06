@@ -91,8 +91,7 @@ pub export fn wgpuBufferAddRef(a0: types.WGPUBuffer) callconv(.c) void {
 }
 
 pub export fn wgpuBufferDestroy(a0: types.WGPUBuffer) callconv(.c) void {
-    // Doe buffers are cleaned up on release; destroy is a validated no-op.
-    _ = native.cast(native.DoeBuffer, a0);
+    native.doeNativeBufferDestroy(a0);
 }
 
 pub export fn wgpuCommandBufferAddRef(a0: types.WGPUCommandBuffer) callconv(.c) void {

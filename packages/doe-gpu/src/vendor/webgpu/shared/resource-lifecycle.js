@@ -1,5 +1,6 @@
 const MAX_SAFE_U64 = Number.MAX_SAFE_INTEGER;
 const UINT32_MAX = 0xFFFF_FFFF;
+const RESOURCE_RELEASES = new WeakMap();
 
 function failValidation(path, message) {
   throw new Error(`${path}: ${message}`);
@@ -9,11 +10,18 @@ function describeResourceLabel(value, fallback = 'resource') {
   return value?._resourceLabel ?? fallback;
 }
 
-function initResource(target, label, owner = null) {
+function initResource(target, label, owner = null, release = null) {
   target._resourceLabel = label;
   target._resourceOwner = owner;
   target._destroyed = false;
+  if (release) RESOURCE_RELEASES.set(target, release);
   return target;
+}
+
+function releaseOwnedResource(resource) {
+  const release = RESOURCE_RELEASES.get(resource);
+  if (release) destroyResource(resource, release);
+  else resource.destroy?.();
 }
 
 function assertObject(value, path, label) {
@@ -115,4 +123,5 @@ export {
   validatePositiveInteger,
   assertLiveResource,
   destroyResource,
+  releaseOwnedResource,
 };

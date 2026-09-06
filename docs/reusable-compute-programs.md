@@ -65,6 +65,21 @@ resolve their final allocation before descriptors capture handles. Prepared
 programs validate retained resources before submission. These are internal
 correctness checks; public descriptor, native ABI, and receipt versions remain
 unchanged.
+Program close releases owned bind groups, layouts, pipelines, shaders, and
+buffers when their last program or output lease ends. Buffer destruction drains
+submitted work and releases backing storage even while native handles remain
+referenced. Ordinary Vulkan caches discard descriptors for destroyed buffers
+while retaining compatible pipelines and unrelated live bindings. Device
+teardown releases its queue reference; native resources retain the device they
+need for subsequent cleanup. These lifecycle corrections preserve declaration,
+options, and receipt schema versions. Checkpoint DRM allocation and residency
+records in the [live status](status/reusable-compute-programs.md) are resource
+retention diagnostics, not peak-memory or driver-loss evidence.
+Linux package qualification runs the same native resource-retention regression
+in Node, Bun, and Electron. It retains closed programs while checking DRM
+allocation totals and device teardown, including timestamp scratch storage and
+labeled queues. This adds acceptance evidence within qualification version 2;
+it does not change its schema or establish another platform's resource behavior.
 Compatible descriptor layouts permit sharing the compiled pipeline while
 keeping descriptor sets independent, as specified by
 [Vulkan layout compatibility](https://docs.vulkan.org/spec/latest/chapters/descriptorsets.html#descriptorsets-compatibility).

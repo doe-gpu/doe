@@ -376,6 +376,19 @@ try {
     await program.close();
   }
   console.log('ok: destroyed device invalidates prepared program');
+  for (const execution of modes) {
+    const ownedAdapter = await requestAdapter({ backend: process.platform === 'darwin' ? 'metal' : 'vulkan' });
+    const ownedDevice = await ownedAdapter.requestDevice({ requiredFeatures: timed ? ['timestamp-query'] : [] });
+    const program = await prepareComputeProgram(ownedDevice, descriptor, { execution, ...timingOptions });
+    await program.run({ input: new Uint32Array([1, 2, 3, 4]) });
+    ownedDevice.destroy();
+    assert.throws(() => program.run({ input: new Uint32Array(4) }), { code: 'DOE_PROGRAM_INVALIDATED' });
+    await program.close();
+    await program.close();
+    ownedDevice.destroy();
+    ownedAdapter.destroy();
+  }
+  console.log('ok: each recording mode releases live resources safely after its owning device is destroyed');
 } finally {
   device.destroy();
 }

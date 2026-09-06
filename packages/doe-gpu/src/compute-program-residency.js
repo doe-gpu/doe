@@ -1,5 +1,6 @@
 // Private GPU output leases and immutable input provenance for prepared programs.
 import { hashBytes, programError, PROGRAM_SCHEMA } from './compute-program-contract.js';
+import { releaseOwnedResource } from './vendor/webgpu/shared/resource-lifecycle.js';
 
 const OUTPUTS = new WeakMap();
 const DEFAULT_LIFETIME = PROGRAM_SCHEMA.$defs.buffer.properties.lifetime.default;
@@ -27,7 +28,7 @@ function outputReference(owner, entry, origin) {
 
 function releaseEntry(entry) {
   entry.refs -= 1;
-  if (entry.refs === 0) entry.value.destroy?.();
+  if (entry.refs === 0) releaseOwnedResource(entry.value);
 }
 
 function inputBatch(owner, declarations, entries, values) {

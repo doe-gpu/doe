@@ -754,6 +754,7 @@ napi_value native_direct_buffer_destroy(napi_env env, napi_callback_info info) {
     WGPUBuffer buffer = buffer_cache ? buffer_cache->buffer : native_direct_unwrap_external_prop(env, this_arg, DOE_DIRECT_NATIVE);
     native_direct_invalidate_buffer_mapped_range_cache(env, buffer_cache);
     if (buffer) {
+        pfn_wgpuBufferDestroy(buffer);
         pfn_wgpuBufferRelease(buffer);
         native_direct_set_external_prop(env, this_arg, DOE_DIRECT_NATIVE, NULL);
         if (buffer_cache) buffer_cache->buffer = NULL;

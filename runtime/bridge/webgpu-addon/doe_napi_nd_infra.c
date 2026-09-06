@@ -220,6 +220,10 @@ NativeDirectBufferCache* native_direct_get_buffer_cache(napi_env env, napi_value
 void native_direct_invalidate_buffer_mapped_range_cache(napi_env env, NativeDirectBufferCache* cache) {
     if (!cache) return;
     if (cache->mapped_range_ref) {
+        napi_value range;
+        if (napi_get_reference_value(env, cache->mapped_range_ref, &range) == napi_ok) {
+            napi_detach_arraybuffer(env, range);
+        }
         napi_delete_reference(env, cache->mapped_range_ref);
         cache->mapped_range_ref = NULL;
     }

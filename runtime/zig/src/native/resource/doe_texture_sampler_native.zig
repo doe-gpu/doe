@@ -389,6 +389,13 @@ pub export fn doeNativeDeviceValidateTextureDescriptor(
 }
 
 pub export fn doeNativeDeviceCreateTexture(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUTextureDescriptor) callconv(.c) ?*anyopaque {
+    const raw = createTexture(dev_raw, desc) orelse return null;
+    cast(DoeTexture, raw).?.device_ref = cast(DoeDevice, dev_raw).?;
+    native_helpers.object_add_ref(DoeDevice, dev_raw);
+    return raw;
+}
+
+fn createTexture(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUTextureDescriptor) ?*anyopaque {
     const dev = cast(DoeDevice, dev_raw) orelse return null;
     const d = desc orelse {
         dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "texture descriptor is null");
@@ -678,6 +685,8 @@ pub export fn doeNativeTextureDestroy(raw: ?*anyopaque) callconv(.c) void {
 pub export fn doeNativeTextureRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeTexture, raw)) |t| {
         if (!native_helpers.object_should_destroy(t)) return;
+        const device = t.device_ref;
+        defer if (device) |dev| native_exports.doeNativeDeviceRelease(toOpaque(dev));
         texture_registry.remove(raw);
         label_store.remove(raw);
         if (d3d12_texture_registry.contains(raw)) {
@@ -732,6 +741,13 @@ pub export fn doeNativeTextureViewRelease(raw: ?*anyopaque) callconv(.c) void {
 // ============================================================
 
 pub export fn doeNativeDeviceCreateSampler(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUSamplerDescriptor) callconv(.c) ?*anyopaque {
+    const raw = createSampler(dev_raw, desc) orelse return null;
+    cast(DoeSampler, raw).?.device_ref = cast(DoeDevice, dev_raw).?;
+    native_helpers.object_add_ref(DoeDevice, dev_raw);
+    return raw;
+}
+
+fn createSampler(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUSamplerDescriptor) ?*anyopaque {
     const dev = cast(DoeDevice, dev_raw) orelse return null;
     const d = desc orelse return null;
     const s = make(DoeSampler) orelse return null;
@@ -787,6 +803,8 @@ pub export fn doeNativeDeviceCreateSampler(dev_raw: ?*anyopaque, desc: ?*const a
 pub export fn doeNativeSamplerRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeSampler, raw)) |s| {
         if (!native_helpers.object_should_destroy(s)) return;
+        const device = s.device_ref;
+        defer if (device) |dev| native_exports.doeNativeDeviceRelease(toOpaque(dev));
         label_store.remove(raw);
         if (d3d12_sampler_registry.contains(raw)) {
             d3d12_sampler_registry.remove(raw);

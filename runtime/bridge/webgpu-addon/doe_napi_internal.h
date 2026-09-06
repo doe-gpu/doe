@@ -536,6 +536,7 @@ DECL_PFN(void, doeNativeQueueWriteBufferBatchDataPtrs, (WGPUQueue, size_t, const
 DECL_PFN(WGPUFuture, wgpuQueueOnSubmittedWorkDone, (WGPUQueue, WGPUQueueWorkDoneCallbackInfo));
 DECL_PFN(void, wgpuQueueRelease, (WGPUQueue));
 DECL_PFN(void, wgpuBufferRelease, (WGPUBuffer));
+DECL_PFN(void, wgpuBufferDestroy, (WGPUBuffer));
 DECL_PFN(void, wgpuBufferUnmap, (WGPUBuffer));
 DECL_PFN(const void*, wgpuBufferGetConstMappedRange, (WGPUBuffer, size_t, size_t));
 DECL_PFN(void*, wgpuBufferGetMappedRange, (WGPUBuffer, size_t, size_t));

@@ -1170,7 +1170,7 @@ function createFullSurfaceClasses({
       this._autoLayoutEntriesByGroup = autoLayoutEntriesByGroup;
       this._cachedLayouts = new Map();
       this.label = '';
-      initResource(this, 'GPUComputePipeline', device);
+      initResource(this, 'GPUComputePipeline', device, backend.computePipelineRelease);
     }
 
     getBindGroupLayout(index) {
@@ -1192,7 +1192,7 @@ function createFullSurfaceClasses({
     constructor(native, owner) {
       this._native = native;
       this.label = '';
-      initResource(this, 'GPUBindGroupLayout', owner);
+      initResource(this, 'GPUBindGroupLayout', owner, backend.bindGroupLayoutRelease);
     }
   }
 
@@ -1200,7 +1200,7 @@ function createFullSurfaceClasses({
     constructor(native, owner) {
       this._native = native;
       this.label = '';
-      initResource(this, 'GPUBindGroup', owner);
+      initResource(this, 'GPUBindGroup', owner, backend.bindGroupRelease);
     }
   }
 
@@ -1208,7 +1208,7 @@ function createFullSurfaceClasses({
     constructor(native, owner) {
       this._native = native;
       this.label = '';
-      initResource(this, 'GPUPipelineLayout', owner);
+      initResource(this, 'GPUPipelineLayout', owner, backend.pipelineLayoutRelease);
     }
   }
 
@@ -1794,7 +1794,7 @@ function createFullSurfaceClasses({
 
     destroy() {
       resolveDeviceLost(this, 'destroyed', 'GPUDevice.destroy() was called');
-      destroyResource(this, (native) => backend.deviceDestroy(native));
+      destroyResource(this, (native) => backend.deviceDestroy(native, this));
     }
   }
 

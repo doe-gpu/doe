@@ -1336,9 +1336,9 @@
       },
       "src/backend/vulkan/vk_pipeline_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "1d1d4f6c93798dcb9158404c571246e683a35ae14e4cd10dc7db57393fcf9da8",
+        "moduleSha256": "b7a36a995d3ff7e39da0b9450dc39fb03d43a13e145c31c57d2f9b314f9f9399",
         "reason": "Keep: compute and descriptor caches own exact identities across active, hot, and map storage; collision probing and rollback preserve recorded state.",
-        "reviewer": "codex-descriptor-identity/2026-09-05"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/backend/vulkan/vk_pipeline_cache_persistent.zig": {
         "decision": "Keep",
@@ -1360,9 +1360,9 @@
       },
       "src/backend/vulkan/vk_resources.zig": {
         "decision": "Keep",
-        "moduleSha256": "c8de4a7b4ad99cae9a46d038d2a26abab57a9e591b31e94df88470acc0b05327",
+        "moduleSha256": "8f0efae2b615638687a225e2e02118cf03a8e8154ce641f1232da2f033fbd5a0",
         "reason": "Keep: native buffer and image creation assign generations; texture replacement reserves ownership and creates the successor before destroying the predecessor.",
-        "reviewer": "codex-descriptor-identity/2026-09-05"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/backend/vulkan/vk_runtime_probe_ops.zig": {
         "decision": "Keep",
@@ -3208,9 +3208,9 @@
       },
       "src/dropin/wgpu_dropin_ext_a_exports.zig": {
         "decision": "Keep",
-        "moduleSha256": "d75062e4ec1206c9dd00f6abd2cf315bfd4dd233515fe292a88cea2bbf006825",
+        "moduleSha256": "3041d6a241babc2e7d3e574114c01c0acb34aacd1e78411ce91b20d85ccd0735",
         "reason": "Keep: versioned drop-in extension export capsule and C ABI boundary.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/dropin/wgpu_dropin_ext_a_pipeline.zig": {
         "decision": "Keep",
@@ -3460,9 +3460,9 @@
       },
       "src/native/api/doe_native_api_core_exports.zig": {
         "decision": "Keep",
-        "moduleSha256": "35f9603cbbc6212bd1f348f53bfca3e9bc5caf943ec5d941ad3f5978c0ce09ac",
+        "moduleSha256": "15cdab24aef811e2a9b526c015cb3c302fa6f5fdbc937d2f64a7b7bdb6bdc8b3",
         "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/api/doe_native_api_misc_exports.zig": {
         "decision": "Keep",
@@ -3562,15 +3562,15 @@
       },
       "src/native/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "443b63b8d5cbfdd89b3db9cee418ff9699e9ee700444cba733f99d76b9eb2edb",
+        "moduleSha256": "a55ef64596b0ab9923dfad70e8930406b0ee7b84afc69672df0e0d3bf9370018",
         "reason": "Keep: reachable native implementation shared by 7 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/queue/doe_queue_copy_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "e57e85f5000dc6163fd73731b177a7fbd4e65d940fe30a4a7607d8651ece946e",
+        "moduleSha256": "e786048a85db29e44bd3d5b856dca63167c392614b9ebe6f6883e974fc9484b2",
         "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/queue/doe_queue_flush_breakdown.zig": {
         "decision": "Keep",
@@ -3646,15 +3646,15 @@
       },
       "src/native/resource/doe_bind_group_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "6ad47ab2fcd537fc6f5ccbd2aed4422d342fa82d88ba2693bf334af2958858bd",
+        "moduleSha256": "6cc77edf1e84218fdc9eac39e325f185883fa164bce9aab418481d45c437453b",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-gigi-compatibility/2026-08-15"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/resource/doe_buffer_ops_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "589936a3b0e6d0e7691b6306eb807a86ecfd7c901144ed3e3e4de72831b1c762",
+        "moduleSha256": "909d6f77ce20aa6c8851c06f513e04a063fde884cf6f521697943516e4af4418",
         "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/resource/doe_command_texture_native.zig": {
         "decision": "Keep",
@@ -3670,15 +3670,15 @@
       },
       "src/native/resource/doe_query_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "37952fa624daf1b469b04e3d7c9da8be6aa3d6c176431f230f6e403fb3c981a5",
+        "moduleSha256": "35e10905ae84e7f6bc3fe3ed9ea43f8f20324c4b2b9c3777bb7a54f6a061fb11",
         "reason": "Keep: native query sets own normalization scratch and release it with the retained pool; resolve uses the common backend conversion and validates device/ranges.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/resource/doe_texture_sampler_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "1dc154121189e50d7257ea82ad90f5af7527fd902d75909dce14a6a6a87d8755",
+        "moduleSha256": "3cb6cac7493eab952c710323d77e4acc832ca01d9815f853ae9b2504b9eaca87",
         "reason": "Keep: cohesive native texture, texture-view, and sampler ABI ownership; the upstream chained swizzle descriptor belongs to texture-view normalization and does not justify a size-only split.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/resource/doe_texture_validation.zig": {
         "decision": "Keep",
@@ -3754,9 +3754,9 @@
       },
       "src/native/support/doe_native_object_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "9f026f1a640951b40c0863a4e000de18f775eb66cad67e13e0921dc74fcbc3db",
+        "moduleSha256": "7ad0caee0fb23b35e043d061b8776a79238aa90b5f5aa9c11d38b301cbe080be",
         "reason": "Keep: reachable native implementation shared by 43 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-render-identity/2026-08-16"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/support/doe_native_runtime_helpers.zig": {
         "decision": "Keep",
@@ -3784,9 +3784,9 @@
       },
       "src/native/vulkan/vulkan_compute_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "11aa071c7ca39752395b2efc511625891f081e66fd54126b023998339dd8d96e",
+        "moduleSha256": "79ab04b9ecf0b32f01d6bf3ed70ecfa1d435d69ee149b11c5f26d8baa55a0835",
         "reason": "Keep: Vulkan translation preserves compiler error unions through module and override pipeline creation while retaining explicit execution resource ownership.",
-        "reviewer": "codex-compiler-diagnostics/2026-09-05"
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       },
       "src/native/vulkan/vulkan_feature_cache.zig": {
         "decision": "Keep",
@@ -4255,6 +4255,12 @@
         "moduleSha256": "2587d8e4d1184084a0c45ba03e4fc5faa4021c32455b0eea319d08c104702510",
         "reason": "Own the scalar floating-point reassociation and fusion transform independently of emitters and runtime submission.",
         "reviewer": "codex-compute-fusion/2026-09-05"
+      },
+      "src/backend/vulkan/vk_timestamp.zig": {
+        "decision": "Keep",
+        "moduleSha256": "4e906d85cd2d1faa49e7a4c1a23a0c22625727fe12cb32e1992e788c0e4ed6a8",
+        "reason": "Keep: query normalization and query-owned scratch lifetime remain cohesive; buffer destruction retires obsolete descriptors through the shared resource owner.",
+        "reviewer": "codex-resource-lifetime/2026-09-06"
       }
     },
     "linePolicy": {

@@ -47,6 +47,13 @@ napi_value doe_buffer_release(napi_env env, napi_callback_info info) {
     return NULL;
 }
 
+napi_value doe_buffer_destroy(napi_env env, napi_callback_info info) {
+    NAPI_ASSERT_ARGC(env, info, 1);
+    WGPUBuffer buffer = unwrap_ptr(env, _args[0]);
+    if (buffer) pfn_wgpuBufferDestroy(buffer);
+    return NULL;
+}
+
 napi_value doe_buffer_unmap(napi_env env, napi_callback_info info) {
     NAPI_ASSERT_ARGC(env, info, 1);
     WGPUBuffer buf = unwrap_ptr(env, _args[0]);

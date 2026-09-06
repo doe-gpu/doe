@@ -51,7 +51,7 @@ pub const Resolve = struct {
     }
 
     pub fn deinit(self: *Resolve, rt: anytype) void {
-        if (rt.compute_buffers.fetchRemove(self.resource_handle)) |entry| resources.release_compute_buffer(rt, entry.value);
+        if (self.resource_handle != 0) resources.destroy_compute_buffer(rt, self.resource_handle);
         self.* = .{};
     }
 

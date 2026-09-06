@@ -6,6 +6,8 @@ import {
   createFullSurfaceClasses,
   GPUDeviceLostInfo,
 } from '../../src/vendor/webgpu/shared/full-surface.js';
+import { releaseOwnedResource } from '../../src/vendor/webgpu/shared/resource-lifecycle.js';
+import { releaseEntry } from '../../src/compute-program-residency.js';
 
 function createTestDevice(backendOverrides = {}) {
   const backend = {
@@ -116,6 +118,29 @@ async function assertRejectsOperationError(promise) {
   assert.equal(viewDescriptor.dimension, '3d');
   assert.equal(viewDescriptor.baseArrayLayer, 0);
   assert.equal(viewDescriptor.arrayLayerCount, 1);
+}
+
+{
+  const released = [];
+  const backend = {
+    computePipelineRelease: (native) => released.push(native),
+    bindGroupLayoutRelease: (native) => released.push(native),
+    bindGroupRelease: (native) => released.push(native),
+    pipelineLayoutRelease: (native) => released.push(native),
+  };
+  const classes = createFullSurfaceClasses({ globals: {}, backend, encoderClasses: {} });
+  for (const name of ['DoeGPUComputePipeline', 'DoeGPUBindGroupLayout', 'DoeGPUBindGroup', 'DoeGPUPipelineLayout']) {
+    const native = { name };
+    const resource = new classes[name](native, {});
+    const entry = { value: resource, refs: 2 };
+    releaseEntry(entry);
+    assert.equal(resource._native, native, 'a replacement program still owns the shared resource');
+    assert(!released.includes(native));
+    releaseEntry(entry);
+    assert.equal(resource._native, null);
+    releaseOwnedResource(resource);
+    assert.equal(released.filter((value) => value === native).length, 1);
+  }
 }
 
 console.log('full-surface-lifecycle.test: ok');

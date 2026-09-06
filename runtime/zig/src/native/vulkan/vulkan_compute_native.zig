@@ -895,6 +895,7 @@ pub fn vulkan_prepare_dispatch_binding_state(
     state: *const VulkanDispatchBindingState,
 ) bool {
     if (comptime !has_vulkan) return false;
+    if (!bindingBuffersLive(rt, state.bindings[0..state.count])) return false;
     const spirv = pipeline_spirv_or_log(pip) orelse return false;
     const binding_result = BindingCollection{
         .count = state.count,
@@ -902,6 +903,13 @@ pub fn vulkan_prepare_dispatch_binding_state(
         .descriptor_hash = state.descriptor_hash,
     };
     return prepare_pipeline_bindings(rt, pip, spirv, binding_result, state.bindings[0..state.count]);
+}
+
+fn bindingBuffersLive(rt: *const NativeVulkanRuntime, bindings: []const model_compute_types.KernelBinding) bool {
+    for (bindings) |binding| {
+        if (binding.resource_kind == .buffer and !rt.compute_buffers.contains(binding.resource_handle)) return false;
+    }
+    return true;
 }
 
 /// Replay a recorded compute dispatch through NativeVulkanRuntime at queue-submit time.
@@ -914,6 +922,7 @@ pub fn vulkan_prepare_recorded_dispatch(rt: *NativeVulkanRuntime, dispatch: anyt
     const spirv = pipeline_spirv_or_log(pip) orelse return false;
     if (dispatch.vulkan_binding_state.valid) {
         const state = dispatch.vulkan_binding_state;
+        if (!bindingBuffersLive(rt, state.bindings[0..state.count])) return false;
         const binding_result = BindingCollection{
             .count = state.count,
             .flat_mask = state.flat_mask,

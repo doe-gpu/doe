@@ -39,6 +39,7 @@ napi_value doe_device_register_lost_callback(napi_env env, napi_callback_info in
 /* Buffer */
 napi_value doe_create_buffer(napi_env env, napi_callback_info info);
 napi_value doe_buffer_release(napi_env env, napi_callback_info info);
+napi_value doe_buffer_destroy(napi_env env, napi_callback_info info);
 napi_value doe_buffer_unmap(napi_env env, napi_callback_info info);
 napi_value doe_buffer_map_sync(napi_env env, napi_callback_info info);
 napi_value doe_buffer_get_mapped_range(napi_env env, napi_callback_info info);
@@ -222,6 +223,7 @@ napi_value doe_module_init(napi_env env, napi_value exports) {
         EXPORT_FN("deviceRegisterLostCallback",               doe_device_register_lost_callback),
         EXPORT_FN("createBuffer",                             doe_create_buffer),
         EXPORT_FN("bufferRelease",                            doe_buffer_release),
+        EXPORT_FN("bufferDestroy",                            doe_buffer_destroy),
         EXPORT_FN("bufferUnmap",                              doe_buffer_unmap),
         EXPORT_FN("bufferMapSync",                            doe_buffer_map_sync),
         EXPORT_FN("bufferGetMappedRange",                     doe_buffer_get_mapped_range),

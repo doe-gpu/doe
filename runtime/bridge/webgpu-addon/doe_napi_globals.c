@@ -73,6 +73,7 @@ PFN_doeNativeQueueWriteBufferBatchDataPtrs pfn_doeNativeQueueWriteBufferBatchDat
 PFN_wgpuQueueOnSubmittedWorkDone pfn_wgpuQueueOnSubmittedWorkDone = NULL;
 PFN_wgpuQueueRelease pfn_wgpuQueueRelease = NULL;
 PFN_wgpuBufferRelease pfn_wgpuBufferRelease = NULL;
+PFN_wgpuBufferDestroy pfn_wgpuBufferDestroy = NULL;
 PFN_wgpuBufferUnmap pfn_wgpuBufferUnmap = NULL;
 PFN_wgpuBufferGetConstMappedRange pfn_wgpuBufferGetConstMappedRange = NULL;
 PFN_wgpuBufferGetMappedRange pfn_wgpuBufferGetMappedRange = NULL;
@@ -347,6 +348,7 @@ napi_value doe_load_library(napi_env env, napi_callback_info info) {
     LOAD_SYM(wgpuQueueOnSubmittedWorkDone);
     LOAD_SYM(wgpuQueueRelease);
     LOAD_SYM(wgpuBufferRelease);
+    LOAD_SYM(wgpuBufferDestroy);
     LOAD_SYM(wgpuBufferUnmap);
     LOAD_SYM(wgpuBufferGetConstMappedRange);
     LOAD_SYM(wgpuBufferGetMappedRange);

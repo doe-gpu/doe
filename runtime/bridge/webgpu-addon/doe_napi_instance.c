@@ -489,10 +489,11 @@ napi_value doe_request_device(napi_env env, napi_callback_info info) {
         if (pfn_doeNativeObjectSetLabel && descriptor.label.data && descriptor.label.length > 0) {
             pfn_doeNativeObjectSetLabel(result.device, (const uint8_t*)descriptor.label.data, descriptor.label.length);
         }
-        if (pfn_wgpuDeviceGetQueue) {
+        if (pfn_doeNativeObjectSetLabel && descriptor.defaultQueue.label.data && descriptor.defaultQueue.label.length > 0) {
             WGPUQueue queue = pfn_wgpuDeviceGetQueue(result.device);
-            if (queue && pfn_doeNativeObjectSetLabel && descriptor.defaultQueue.label.data && descriptor.defaultQueue.label.length > 0) {
+            if (queue) {
                 pfn_doeNativeObjectSetLabel(queue, (const uint8_t*)descriptor.defaultQueue.label.data, descriptor.defaultQueue.label.length);
+                pfn_wgpuQueueRelease(queue);
             }
         }
     }
