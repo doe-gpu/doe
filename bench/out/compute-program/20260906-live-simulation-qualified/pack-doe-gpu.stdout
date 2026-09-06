@@ -1,0 +1,526 @@
+[
+  {
+    "id": "doe-gpu@0.5.0",
+    "name": "doe-gpu",
+    "version": "0.5.0",
+    "size": 242709,
+    "unpackedSize": 1217630,
+    "shasum": "9cd0fd355c6a9daf84f458d25493bbf670d4febe",
+    "integrity": "sha512-q1bXV7bJvYpmcsc+qb11nQjadq8XHAWUhaUf8ywz49oSwWSki3xoNrD+98SuvNqAkdRiNV2Vw4C2iOHj8O/HjQ==",
+    "filename": "doe-gpu-0.5.0.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 10773,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 21086,
+        "mode": 420
+      },
+      {
+        "path": "assets/compute-program.schema.json",
+        "size": 8529,
+        "mode": 420
+      },
+      {
+        "path": "assets/governed-node-webgpu-process-artifact.schema.json",
+        "size": 2879,
+        "mode": 420
+      },
+      {
+        "path": "assets/governed-node-webgpu-process-contract.schema.json",
+        "size": 4015,
+        "mode": 420
+      },
+      {
+        "path": "assets/governed-node-webgpu-process-receipt.schema.json",
+        "size": 8937,
+        "mode": 420
+      },
+      {
+        "path": "assets/live-simulation.json",
+        "size": 516,
+        "mode": 420
+      },
+      {
+        "path": "assets/live-simulation.schema.json",
+        "size": 2092,
+        "mode": 420
+      },
+      {
+        "path": "assets/program-bundle.schema.json",
+        "size": 14732,
+        "mode": 420
+      },
+      {
+        "path": "assets/transparent-webgpu-observation.schema.json",
+        "size": 3021,
+        "mode": 420
+      },
+      {
+        "path": "bin/doe-proof-node.js",
+        "size": 460,
+        "mode": 493
+      },
+      {
+        "path": "binding.gyp",
+        "size": 1723,
+        "mode": 420
+      },
+      {
+        "path": "examples/bun-first-kernel.mjs",
+        "size": 120,
+        "mode": 420
+      },
+      {
+        "path": "examples/compute-program.js",
+        "size": 2044,
+        "mode": 420
+      },
+      {
+        "path": "examples/compute-programs.js",
+        "size": 3921,
+        "mode": 420
+      },
+      {
+        "path": "examples/electron-first-kernel.mjs",
+        "size": 2486,
+        "mode": 420
+      },
+      {
+        "path": "examples/first-kernel.js",
+        "size": 1953,
+        "mode": 420
+      },
+      {
+        "path": "examples/live-simulation.js",
+        "size": 3925,
+        "mode": 420
+      },
+      {
+        "path": "examples/live-simulation/process.js",
+        "size": 2501,
+        "mode": 420
+      },
+      {
+        "path": "examples/live-simulation/program.js",
+        "size": 3399,
+        "mode": 420
+      },
+      {
+        "path": "examples/live-simulation/reference.js",
+        "size": 2274,
+        "mode": 420
+      },
+      {
+        "path": "examples/live-simulation/session.js",
+        "size": 7118,
+        "mode": 420
+      },
+      {
+        "path": "examples/live-simulation/worker.js",
+        "size": 2559,
+        "mode": 420
+      },
+      {
+        "path": "examples/node-first-kernel.mjs",
+        "size": 121,
+        "mode": 420
+      },
+      {
+        "path": "examples/node-governed-first-kernel.mjs",
+        "size": 5006,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 4831,
+        "mode": 420
+      },
+      {
+        "path": "scripts/build-addon.js",
+        "size": 2997,
+        "mode": 420
+      },
+      {
+        "path": "scripts/build-plan-refactor-receipt.js",
+        "size": 4310,
+        "mode": 420
+      },
+      {
+        "path": "scripts/check-plan-schema-parity.js",
+        "size": 3844,
+        "mode": 420
+      },
+      {
+        "path": "scripts/install.js",
+        "size": 320,
+        "mode": 420
+      },
+      {
+        "path": "scripts/native-abi-layout.js",
+        "size": 2291,
+        "mode": 420
+      },
+      {
+        "path": "scripts/rebuild-native.js",
+        "size": 4416,
+        "mode": 420
+      },
+      {
+        "path": "scripts/stage-platform-package.js",
+        "size": 8458,
+        "mode": 420
+      },
+      {
+        "path": "scripts/stage-prebuilds.js",
+        "size": 3987,
+        "mode": 420
+      },
+      {
+        "path": "scripts/sync-program-bundle-schema.js",
+        "size": 1695,
+        "mode": 420
+      },
+      {
+        "path": "scripts/sync-vendor.js",
+        "size": 138,
+        "mode": 420
+      },
+      {
+        "path": "scripts/verify-publish-readiness.js",
+        "size": 2390,
+        "mode": 420
+      },
+      {
+        "path": "src/api.d.ts",
+        "size": 282,
+        "mode": 420
+      },
+      {
+        "path": "src/api.js",
+        "size": 256,
+        "mode": 420
+      },
+      {
+        "path": "src/browser.d.ts",
+        "size": 6603,
+        "mode": 420
+      },
+      {
+        "path": "src/browser.js",
+        "size": 2886,
+        "mode": 420
+      },
+      {
+        "path": "src/bun.js",
+        "size": 1400,
+        "mode": 420
+      },
+      {
+        "path": "src/capture-provider.js",
+        "size": 22655,
+        "mode": 420
+      },
+      {
+        "path": "src/capture.d.ts",
+        "size": 64,
+        "mode": 420
+      },
+      {
+        "path": "src/capture.js",
+        "size": 138,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program-completion.js",
+        "size": 776,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program-contract.js",
+        "size": 6208,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program-native.js",
+        "size": 391,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program-residency.js",
+        "size": 4028,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program-timing.js",
+        "size": 1846,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program-update.js",
+        "size": 2883,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program.d.ts",
+        "size": 4565,
+        "mode": 420
+      },
+      {
+        "path": "src/compute-program.js",
+        "size": 19465,
+        "mode": 420
+      },
+      {
+        "path": "src/compute.d.ts",
+        "size": 6327,
+        "mode": 420
+      },
+      {
+        "path": "src/compute.js",
+        "size": 812,
+        "mode": 420
+      },
+      {
+        "path": "src/deno.js",
+        "size": 846,
+        "mode": 420
+      },
+      {
+        "path": "src/hybrid.d.ts",
+        "size": 1213,
+        "mode": 420
+      },
+      {
+        "path": "src/hybrid.js",
+        "size": 6060,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 12436,
+        "mode": 420
+      },
+      {
+        "path": "src/index.js",
+        "size": 123,
+        "mode": 420
+      },
+      {
+        "path": "src/json-canonical.js",
+        "size": 398,
+        "mode": 420
+      },
+      {
+        "path": "src/native.d.ts",
+        "size": 66,
+        "mode": 420
+      },
+      {
+        "path": "src/native.js",
+        "size": 1591,
+        "mode": 420
+      },
+      {
+        "path": "src/node-process-termination.js",
+        "size": 490,
+        "mode": 420
+      },
+      {
+        "path": "src/node-webgpu-loader.js",
+        "size": 6002,
+        "mode": 420
+      },
+      {
+        "path": "src/node-webgpu-process-cli.js",
+        "size": 26309,
+        "mode": 420
+      },
+      {
+        "path": "src/node-webgpu-process.d.ts",
+        "size": 3615,
+        "mode": 420
+      },
+      {
+        "path": "src/node-webgpu-process.js",
+        "size": 42446,
+        "mode": 420
+      },
+      {
+        "path": "src/node-webgpu.d.ts",
+        "size": 5561,
+        "mode": 420
+      },
+      {
+        "path": "src/node-webgpu.js",
+        "size": 42142,
+        "mode": 420
+      },
+      {
+        "path": "src/observe.d.ts",
+        "size": 1737,
+        "mode": 420
+      },
+      {
+        "path": "src/observe.js",
+        "size": 27660,
+        "mode": 420
+      },
+      {
+        "path": "src/plan-contracts.js",
+        "size": 7101,
+        "mode": 420
+      },
+      {
+        "path": "src/plan-validation.js",
+        "size": 16180,
+        "mode": 420
+      },
+      {
+        "path": "src/plan.d.ts",
+        "size": 13584,
+        "mode": 420
+      },
+      {
+        "path": "src/plan.js",
+        "size": 2973,
+        "mode": 420
+      },
+      {
+        "path": "src/program-bundle-runner.d.ts",
+        "size": 2247,
+        "mode": 420
+      },
+      {
+        "path": "src/program-bundle-runner.js",
+        "size": 13282,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/doe-determinism-policy.js",
+        "size": 7631,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/doe-namespace.d.ts",
+        "size": 20786,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/doe-namespace.js",
+        "size": 91405,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/doe-numeric-stability-policy.js",
+        "size": 2294,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/browser.js",
+        "size": 26493,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/build-metadata.js",
+        "size": 3895,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/bun-ffi.js",
+        "size": 203114,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/bun.js",
+        "size": 3170,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/compute.js",
+        "size": 32068,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/full.js",
+        "size": 1191,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/index.js",
+        "size": 147069,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/platform-package.js",
+        "size": 2848,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/runtime-cli.js",
+        "size": 19647,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/browser-native-canvas-backend.js",
+        "size": 4709,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/browser-surface.js",
+        "size": 4865,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/capabilities.js",
+        "size": 7546,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/compiler-errors.js",
+        "size": 4884,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/encoder-surface.js",
+        "size": 32084,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/full-surface.js",
+        "size": 75127,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/native-metal-canvas-backend.js",
+        "size": 8237,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/public-surface.js",
+        "size": 2114,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/resource-lifecycle.js",
+        "size": 3518,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/shared/validation.js",
+        "size": 40732,
+        "mode": 420
+      },
+      {
+        "path": "src/vendor/webgpu/webgpu-constants.js",
+        "size": 689,
+        "mode": 420
+      }
+    ],
+    "entryCount": 102,
+    "bundled": []
+  }
+]

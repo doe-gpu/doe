@@ -1,0 +1,2 @@
+ok: direct rendering survives caller releases before submission
+ok: bundle rendering survives caller releases before submission

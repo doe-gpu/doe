@@ -1,0 +1,1 @@
+ok: native reflection rejects failures, preserves empty success, and keeps module diagnostics

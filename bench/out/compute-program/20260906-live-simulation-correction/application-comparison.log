@@ -1,0 +1,33 @@
+audit passed: image_edges/doe-recorded
+audit passed: image_edges/doe-webgpu
+audit passed: image_edges/dawn
+audit passed: image_edges/wgpu
+audit passed: heat_diffusion/doe-recorded
+audit passed: heat_diffusion/doe-webgpu
+audit passed: heat_diffusion/dawn
+audit passed: heat_diffusion/wgpu
+measured: image_edges/doe-recorded/process-0
+measured: image_edges/doe-webgpu/process-0
+measured: image_edges/dawn/process-0
+measured: image_edges/wgpu/process-0
+measured: heat_diffusion/doe-recorded/process-0
+measured: heat_diffusion/doe-webgpu/process-0
+measured: heat_diffusion/dawn/process-0
+measured: heat_diffusion/wgpu/process-0
+measured: image_edges/doe-webgpu/process-1
+measured: image_edges/dawn/process-1
+measured: image_edges/wgpu/process-1
+measured: image_edges/doe-recorded/process-1
+measured: heat_diffusion/doe-webgpu/process-1
+measured: heat_diffusion/dawn/process-1
+measured: heat_diffusion/wgpu/process-1
+measured: heat_diffusion/doe-recorded/process-1
+measured: image_edges/dawn/process-2
+measured: image_edges/wgpu/process-2
+measured: image_edges/doe-recorded/process-2
+measured: image_edges/doe-webgpu/process-2
+measured: heat_diffusion/dawn/process-2
+measured: heat_diffusion/wgpu/process-2
+measured: heat_diffusion/doe-recorded/process-2
+measured: heat_diffusion/doe-webgpu/process-2
+{"summary": "/home/x/deco/doe/bench/out/compute-program/20260906-live-simulation-applications/summary.json", "status": "diagnostic", "error": null}

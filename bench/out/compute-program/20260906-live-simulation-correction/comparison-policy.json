@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 5,
+  "width": 256,
+  "height": 256,
+  "heatIterations": 32,
+  "warmupRuns": 5,
+  "timedRuns": 32,
+  "processRuns": 3,
+  "absoluteTolerance": 1e-05,
+  "relativeTolerance": 1e-05,
+  "interactiveDeadlineMs": 16.666667,
+  "minimumCpuReductionRatio": 1.2,
+  "denoVersion": "2.9.6",
+  "applications": [
+    "image_edges",
+    "heat_diffusion"
+  ],
+  "providers": [
+    "doe-recorded",
+    "doe-webgpu",
+    "dawn",
+    "wgpu"
+  ],
+  "claimStatus": "diagnostic",
+  "processTimeoutMs": 120000,
+  "preparedExecution": "gpu-recorded",
+  "percentileMethod": "nearest-rank",
+  "fixtures": {},
+  "gpuActivity": "reject-observed-linux-drm"
+}

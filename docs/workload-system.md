@@ -63,8 +63,9 @@ checked compute, direct-render, and submission rows and materializes the exact
 hash-named SPIR-V bytes. Compute admission requires source hash, entry point,
 workgroup identity, and a later same-process outer submission. Direct-render
 admission requires both stage source identities, both entry points, normalized
-draw arguments, and `internal_submit_and_wait_succeeded`, because that backend
-submits and waits inside the render call. Both paths require artifact digest
+draw arguments, and `internal_submit_and_wait_succeeded`, because the deferred
+Vulkan draw submits and waits when consumed by queue submission. Recording a
+draw does not execute it. Both paths require artifact digest
 validation and the application oracle. The row schema is
 [`../config/native-program-identity-trace-row.schema.json`](../config/native-program-identity-trace-row.schema.json).
 This diagnostic journal does not establish dependency closure, driver identity,

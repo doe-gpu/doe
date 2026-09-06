@@ -1,0 +1,19 @@
+ok: identical shaders on independent devices survive sibling teardown and reject foreign pipelines
+ok: arithmetic transformation preserves dynamic operand order and evaluates each call once
+ok: compute/graphics compiler cause and source locations survive subsequent compilations
+ok: clear executes at submission in copy/clear/copy order
+ok: submission invalidates later uploads; partial writes cannot validate stale bytes
+ok: separate copy submission waits for its preceding GPU producer
+ok: native-recorded snapshots, reset, cancellation, shape/source update, reuse, rollback, close
+ok: webgpu snapshots, reset, cancellation, shape/source update, reuse, rollback, close
+ok: gpu-recorded snapshots, reset, cancellation, shape/source update, reuse, rollback, close
+ok: GPU recordings survive interleaved programs, ordinary cache changes, and independent close
+ok: destroyed timestamp query invalidates GPU recording before submission
+ok: native-recorded strict update approval, state-format reset, stale approval and preparation rollback
+ok: webgpu strict update approval, state-format reset, stale approval and preparation rollback
+ok: gpu-recorded strict update approval, state-format reset, stale approval and preparation rollback
+ok: native-recorded resident inputs/state, GPU output leases, stale references, cancellation and transactional update
+ok: webgpu resident inputs/state, GPU output leases, stale references, cancellation and transactional update
+ok: gpu-recorded resident inputs/state, GPU output leases, stale references, cancellation and transactional update
+ok: destroyed device invalidates prepared program
+ok: each recording mode releases live resources safely after its owning device is destroyed

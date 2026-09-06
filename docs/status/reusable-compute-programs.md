@@ -17,6 +17,13 @@ reopening. Package qualification runs the application on Node only. Physical
 Metal, prolonged memory testing, and an application performance advantage
 remain separate acceptance work. Commands and limits are in
 [reusable compute programs](../reusable-compute-programs.md).
+The same retained wrapper and native package pass controlled host qualification
+at `bench/out/compute-program/20260906-live-simulation-qualified/summary.json`.
+Application comparisons from those exact packages are retained at
+`bench/out/compute-program/20260906-live-simulation-applications/summary.json`;
+the Deno/wgpu rows trigger the suspicious-speedup audit and remain diagnostic.
+See `bench/out/compute-program/20260906-live-simulation-correction/README.md`
+for source identities, test commands, archive extraction, and current limits.
 
 ## Explicit simulation state changes
 
