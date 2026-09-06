@@ -1348,9 +1348,9 @@
       },
       "src/backend/vulkan/vk_render.zig": {
         "decision": "Keep",
-        "moduleSha256": "065d05df21c0c065d5c95dfcfafd5288bf56a5cfc747adb95da3c67e464a630f",
-        "reason": "Keep: cohesive Vulkan render encoding state and commands; native render control remains backend-local by policy.",
-        "reviewer": "codex-gigi-compatibility/2026-08-15"
+        "moduleSha256": "27d005d9b9e4fb796d7ecf73d5a4114daf63890cb3742556513d7032a6725bf1",
+        "reason": "Keep: Vulkan attachment load behavior and color synchronization remain local to render-pass construction; later draws preserve earlier attachment writes.",
+        "reviewer": "codex-render-load/2026-09-06"
       },
       "src/backend/vulkan/vk_render_pipeline.zig": {
         "decision": "Keep",
@@ -2770,9 +2770,9 @@
       },
       "src/contracts/model/model_render_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "88603cdb172f9f4a15b4ffc8b11480a4fbe8aec7a6f0767dc930f042f6afc821",
-        "reason": "Keep: reachable neutral contract owner at src/contracts/model/model_render_types.zig.",
-        "reviewer": "codex-gigi-compatibility/2026-08-15"
+        "moduleSha256": "8e8cfd262505c24e3c6fb96679dd651c9efc5f10c7c4005b9547269998340338",
+        "reason": "Keep: neutral render-command values own explicit attachment load semantics without exposing backend constants.",
+        "reviewer": "codex-render-load/2026-09-06"
       },
       "src/contracts/model/model_resource_types.zig": {
         "decision": "Keep",
@@ -3754,9 +3754,9 @@
       },
       "src/native/support/doe_native_object_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "83f9105c38ab43332b0526ae8fe38b6e9bab768f3d2a0ca0e20c8f64674bbfd1",
-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
-        "reviewer": "codex-render-ownership/2026-09-06"
+        "moduleSha256": "bd0e60a8112c4b4343a9bc8cee4eb4808c84a34d23eb6fc88d96a771d6a46797",
+        "reason": "Keep: native object lifetimes own whether a render attachment has actually been recorded, independently of API draw-count accounting.",
+        "reviewer": "codex-render-load/2026-09-06"
       },
       "src/native/support/doe_native_runtime_helpers.zig": {
         "decision": "Keep",
@@ -3814,9 +3814,9 @@
       },
       "src/native/vulkan/vulkan_render_pass_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "cf7751db092f827cd7a68737b2541be390cf3fcdf5452e2d5ebee1d6af3d1330",
-        "reason": "Keep: snapshot Vulkan draw inputs at recording and execute them in submission order, retaining native resources and matching attachment dimensions.",
-        "reviewer": "codex-render-submission/2026-09-06"
+        "moduleSha256": "f6557da14f839b96b93f06f8ffb002cf5b0ab677ab088a7d6afba14d0e363ff9",
+        "reason": "Keep: native Vulkan recording snapshots the first attachment load and preserves subsequent draws, including bundle replay and empty load passes.",
+        "reviewer": "codex-render-load/2026-09-06"
       },
       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
         "decision": "Keep",

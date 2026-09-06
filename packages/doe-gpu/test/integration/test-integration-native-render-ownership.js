@@ -38,7 +38,7 @@ try {
       }), addon.renderPipelineRelease);
       release(shader);
       const texture = own(addon.createTexture(device._native, {
-        width: 1, height: 1, format: 'rgba8unorm',
+        width: 2, height: 1, format: 'rgba8unorm',
         usage: globals.GPUTextureUsage.RENDER_ATTACHMENT | globals.GPUTextureUsage.COPY_SRC,
       }), addon.textureRelease);
       const view = own(addon.textureCreateView(texture), addon.textureViewRelease);
@@ -51,17 +51,21 @@ try {
       const encoder = own(addon.createCommandEncoder(device._native, 'retained-render'), addon.commandEncoderRelease);
       const pass = own(addon.beginRenderPass(encoder, { colorAttachments: [{ view,
         loadOp: 'clear', storeOp: 'store', clearValue: { r: 0, g: 0, b: 1, a: 1 } }] }), addon.renderPassRelease);
-      release(view);
       let drawEncoder = pass;
       if (bundled) {
         drawEncoder = own(addon.createRenderBundleEncoder(device._native, ['rgba8unorm'], undefined, 1, false, false),
           addon.renderBundleEncoderRelease);
       }
       const prefix = bundled ? 'renderBundleEncoder' : 'renderPass';
+      addon.renderPassSetScissorRect(pass, 0, 0, 1, 1);
       addon[`${prefix}SetPipeline`](drawEncoder, pipeline);
       addon[`${prefix}SetVertexBuffer`](drawEncoder, 0, vertex, 0, 24);
       addon[`${prefix}SetIndexBuffer`](drawEncoder, index, 'uint32', 0, 12);
       addon[`${prefix}DrawIndexedIndirect`](drawEncoder, indirect, 0);
+      if (!bundled) {
+        addon.renderPassSetScissorRect(pass, 1, 0, 1, 1);
+        addon.renderPassDrawIndexedIndirect(pass, indirect, 0);
+      }
       // A write after recording must be visible when the command buffer is submitted.
       addon.queueWriteBuffer(device.queue._native, vertex, 0, new Float32Array([-1, -1, 3, -1, -1, 3]));
       for (const handle of [pipeline, vertex, index, indirect]) release(handle);
@@ -69,24 +73,32 @@ try {
         const bundle = own(addon.renderBundleEncoderFinish(drawEncoder), addon.renderBundleRelease);
         release(drawEncoder);
         addon.renderPassExecuteBundles(pass, [bundle]);
+        addon.renderPassSetScissorRect(pass, 1, 0, 1, 1);
+        addon.renderPassExecuteBundles(pass, [bundle]);
         release(bundle);
       }
       addon.renderPassEnd(pass);
+      const loadPass = own(addon.beginRenderPass(encoder, { colorAttachments: [{ view,
+        loadOp: 'load', storeOp: 'store' }] }), addon.renderPassRelease);
+      release(view);
+      addon.renderPassEnd(loadPass);
       addon.commandEncoderCopyTextureToBuffer(encoder, texture, 0, 0, 0, 0, 1,
-        readback, 0, rowBytes, 1, 1, 1, 1);
+        readback, 0, rowBytes, 1, 2, 1, 1);
       release(texture);
       const commands = own(addon.commandEncoderFinish(encoder), addon.commandBufferRelease);
       release(encoder);
       release(pass);
+      release(loadPass);
       addon.queueSubmit(device.queue._native, [commands]);
       await device.queue.onSubmittedWorkDone();
       release(commands);
       addon.bufferMapSync(device._instance, readback, globals.GPUMapMode.READ, 0, rowBytes);
-      assert.deepEqual(new Uint8Array(addon.bufferReadCopy(readback, 0, rowBytes)).slice(0, 4), new Uint8Array([255, 0, 0, 255]));
+      assert.deepEqual(new Uint8Array(addon.bufferReadCopy(readback, 0, rowBytes)).slice(0, 8),
+        new Uint8Array([255, 0, 0, 255, 255, 0, 0, 255]));
       addon.bufferUnmap(readback);
       release(readback);
       assert.equal(cleanup.size, 0);
-      console.log(`ok: ${bundled ? 'bundle' : 'direct'} rendering survives caller releases before submission`);
+      console.log(`ok: ${bundled ? 'bundle' : 'direct'} draws preserve color through a load pass and caller release`);
     } finally {
       for (const [handle, action] of [...cleanup].reverse()) action(handle);
     }

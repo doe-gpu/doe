@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe_native_program_identity_trace_validation",
+  "inputs": {
+    "trace": {
+      "path": "bench/out/compute-program/20260906-render-load/native.jsonl",
+      "sha256": "6695a5efce5e87fb47a67e3bf4ee1490314118cc5834f7510fb252fe7be125e7"
+    },
+    "rowSchema": {
+      "path": "config/native-program-identity-trace-row.schema.json",
+      "sha256": "34799d1a2571070bb34ac7f14e36a42a0f63616c9216ab86d6ca0e16c0db4a89"
+    },
+    "artifactRoot": "bench/out/compute-program/20260906-render-load",
+    "spirvValidator": "/usr/bin/spirv-val",
+    "requireRenderCompletion": true
+  },
+  "counts": {
+    "rows": 28,
+    "processes": 1,
+    "dispatches": 0,
+    "renderDraws": 0,
+    "submissions": 0,
+    "artifacts": 0
+  },
+  "checks": {
+    "rowSchemaValid": true,
+    "processSequenceValid": true,
+    "computeSubmissionValid": true,
+    "renderCompletionValid": true,
+    "backendArtifactsValid": true
+  },
+  "artifacts": [],
+  "verdict": {
+    "status": "passed",
+    "failureCodes": [],
+    "claimBoundary": "native journal schema, event sequence, completion, and exact SPIR-V bytes; not public-observer identity, output correctness, driver identity, or performance"
+  },
+  "validationSha256": "25b9eb77aba7ae87d5bcc75050fc6445dfa43d10680270cf96ef78161e5c99e2"
+}

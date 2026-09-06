@@ -108,6 +108,7 @@ pub fn execute_render_draw(
         has_depth_stencil,
         depth_stencil_vk_format,
         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        cmd.color_load,
     );
     try create_framebuffer(self, &render_state, target_width, target_height);
     try create_graphics_pipeline(self, &render_state, vk_format, cmd);
@@ -163,6 +164,7 @@ pub fn execute_render_clear(
         false,
         0,
         color_final_layout,
+        cmd.color_load,
     );
     try create_framebuffer(self, &render_state, target_width, target_height);
     const encode_end = common_timing.now_ns();
@@ -384,6 +386,7 @@ fn create_render_pass(
     has_depth_stencil: bool,
     depth_stencil_vk_format: u32,
     color_final_layout: u32,
+    color_load: model_render_types.RenderAttachmentLoad,
 ) !void {
     const color_initial_layout = if (state.render_target) |target| target.layout else c.VK_IMAGE_LAYOUT_UNDEFINED;
     const depth_initial_layout = if (state.depth_stencil_target) |target| target.layout else c.VK_IMAGE_LAYOUT_UNDEFINED;
@@ -392,7 +395,10 @@ fn create_render_pass(
             .flags = 0,
             .format = vk_format,
             .samples = c.VK_SAMPLE_COUNT_1_BIT,
-            .loadOp = c.VK_ATTACHMENT_LOAD_OP_CLEAR,
+            .loadOp = switch (color_load) {
+                .clear => c.VK_ATTACHMENT_LOAD_OP_CLEAR,
+                .load => c.VK_ATTACHMENT_LOAD_OP_LOAD,
+            },
             .storeOp = c.VK_ATTACHMENT_STORE_OP_STORE,
             .stencilLoadOp = c.VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             .stencilStoreOp = c.VK_ATTACHMENT_STORE_OP_DONT_CARE,
@@ -434,23 +440,24 @@ fn create_render_pass(
         .pPreserveAttachments = null,
     };
 
+    const color_source = vk_resources.texture_transition_source(color_initial_layout);
     var dependency = c.VkSubpassDependency{
         .srcSubpass = c.VK_SUBPASS_EXTERNAL,
         .dstSubpass = 0,
-        .srcStageMask = c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        .srcStageMask = color_source.src_stage,
         .dstStageMask = if (has_depth_stencil)
             c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
                 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
                 VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
         else
             c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        .srcAccessMask = 0,
+        .srcAccessMask = color_source.src_access_mask,
         .dstAccessMask = if (has_depth_stencil)
-            c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+            c.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
                 VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
                 VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
         else
-            c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+            c.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
         .dependencyFlags = 0,
     };
 
@@ -940,6 +947,7 @@ pub fn execute_render_bundles(
         false,
         0,
         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .clear,
     );
     try create_framebuffer(self, &state, width, height);
     const encode_end = common_timing.now_ns();

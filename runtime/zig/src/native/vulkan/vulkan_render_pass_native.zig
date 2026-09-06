@@ -4,6 +4,7 @@ const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const query_native = @import("../resource/doe_query_native.zig");
 const std = @import("std");
+const upstream = @import("../../core/abi/generated/webgpu_upstream.zig").c;
 const shared = @import("vulkan_render_shared.zig");
 
 const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);
@@ -45,6 +46,10 @@ fn populate_draw_cmd_from_pass(cmd: *model_render_types.RenderDrawCommand, pass:
         @floatCast(pass.clear_b),
         @floatCast(pass.clear_a),
     };
+    cmd.color_load = if (pass.color_attachment_started or pass.color_load_op == upstream.WGPULoadOp_Load)
+        .load
+    else
+        .clear;
 
     var bound_vertex_count: u32 = 0;
     var bound_slot: usize = 0;
@@ -178,6 +183,7 @@ fn recordRender(pass: *shared.DoeRenderPass, cmd: model_render_types.RenderDrawC
         .pipeline = if (pass.pipeline) |pipeline| native_helpers.toOpaque(pipeline) else null,
         .clear_only = clear_only,
     } }) catch std.debug.panic("Vulkan render: OOM recording draw state", .{});
+    pass.color_attachment_started = true;
 }
 
 pub fn vulkan_render_pass_draw(pass: *shared.DoeRenderPass, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) void {
@@ -223,7 +229,7 @@ pub fn vulkan_render_pass_draw_indexed_indirect(pass: *shared.DoeRenderPass, ind
 }
 
 pub fn vulkan_render_pass_end(pass: *shared.DoeRenderPass) void {
-    if (pass.recorded_draw_count != 0) return;
+    if (pass.color_attachment_started) return;
     var cmd = base_vulkan_render_cmd(pass);
     populate_draw_cmd_from_pass(&cmd, pass);
     recordRender(pass, cmd, true);

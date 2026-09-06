@@ -1,0 +1,324 @@
+diff --git a/docs/process.md b/docs/process.md
+index 588536d14..25668d85d 100644
+--- a/docs/process.md
++++ b/docs/process.md
+@@ -317,6 +317,14 @@ isolated-host qualification remains necessary. Numerical audits and historical
+ policies retain their existing contracts. Migration and observation limits are
+ documented in [`reusable-compute-programs.md`](reusable-compute-programs.md).
+ 
++Color-attachment preservation uses the native-addon ownership regression with
++adjacent direct/bundled draws, an empty load pass, deferred submission, and
++released caller references. The WebGPU input contract and trace schema are
++unchanged; the correction carries the existing load semantics through the
++internal render command. Native architecture checks, Zig regressions, and
++same-package controlled-host qualification remain required. This evidence does
++not qualify depth/stencil, store/discard, resolve, or render-query behavior.
++
+ Bounded WGSL candidate jobs use `bench/cli.py program candidate`. Admission
+ requires the independently pinned acceptance job, unchanged reference/input
+ hashes, valid declared resource budgets, exact qualified package bytes, every
+diff --git a/docs/status/compiler-and-webgpu.md b/docs/status/compiler-and-webgpu.md
+index 28603c905..6134a677e 100644
+--- a/docs/status/compiler-and-webgpu.md
++++ b/docs/status/compiler-and-webgpu.md
+@@ -3,6 +3,22 @@
+ This is the live status front door for the non-TSIR WGSL compiler and WebGPU
+ runtime path. Artifacts and executable tests own pass/fail state.
+ 
++## Color attachment preservation
++
++Native Vulkan recording now distinguishes the first recorded attachment use
++from API draw-count accounting. The initial draw honors the declared color load;
++later direct and bundled draws preserve previous color writes. Empty passes
++also preserve existing color when `load` is requested. Render-pass dependencies
++derive their source scope from the existing texture-layout owner.
++
++The native-addon regression draws adjacent regions, loads them through an empty
++pass, releases caller references, and checks the submitted pixels. The failing
++reproduction, source correction, native checks, and exact-package qualification
++are indexed at `bench/out/compute-program/20260906-render-load/README.md`.
++This correction concerns existing color attachments. Depth/stencil attachment
++identity, store/discard initialization, resolve behavior, render queries, and
++broader render-pass conformance remain separate correctness work.
++
+ ## Deferred rendering and native ownership
+ 
+ Vulkan draws are recorded as owned command snapshots and executed during queue
+diff --git a/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js b/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js
+index a0ebe5a07..f5dbd7ad8 100644
+--- a/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js
++++ b/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js
+@@ -38,7 +38,7 @@ try {
+       }), addon.renderPipelineRelease);
+       release(shader);
+       const texture = own(addon.createTexture(device._native, {
+-        width: 1, height: 1, format: 'rgba8unorm',
++        width: 2, height: 1, format: 'rgba8unorm',
+         usage: globals.GPUTextureUsage.RENDER_ATTACHMENT | globals.GPUTextureUsage.COPY_SRC,
+       }), addon.textureRelease);
+       const view = own(addon.textureCreateView(texture), addon.textureViewRelease);
+@@ -51,17 +51,21 @@ try {
+       const encoder = own(addon.createCommandEncoder(device._native, 'retained-render'), addon.commandEncoderRelease);
+       const pass = own(addon.beginRenderPass(encoder, { colorAttachments: [{ view,
+         loadOp: 'clear', storeOp: 'store', clearValue: { r: 0, g: 0, b: 1, a: 1 } }] }), addon.renderPassRelease);
+-      release(view);
+       let drawEncoder = pass;
+       if (bundled) {
+         drawEncoder = own(addon.createRenderBundleEncoder(device._native, ['rgba8unorm'], undefined, 1, false, false),
+           addon.renderBundleEncoderRelease);
+       }
+       const prefix = bundled ? 'renderBundleEncoder' : 'renderPass';
++      addon.renderPassSetScissorRect(pass, 0, 0, 1, 1);
+       addon[`${prefix}SetPipeline`](drawEncoder, pipeline);
+       addon[`${prefix}SetVertexBuffer`](drawEncoder, 0, vertex, 0, 24);
+       addon[`${prefix}SetIndexBuffer`](drawEncoder, index, 'uint32', 0, 12);
+       addon[`${prefix}DrawIndexedIndirect`](drawEncoder, indirect, 0);
++      if (!bundled) {
++        addon.renderPassSetScissorRect(pass, 1, 0, 1, 1);
++        addon.renderPassDrawIndexedIndirect(pass, indirect, 0);
++      }
+       // A write after recording must be visible when the command buffer is submitted.
+       addon.queueWriteBuffer(device.queue._native, vertex, 0, new Float32Array([-1, -1, 3, -1, -1, 3]));
+       for (const handle of [pipeline, vertex, index, indirect]) release(handle);
+@@ -69,24 +73,32 @@ try {
+         const bundle = own(addon.renderBundleEncoderFinish(drawEncoder), addon.renderBundleRelease);
+         release(drawEncoder);
+         addon.renderPassExecuteBundles(pass, [bundle]);
++        addon.renderPassSetScissorRect(pass, 1, 0, 1, 1);
++        addon.renderPassExecuteBundles(pass, [bundle]);
+         release(bundle);
+       }
+       addon.renderPassEnd(pass);
++      const loadPass = own(addon.beginRenderPass(encoder, { colorAttachments: [{ view,
++        loadOp: 'load', storeOp: 'store' }] }), addon.renderPassRelease);
++      release(view);
++      addon.renderPassEnd(loadPass);
+       addon.commandEncoderCopyTextureToBuffer(encoder, texture, 0, 0, 0, 0, 1,
+-        readback, 0, rowBytes, 1, 1, 1, 1);
++        readback, 0, rowBytes, 1, 2, 1, 1);
+       release(texture);
+       const commands = own(addon.commandEncoderFinish(encoder), addon.commandBufferRelease);
+       release(encoder);
+       release(pass);
++      release(loadPass);
+       addon.queueSubmit(device.queue._native, [commands]);
+       await device.queue.onSubmittedWorkDone();
+       release(commands);
+       addon.bufferMapSync(device._instance, readback, globals.GPUMapMode.READ, 0, rowBytes);
+-      assert.deepEqual(new Uint8Array(addon.bufferReadCopy(readback, 0, rowBytes)).slice(0, 4), new Uint8Array([255, 0, 0, 255]));
++      assert.deepEqual(new Uint8Array(addon.bufferReadCopy(readback, 0, rowBytes)).slice(0, 8),
++        new Uint8Array([255, 0, 0, 255, 255, 0, 0, 255]));
+       addon.bufferUnmap(readback);
+       release(readback);
+       assert.equal(cleanup.size, 0);
+-      console.log(`ok: ${bundled ? 'bundle' : 'direct'} rendering survives caller releases before submission`);
++      console.log(`ok: ${bundled ? 'bundle' : 'direct'} draws preserve color through a load pass and caller release`);
+     } finally {
+       for (const [handle, action] of [...cleanup].reverse()) action(handle);
+     }
+diff --git a/runtime/zig/source-layout.json b/runtime/zig/source-layout.json
+index e76a963d8..fd8f6519d 100644
+--- a/runtime/zig/source-layout.json
++++ b/runtime/zig/source-layout.json
+@@ -1348,9 +1348,9 @@
+       },
+       "src/backend/vulkan/vk_render.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "065d05df21c0c065d5c95dfcfafd5288bf56a5cfc747adb95da3c67e464a630f",
+-        "reason": "Keep: cohesive Vulkan render encoding state and commands; native render control remains backend-local by policy.",
+-        "reviewer": "codex-gigi-compatibility/2026-08-15"
++        "moduleSha256": "27d005d9b9e4fb796d7ecf73d5a4114daf63890cb3742556513d7032a6725bf1",
++        "reason": "Keep: Vulkan attachment load behavior and color synchronization remain local to render-pass construction; later draws preserve earlier attachment writes.",
++        "reviewer": "codex-render-load/2026-09-06"
+       },
+       "src/backend/vulkan/vk_render_pipeline.zig": {
+         "decision": "Keep",
+@@ -2770,9 +2770,9 @@
+       },
+       "src/contracts/model/model_render_types.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "88603cdb172f9f4a15b4ffc8b11480a4fbe8aec7a6f0767dc930f042f6afc821",
+-        "reason": "Keep: reachable neutral contract owner at src/contracts/model/model_render_types.zig.",
+-        "reviewer": "codex-gigi-compatibility/2026-08-15"
++        "moduleSha256": "8e8cfd262505c24e3c6fb96679dd651c9efc5f10c7c4005b9547269998340338",
++        "reason": "Keep: neutral render-command values own explicit attachment load semantics without exposing backend constants.",
++        "reviewer": "codex-render-load/2026-09-06"
+       },
+       "src/contracts/model/model_resource_types.zig": {
+         "decision": "Keep",
+@@ -3754,9 +3754,9 @@
+       },
+       "src/native/support/doe_native_object_types.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "83f9105c38ab43332b0526ae8fe38b6e9bab768f3d2a0ca0e20c8f64674bbfd1",
+-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+-        "reviewer": "codex-render-ownership/2026-09-06"
++        "moduleSha256": "bd0e60a8112c4b4343a9bc8cee4eb4808c84a34d23eb6fc88d96a771d6a46797",
++        "reason": "Keep: native object lifetimes own whether a render attachment has actually been recorded, independently of API draw-count accounting.",
++        "reviewer": "codex-render-load/2026-09-06"
+       },
+       "src/native/support/doe_native_runtime_helpers.zig": {
+         "decision": "Keep",
+@@ -3814,9 +3814,9 @@
+       },
+       "src/native/vulkan/vulkan_render_pass_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "cf7751db092f827cd7a68737b2541be390cf3fcdf5452e2d5ebee1d6af3d1330",
+-        "reason": "Keep: snapshot Vulkan draw inputs at recording and execute them in submission order, retaining native resources and matching attachment dimensions.",
+-        "reviewer": "codex-render-submission/2026-09-06"
++        "moduleSha256": "f6557da14f839b96b93f06f8ffb002cf5b0ab677ab088a7d6afba14d0e363ff9",
++        "reason": "Keep: native Vulkan recording snapshots the first attachment load and preserves subsequent draws, including bundle replay and empty load passes.",
++        "reviewer": "codex-render-load/2026-09-06"
+       },
+       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
+         "decision": "Keep",
+diff --git a/runtime/zig/src/backend/vulkan/vk_render.zig b/runtime/zig/src/backend/vulkan/vk_render.zig
+index 89931e901..3a0cce9b4 100644
+--- a/runtime/zig/src/backend/vulkan/vk_render.zig
++++ b/runtime/zig/src/backend/vulkan/vk_render.zig
+@@ -108,6 +108,7 @@ pub fn execute_render_draw(
+         has_depth_stencil,
+         depth_stencil_vk_format,
+         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
++        cmd.color_load,
+     );
+     try create_framebuffer(self, &render_state, target_width, target_height);
+     try create_graphics_pipeline(self, &render_state, vk_format, cmd);
+@@ -163,6 +164,7 @@ pub fn execute_render_clear(
+         false,
+         0,
+         color_final_layout,
++        cmd.color_load,
+     );
+     try create_framebuffer(self, &render_state, target_width, target_height);
+     const encode_end = common_timing.now_ns();
+@@ -384,6 +386,7 @@ fn create_render_pass(
+     has_depth_stencil: bool,
+     depth_stencil_vk_format: u32,
+     color_final_layout: u32,
++    color_load: model_render_types.RenderAttachmentLoad,
+ ) !void {
+     const color_initial_layout = if (state.render_target) |target| target.layout else c.VK_IMAGE_LAYOUT_UNDEFINED;
+     const depth_initial_layout = if (state.depth_stencil_target) |target| target.layout else c.VK_IMAGE_LAYOUT_UNDEFINED;
+@@ -392,7 +395,10 @@ fn create_render_pass(
+             .flags = 0,
+             .format = vk_format,
+             .samples = c.VK_SAMPLE_COUNT_1_BIT,
+-            .loadOp = c.VK_ATTACHMENT_LOAD_OP_CLEAR,
++            .loadOp = switch (color_load) {
++                .clear => c.VK_ATTACHMENT_LOAD_OP_CLEAR,
++                .load => c.VK_ATTACHMENT_LOAD_OP_LOAD,
++            },
+             .storeOp = c.VK_ATTACHMENT_STORE_OP_STORE,
+             .stencilLoadOp = c.VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+             .stencilStoreOp = c.VK_ATTACHMENT_STORE_OP_DONT_CARE,
+@@ -434,23 +440,24 @@ fn create_render_pass(
+         .pPreserveAttachments = null,
+     };
+ 
++    const color_source = vk_resources.texture_transition_source(color_initial_layout);
+     var dependency = c.VkSubpassDependency{
+         .srcSubpass = c.VK_SUBPASS_EXTERNAL,
+         .dstSubpass = 0,
+-        .srcStageMask = c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
++        .srcStageMask = color_source.src_stage,
+         .dstStageMask = if (has_depth_stencil)
+             c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+                 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+                 VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
+         else
+             c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+-        .srcAccessMask = 0,
++        .srcAccessMask = color_source.src_access_mask,
+         .dstAccessMask = if (has_depth_stencil)
+-            c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
++            c.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+                 VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+                 VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+         else
+-            c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
++            c.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+         .dependencyFlags = 0,
+     };
+ 
+@@ -940,6 +947,7 @@ pub fn execute_render_bundles(
+         false,
+         0,
+         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
++        .clear,
+     );
+     try create_framebuffer(self, &state, width, height);
+     const encode_end = common_timing.now_ns();
+diff --git a/runtime/zig/src/contracts/model/model_render_types.zig b/runtime/zig/src/contracts/model/model_render_types.zig
+index d24b5fe42..c8715353f 100644
+--- a/runtime/zig/src/contracts/model/model_render_types.zig
++++ b/runtime/zig/src/contracts/model/model_render_types.zig
+@@ -25,6 +25,8 @@ pub const RenderIndexFormat = enum {
+     uint32,
+ };
+ 
++pub const RenderAttachmentLoad = enum { clear, load };
++
+ pub const MAX_VERTEX_BUFFERS: usize = 8;
+ pub const MAX_VERTEX_ATTRIBUTES: usize = 16;
+ pub const MAX_RENDER_BIND_ENTRIES: usize = 16;
+@@ -113,6 +115,7 @@ pub const RenderDrawCommand = struct {
+     sample_count: u32 = 1,
+     blend_constant: [4]f32 = .{ 0, 0, 0, 0 },
+     clear_color: [4]f32 = .{ 0, 0, 0, 1 },
++    color_load: RenderAttachmentLoad = .clear,
+     stencil_reference: u32 = 0,
+     occlusion_query_pool: u64 = 0,
+     occlusion_query_index: ?u32 = null,
+diff --git a/runtime/zig/src/native/support/doe_native_object_types.zig b/runtime/zig/src/native/support/doe_native_object_types.zig
+index 5e3cc49e4..7121e3677 100644
+--- a/runtime/zig/src/native/support/doe_native_object_types.zig
++++ b/runtime/zig/src/native/support/doe_native_object_types.zig
+@@ -403,6 +403,7 @@ pub const DoeRenderPass = struct {
+     pipeline: ?*DoeRenderPipeline = null,
+     max_draw_count: u64 = 50_000_000,
+     recorded_draw_count: u64 = 0,
++    color_attachment_started: bool = false,
+     recorded_command_start: usize = 0,
+     target: ?*anyopaque = null,
+     resolve_target: ?*anyopaque = null,
+diff --git a/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig b/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
+index ed3f16b64..9c53ff953 100644
+--- a/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
++++ b/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
+@@ -4,6 +4,7 @@ const native_helpers = @import("../support/doe_native_object_helpers.zig");
+ const native_shared = @import("../support/doe_native_shared_types.zig");
+ const query_native = @import("../resource/doe_query_native.zig");
+ const std = @import("std");
++const upstream = @import("../../core/abi/generated/webgpu_upstream.zig").c;
+ const shared = @import("vulkan_render_shared.zig");
+ 
+ const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);
+@@ -45,6 +46,10 @@ fn populate_draw_cmd_from_pass(cmd: *model_render_types.RenderDrawCommand, pass:
+         @floatCast(pass.clear_b),
+         @floatCast(pass.clear_a),
+     };
++    cmd.color_load = if (pass.color_attachment_started or pass.color_load_op == upstream.WGPULoadOp_Load)
++        .load
++    else
++        .clear;
+ 
+     var bound_vertex_count: u32 = 0;
+     var bound_slot: usize = 0;
+@@ -178,6 +183,7 @@ fn recordRender(pass: *shared.DoeRenderPass, cmd: model_render_types.RenderDrawC
+         .pipeline = if (pass.pipeline) |pipeline| native_helpers.toOpaque(pipeline) else null,
+         .clear_only = clear_only,
+     } }) catch std.debug.panic("Vulkan render: OOM recording draw state", .{});
++    pass.color_attachment_started = true;
+ }
+ 
+ pub fn vulkan_render_pass_draw(pass: *shared.DoeRenderPass, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) void {
+@@ -223,7 +229,7 @@ pub fn vulkan_render_pass_draw_indexed_indirect(pass: *shared.DoeRenderPass, ind
+ }
+ 
+ pub fn vulkan_render_pass_end(pass: *shared.DoeRenderPass) void {
+-    if (pass.recorded_draw_count != 0) return;
++    if (pass.color_attachment_started) return;
+     var cmd = base_vulkan_render_cmd(pass);
+     populate_draw_cmd_from_pass(&cmd, pass);
+     recordRender(pass, cmd, true);

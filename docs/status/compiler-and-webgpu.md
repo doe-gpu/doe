@@ -3,6 +3,22 @@
 This is the live status front door for the non-TSIR WGSL compiler and WebGPU
 runtime path. Artifacts and executable tests own pass/fail state.
 
+## Color attachment preservation
+
+Native Vulkan recording now distinguishes the first recorded attachment use
+from API draw-count accounting. The initial draw honors the declared color load;
+later direct and bundled draws preserve previous color writes. Empty passes
+also preserve existing color when `load` is requested. Render-pass dependencies
+derive their source scope from the existing texture-layout owner.
+
+The native-addon regression draws adjacent regions, loads them through an empty
+pass, releases caller references, and checks the submitted pixels. The failing
+reproduction, source correction, native checks, and exact-package qualification
+are indexed at `bench/out/compute-program/20260906-render-load/README.md`.
+This correction concerns existing color attachments. Depth/stencil attachment
+identity, store/discard initialization, resolve behavior, render queries, and
+broader render-pass conformance remain separate correctness work.
+
 ## Deferred rendering and native ownership
 
 Vulkan draws are recorded as owned command snapshots and executed during queue

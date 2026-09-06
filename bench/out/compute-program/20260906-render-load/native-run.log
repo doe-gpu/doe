@@ -1,0 +1,2 @@
+ok: direct draws preserve color through a load pass and caller release
+ok: bundle draws preserve color through a load pass and caller release

@@ -25,6 +25,8 @@ pub const RenderIndexFormat = enum {
     uint32,
 };
 
+pub const RenderAttachmentLoad = enum { clear, load };
+
 pub const MAX_VERTEX_BUFFERS: usize = 8;
 pub const MAX_VERTEX_ATTRIBUTES: usize = 16;
 pub const MAX_RENDER_BIND_ENTRIES: usize = 16;
@@ -113,6 +115,7 @@ pub const RenderDrawCommand = struct {
     sample_count: u32 = 1,
     blend_constant: [4]f32 = .{ 0, 0, 0, 0 },
     clear_color: [4]f32 = .{ 0, 0, 0, 1 },
+    color_load: RenderAttachmentLoad = .clear,
     stencil_reference: u32 = 0,
     occlusion_query_pool: u64 = 0,
     occlusion_query_index: ?u32 = null,

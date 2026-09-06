@@ -317,6 +317,14 @@ isolated-host qualification remains necessary. Numerical audits and historical
 policies retain their existing contracts. Migration and observation limits are
 documented in [`reusable-compute-programs.md`](reusable-compute-programs.md).
 
+Color-attachment preservation uses the native-addon ownership regression with
+adjacent direct/bundled draws, an empty load pass, deferred submission, and
+released caller references. The WebGPU input contract and trace schema are
+unchanged; the correction carries the existing load semantics through the
+internal render command. Native architecture checks, Zig regressions, and
+same-package controlled-host qualification remain required. This evidence does
+not qualify depth/stencil, store/discard, resolve, or render-query behavior.
+
 Bounded WGSL candidate jobs use `bench/cli.py program candidate`. Admission
 requires the independently pinned acceptance job, unchanged reference/input
 hashes, valid declared resource budgets, exact qualified package bytes, every

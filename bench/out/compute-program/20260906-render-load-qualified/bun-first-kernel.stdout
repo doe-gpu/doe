@@ -1,0 +1,52 @@
+{
+  "kind": "doe-gpu.first-kernel.receipt",
+  "schemaVersion": 1,
+  "runtimeHost": "bun",
+  "provider": {
+    "module": "doe-gpu",
+    "loaded": true,
+    "loadError": "",
+    "defaultCreateArgs": [],
+    "doeNative": true,
+    "libraryFlavor": "doe-dropin",
+    "doeLibraryPath": "/tmp/doe-program-bun-6rauirc1/node_modules/doe-gpu-linux-x64/bin/libwebgpu_doe.so",
+    "buildMetadataSource": "prebuild",
+    "buildMetadataPath": "/tmp/doe-program-bun-6rauirc1/node_modules/doe-gpu-linux-x64/bin/metadata.json",
+    "leanVerifiedBuild": false,
+    "proofArtifactSha256": null,
+    "nativeFastPaths": {
+      "appleFastPathCompiled": false,
+      "queueFlush": true,
+      "queueFlushBreakdown": true,
+      "queueWriteBufferBatch": true,
+      "queueWriteBufferBatchDataPtrs": true,
+      "computeDispatchFlush": true,
+      "computeDispatchFlushBreakdown": true,
+      "computeDispatchBatchFlush": true,
+      "computeDispatchBatchCopyFlush": true,
+      "computeDispatchBatchCopyFlushBreakdown": true,
+      "computePrewarmDispatchBindings": true,
+      "bufferMapReadCopyUnmap": true
+    }
+  },
+  "workload": {
+    "id": "vector-scale-f32",
+    "elementCount": 8,
+    "wgslSha256": "f03b12ba1e7df16b58babac43b326771a30d3e7de9278bfcd3daa8d95faf80b2",
+    "inputSha256": "af7de0621354bafceb193edf0fcf5d421cf21de7146580062fff53c7907f54e5"
+  },
+  "result": {
+    "output": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+    "durationMs": 56.094
+  }
+}

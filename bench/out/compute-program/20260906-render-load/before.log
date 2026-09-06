@@ -1,0 +1,38 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  Uint8Array(8) [
+-   255,
+    0,
+    0,
+-   255,
+-   255,
+    0,
+    0,
++   0,
++   0,
++   0,
++   0
+-   255
+  ]
+
+    at file:///home/x/deco/doe/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js:96:14 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: Uint8Array(8) [
+    0, 0, 0, 0,
+    0, 0, 0, 0
+  ],
+  expected: Uint8Array(8) [
+    255, 0, 0, 255,
+    255, 0, 0, 255
+  ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.1
