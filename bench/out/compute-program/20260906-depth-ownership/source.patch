@@ -1,0 +1,746 @@
+diff --git a/docs/process.md b/docs/process.md
+index 25668d85d..0165feb8f 100644
+--- a/docs/process.md
++++ b/docs/process.md
+@@ -325,6 +325,14 @@ internal render command. Native architecture checks, Zig regressions, and
+ same-package controlled-host qualification remain required. This evidence does
+ not qualify depth/stencil, store/discard, resolve, or render-query behavior.
+ 
++Depth ownership extends the same native-addon regression with near/far geometry,
++later load passes, read-only depth, empty depth clears, depth readback, and
++released caller references. Vulkan uses the caller's retained attachment and the same parent
++allocation identity check used by descriptors. Existing WebGPU fields flow
++through internal command snapshots; public descriptor and trace schemas do not
++change. Stencil operations, depth-only passes, store/discard, multisampling,
++and physical non-Vulkan execution remain separately qualified behavior.
++
+ Bounded WGSL candidate jobs use `bench/cli.py program candidate`. Admission
+ requires the independently pinned acceptance job, unchanged reference/input
+ hashes, valid declared resource budgets, exact qualified package bytes, every
+diff --git a/docs/status/compiler-and-webgpu.md b/docs/status/compiler-and-webgpu.md
+index 6134a677e..5e0aeec01 100644
+--- a/docs/status/compiler-and-webgpu.md
++++ b/docs/status/compiler-and-webgpu.md
+@@ -3,6 +3,26 @@
+ This is the live status front door for the non-TSIR WGSL compiler and WebGPU
+ runtime path. Artifacts and executable tests own pass/fail state.
+ 
++## Depth attachment ownership
++
++Native Vulkan execution binds the application's retained depth texture and view
++instead of allocating an unrelated target for each draw. Internal commands
++carry attachment identity, load operations, and clear values. Draws, later
++passes, and read-only depth use preserve the existing state; an empty clear
++pass resets it explicitly. Borrowed attachments remain owned by the native
++command-buffer leases, and temporary backend targets retain separate cleanup.
++
++Descriptor snapshots and render attachments use the same texture-parent
++allocation identity rule. Recycled generations, changed images, and another
++parent cannot satisfy a retained view's binding. The regression checks depth
++occlusion across draws/passes, read-only depth, empty clears, caller release,
++and readback from the application's depth texture.
++Source, native traces, tests, and retained packages are indexed at
++`bench/out/compute-program/20260906-depth-ownership/README.md`.
++The physical image regression covers depth; stencil operations, depth-only
++passes, store/discard initialization, multisampling/resolve, broad view-range
++validation, and other backends still require their own acceptance evidence.
++
+ ## Color attachment preservation
+ 
+ Native Vulkan recording now distinguishes the first recorded attachment use
+@@ -15,8 +35,8 @@ The native-addon regression draws adjacent regions, loads them through an empty
+ pass, releases caller references, and checks the submitted pixels. The failing
+ reproduction, source correction, native checks, and exact-package qualification
+ are indexed at `bench/out/compute-program/20260906-render-load/README.md`.
+-This correction concerns existing color attachments. Depth/stencil attachment
+-identity, store/discard initialization, resolve behavior, render queries, and
++This checkpoint concerns existing color attachments. Broader depth/stencil
++behavior, store/discard initialization, resolve behavior, render queries, and
+ broader render-pass conformance remain separate correctness work.
+ 
+ ## Deferred rendering and native ownership
+diff --git a/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js b/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js
+index f5dbd7ad8..1c3b77983 100644
+--- a/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js
++++ b/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js
+@@ -8,6 +8,7 @@ const device = await adapter.requestDevice();
+ const addon = await loadNativeAddon();
+ const usage = globals.GPUBufferUsage;
+ const rowBytes = 256;
++const TEXTURE_ASPECT = Object.freeze({ all: 1, depthOnly: 3 });
+ const shaderSource = `
+   @vertex fn vertex(@location(0) position: vec2<f32>) -> @builtin(position) vec4<f32> {
+     return vec4<f32>(position, 0.0, 1.0);
+@@ -16,6 +17,97 @@ const shaderSource = `
+     return vec4<f32>(1.0, 0.0, 0.0, 1.0);
+   }`;
+ 
++async function depthPersistence() {
++  const retained = [];
++  const own = (handle, release) => { retained.push([handle, release]); return handle; };
++  const shader = (depth, color) => `
++    @vertex fn vertex(@builtin(vertex_index) index: u32) -> @builtin(position) vec4<f32> {
++      let x = f32((index << 1u) & 2u) * 2.0 - 1.0;
++      let y = f32(index & 2u) * 2.0 - 1.0;
++      return vec4<f32>(x, y, ${depth}, 1.0);
++    }
++    @fragment fn fragment() -> @location(0) vec4<f32> { return vec4<f32>(${color}, 1.0); }`;
++  function pipeline(depth, color, depthWriteEnabled = true) {
++    const module = own(addon.createShaderModule(device._native, shader(depth, color)), addon.shaderModuleRelease);
++    return own(addon.createRenderPipeline(device._native, {
++      vertex: { module, entryPoint: 'vertex' },
++      fragment: { module, entryPoint: 'fragment', targets: [{ format: 'rgba8unorm' }] },
++      primitive: { topology: 'triangle-list' },
++      depthStencil: { format: 'depth32float', depthWriteEnabled, depthCompare: 'less' },
++    }), addon.renderPipelineRelease);
++  }
++  const readbacks = [];
++  let commands;
++  try {
++    const near = pipeline('0.25', '1.0, 0.0, 0.0');
++    const far = pipeline('0.75', '0.0, 0.0, 1.0');
++    const readOnlyFar = pipeline('0.75', '0.0, 0.0, 1.0', false);
++    const texture = own(addon.createTexture(device._native, { width: 1, height: 1, format: 'rgba8unorm',
++      usage: globals.GPUTextureUsage.RENDER_ATTACHMENT | globals.GPUTextureUsage.COPY_SRC }), addon.textureRelease);
++    const color = own(addon.textureCreateView(texture), addon.textureViewRelease);
++    const depthTexture = own(addon.createTexture(device._native, { width: 1, height: 1, format: 'depth32float',
++      usage: globals.GPUTextureUsage.RENDER_ATTACHMENT | globals.GPUTextureUsage.COPY_SRC }), addon.textureRelease);
++    const depth = own(addon.textureCreateView(depthTexture), addon.textureViewRelease);
++    for (const index of [0, 1, 2, 3]) readbacks[index] = addon.createBuffer(device._native,
++      { size: rowBytes, usage: usage.MAP_READ | usage.COPY_DST });
++    const encoder = own(addon.createCommandEncoder(device._native, 'retained-depth'), addon.commandEncoderRelease);
++    function pass(colorLoad, depthLoad, readOnly = false) {
++      return own(addon.beginRenderPass(encoder, {
++        colorAttachments: [{ view: color, loadOp: colorLoad, storeOp: 'store', clearValue: { r: 0, g: 0, b: 0, a: 1 } }],
++        depthStencilAttachment: readOnly ? { view: depth, depthReadOnly: true }
++          : { view: depth, depthLoadOp: depthLoad, depthStoreOp: 'store', depthClearValue: 1 },
++      }), addon.renderPassRelease);
++    }
++    function draw(renderPass, selected) {
++      addon.renderPassSetPipeline(renderPass, selected);
++      addon.renderPassDraw(renderPass, 3, 1, 0, 0);
++    }
++    const first = pass('clear', 'clear');
++    draw(first, near);
++    draw(first, far);
++    addon.renderPassEnd(first);
++    const loaded = pass('load', 'load');
++    draw(loaded, far);
++    addon.renderPassEnd(loaded);
++    const readOnly = pass('load', undefined, true);
++    draw(readOnly, readOnlyFar);
++    addon.renderPassEnd(readOnly);
++    addon.commandEncoderCopyTextureToBuffer(encoder, texture, 0, 0, 0, 0, TEXTURE_ASPECT.all,
++      readbacks[0], 0, rowBytes, 1, 1, 1, 1);
++    addon.commandEncoderCopyTextureToBuffer(encoder, depthTexture, 0, 0, 0, 0, TEXTURE_ASPECT.depthOnly,
++      readbacks[2], 0, rowBytes, 1, 1, 1, 1);
++    const cleared = pass('load', 'clear');
++    addon.renderPassEnd(cleared);
++    const afterClear = pass('load', 'load');
++    draw(afterClear, far);
++    addon.renderPassEnd(afterClear);
++    addon.commandEncoderCopyTextureToBuffer(encoder, texture, 0, 0, 0, 0, TEXTURE_ASPECT.all,
++      readbacks[1], 0, rowBytes, 1, 1, 1, 1);
++    addon.commandEncoderCopyTextureToBuffer(encoder, depthTexture, 0, 0, 0, 0, TEXTURE_ASPECT.depthOnly,
++      readbacks[3], 0, rowBytes, 1, 1, 1, 1);
++    commands = addon.commandEncoderFinish(encoder);
++    for (const [handle, release] of retained.splice(0).reverse()) release(handle);
++    addon.queueSubmit(device.queue._native, [commands]);
++    await device.queue.onSubmittedWorkDone();
++    for (const [index, expected] of [[0, [255, 0, 0, 255]], [1, [0, 0, 255, 255]]]) {
++      addon.bufferMapSync(device._instance, readbacks[index], globals.GPUMapMode.READ, 0, rowBytes);
++      assert.deepEqual(new Uint8Array(addon.bufferReadCopy(readbacks[index], 0, rowBytes)).slice(0, 4), new Uint8Array(expected));
++      addon.bufferUnmap(readbacks[index]);
++    }
++    for (const [index, expected] of [[2, 0.25], [3, 0.75]]) {
++      addon.bufferMapSync(device._instance, readbacks[index], globals.GPUMapMode.READ, 0, rowBytes);
++      const bytes = new Uint8Array(addon.bufferReadCopy(readbacks[index], 0, rowBytes));
++      assert.equal(new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getFloat32(0, true), expected);
++      addon.bufferUnmap(readbacks[index]);
++    }
++    console.log('ok: depth survives draws, load/read-only passes, and caller release; an empty clear resets it');
++  } finally {
++    if (commands) addon.commandBufferRelease(commands);
++    for (const [handle, release] of retained.reverse()) release(handle);
++    for (const buffer of readbacks) addon.bufferRelease(buffer);
++  }
++}
++
+ try {
+   for (const bundled of [false, true]) {
+     const cleanup = new Map();
+@@ -82,7 +174,7 @@ try {
+         loadOp: 'load', storeOp: 'store' }] }), addon.renderPassRelease);
+       release(view);
+       addon.renderPassEnd(loadPass);
+-      addon.commandEncoderCopyTextureToBuffer(encoder, texture, 0, 0, 0, 0, 1,
++      addon.commandEncoderCopyTextureToBuffer(encoder, texture, 0, 0, 0, 0, TEXTURE_ASPECT.all,
+         readback, 0, rowBytes, 1, 2, 1, 1);
+       release(texture);
+       const commands = own(addon.commandEncoderFinish(encoder), addon.commandBufferRelease);
+@@ -103,6 +195,7 @@ try {
+       for (const [handle, action] of [...cleanup].reverse()) action(handle);
+     }
+   }
++  await depthPersistence();
+ } finally {
+   device.destroy();
+   adapter.destroy();
+diff --git a/runtime/zig/source-layout.json b/runtime/zig/source-layout.json
+index fd8f6519d..7de48ccc6 100644
+--- a/runtime/zig/source-layout.json
++++ b/runtime/zig/source-layout.json
+@@ -1270,9 +1270,9 @@
+       },
+       "src/backend/vulkan/vk_constants.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "6b8d5a13a36b9fbb48d7b9bbce929499be880b15c7d794fca0fe7942b14c2cc6",
+-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+-        "reviewer": "codex-gpu-program/2026-09-05"
++        "moduleSha256": "b021630d1dcfd7b0b20d15c21f2dde35855b53eb5a2cd601860ae7335c965d2d",
++        "reason": "Keep: Vulkan ABI values have one backend-local owner, including depth/stencil layout and synchronization bits.",
++        "reviewer": "codex-depth-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_device.zig": {
+         "decision": "Keep",
+@@ -1348,9 +1348,9 @@
+       },
+       "src/backend/vulkan/vk_render.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "27d005d9b9e4fb796d7ecf73d5a4114daf63890cb3742556513d7032a6725bf1",
+-        "reason": "Keep: Vulkan attachment load behavior and color synchronization remain local to render-pass construction; later draws preserve earlier attachment writes.",
+-        "reviewer": "codex-render-load/2026-09-06"
++        "moduleSha256": "dc83866472d2b5b423f542caeee23e889b1ae02398b499535f4a59b124383b72",
++        "reason": "Keep: render execution binds caller-owned depth views, preserves attachment contents across draws, and separates borrowed targets from owned temporary targets.",
++        "reviewer": "codex-depth-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_render_pipeline.zig": {
+         "decision": "Keep",
+@@ -1360,9 +1360,9 @@
+       },
+       "src/backend/vulkan/vk_resources.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "8f0efae2b615638687a225e2e02118cf03a8e8154ce641f1232da2f033fbd5a0",
+-        "reason": "Keep: native buffer and image creation assign generations; texture replacement reserves ownership and creates the successor before destroying the predecessor.",
+-        "reviewer": "codex-resource-lifetime/2026-09-06"
++        "moduleSha256": "9f57e2bd939f5dcae0b7ff1c95bd70b53abaafa73672a47da58c9bc5f3e8a346",
++        "reason": "Keep: texture resources own layout-to-access synchronization, including persistent depth/stencil attachment reads and writes.",
++        "reviewer": "codex-depth-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_runtime_probe_ops.zig": {
+         "decision": "Keep",
+@@ -2770,9 +2770,9 @@
+       },
+       "src/contracts/model/model_render_types.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "8e8cfd262505c24e3c6fb96679dd651c9efc5f10c7c4005b9547269998340338",
+-        "reason": "Keep: neutral render-command values own explicit attachment load semantics without exposing backend constants.",
+-        "reviewer": "codex-render-load/2026-09-06"
++        "moduleSha256": "596a984301f25c33a47d132fb71abe5e64a85b7da97341ee27d21aa1f3739644",
++        "reason": "Keep: neutral render-command values carry explicit attachment identities, load choices, and clear values without backend handles escaping native adaptation.",
++        "reviewer": "codex-depth-ownership/2026-09-06"
+       },
+       "src/contracts/model/model_resource_types.zig": {
+         "decision": "Keep",
+@@ -3754,9 +3754,9 @@
+       },
+       "src/native/support/doe_native_object_types.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "bd0e60a8112c4b4343a9bc8cee4eb4808c84a34d23eb6fc88d96a771d6a46797",
+-        "reason": "Keep: native object lifetimes own whether a render attachment has actually been recorded, independently of API draw-count accounting.",
+-        "reviewer": "codex-render-load/2026-09-06"
++        "moduleSha256": "bcc5dd06f96e5f9062bb37d2dba8b82878aa4180e8f0a965a6754605eaa30ffd",
++        "reason": "Keep: native render-pass state owns whether attachments have actually been recorded, independently of API draw accounting.",
++        "reviewer": "codex-depth-ownership/2026-09-06"
+       },
+       "src/native/support/doe_native_runtime_helpers.zig": {
+         "decision": "Keep",
+@@ -3814,9 +3814,9 @@
+       },
+       "src/native/vulkan/vulkan_render_pass_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "f6557da14f839b96b93f06f8ffb002cf5b0ab677ab088a7d6afba14d0e363ff9",
+-        "reason": "Keep: native Vulkan recording snapshots the first attachment load and preserves subsequent draws, including bundle replay and empty load passes.",
+-        "reviewer": "codex-render-load/2026-09-06"
++        "moduleSha256": "fce8a1d729bd8cf7304879e88b956f51452e4074cb03b51ddda03f1b42ce26c1",
++        "reason": "Keep: native Vulkan recording snapshots retained color/depth views and first-use load semantics, preserving read-only attachments and subsequent draws.",
++        "reviewer": "codex-depth-ownership/2026-09-06"
+       },
+       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
+         "decision": "Keep",
+@@ -4240,9 +4240,9 @@
+       },
+       "src/backend/vulkan/vk_descriptor_identity.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "33c4e40b0796d5121dff4100cfc2da6d2126370b41688d7943cfe5d2d8eb9c6f",
+-        "reason": "Keep: leaf resource identity snapshots compare binding declarations and native allocation generations without owning execution or cache policy.",
+-        "reviewer": "codex-descriptor-identity/2026-09-05"
++        "moduleSha256": "b05a8441a64f5bf01fa89206ae0270a2b6fc6522d1018a614c0981bd65835b3d",
++        "reason": "Keep: native descriptor and render-attachment bindings share exact texture-parent allocation identity; cache snapshot ownership remains local.",
++        "reviewer": "codex-depth-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_descriptors.zig": {
+         "decision": "Keep",
+diff --git a/runtime/zig/src/backend/vulkan/vk_constants.zig b/runtime/zig/src/backend/vulkan/vk_constants.zig
+index 94e440dc7..3717c6b26 100644
+--- a/runtime/zig/src/backend/vulkan/vk_constants.zig
++++ b/runtime/zig/src/backend/vulkan/vk_constants.zig
+@@ -406,6 +406,11 @@ pub const VK_PRESENT_MODE_FIFO_KHR: u32 = 0x00000002;
+ pub const DEFAULT_SURFACE_MAX_FRAME_LATENCY: u32 = 2;
+ 
+ // --- Render pass constants ---
++pub const VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL: u32 = 3;
++pub const VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT: u32 = 0x00000100;
++pub const VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT: u32 = 0x00000200;
++pub const VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT: u32 = 0x00000200;
++pub const VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT: u32 = 0x00000400;
+ pub const VK_ATTACHMENT_LOAD_OP_LOAD: u32 = 0;
+ pub const VK_ATTACHMENT_LOAD_OP_CLEAR: u32 = 1;
+ pub const VK_ATTACHMENT_LOAD_OP_DONT_CARE: u32 = 2;
+diff --git a/runtime/zig/src/backend/vulkan/vk_descriptor_identity.zig b/runtime/zig/src/backend/vulkan/vk_descriptor_identity.zig
+index 9a8217402..87b960702 100644
+--- a/runtime/zig/src/backend/vulkan/vk_descriptor_identity.zig
++++ b/runtime/zig/src/backend/vulkan/vk_descriptor_identity.zig
+@@ -7,6 +7,13 @@ pub const Sampler = struct {
+     generation: u64,
+ };
+ 
++pub const TextureParent = struct { handle: u64, generation: u64, image: u64 };
++
++pub fn matchesTextureParent(expected: TextureParent, actual: TextureParent) bool {
++    return expected.image == actual.image and (expected.handle == 0 or
++        (expected.handle == actual.handle and expected.generation == actual.generation));
++}
++
+ pub const Binding = struct {
+     declaration: compute.KernelBinding,
+     generation: u64,
+@@ -33,7 +40,10 @@ pub fn snapshot(self: anytype, declaration: compute.KernelBinding) !Binding {
+             const resource = self.textures.get(declaration.resource_handle) orelse return error.InvalidState;
+             if (resource.parent_handle != 0) {
+                 const parent = self.textures.get(resource.parent_handle) orelse return error.InvalidState;
+-                if (parent.generation != resource.parent_generation or parent.image != resource.image) return error.InvalidState;
++                if (!matchesTextureParent(
++                    .{ .handle = resource.parent_handle, .generation = resource.parent_generation, .image = resource.image },
++                    .{ .handle = resource.parent_handle, .generation = parent.generation, .image = parent.image },
++                )) return error.InvalidState;
+             }
+             break :blk .{ .declaration = declaration, .generation = resource.generation, .handle = resource.view, .backing_handle = resource.image, .image_layout = resource.layout };
+         },
+diff --git a/runtime/zig/src/backend/vulkan/vk_render.zig b/runtime/zig/src/backend/vulkan/vk_render.zig
+index 3a0cce9b4..ce5e5cc64 100644
+--- a/runtime/zig/src/backend/vulkan/vk_render.zig
++++ b/runtime/zig/src/backend/vulkan/vk_render.zig
+@@ -18,11 +18,11 @@ const DispatchMetrics = @import("vk_metrics.zig").DispatchMetrics;
+ const VK_NULL_U64 = c.VK_NULL_U64;
+ const VK_QUERY_CONTROL_NONE: u32 = 0;
+ const VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT: u32 = 0x00000020;
+-const VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL: u32 = 3;
+-const VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT: u32 = 0x00000100;
+-const VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT: u32 = 0x00000200;
+-const VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT: u32 = 0x00000200;
+-const VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT: u32 = 0x00000400;
++const VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL = c.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
++const VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT = c.VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
++const VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT = c.VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
++const VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT = c.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
++const VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT = c.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+ const WGPU_INDEX_FORMAT_UINT16: u32 = 0x00000001;
+ const WGPU_INDEX_FORMAT_UINT32: u32 = 0x00000002;
+ const VK_PIPELINE_STAGE_GRAPHICS_SHADER_BITS: u32 = c.VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | c.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+@@ -44,8 +44,6 @@ pub const RenderState = struct {
+     descriptor_set: u64 = VK_NULL_U64,
+     render_target: ?vk_resources.TextureResource = null,
+     depth_stencil_target: ?vk_resources.TextureResource = null,
+-    render_target_handle: u64 = 0,
+-    render_target_view_handle: u64 = 0,
+     target_width: u32 = 0,
+     target_height: u32 = 0,
+     target_format: u32 = 0,
+@@ -108,7 +106,7 @@ pub fn execute_render_draw(
+         has_depth_stencil,
+         depth_stencil_vk_format,
+         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+-        cmd.color_load,
++        cmd,
+     );
+     try create_framebuffer(self, &render_state, target_width, target_height);
+     try create_graphics_pipeline(self, &render_state, vk_format, cmd);
+@@ -150,21 +148,23 @@ pub fn execute_render_clear(
+         target_width,
+         target_height,
+         cmd.target_format,
+-        model_gpu_types.WGPUTextureFormat_Undefined,
++        cmd.depth_stencil_format,
+     );
+     const surface_sync = surface_sync_for_target(self, cmd.target_handle);
+     const color_final_layout = if (surface_sync.signal_semaphore != VK_NULL_U64)
+         c.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+     else
+         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
++    const has_depth_stencil = cmd.depth_stencil_format != model_gpu_types.WGPUTextureFormat_Undefined;
++    const depth_stencil_vk_format = if (has_depth_stencil) try vk_resources.texture_format_to_vk(cmd.depth_stencil_format) else 0;
+     try create_render_pass(
+         self,
+         &render_state,
+         vk_format,
+-        false,
+-        0,
++        has_depth_stencil,
++        depth_stencil_vk_format,
+         color_final_layout,
+-        cmd.color_load,
++        cmd,
+     );
+     try create_framebuffer(self, &render_state, target_width, target_height);
+     const encode_end = common_timing.now_ns();
+@@ -172,16 +172,7 @@ pub fn execute_render_clear(
+     const submit_start = common_timing.now_ns();
+     try record_and_submit_clear(self, &render_state, cmd, target_width, target_height, surface_sync);
+     const submit_end = common_timing.now_ns();
+-    if (render_state.render_target_handle != 0) {
+-        if (self.textures.getPtr(render_state.render_target_handle)) |texture| {
+-            texture.layout = color_final_layout;
+-        }
+-        if (render_state.render_target_view_handle != 0) {
+-            if (self.textures.getPtr(render_state.render_target_view_handle)) |view| {
+-                view.layout = color_final_layout;
+-            }
+-        }
+-    }
++    mark_attachment_layouts(self, &render_state, color_final_layout);
+     return .{
+         .encode_ns = common_timing.ns_delta(encode_end, encode_start),
+         .submit_wait_ns = common_timing.ns_delta(submit_end, submit_start),
+@@ -201,40 +192,33 @@ fn ensure_render_target(
+     format: model_gpu_types.WGPUTextureFormat,
+     depth_stencil_format: model_gpu_types.WGPUTextureFormat,
+ ) !void {
+-    if (try bind_existing_render_target(self, state, cmd, width, height, format)) {
+-        if (depth_stencil_format != model_gpu_types.WGPUTextureFormat_Undefined) {
+-            const depth_texture_spec = model_resource_types.CopyTextureResource{
+-                .handle = 0,
+-                .width = width,
+-                .height = height,
+-                .format = depth_stencil_format,
+-                .usage = model_gpu_types.WGPUTextureUsage_RenderAttachment,
+-                .mip_level = 0,
+-                .bytes_per_row = 0,
+-                .rows_per_image = 0,
+-            };
+-            state.depth_stencil_target = try create_render_target_texture(self, depth_texture_spec);
+-            state.owns_depth_stencil_target = true;
+-        }
+-        state.target_width = width;
+-        state.target_height = height;
+-        return;
++    if (!try bind_existing_render_target(self, state, cmd, width, height, format)) {
++        const texture_spec = model_resource_types.CopyTextureResource{
++            .handle = 0,
++            .width = width,
++            .height = height,
++            .format = format,
++            .usage = model_gpu_types.WGPUTextureUsage_RenderAttachment | model_gpu_types.WGPUTextureUsage_CopyDst,
++            .mip_level = 0,
++            .bytes_per_row = 0,
++            .rows_per_image = 0,
++        };
++        state.render_target = try create_render_target_texture(self, texture_spec);
++        state.owns_render_target = true;
+     }
+-
+-    const usage = model_gpu_types.WGPUTextureUsage_RenderAttachment | model_gpu_types.WGPUTextureUsage_CopyDst;
+-    const texture_spec = model_resource_types.CopyTextureResource{
+-        .handle = 0,
+-        .width = width,
+-        .height = height,
+-        .format = format,
+-        .usage = usage,
+-        .mip_level = 0,
+-        .bytes_per_row = 0,
+-        .rows_per_image = 0,
+-    };
+-    state.render_target = try create_render_target_texture(self, texture_spec);
+-    state.owns_render_target = true;
+-    if (depth_stencil_format != model_gpu_types.WGPUTextureFormat_Undefined) {
++    if (cmd.depth_target_handle != 0) {
++        const texture = self.textures.get(cmd.depth_target_handle) orelse return error.InvalidState;
++        const view = if (cmd.depth_target_view_handle != 0)
++            self.textures.get(cmd.depth_target_view_handle) orelse return error.InvalidState
++        else
++            texture;
++        if (!vk_formats.is_depth_stencil(view.format) or view.format != depth_stencil_format or
++            !vk_resources.texture_view_matches_parent(view, cmd.depth_target_handle, texture))
++            return error.InvalidArgument;
++        var attachment = texture;
++        attachment.view = view.view;
++        state.depth_stencil_target = attachment;
++    } else if (depth_stencil_format != model_gpu_types.WGPUTextureFormat_Undefined) {
+         const depth_texture_spec = model_resource_types.CopyTextureResource{
+             .handle = 0,
+             .width = width,
+@@ -266,6 +250,7 @@ fn bind_existing_render_target(
+         self.textures.get(cmd.target_view_handle) orelse return error.InvalidState
+     else
+         texture;
++    if (!vk_resources.texture_view_matches_parent(view_resource, cmd.target_handle, texture)) return error.InvalidState;
+     state.render_target = .{
+         .image = texture.image,
+         .memory = texture.memory,
+@@ -282,8 +267,6 @@ fn bind_existing_render_target(
+         .usage = texture.usage,
+         .layout = texture.layout,
+     };
+-    state.render_target_handle = cmd.target_handle;
+-    state.render_target_view_handle = cmd.target_view_handle;
+     return true;
+ }
+ 
+@@ -386,7 +369,7 @@ fn create_render_pass(
+     has_depth_stencil: bool,
+     depth_stencil_vk_format: u32,
+     color_final_layout: u32,
+-    color_load: model_render_types.RenderAttachmentLoad,
++    cmd: model_render_types.RenderDrawCommand,
+ ) !void {
+     const color_initial_layout = if (state.render_target) |target| target.layout else c.VK_IMAGE_LAYOUT_UNDEFINED;
+     const depth_initial_layout = if (state.depth_stencil_target) |target| target.layout else c.VK_IMAGE_LAYOUT_UNDEFINED;
+@@ -395,7 +378,7 @@ fn create_render_pass(
+             .flags = 0,
+             .format = vk_format,
+             .samples = c.VK_SAMPLE_COUNT_1_BIT,
+-            .loadOp = switch (color_load) {
++            .loadOp = switch (cmd.color_load) {
+                 .clear => c.VK_ATTACHMENT_LOAD_OP_CLEAR,
+                 .load => c.VK_ATTACHMENT_LOAD_OP_LOAD,
+             },
+@@ -409,10 +392,16 @@ fn create_render_pass(
+             .flags = 0,
+             .format = depth_stencil_vk_format,
+             .samples = c.VK_SAMPLE_COUNT_1_BIT,
+-            .loadOp = c.VK_ATTACHMENT_LOAD_OP_CLEAR,
+-            .storeOp = c.VK_ATTACHMENT_STORE_OP_DONT_CARE,
+-            .stencilLoadOp = c.VK_ATTACHMENT_LOAD_OP_CLEAR,
+-            .stencilStoreOp = c.VK_ATTACHMENT_STORE_OP_DONT_CARE,
++            .loadOp = switch (cmd.depth_load) {
++                .clear => c.VK_ATTACHMENT_LOAD_OP_CLEAR,
++                .load => c.VK_ATTACHMENT_LOAD_OP_LOAD,
++            },
++            .storeOp = c.VK_ATTACHMENT_STORE_OP_STORE,
++            .stencilLoadOp = switch (cmd.stencil_load) {
++                .clear => c.VK_ATTACHMENT_LOAD_OP_CLEAR,
++                .load => c.VK_ATTACHMENT_LOAD_OP_LOAD,
++            },
++            .stencilStoreOp = c.VK_ATTACHMENT_STORE_OP_STORE,
+             .initialLayout = depth_initial_layout,
+             .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+         },
+@@ -441,17 +430,18 @@ fn create_render_pass(
+     };
+ 
+     const color_source = vk_resources.texture_transition_source(color_initial_layout);
++    const depth_source = vk_resources.texture_transition_source(depth_initial_layout);
+     var dependency = c.VkSubpassDependency{
+         .srcSubpass = c.VK_SUBPASS_EXTERNAL,
+         .dstSubpass = 0,
+-        .srcStageMask = color_source.src_stage,
++        .srcStageMask = color_source.src_stage | depth_source.src_stage,
+         .dstStageMask = if (has_depth_stencil)
+             c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+                 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+                 VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
+         else
+             c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+-        .srcAccessMask = color_source.src_access_mask,
++        .srcAccessMask = color_source.src_access_mask | depth_source.src_access_mask,
+         .dstAccessMask = if (has_depth_stencil)
+             c.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+                 VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+@@ -579,7 +569,7 @@ fn record_and_submit_draws(
+             .color = .{ .float32 = cmd.clear_color },
+         },
+         .{
+-            .depthStencil = .{ .depth = 1.0, .stencil = 0 },
++            .depthStencil = .{ .depth = cmd.depth_clear_value, .stencil = cmd.stencil_clear_value },
+         },
+     };
+     var render_pass_begin = c.VkRenderPassBeginInfo{
+@@ -739,15 +729,17 @@ fn record_and_submit_draws(
+     c.vkCmdEndRenderPass(self.primary_command_buffer);
+     try c.check_vk(c.vkEndCommandBuffer(self.primary_command_buffer));
+     try submit_and_wait(self);
+-    if (state.render_target_handle != 0) {
+-        if (self.textures.getPtr(state.render_target_handle)) |texture| {
+-            texture.layout = c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+-        }
+-        if (state.render_target_view_handle != 0) {
+-            if (self.textures.getPtr(state.render_target_view_handle)) |view| {
+-                view.layout = c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+-            }
+-        }
++    mark_attachment_layouts(self, state, c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
++}
++
++fn mark_attachment_layouts(self: anytype, state: *const RenderState, color_layout: u32) void {
++    if (!state.owns_render_target) {
++        if (state.render_target) |texture|
++            vk_resources.mark_texture_image_layout(self, texture.image, color_layout);
++    }
++    if (!state.owns_depth_stencil_target) {
++        if (state.depth_stencil_target) |texture|
++            vk_resources.mark_texture_image_layout(self, texture.image, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+     }
+ }
+ 
+@@ -772,8 +764,9 @@ fn record_and_submit_clear(
+ ) !void {
+     try begin_primary_recording(self);
+ 
+-    var clear_value = c.VkClearValue{
+-        .color = .{ .float32 = cmd.clear_color },
++    var clear_values = [_]c.VkClearValue{
++        .{ .color = .{ .float32 = cmd.clear_color } },
++        .{ .depthStencil = .{ .depth = cmd.depth_clear_value, .stencil = cmd.stencil_clear_value } },
+     };
+     var render_pass_begin = c.VkRenderPassBeginInfo{
+         .sType = c.VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+@@ -784,8 +777,8 @@ fn record_and_submit_clear(
+             .offset = .{ .x = 0, .y = 0 },
+             .extent = .{ .width = target_width, .height = target_height },
+         },
+-        .clearValueCount = 1,
+-        .pClearValues = @ptrCast(&clear_value),
++        .clearValueCount = if (state.depth_stencil_target != null) 2 else 1,
++        .pClearValues = clear_values[0..if (state.depth_stencil_target != null) 2 else 1].ptr,
+     };
+     c.vkCmdBeginRenderPass(self.primary_command_buffer, &render_pass_begin, c.VK_SUBPASS_CONTENTS_INLINE);
+     c.vkCmdEndRenderPass(self.primary_command_buffer);
+@@ -947,7 +940,7 @@ pub fn execute_render_bundles(
+         false,
+         0,
+         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+-        .clear,
++        bundle_cmd,
+     );
+     try create_framebuffer(self, &state, width, height);
+     const encode_end = common_timing.now_ns();
+diff --git a/runtime/zig/src/backend/vulkan/vk_resources.zig b/runtime/zig/src/backend/vulkan/vk_resources.zig
+index 204c6512d..a2dd04e24 100644
+--- a/runtime/zig/src/backend/vulkan/vk_resources.zig
++++ b/runtime/zig/src/backend/vulkan/vk_resources.zig
+@@ -75,6 +75,29 @@ const TextureTransitionSource = struct {
+     src_stage: u32,
+ };
+ 
++pub fn texture_view_matches_parent(view: TextureResource, parent_handle: u64, parent: TextureResource) bool {
++    return identity.matchesTextureParent(
++        .{ .handle = view.parent_handle, .generation = view.parent_generation, .image = view.image },
++        .{ .handle = parent_handle, .generation = parent.generation, .image = parent.image },
++    );
++}
++
++test "texture views reject recycled parent allocations and another attachment owner" {
++    var parent = std.mem.zeroes(TextureResource);
++    parent.generation = 1;
++    parent.image = 1;
++    var view = parent;
++    view.parent_handle = 2;
++    view.parent_generation = parent.generation;
++    try std.testing.expect(texture_view_matches_parent(view, 2, parent));
++    try std.testing.expect(!texture_view_matches_parent(view, 3, parent));
++    parent.generation += 1;
++    try std.testing.expect(!texture_view_matches_parent(view, 2, parent));
++    view.parent_generation = parent.generation;
++    parent.image += 1;
++    try std.testing.expect(!texture_view_matches_parent(view, 2, parent));
++}
++
+ fn texture_dimension_to_vk_image_type(dimension: u32) u32 {
+     return switch (dimension) {
+         model_gpu_types.WGPUTextureDimension_1D => c.VK_IMAGE_TYPE_1D,
+@@ -964,6 +987,10 @@ pub fn texture_transition_source(layout: u32) TextureTransitionSource {
+             .src_access_mask = c.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+             .src_stage = c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+         },
++        c.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL => .{
++            .src_access_mask = c.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | c.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
++            .src_stage = c.VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | c.VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
++        },
+         c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL => .{
+             .src_access_mask = c.VK_ACCESS_SHADER_READ_BIT,
+             .src_stage = c.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+diff --git a/runtime/zig/src/contracts/model/model_render_types.zig b/runtime/zig/src/contracts/model/model_render_types.zig
+index c8715353f..2b88a41c0 100644
+--- a/runtime/zig/src/contracts/model/model_render_types.zig
++++ b/runtime/zig/src/contracts/model/model_render_types.zig
+@@ -134,6 +134,12 @@ pub const RenderDrawCommand = struct {
+     vertex_attribute_locations: [16]u32 = [_]u32{0} ** 16,
+     vertex_attribute_buffer_slots: [16]u32 = [_]u32{0} ** 16,
+     depth_stencil_format: transfer.WGPUTextureFormat = transfer.WGPUTextureFormat_Undefined,
++    depth_target_handle: u64 = 0,
++    depth_target_view_handle: u64 = 0,
++    depth_load: RenderAttachmentLoad = .clear,
++    stencil_load: RenderAttachmentLoad = .clear,
++    depth_clear_value: f32 = 1,
++    stencil_clear_value: u32 = 0,
+     depth_compare: u32 = 0,
+     depth_write_enabled: bool = false,
+     stencil_front_compare: u32 = 0x00000008,
+diff --git a/runtime/zig/src/native/support/doe_native_object_types.zig b/runtime/zig/src/native/support/doe_native_object_types.zig
+index 7121e3677..6d17e2de4 100644
+--- a/runtime/zig/src/native/support/doe_native_object_types.zig
++++ b/runtime/zig/src/native/support/doe_native_object_types.zig
+@@ -403,7 +403,7 @@ pub const DoeRenderPass = struct {
+     pipeline: ?*DoeRenderPipeline = null,
+     max_draw_count: u64 = 50_000_000,
+     recorded_draw_count: u64 = 0,
+-    color_attachment_started: bool = false,
++    attachments_started: bool = false,
+     recorded_command_start: usize = 0,
+     target: ?*anyopaque = null,
+     resolve_target: ?*anyopaque = null,
+diff --git a/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig b/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
+index 9c53ff953..7660f3296 100644
+--- a/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
++++ b/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
+@@ -46,10 +46,21 @@ fn populate_draw_cmd_from_pass(cmd: *model_render_types.RenderDrawCommand, pass:
+         @floatCast(pass.clear_b),
+         @floatCast(pass.clear_a),
+     };
+-    cmd.color_load = if (pass.color_attachment_started or pass.color_load_op == upstream.WGPULoadOp_Load)
++    cmd.color_load = if (pass.attachments_started or pass.color_load_op == upstream.WGPULoadOp_Load)
+         .load
+     else
+         .clear;
++    if (pass.depth_target_view_handle != 0) {
++        if (native_helpers.cast(shared.DoeTextureView, @ptrFromInt(pass.depth_target_view_handle))) |view| {
++            cmd.depth_target_handle = view.tex.vk_id;
++            cmd.depth_target_view_handle = if (view.handle) |handle| @intFromPtr(handle) else view.tex.vk_id;
++            cmd.depth_stencil_format = pass.depth_stencil_format;
++        }
++    }
++    cmd.depth_load = if (pass.attachments_started or pass.depth_read_only or pass.depth_load_op == upstream.WGPULoadOp_Load) .load else .clear;
++    cmd.stencil_load = if (pass.attachments_started or pass.stencil_read_only or pass.stencil_load_op == upstream.WGPULoadOp_Load) .load else .clear;
++    cmd.depth_clear_value = pass.depth_clear_value;
++    cmd.stencil_clear_value = pass.stencil_clear_value;
+ 
+     var bound_vertex_count: u32 = 0;
+     var bound_slot: usize = 0;
+@@ -183,7 +194,7 @@ fn recordRender(pass: *shared.DoeRenderPass, cmd: model_render_types.RenderDrawC
+         .pipeline = if (pass.pipeline) |pipeline| native_helpers.toOpaque(pipeline) else null,
+         .clear_only = clear_only,
+     } }) catch std.debug.panic("Vulkan render: OOM recording draw state", .{});
+-    pass.color_attachment_started = true;
++    pass.attachments_started = true;
+ }
+ 
+ pub fn vulkan_render_pass_draw(pass: *shared.DoeRenderPass, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) void {
+@@ -229,7 +240,7 @@ pub fn vulkan_render_pass_draw_indexed_indirect(pass: *shared.DoeRenderPass, ind
+ }
+ 
+ pub fn vulkan_render_pass_end(pass: *shared.DoeRenderPass) void {
+-    if (pass.color_attachment_started) return;
++    if (pass.attachments_started) return;
+     var cmd = base_vulkan_render_cmd(pass);
+     populate_draw_cmd_from_pass(&cmd, pass);
+     recordRender(pass, cmd, true);

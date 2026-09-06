@@ -1,0 +1,3 @@
+ok: direct draws preserve color through a load pass and caller release
+ok: bundle draws preserve color through a load pass and caller release
+ok: depth survives draws, load/read-only passes, and caller release; an empty clear resets it

@@ -1,0 +1,64 @@
+{
+  "artifacts": [
+    {
+      "hash": "255b84b7140b0ca5a726b2b045c6c0c890fdd899bb51ed7f83b1b3711213b1e2",
+      "path": "doe-gpu-0.5.0.tgz"
+    },
+    {
+      "hash": "65a26a377148d15cd4d52da667b6e9e111614ddef103fa617fd6f0221133ca09",
+      "path": "doe-gpu-linux-x64-0.5.0.tgz"
+    },
+    {
+      "hash": "ce21e28a58e9554eb989c10008994338826a9c723011d420ba1151e385b5a01c",
+      "path": "node-install.stderr"
+    },
+    {
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "node-install.stdout"
+    },
+    {
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "pack-doe-gpu-linux-x64.stderr"
+    },
+    {
+      "hash": "dc55a7d224df57cb93277dc7468c7ccf6cd00af300a62f14eda0054f51e80049",
+      "path": "pack-doe-gpu-linux-x64.stdout"
+    },
+    {
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "pack-doe-gpu.stderr"
+    },
+    {
+      "hash": "7b77c54324c294c99f1a7c538d8e6b84104cbcf082f7f143df5aa065a1920546",
+      "path": "pack-doe-gpu.stdout"
+    },
+    {
+      "hash": "f67a8e653f9419a2b32170ba67b4ce1d0fa2178f8479113413f41ed6ca9d4231",
+      "path": "qualifier.py"
+    }
+  ],
+  "claimStatus": "diagnostic",
+  "error": "node-install: exit 134; see retained stdout/stderr",
+  "hosts": [],
+  "installation": "retained-local-tarballs-with-install-scripts",
+  "kind": "compute_program_package_qualification",
+  "lifecycleCycles": 3,
+  "limits": [
+    "Local candidate, not registry publication or release admission",
+    "Electron main process only; no renderer or Chromium provider substitution",
+    "Explicit device destruction tests recovery; no forced driver loss"
+  ],
+  "packages": [
+    {
+      "hash": "255b84b7140b0ca5a726b2b045c6c0c890fdd899bb51ed7f83b1b3711213b1e2",
+      "path": "doe-gpu-0.5.0.tgz"
+    },
+    {
+      "hash": "65a26a377148d15cd4d52da667b6e9e111614ddef103fa617fd6f0221133ca09",
+      "path": "doe-gpu-linux-x64-0.5.0.tgz"
+    }
+  ],
+  "schemaVersion": 2,
+  "status": "failed",
+  "timeoutMs": 120000
+}

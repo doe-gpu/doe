@@ -75,6 +75,29 @@ const TextureTransitionSource = struct {
     src_stage: u32,
 };
 
+pub fn texture_view_matches_parent(view: TextureResource, parent_handle: u64, parent: TextureResource) bool {
+    return identity.matchesTextureParent(
+        .{ .handle = view.parent_handle, .generation = view.parent_generation, .image = view.image },
+        .{ .handle = parent_handle, .generation = parent.generation, .image = parent.image },
+    );
+}
+
+test "texture views reject recycled parent allocations and another attachment owner" {
+    var parent = std.mem.zeroes(TextureResource);
+    parent.generation = 1;
+    parent.image = 1;
+    var view = parent;
+    view.parent_handle = 2;
+    view.parent_generation = parent.generation;
+    try std.testing.expect(texture_view_matches_parent(view, 2, parent));
+    try std.testing.expect(!texture_view_matches_parent(view, 3, parent));
+    parent.generation += 1;
+    try std.testing.expect(!texture_view_matches_parent(view, 2, parent));
+    view.parent_generation = parent.generation;
+    parent.image += 1;
+    try std.testing.expect(!texture_view_matches_parent(view, 2, parent));
+}
+
 fn texture_dimension_to_vk_image_type(dimension: u32) u32 {
     return switch (dimension) {
         model_gpu_types.WGPUTextureDimension_1D => c.VK_IMAGE_TYPE_1D,
@@ -963,6 +986,10 @@ pub fn texture_transition_source(layout: u32) TextureTransitionSource {
         c.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL => .{
             .src_access_mask = c.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | c.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
             .src_stage = c.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        },
+        c.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL => .{
+            .src_access_mask = c.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | c.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+            .src_stage = c.VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | c.VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
         },
         c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL => .{
             .src_access_mask = c.VK_ACCESS_SHADER_READ_BIT,

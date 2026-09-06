@@ -325,6 +325,14 @@ internal render command. Native architecture checks, Zig regressions, and
 same-package controlled-host qualification remain required. This evidence does
 not qualify depth/stencil, store/discard, resolve, or render-query behavior.
 
+Depth ownership extends the same native-addon regression with near/far geometry,
+later load passes, read-only depth, empty depth clears, depth readback, and
+released caller references. Vulkan uses the caller's retained attachment and the same parent
+allocation identity check used by descriptors. Existing WebGPU fields flow
+through internal command snapshots; public descriptor and trace schemas do not
+change. Stencil operations, depth-only passes, store/discard, multisampling,
+and physical non-Vulkan execution remain separately qualified behavior.
+
 Bounded WGSL candidate jobs use `bench/cli.py program candidate`. Admission
 requires the independently pinned acceptance job, unchanged reference/input
 hashes, valid declared resource budgets, exact qualified package bytes, every

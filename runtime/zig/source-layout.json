@@ -1270,9 +1270,9 @@
       },
       "src/backend/vulkan/vk_constants.zig": {
         "decision": "Keep",
-        "moduleSha256": "6b8d5a13a36b9fbb48d7b9bbce929499be880b15c7d794fca0fe7942b14c2cc6",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "b021630d1dcfd7b0b20d15c21f2dde35855b53eb5a2cd601860ae7335c965d2d",
+        "reason": "Keep: Vulkan ABI values have one backend-local owner, including depth/stencil layout and synchronization bits.",
+        "reviewer": "codex-depth-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_device.zig": {
         "decision": "Keep",
@@ -1348,9 +1348,9 @@
       },
       "src/backend/vulkan/vk_render.zig": {
         "decision": "Keep",
-        "moduleSha256": "27d005d9b9e4fb796d7ecf73d5a4114daf63890cb3742556513d7032a6725bf1",
-        "reason": "Keep: Vulkan attachment load behavior and color synchronization remain local to render-pass construction; later draws preserve earlier attachment writes.",
-        "reviewer": "codex-render-load/2026-09-06"
+        "moduleSha256": "dc83866472d2b5b423f542caeee23e889b1ae02398b499535f4a59b124383b72",
+        "reason": "Keep: render execution binds caller-owned depth views, preserves attachment contents across draws, and separates borrowed targets from owned temporary targets.",
+        "reviewer": "codex-depth-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_render_pipeline.zig": {
         "decision": "Keep",
@@ -1360,9 +1360,9 @@
       },
       "src/backend/vulkan/vk_resources.zig": {
         "decision": "Keep",
-        "moduleSha256": "8f0efae2b615638687a225e2e02118cf03a8e8154ce641f1232da2f033fbd5a0",
-        "reason": "Keep: native buffer and image creation assign generations; texture replacement reserves ownership and creates the successor before destroying the predecessor.",
-        "reviewer": "codex-resource-lifetime/2026-09-06"
+        "moduleSha256": "9f57e2bd939f5dcae0b7ff1c95bd70b53abaafa73672a47da58c9bc5f3e8a346",
+        "reason": "Keep: texture resources own layout-to-access synchronization, including persistent depth/stencil attachment reads and writes.",
+        "reviewer": "codex-depth-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_runtime_probe_ops.zig": {
         "decision": "Keep",
@@ -2770,9 +2770,9 @@
       },
       "src/contracts/model/model_render_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "8e8cfd262505c24e3c6fb96679dd651c9efc5f10c7c4005b9547269998340338",
-        "reason": "Keep: neutral render-command values own explicit attachment load semantics without exposing backend constants.",
-        "reviewer": "codex-render-load/2026-09-06"
+        "moduleSha256": "596a984301f25c33a47d132fb71abe5e64a85b7da97341ee27d21aa1f3739644",
+        "reason": "Keep: neutral render-command values carry explicit attachment identities, load choices, and clear values without backend handles escaping native adaptation.",
+        "reviewer": "codex-depth-ownership/2026-09-06"
       },
       "src/contracts/model/model_resource_types.zig": {
         "decision": "Keep",
@@ -3754,9 +3754,9 @@
       },
       "src/native/support/doe_native_object_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "bd0e60a8112c4b4343a9bc8cee4eb4808c84a34d23eb6fc88d96a771d6a46797",
-        "reason": "Keep: native object lifetimes own whether a render attachment has actually been recorded, independently of API draw-count accounting.",
-        "reviewer": "codex-render-load/2026-09-06"
+        "moduleSha256": "bcc5dd06f96e5f9062bb37d2dba8b82878aa4180e8f0a965a6754605eaa30ffd",
+        "reason": "Keep: native render-pass state owns whether attachments have actually been recorded, independently of API draw accounting.",
+        "reviewer": "codex-depth-ownership/2026-09-06"
       },
       "src/native/support/doe_native_runtime_helpers.zig": {
         "decision": "Keep",
@@ -3814,9 +3814,9 @@
       },
       "src/native/vulkan/vulkan_render_pass_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "f6557da14f839b96b93f06f8ffb002cf5b0ab677ab088a7d6afba14d0e363ff9",
-        "reason": "Keep: native Vulkan recording snapshots the first attachment load and preserves subsequent draws, including bundle replay and empty load passes.",
-        "reviewer": "codex-render-load/2026-09-06"
+        "moduleSha256": "fce8a1d729bd8cf7304879e88b956f51452e4074cb03b51ddda03f1b42ce26c1",
+        "reason": "Keep: native Vulkan recording snapshots retained color/depth views and first-use load semantics, preserving read-only attachments and subsequent draws.",
+        "reviewer": "codex-depth-ownership/2026-09-06"
       },
       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
         "decision": "Keep",
@@ -4240,9 +4240,9 @@
       },
       "src/backend/vulkan/vk_descriptor_identity.zig": {
         "decision": "Keep",
-        "moduleSha256": "33c4e40b0796d5121dff4100cfc2da6d2126370b41688d7943cfe5d2d8eb9c6f",
-        "reason": "Keep: leaf resource identity snapshots compare binding declarations and native allocation generations without owning execution or cache policy.",
-        "reviewer": "codex-descriptor-identity/2026-09-05"
+        "moduleSha256": "b05a8441a64f5bf01fa89206ae0270a2b6fc6522d1018a614c0981bd65835b3d",
+        "reason": "Keep: native descriptor and render-attachment bindings share exact texture-parent allocation identity; cache snapshot ownership remains local.",
+        "reviewer": "codex-depth-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_descriptors.zig": {
         "decision": "Keep",

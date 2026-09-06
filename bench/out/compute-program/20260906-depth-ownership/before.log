@@ -1,0 +1,28 @@
+ok: direct draws preserve color through a load pass and caller release
+ok: bundle draws preserve color through a load pass and caller release
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  Uint8Array(4) [
+-   255,
+    0,
+    0,
+    255,
++   255
+  ]
+
+    at depthPersistence (file:///home/x/deco/doe/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js:81:14)
+    at async file:///home/x/deco/doe/packages/doe-gpu/test/integration/test-integration-native-render-ownership.js:179:3 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: Uint8Array(4) [ 0, 0, 255, 255 ],
+  expected: Uint8Array(4) [ 255, 0, 0, 255 ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.1

@@ -7,6 +7,13 @@ pub const Sampler = struct {
     generation: u64,
 };
 
+pub const TextureParent = struct { handle: u64, generation: u64, image: u64 };
+
+pub fn matchesTextureParent(expected: TextureParent, actual: TextureParent) bool {
+    return expected.image == actual.image and (expected.handle == 0 or
+        (expected.handle == actual.handle and expected.generation == actual.generation));
+}
+
 pub const Binding = struct {
     declaration: compute.KernelBinding,
     generation: u64,
@@ -33,7 +40,10 @@ pub fn snapshot(self: anytype, declaration: compute.KernelBinding) !Binding {
             const resource = self.textures.get(declaration.resource_handle) orelse return error.InvalidState;
             if (resource.parent_handle != 0) {
                 const parent = self.textures.get(resource.parent_handle) orelse return error.InvalidState;
-                if (parent.generation != resource.parent_generation or parent.image != resource.image) return error.InvalidState;
+                if (!matchesTextureParent(
+                    .{ .handle = resource.parent_handle, .generation = resource.parent_generation, .image = resource.image },
+                    .{ .handle = resource.parent_handle, .generation = parent.generation, .image = parent.image },
+                )) return error.InvalidState;
             }
             break :blk .{ .declaration = declaration, .generation = resource.generation, .handle = resource.view, .backing_handle = resource.image, .image_layout = resource.layout };
         },

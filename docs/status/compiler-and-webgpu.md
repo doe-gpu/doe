@@ -3,6 +3,26 @@
 This is the live status front door for the non-TSIR WGSL compiler and WebGPU
 runtime path. Artifacts and executable tests own pass/fail state.
 
+## Depth attachment ownership
+
+Native Vulkan execution binds the application's retained depth texture and view
+instead of allocating an unrelated target for each draw. Internal commands
+carry attachment identity, load operations, and clear values. Draws, later
+passes, and read-only depth use preserve the existing state; an empty clear
+pass resets it explicitly. Borrowed attachments remain owned by the native
+command-buffer leases, and temporary backend targets retain separate cleanup.
+
+Descriptor snapshots and render attachments use the same texture-parent
+allocation identity rule. Recycled generations, changed images, and another
+parent cannot satisfy a retained view's binding. The regression checks depth
+occlusion across draws/passes, read-only depth, empty clears, caller release,
+and readback from the application's depth texture.
+Source, native traces, tests, and retained packages are indexed at
+`bench/out/compute-program/20260906-depth-ownership/README.md`.
+The physical image regression covers depth; stencil operations, depth-only
+passes, store/discard initialization, multisampling/resolve, broad view-range
+validation, and other backends still require their own acceptance evidence.
+
 ## Color attachment preservation
 
 Native Vulkan recording now distinguishes the first recorded attachment use
@@ -15,8 +35,8 @@ The native-addon regression draws adjacent regions, loads them through an empty
 pass, releases caller references, and checks the submitted pixels. The failing
 reproduction, source correction, native checks, and exact-package qualification
 are indexed at `bench/out/compute-program/20260906-render-load/README.md`.
-This correction concerns existing color attachments. Depth/stencil attachment
-identity, store/discard initialization, resolve behavior, render queries, and
+This checkpoint concerns existing color attachments. Broader depth/stencil
+behavior, store/discard initialization, resolve behavior, render queries, and
 broader render-pass conformance remain separate correctness work.
 
 ## Deferred rendering and native ownership

@@ -1,0 +1,8 @@
+npm WARN tar TAR_ENTRY_ERROR Unknown system error -122: Unknown system error -122, write
+npm ERR! code Unknown system error -122
+npm ERR! syscall write
+npm ERR! errno -122
+npm ERR! Unknown system error -122: Unknown system error -122, write
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/x/.npm/_logs/2026-09-06T22_33_37_140Z-debug-0.log

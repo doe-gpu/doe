@@ -46,10 +46,21 @@ fn populate_draw_cmd_from_pass(cmd: *model_render_types.RenderDrawCommand, pass:
         @floatCast(pass.clear_b),
         @floatCast(pass.clear_a),
     };
-    cmd.color_load = if (pass.color_attachment_started or pass.color_load_op == upstream.WGPULoadOp_Load)
+    cmd.color_load = if (pass.attachments_started or pass.color_load_op == upstream.WGPULoadOp_Load)
         .load
     else
         .clear;
+    if (pass.depth_target_view_handle != 0) {
+        if (native_helpers.cast(shared.DoeTextureView, @ptrFromInt(pass.depth_target_view_handle))) |view| {
+            cmd.depth_target_handle = view.tex.vk_id;
+            cmd.depth_target_view_handle = if (view.handle) |handle| @intFromPtr(handle) else view.tex.vk_id;
+            cmd.depth_stencil_format = pass.depth_stencil_format;
+        }
+    }
+    cmd.depth_load = if (pass.attachments_started or pass.depth_read_only or pass.depth_load_op == upstream.WGPULoadOp_Load) .load else .clear;
+    cmd.stencil_load = if (pass.attachments_started or pass.stencil_read_only or pass.stencil_load_op == upstream.WGPULoadOp_Load) .load else .clear;
+    cmd.depth_clear_value = pass.depth_clear_value;
+    cmd.stencil_clear_value = pass.stencil_clear_value;
 
     var bound_vertex_count: u32 = 0;
     var bound_slot: usize = 0;
@@ -183,7 +194,7 @@ fn recordRender(pass: *shared.DoeRenderPass, cmd: model_render_types.RenderDrawC
         .pipeline = if (pass.pipeline) |pipeline| native_helpers.toOpaque(pipeline) else null,
         .clear_only = clear_only,
     } }) catch std.debug.panic("Vulkan render: OOM recording draw state", .{});
-    pass.color_attachment_started = true;
+    pass.attachments_started = true;
 }
 
 pub fn vulkan_render_pass_draw(pass: *shared.DoeRenderPass, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) void {
@@ -229,7 +240,7 @@ pub fn vulkan_render_pass_draw_indexed_indirect(pass: *shared.DoeRenderPass, ind
 }
 
 pub fn vulkan_render_pass_end(pass: *shared.DoeRenderPass) void {
-    if (pass.color_attachment_started) return;
+    if (pass.attachments_started) return;
     var cmd = base_vulkan_render_cmd(pass);
     populate_draw_cmd_from_pass(&cmd, pass);
     recordRender(pass, cmd, true);

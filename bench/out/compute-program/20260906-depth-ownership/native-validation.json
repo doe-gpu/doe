@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe_native_program_identity_trace_validation",
+  "inputs": {
+    "trace": {
+      "path": "bench/out/compute-program/20260906-depth-ownership/native.jsonl",
+      "sha256": "49b208c2146019992e7e079ac8dc3e63dd8865eec84f4e3eb3a25a4eac9dcd83"
+    },
+    "rowSchema": {
+      "path": "config/native-program-identity-trace-row.schema.json",
+      "sha256": "34799d1a2571070bb34ac7f14e36a42a0f63616c9216ab86d6ca0e16c0db4a89"
+    },
+    "artifactRoot": "bench/out/compute-program/20260906-depth-ownership",
+    "spirvValidator": "/usr/bin/spirv-val",
+    "requireRenderCompletion": true
+  },
+  "counts": {
+    "rows": 54,
+    "processes": 1,
+    "dispatches": 0,
+    "renderDraws": 5,
+    "submissions": 0,
+    "artifacts": 4
+  },
+  "checks": {
+    "rowSchemaValid": true,
+    "processSequenceValid": true,
+    "computeSubmissionValid": true,
+    "renderCompletionValid": true,
+    "backendArtifactsValid": true
+  },
+  "artifacts": [
+    {
+      "stage": "vertex",
+      "path": "bench/out/compute-program/20260906-depth-ownership/doe-native-vulkan-813a366d8050393d26842e7cc2885b6ed1c4919143af18463027d2d821c4e492.spv",
+      "expectedSha256": "813a366d8050393d26842e7cc2885b6ed1c4919143af18463027d2d821c4e492",
+      "actualSha256": "813a366d8050393d26842e7cc2885b6ed1c4919143af18463027d2d821c4e492",
+      "spirvValPassed": true
+    },
+    {
+      "stage": "fragment",
+      "path": "bench/out/compute-program/20260906-depth-ownership/doe-native-vulkan-751d4a297a9811efdce4b1523cd75e7a1ac840e0a8c44b92f639cb26cb722688.spv",
+      "expectedSha256": "751d4a297a9811efdce4b1523cd75e7a1ac840e0a8c44b92f639cb26cb722688",
+      "actualSha256": "751d4a297a9811efdce4b1523cd75e7a1ac840e0a8c44b92f639cb26cb722688",
+      "spirvValPassed": true
+    },
+    {
+      "stage": "vertex",
+      "path": "bench/out/compute-program/20260906-depth-ownership/doe-native-vulkan-1bb43dfd51428e07cf56de794dacfc1b8b46be160617a2ff8fac4f4fe5eba9ee.spv",
+      "expectedSha256": "1bb43dfd51428e07cf56de794dacfc1b8b46be160617a2ff8fac4f4fe5eba9ee",
+      "actualSha256": "1bb43dfd51428e07cf56de794dacfc1b8b46be160617a2ff8fac4f4fe5eba9ee",
+      "spirvValPassed": true
+    },
+    {
+      "stage": "fragment",
+      "path": "bench/out/compute-program/20260906-depth-ownership/doe-native-vulkan-203b90da0667875aad970b6d3c4400d8f6e97393f859963138b51014ee0f011f.spv",
+      "expectedSha256": "203b90da0667875aad970b6d3c4400d8f6e97393f859963138b51014ee0f011f",
+      "actualSha256": "203b90da0667875aad970b6d3c4400d8f6e97393f859963138b51014ee0f011f",
+      "spirvValPassed": true
+    }
+  ],
+  "verdict": {
+    "status": "passed",
+    "failureCodes": [],
+    "claimBoundary": "native journal schema, event sequence, completion, and exact SPIR-V bytes; not public-observer identity, output correctness, driver identity, or performance"
+  },
+  "validationSha256": "40590a6e5f1ca01494a107d019f4e9bbe73393f34ebc27f619a1f448978b208b"
+}
