@@ -418,9 +418,42 @@ def _write_browser_release_artifacts(
         }
 
     def comparison_mode_result(mode: str, previous_hash: str | None) -> dict:
+        selection = comparison_runtime_selection(mode)
+        adapter_info = {
+            "vendor": "unit-vendor",
+            "architecture": "unit-architecture",
+            "device": "unit-device",
+            "description": "unit-browser-adapter",
+        }
         entry = {
             "mode": mode,
-            "runtimeSelection": comparison_runtime_selection(mode),
+            "runtimeSelection": selection,
+            "adapterInfo": adapter_info,
+            "activeRuntimeProof": {
+                "schemaVersion": 2,
+                "selectedRuntime": mode,
+                "providerIdentitySource": "runtimeSelector",
+                "hardwareIdentitySource": "wgpuAdapterGetInfo",
+                "provider": {
+                    "selectionMode": mode,
+                    "selectedRuntime": mode,
+                    "forcedMode": mode,
+                    "fallbackApplied": False,
+                    "hiddenFallbackAllowed": False,
+                    "runtimeArtifactSha256": UNIT_DOE_RUNTIME_SHA256
+                    if mode == "doe" else UNIT_DAWN_FALLBACK_RUNTIME_SHA256,
+                    "launchArgsHash": selection["launchArgsHash"],
+                },
+                "hardware": adapter_info,
+                "expected": {
+                    "provider": mode,
+                    "fallbackApplied": False,
+                    "hiddenFallbackAllowed": False,
+                    "hardwareVendorMustBeNonEmpty": True,
+                    "hardwareArchitectureMustBeNonEmpty": True,
+                },
+                "matched": True,
+            },
             "shaderCompilerIdentity": {
                 "compilerSurface": "doe_runtime_embedded_shader_compiler"
                 if mode == "doe"
@@ -456,7 +489,7 @@ def _write_browser_release_artifacts(
     dawn_mode_result = comparison_mode_result("dawn", None)
     doe_mode_result = comparison_mode_result("doe", dawn_mode_result["hash"])
     comparison_artifact_payload = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "reportKind": "chromium-webgpu-playwright-smoke",
         "benchmarkClass": "diagnostic",
         "comparisonStatus": "diagnostic",

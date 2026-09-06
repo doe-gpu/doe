@@ -7,15 +7,15 @@ under `bench/`.
 
 ## Source ownership
 
-- `src/core/`: compute-focused runtime contract
-- `src/full/`: full WebGPU additions with one-way dependency on core
-- `src/backend/`: Metal, Vulkan, D3D12, and delegate execution
-- `src/compiler/wgsl/`: WGSL frontend, transforms, and backend emitters
-- `src/compiler/tsir/`: semantic and realization lowering
-- `src/runtime/`: shared queues, caches, lifecycle, and execution policy
-- `tools/`: source-layout, import, and line-limit checks
+Start with the [generated source map](src/README.md). Its responsibility labels,
+build views, and import boundaries come from [source-layout.json](source-layout.json).
+The map distinguishes WebGPU object ownership, command execution through the
+WebGPU ABI, shared execution services, and module incubation. Historical names
+such as `core` and `full` are not evidence of which build ships a module.
 
-Use the nearest source module rather than adding catch-all utilities.
+Use the nearest owner rather than adding catch-all utilities. The import fence
+enforces dependency direction; organization quality still requires reviewing
+responsibility splits and actual consumers.
 
 ## Build and test
 

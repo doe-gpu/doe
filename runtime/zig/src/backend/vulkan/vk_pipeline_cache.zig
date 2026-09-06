@@ -165,6 +165,33 @@ fn take_hot_compute_state(self: anytype, pipeline_hash: u64) ?CachedComputeState
     return null;
 }
 
+fn cached_compute_state(self: anytype, key: u64) ?*const CachedComputeState {
+    for (self.hot_compute_state_hashes, 0..) |hash, index| {
+        if (hash == key) return &self.hot_compute_states[index];
+    }
+    return self.cached_compute_states.getPtr(key);
+}
+
+/// Hashes locate candidates; exact identity authorizes reuse. Collision entries
+/// stay independently owned so already-recorded commands retain their pipelines.
+pub fn resolve_compute_state_hash(self: anytype, hash: u64, request: shared.Request) !u64 {
+    var key = if (hash == 0) 1 else hash;
+    while (true) {
+        const entry = blk: {
+            if (self.has_pipeline and self.current_pipeline_hash == key) {
+                break :blk self.shared_pipeline orelse return error.InvalidState;
+            }
+            if (cached_compute_state(self, key)) |cached| {
+                break :blk cached.shared_pipeline orelse return error.InvalidState;
+            }
+            return key;
+        };
+        if (try entry.matches(request)) return key;
+        key +%= 1;
+        if (key == 0) key = 1;
+    }
+}
+
 fn put_hot_compute_state(self: anytype, pipeline_hash: u64, cached: CachedComputeState) bool {
     if (pipeline_hash == 0) return false;
     for (self.hot_compute_state_hashes, 0..) |hash, index| {

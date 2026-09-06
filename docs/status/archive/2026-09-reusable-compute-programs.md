@@ -179,3 +179,28 @@ receipt shape and workload hashes are unchanged. Compute declarations and
 closed bundles share recursive JSON key ordering with historical hashes pinned
 by the package contract tests. The public README starts with provider selection
 and documents opt-in resident execution separately.
+
+
+## Pipeline identity correction predecessor
+
+## Buffer publication and replacement
+
+Buffer registry capacity is reserved before allocation and GPU initialization.
+Resizing drains prior work and keeps the old allocation until replacement
+succeeds. Descriptor, receipt, and native ABI contracts are unchanged. The
+original physical failure and corrected allocation/retry evidence are retained
+under `bench/out/compute-program/20260905-buffer-publication-failure/` and
+`bench/out/compute-program/20260905-buffer-publication-correction/`.
+
+## Native pipeline reuse
+
+Vulkan recordings now share live compiled pipelines through a device-owned
+registry. Exact SPIR-V, entry-point, layout, and subgroup checks govern sharing;
+descriptor pools remain private. The owner retains the creation layout for
+older Vulkan implementations and destroys the pipeline at its last release.
+Shader modules are temporary creation inputs. The build contract is
+`config/vulkan-compute-pipeline-policy.json`; package and receipt versions keep
+their meanings. Native handles, output, changed layouts/shaders, allocation
+failures, creator teardown, and device isolation pass under both policy modes.
+Source, policy controls, and logs are retained under
+`bench/out/compute-program/20260905-shared-pipeline-native/`.

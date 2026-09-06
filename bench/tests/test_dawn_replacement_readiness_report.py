@@ -16,6 +16,8 @@ import jsonschema
 
 from bench.browser.browser_gate import stable_hash
 from bench.tools import build_dawn_replacement_readiness_report as report_builder
+from bench.tools import build_webgpu_cts_backend_pass_ledger as cts_ledger_builder
+from bench.tools import build_webgpu_cts_subset_receipt as cts_subset_builder
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -310,8 +312,8 @@ def test_readiness_report_uses_frontier_gate_result() -> None:
     assert report["summary"]["frontierRowCount"] == 11
     assert report["summary"]["productRowCount"] == 10
     assert report["summary"]["claimAllowedProductRowCount"] == 5
-    assert report["summary"]["evidenceSliceCount"] == 16
-    assert report["summary"]["claimAllowedEvidenceSliceCount"] == 5
+    assert report["summary"]["evidenceSliceCount"] == 18
+    assert report["summary"]["claimAllowedEvidenceSliceCount"] == 7
     assert report["summary"]["blockedEvidenceSliceCount"] == 10
 
 
@@ -355,7 +357,23 @@ def test_readiness_report_links_claimable_rows_to_claim_index() -> None:
 
 
 def test_cts_readiness_uses_receipts_to_clear_cts_evidence_blockers() -> None:
-    report = _report()
+    with tempfile.TemporaryDirectory(dir=REPO_ROOT) as tmpdir:
+        subset_path = Path(tmpdir).relative_to(REPO_ROOT) / "cts-subset.json"
+        ledger_path = Path(tmpdir).relative_to(REPO_ROOT) / "cts-ledger.json"
+        subset = cts_subset_builder.build_receipt(
+            root=REPO_ROOT,
+            evidence_path=Path("config/webgpu-cts-evidence.json"),
+        )
+        (REPO_ROOT / subset_path).write_text(json.dumps(subset), encoding="utf-8")
+        ledger = cts_ledger_builder.build_ledger(
+            root=REPO_ROOT, subset_receipt_path=subset_path,
+        )
+        (REPO_ROOT / ledger_path).write_text(json.dumps(ledger), encoding="utf-8")
+        report = report_builder.build_report(
+            _load(FRONTIER_PATH), _load(SCHEMA_PATH), _load(CLAIM_INDEX_PATH),
+            REPO_ROOT, cts_subset_receipt_path=subset_path,
+            cts_backend_pass_ledger_path=ledger_path,
+        )
     cts_row = next(row for row in report["rows"] if row["id"] == "webgpu-cts-conformance")
     blocker_codes = [blocker["code"] for blocker in cts_row["blockers"]]
     cts_evidence = cts_row["ctsConformanceEvidence"]
@@ -369,17 +387,42 @@ def test_cts_readiness_uses_receipts_to_clear_cts_evidence_blockers() -> None:
     assert cts_evidence["policyStatus"] == "defined"
     assert cts_evidence["claimLanguage"] == "diagnostic_until_full_published_pass_ledger"
     assert cts_evidence["summary"]["policyFailureCount"] == 0
-    assert subset_receipt["path"] == "examples/webgpu-cts-subset-receipt.sample.json"
+    assert subset_receipt["path"] == subset_path.as_posix()
     assert subset_receipt["status"] == "pass"
     assert subset_receipt["summary"]["failureCount"] == 0
     assert subset_receipt["sourceEvidence"]["path"] == "config/webgpu-cts-evidence.json"
-    assert backend_pass_ledger["path"] == "examples/webgpu-cts-backend-pass-ledger.sample.json"
+    assert backend_pass_ledger["path"] == ledger_path.as_posix()
     assert backend_pass_ledger["status"] == "pass"
     assert backend_pass_ledger["ledgerStatus"] == "pass"
     assert backend_pass_ledger["summary"]["failureCount"] == 0
     assert backend_pass_ledger["fullConformanceClaimAllowed"] is False
     assert backend_pass_ledger["replacementClaimAllowed"] is False
     assert backend_pass_ledger["sourceReceipt"]["path"] == subset_receipt["path"]
+
+
+def test_cts_readiness_rejects_changed_published_subset_identity() -> None:
+    for mutation, code in (
+        ("artifact", "cts_subset_artifact_receipts_mismatch"),
+        ("source", "cts_subset_source_hash_mismatch"),
+        ("coverage", "cts_subset_query_coverage_mismatch"),
+        ("version", "cts_subset_receipt_schema_version_mismatch"),
+    ):
+        payload = cts_subset_builder.build_receipt(
+            root=REPO_ROOT, evidence_path=Path("config/webgpu-cts-evidence.json"),
+        )
+        if mutation == "artifact":
+            payload["artifactReceipts"][0]["sha256"] = "0" * 64
+        elif mutation == "source":
+            payload["sourceEvidence"]["sha256"] = "0" * 64
+        elif mutation == "coverage":
+            payload["queryCoverage"].pop()
+        else:
+            payload["schemaVersion"] = True
+        _, report = _build_report_with_cts_subset_receipt_payload(payload)
+        row = next(row for row in report["rows"] if row["id"] == "webgpu-cts-conformance")
+        receipt = row["ctsConformanceEvidence"]["subsetReceipt"]
+        assert receipt["status"] == "fail"
+        assert code in {failure["code"] for failure in receipt["failures"]}
 
 
 def test_cts_readiness_keeps_backend_ledger_blocker_for_stale_projection() -> None:
@@ -441,6 +484,9 @@ def test_cts_readiness_keeps_policy_blocker_for_missing_policy() -> None:
 
 def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
     report = _report()
+    proof_surface_hash = hashlib.sha256(
+        (REPO_ROOT / "examples/browser-published-proof-surface.sample.json").read_bytes()
+    ).hexdigest()
     browser_row = next(row for row in report["rows"] if row["id"] == "browser-chromium-runtime")
     blocker_codes = [blocker["code"] for blocker in browser_row["blockers"]]
     claim_entries = {entry["id"]: entry for entry in browser_row["claimIndexEntries"]}
@@ -480,8 +526,8 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
     assert release_bundle["releaseStatus"] == "diagnostic"
     assert release_bundle["artifactVerification"] == {
         "requiredForClaimable": True,
-        "verifyFilesRootProvided": True,
-        "verified": True,
+        "verifyFilesRootProvided": False,
+        "verified": False,
     }
     assert release_support["contractKinds"] == ["contract"]
     assert release_support["claimReportKinds"] == ["browser_claim_report"]
@@ -522,7 +568,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
     assert provenance_report["failureCount"] == 5
     assert provenance_report["componentArtifacts"]["proofSurface"] == {
         "path": "examples/browser-published-proof-surface.sample.json",
-        "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+        "sha256": proof_surface_hash,
         "kind": "browser_published_proof_surface",
     }
     assert provenance_report["componentArtifacts"]["proofSurfaceCheck"] == {
@@ -623,7 +669,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
         },
         "proofSurface": {
             "path": "examples/browser-published-proof-surface.sample.json",
-            "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+            "sha256": proof_surface_hash,
             "kind": "browser_published_proof_surface",
         },
         "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
@@ -670,7 +716,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
         "missingRequired": [],
     }
     assert proof_surface["path"] == "examples/browser-published-proof-surface.sample.json"
-    assert proof_surface["sha256"] == "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa"
+    assert proof_surface["sha256"] == proof_surface_hash
     assert proof_surface["surfaceId"] == "browser-published-proof-surface-sample-v1"
     assert proof_surface["runtimeIdentityPath"] == "examples/browser-runtime-identity.selector.sample.json"
     assert proof_surface["proofPageUrl"] == "about:doe"
@@ -700,7 +746,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
         "sha256": "ce3cf81df86560f60b202d4b941c42509f430a7f308690ab1876a270873e9a97",
         "artifactKind": "browser_published_proof_surface_check",
         "surfacePath": "examples/browser-published-proof-surface.sample.json",
-        "surfaceSha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+        "surfaceSha256": proof_surface_hash,
         "verifyFilesRootProvided": True,
         "requirePublicUrls": True,
         "status": "pass",
@@ -728,12 +774,19 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
     assert consistency["failureCodes"] == sorted(set(failure_codes))
     assert failure_codes == [
         "release_artifact_bundle_not_release_candidate",
+        "release_support_artifact_hash_mismatch",
+        "release_support_artifact_hash_mismatch",
+        "release_support_artifact_hash_mismatch",
         "provenance_report_not_pass",
         "finalizer_report_not_pass",
         "finalizer_check_not_pass",
         "package_inputs_not_release_candidate_eligible",
         "package_inputs_not_release_candidate",
         "package_inputs_blockers_present",
+        "package_inputs_binary_platform_mismatch",
+        "package_inputs_binary_arch_mismatch",
+        "browser_release_proof_surface_comparison_payload_mismatch",
+        "browser_release_proof_surface_comparison_payload_mismatch",
     ]
 
 

@@ -2,13 +2,15 @@
   "schemaVersion": 1,
   "protectedPaths": [
     "bench/cli.py",
+    "bench/browser/release",
     "bench/lib",
     "bench/native_compare_modules",
     "bench/workload_runner.py",
     "pipeline"
   ],
   "legacyDirectScriptRoots": [
-    "bench/browser",
+    "bench/browser/browser_gate.py",
+    "bench/browser/browser_claim_gate.py",
     "bench/drop-in",
     "bench/gates",
     "bench/native-compare",

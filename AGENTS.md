@@ -59,9 +59,10 @@ Default assumptions:
   `doe-gpu`
 - `dawn-research/` is a Gerrit CL analysis pipeline (research surface; see
   `pipeline/agent/README.md`) referenced by `config/tool-surfaces.json`
-- `nursery/` carries active surfaces consumed by CI workflows
-  (`nursery/chromium/`, `nursery/webgpu/` referenced by `.github/workflows/`);
-  the name is historical, not a sign that the trees are dead
+- `nursery/` retains archive navigation; current CI does not consume executable
+  surfaces there. Chromium integration lives in `browser/chromium/`, and CTS
+  provider tooling lives in `bench/cts/`. Use `config/tool-surfaces.json` and
+  current workflow paths when classifying a surface.
 
 Do not infer public product commitments from repo-only tools, scripts, or
 historical docs.

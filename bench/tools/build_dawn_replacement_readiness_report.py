@@ -27,7 +27,7 @@ from bench.gates.claim_index_browser_release_proof import (
     validate_claim_indexed_proof_surface,
     validate_proof_surface_runtime_identity_release_hashes,
 )
-from bench.gates.claim_index_browser_release_receipts import (
+from bench.browser.release.receipts import (
     validate_claim_indexed_proof_surface_receipts,
 )
 from bench.lib.bench_utils import (
@@ -38,6 +38,7 @@ from bench.lib.bench_utils import (
 )
 from bench.tools._public_url import is_public_https_url
 from bench.tools import build_webgpu_cts_backend_pass_ledger as cts_backend_ledger_builder
+from bench.tools import build_webgpu_cts_subset_receipt as cts_subset_builder
 from bench.tools.check_browser_release_package_inputs import (
     detect_file_identity_bytes,
     release_platform_contract,
@@ -1016,6 +1017,17 @@ def cts_subset_receipt_evidence(
         return missing_evidence, False
 
     failures: list[dict[str, str]] = []
+    schema_version = payload.get("schemaVersion")
+    if type(schema_version) is not int or schema_version not in (
+        1, cts_subset_builder.RECEIPT_SCHEMA_VERSION,
+    ):
+        failures.append(
+            failure(
+                "cts_subset_receipt_schema_version_mismatch",
+                "ctsConformanceEvidence.subsetReceipt.schemaVersion",
+                "CTS subset receipt schemaVersion must be a supported receipt version",
+            )
+        )
     if payload.get("artifactKind") != CTS_SUBSET_RECEIPT_KIND:
         failures.append(
             failure(
@@ -1191,7 +1203,33 @@ def cts_subset_receipt_evidence(
             "ctsConformanceEvidence.sourceEvidence.evidence",
         )
         failures.extend(source_row_failures)
-        if not source_row_failures and not coverage_failures and coverage_rows != source_rows:
+        source_rows_valid = not source_row_failures
+        if schema_version == cts_subset_builder.RECEIPT_SCHEMA_VERSION:
+            try:
+                published = cts_subset_builder.build_receipt(
+                    root=root,
+                    evidence_path=cts_evidence_path,
+                )
+            except (OSError, UnicodeError, ValueError) as exc:
+                source_rows_valid = False
+                failures.append(
+                    failure(
+                        "cts_subset_published_artifacts_invalid",
+                        "ctsConformanceEvidence.subsetReceipt.artifactReceipts",
+                        f"CTS published artifact verification failed: {exc}",
+                    )
+                )
+            else:
+                source_rows = published["queryCoverage"]
+                if payload.get("artifactReceipts") != published["artifactReceipts"]:
+                    failures.append(
+                        failure(
+                            "cts_subset_artifact_receipts_mismatch",
+                            "ctsConformanceEvidence.subsetReceipt.artifactReceipts",
+                            "CTS subset artifactReceipts must match verified published artifacts",
+                        )
+                    )
+        if source_rows_valid and not coverage_failures and coverage_rows != source_rows:
             failures.append(
                 failure(
                     "cts_subset_query_coverage_mismatch",

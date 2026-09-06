@@ -6,6 +6,13 @@ history remains in the archive.
 
 ## Current boundary
 
+CTS readiness now shares the receipt builder's published-artifact selection for
+receipt version 2, verifies the retained bytes, and rejects altered artifact
+identities or query coverage. Legacy receipts keep their original contract.
+The original rejection and unchanged-receipt correction are retained under
+`bench/out/organization/20260905-readiness-subset-failure/` and
+`bench/out/organization/20260905-readiness-subset-correction/`.
+
 The execution program is documented in
 [`reusable-compute-programs.md`](reusable-compute-programs.md). Its current AMD
 Vulkan candidate installs the same retained archives on Node, Bun, and Electron

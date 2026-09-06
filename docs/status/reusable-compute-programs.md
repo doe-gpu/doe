@@ -1,26 +1,14 @@
 # Reusable compute programs
 
-## Buffer publication and replacement
+## Exact pipeline cache identity
 
-Buffer registry capacity is reserved before allocation and GPU initialization.
-Resizing drains prior work and keeps the old allocation until replacement
-succeeds. Descriptor, receipt, and native ABI contracts are unchanged. The
-original physical failure and corrected allocation/retry evidence are retained
-under `bench/out/compute-program/20260905-buffer-publication-failure/` and
-`bench/out/compute-program/20260905-buffer-publication-correction/`.
-
-## Native pipeline reuse
-
-Vulkan recordings now share live compiled pipelines through a device-owned
-registry. Exact SPIR-V, entry-point, layout, and subgroup checks govern sharing;
-descriptor pools remain private. The owner retains the creation layout for
-older Vulkan implementations and destroys the pipeline at its last release.
-Shader modules are temporary creation inputs. The build contract is
-`config/vulkan-compute-pipeline-policy.json`; package and receipt versions keep
-their meanings. Native handles, output, changed layouts/shaders, allocation
-failures, creator teardown, and device isolation pass under both policy modes.
-Source, policy controls, and logs are retained under
-`bench/out/compute-program/20260905-shared-pipeline-native/`.
+Active, hot, and spilled Vulkan compute cache hits check complete shader,
+entry-point, layout, and effective subgroup identity. Hash collisions keep
+separate owning entries so existing recordings retain their pipelines. Layout
+reuse checks its definition. The original wrong-output reproduction is retained
+under `bench/out/compute-program/20260905-pipeline-identity-failure/`;
+corrected physical execution and native replay verification live under
+`bench/out/compute-program/20260905-pipeline-identity-correction/`.
 
 ## Resident numerical acceptance
 
@@ -64,7 +52,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-buffer-publication-package/summary.json`.
+`bench/out/compute-program/20260905-pipeline-identity-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -72,14 +60,14 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-buffer-publication-matrix/summary.json`.
+`bench/out/compute-program/20260905-pipeline-identity-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the new receipt contract. It does not measure a
 resident application sequence. Performance remains diagnostic; large Deno host
 ratios remain suspicious and require fairness review.
-Earlier native replay and SPIR-V validation results are retained separately under
-`bench/out/compute-program/20260905-compiler-diagnostics-native/`.
+Native replay and SPIR-V verification for this matrix are retained with the
+pipeline identity correction.
 
 ## Active acceptance gaps
 
@@ -87,7 +75,8 @@ Metal GPU recording and physical transfer remain open; the known Mac host is
 currently unreachable from this workspace. Windows requires an approved
 physical D3D12 lane. Changed plans still rebuild command recordings and private
 descriptor state while retaining unchanged public resources and compatible
-live compute pipelines. Pipeline sharing alone does not establish reduced
+live compute pipelines. Descriptor caches still need an exact native-resource
+identity audit. Pipeline sharing alone does not establish reduced
 useful-operation latency.
 
 The external portfolio, a measured application boundary crossing, resident

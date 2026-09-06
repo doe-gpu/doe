@@ -19,6 +19,130 @@ const REUSE_SHADER =
 const REUSE_BUFFER_BYTES = 4 * @sizeOf(u32);
 const DEVICE_LOCAL_FAILURE_BYTES = 64 * 1024;
 
+test "Vulkan pipeline hash collisions preserve every recorded shader and reject invalid entry points" {
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const first_words = std.mem.bytesAsSlice(u32, output[0..length]);
+    const changed_source = try std.mem.replaceOwned(u8, std.testing.allocator, REUSE_SHADER, "7u", "11u");
+    defer std.testing.allocator.free(changed_source);
+    var changed_output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const changed_length = try compiler.translateToSpirv(std.testing.allocator, changed_source, &changed_output);
+    const second_words = std.mem.bytesAsSlice(u32, changed_output[0..changed_length]);
+
+    for ([_]u64{ 0, std.math.maxInt(u64) }, 0..) |hash, index| {
+        const bindings = [_]compute.KernelBinding{.{ .binding = 0, .resource_kind = .buffer, .resource_handle = 401 + index, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage }};
+        _ = try resources.ensure_compute_buffer_for_binding(&rt, bindings[0], true);
+        var program = compute_program.ComputeProgram{};
+        defer program.deinit(&rt);
+        try program.begin(&rt);
+        for ([_][]const u32{ first_words, second_words, first_words }) |words| {
+            try rt.set_compute_shader_spirv_with_hashes(words, hash, hash, null, "main", &bindings, false);
+            try rt.record_prepared_dispatch_replay_on(program.command_buffer, 4, 1, 1);
+        }
+        try program.finish(&rt);
+        try program.submit(&rt);
+        try expect_reuse_output(&rt, bindings[0].resource_handle, &.{ 25, 28, 31, 34 });
+        try program.submit(&rt);
+        try expect_reuse_output(&rt, bindings[0].resource_handle, &.{ 50, 56, 62, 68 });
+
+        try rt.set_compute_shader_spirv_with_hashes(first_words, hash, hash, null, "main", &bindings, false);
+        const original_pipeline = rt.pipeline;
+        try std.testing.expectError(error.InvalidArgument, rt.set_compute_shader_spirv_with_hashes(first_words, hash, hash, null, "missing_entry", &bindings, false));
+        try std.testing.expectEqual(original_pipeline, rt.pipeline);
+        try std.testing.expectError(error.InvalidArgument, rt.set_compute_shader_spirv_with_hashes(first_words, hash, hash, null, "main", &.{}, false));
+        try std.testing.expectEqual(original_pipeline, rt.pipeline);
+    }
+}
+
+test "Vulkan pipeline layout collisions rebuild descriptor layouts" {
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const words = std.mem.bytesAsSlice(u32, output[0..length]);
+    const bindings = [_]compute.KernelBinding{
+        .{ .binding = 0, .resource_kind = .buffer, .resource_handle = 411, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage },
+        .{ .group = 1, .binding = 0, .resource_kind = .buffer, .resource_handle = 412, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Uniform },
+    };
+    try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, null, "main", bindings[0..1], true);
+    const pipeline = @import("../../src/backend/vulkan/vk_pipeline.zig");
+    try pipeline.build_pipeline_for_words(&rt, words, 2, 1, "main", &bindings);
+    try std.testing.expectEqual(@as(u32, 2), rt.descriptor_set_count);
+    try rt.set_compute_shader_spirv_with_hashes(words, 2, 1, null, "main", &bindings, false);
+    _ = try rt.run_dispatch(4, 1, 1, .per_command, .wait_any, .off);
+    try expect_reuse_output(&rt, bindings[0].resource_handle, &.{ 7, 8, 9, 10 });
+    try pipeline.build_pipeline_for_words(&rt, words, 1, 1, "main", bindings[0..1]);
+    try std.testing.expectEqual(@as(u32, 1), rt.descriptor_set_count);
+}
+
+test "Vulkan pipeline identity follows effective subgroup policy on active and cached hits" {
+    if (std.posix.getenv("DOE_VULKAN_REQUIRED_SUBGROUP_SIZE") != null) return error.SkipZigTest;
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    if (!rt.has_subgroup_size_control_ext or rt.required_compute_subgroup_size == 0) return error.SkipZigTest;
+    var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+    const length = try compiler.translateToSpirv(std.testing.allocator, REUSE_SHADER, &output);
+    const words = std.mem.bytesAsSlice(u32, output[0..length]);
+    const bindings = [_]compute.KernelBinding{.{ .binding = 0, .resource_kind = .buffer, .resource_handle = 451, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage }};
+    try rt.set_compute_shader_spirv(words, "main", &bindings, true);
+    const required = rt.pipeline;
+    try std.testing.expectEqual(rt.required_compute_subgroup_size, rt.shared_pipeline.?.required_subgroup_size.?);
+    rt.vulkan_subgroup_size_policy = .suppress_for_workgroup_memory_256_or_single_invocation;
+    try rt.set_compute_shader_spirv(words, "main", &bindings, false);
+    try std.testing.expectEqual(@as(?u32, null), rt.shared_pipeline.?.required_subgroup_size);
+    try std.testing.expect(rt.pipeline != required);
+    rt.vulkan_subgroup_size_policy = .fixed_32_when_supported;
+    try rt.set_compute_shader_spirv(words, "main", &bindings, false);
+    try std.testing.expectEqual(required, rt.pipeline);
+    _ = try rt.run_dispatch(4, 1, 1, .per_command, .wait_any, .off);
+    try expect_reuse_output(&rt, bindings[0].resource_handle, &.{ 7, 8, 9, 10 });
+}
+
+test "Vulkan pipeline identity survives collision chains beyond the hot cache" {
+    const variant_count = @import("../../src/backend/vulkan/vk_pipeline_cache.zig").HOT_COMPUTE_STATE_CACHE_CAPACITY + 2;
+    var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
+        error.UnsupportedFeature => return error.SkipZigTest,
+        else => return err,
+    };
+    defer rt.deinit();
+    const bindings = [_]compute.KernelBinding{.{ .binding = 0, .resource_kind = .buffer, .resource_handle = 501, .buffer_size = REUSE_BUFFER_BYTES, .buffer_type = binding_types.WGPUBufferBindingType_Storage }};
+    _ = try resources.ensure_compute_buffer_for_binding(&rt, bindings[0], true);
+    var program = compute_program.ComputeProgram{};
+    defer program.deinit(&rt);
+    try program.begin(&rt);
+    var handles: [variant_count]vk.VkPipeline = undefined;
+    for (0..variant_count * 2) |iteration| {
+        const index = if (iteration < variant_count) iteration else variant_count * 2 - iteration - 1;
+        var literal: [32]u8 = undefined;
+        const source = try std.mem.replaceOwned(u8, std.testing.allocator, REUSE_SHADER, "7u", try std.fmt.bufPrint(&literal, "{d}u", .{index + 1}));
+        defer std.testing.allocator.free(source);
+        var output: [compiler.MAX_SPIRV_OUTPUT]u8 align(@alignOf(u32)) = undefined;
+        const length = try compiler.translateToSpirv(std.testing.allocator, source, &output);
+        const words = std.mem.bytesAsSlice(u32, output[0..length]);
+        try rt.set_compute_shader_spirv_with_hashes(words, 1, 1, null, "main", &bindings, false);
+        if (iteration < variant_count) {
+            handles[index] = rt.pipeline;
+        } else try std.testing.expectEqual(handles[index], rt.pipeline);
+        try rt.record_prepared_dispatch_replay_on(program.command_buffer, 4, 1, 1);
+    }
+    try program.finish(&rt);
+    try program.submit(&rt);
+    var expected: [4]u32 = undefined;
+    for (&expected, 0..) |*value, index| value.* = @intCast(variant_count * (variant_count + 1) + variant_count * 2 * index);
+    try expect_reuse_output(&rt, bindings[0].resource_handle, &expected);
+}
+
 test "Vulkan buffer publication failure cannot leave an unowned initialization command" {
     var rt = native_runtime.NativeVulkanRuntime.init(std.testing.allocator, null) catch |err| switch (err) {
         error.UnsupportedFeature => return error.SkipZigTest,

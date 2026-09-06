@@ -49,10 +49,14 @@ pub const Pipeline = struct {
 
     pub fn matches(self: *const Pipeline, request: Request) !bool {
         if (self.required_subgroup_size != request.required_subgroup_size or
-            self.layout.len != request.bindings.len or
             !std.mem.eql(u32, self.words, request.words) or
             !std.mem.eql(u8, self.entry_point, request.entry_point)) return false;
-        for (self.layout, request.bindings) |layout, binding| {
+        return self.matchesLayout(request.bindings);
+    }
+
+    pub fn matchesLayout(self: *const Pipeline, bindings: []const compute.KernelBinding) !bool {
+        if (self.layout.len != bindings.len) return false;
+        for (self.layout, bindings) |layout, binding| {
             if (!std.meta.eql(layout, try LayoutBinding.from(binding))) return false;
         }
         return true;

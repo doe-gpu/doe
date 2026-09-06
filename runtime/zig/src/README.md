@@ -6,26 +6,44 @@ is the single module root; every other Zig file belongs to one owner below.
 
 | Directory | Owns |
 | --- | --- |
-| `app/` | application orchestration and request preparation |
-| `backend/` | backend selection, shared backend seams, and Metal/Vulkan/D3D12 implementations |
-| `cli/` | command-line orchestration and executable entrypoints |
-| `command/` | command-stream parsing and normalization |
-| `compat/` | explicit compatibility barrels that remain under test |
-| `compiler/` | WGSL, TSIR, and compiler target descriptions |
-| `composition/` | composition roots, backend factory, and adapter assembly |
-| `contracts/` | neutral contracts shared by core and full runtime layers |
-| `core/` | compute, resource, queue, replay, trace, and WebGPU ABI core |
-| `dropin/` | WebGPU drop-in symbol routing and behavior policy |
-| `evidence/` | evidence port, execution receipts, trace observer, oracle comparisons, and replay validation |
-| `full/` | render, surface, and full-runtime command behavior |
-| `integrations/` | runtime integration anchors such as ONNX Runtime EP |
-| `native/` | Doe-native WebGPU object and command implementation |
-| `plan/` | direct execution-plan contracts and executors |
-| `quirk/` | quirk parsing, selection, and application |
-| `runtime/` | shared execution, cache, device, queue, diagnostics, and trace services |
-| `spatial/` | HostPlan and CSL orchestration for spatial targets |
-| `tooling/` | I/O contexts shared by command-line tools |
-| `verification/` | runtime consumers of proof artifacts |
+| [app/](app/) | application orchestration and request preparation |
+| [backend/](backend/) | backend selection, shared backend seams, and Metal/Vulkan/D3D12 implementations |
+| [cli/](cli/) | command-line orchestration and executable entrypoints |
+| [command/](command/) | command-stream parsing and normalization |
+| [compat/](compat/) | explicit compatibility barrels that remain under test |
+| [compiler/](compiler/) | WGSL, TSIR, and compiler target descriptions |
+| [composition/](composition/) | composition roots, backend factory, and adapter assembly |
+| [contracts/](contracts/) | neutral contracts shared by core and full runtime layers |
+| [core/](core/) | WebGPU C ABI declarations/loading and compute, resource, and queue commands through that ABI |
+| [dropin/](dropin/) | WebGPU drop-in symbol routing and behavior policy |
+| [evidence/](evidence/) | evidence port, execution receipts, trace observer, oracle comparisons, and replay validation |
+| [full/](full/) | render, surface, and lifecycle commands through the WebGPU ABI; separately classified module incubation under modules/ |
+| [integrations/](integrations/) | runtime integration anchors such as ONNX Runtime EP |
+| [native/](native/) | WebGPU API objects, reference ownership, encoded commands, and native provider integration |
+| [plan/](plan/) | direct execution-plan contracts and executors |
+| [quirk/](quirk/) | quirk parsing, selection, and application |
+| [runtime/](runtime/) | prepared-command execution and shared queue, cache, device, numerical policy, diagnostics, and trace services |
+| [spatial/](spatial/) | HostPlan and CSL orchestration for spatial targets |
+| [tooling/](tooling/) | I/O contexts shared by command-line tools |
+| [verification/](verification/) | runtime consumers of proof artifacts |
+
+## Build reachability
+
+Directory ownership and build scope are separate. The named views in
+[`source-layout.json`](../source-layout.json) identify their source roots;
+[`reachability-views.json`](../reports/architecture/reachability-views.json)
+records the reachable modules. Neither a directory name nor reachability alone
+establishes a supported hardware capability.
+
+| View | Scope |
+| --- | --- |
+| `shipped-native-package-runtime` | Implementation roots selected by the shipped runtime CLI and libwebgpu_doe package artifact |
+| `dropin-compatibility` | Drop-in WebGPU ABI routing and the declared legacy flat compatibility facade |
+| `module-incubation-evidence-tools` | Module incubation, plan comparison, and repo-only integration executables used for evidence rather than shipped runtime claims |
+| `compiler-tsir-spatial-toolchains` | WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets |
+| `test-only-compatibility` | Legacy aggregate type facades and surface contracts exercised by Zig tests but absent from shipped and repository-tool build roots |
+
+## Compiler and compatibility boundaries
 
 WGSL follows the compiler-stage directories declared by `source-layout.json`:
 

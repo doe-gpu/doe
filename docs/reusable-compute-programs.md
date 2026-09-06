@@ -52,6 +52,10 @@ releases the pipeline; the registry does not retain unused pipeline history.
 The shared owner also retains its creation layout for Vulkan implementations
 without maintenance4 lifetime guarantees.
 The `private` policy builds independent pipelines for controlled comparisons.
+Local active and cached pipeline selection applies the same exact identity
+checks. Hashes locate candidates; collisions retain distinct owning entries,
+including pipelines already referenced by recorded commands. Effective subgroup
+policy is resolved before lookup. Layout reuse also checks the layout definition.
 Compatible descriptor layouts permit sharing the compiled pipeline while
 keeping descriptor sets independent, as specified by
 [Vulkan layout compatibility](https://docs.vulkan.org/spec/latest/chapters/descriptorsets.html#descriptorsets-compatibility).
@@ -243,6 +247,11 @@ the ordinary provider, repeated lifecycle, and plan regressions from the
 installed package. It grants neither registry publication nor release admission.
 
 ## Migration and evidence boundaries
+
+The Vulkan pipeline cache now treats precomputed hashes as lookup hints, not
+identity proofs. Rebuild the native library to apply this correction; public
+descriptor, receipt, and ABI fields are unchanged. Earlier hash-only failures
+remain retained independently of corrected physical execution.
 
 The Vulkan compute pipeline policy is an additive build contract. Existing
 package descriptors, public receipts, and native ABI versions keep their

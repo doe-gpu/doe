@@ -2,6 +2,10 @@
 
 This is the current classification of Doe's non-test Zig surfaces. It is an
 architecture review, not a claim that every line is promoted product code.
+The [generated source map](../../runtime/zig/src/README.md) derives responsibility
+labels and named build views from
+[source-layout.json](../../runtime/zig/source-layout.json). Directory names
+and enforced imports do not establish optimal organization or hardware support.
 The import fence and source-layout gates are the structural authority; this
 page records the lifecycle interpretation and follow-up decisions. The target
 structural roadmap lives in [`../runtime-hexagonal-architecture-plan.md`](../runtime-hexagonal-architecture-plan.md).
@@ -32,10 +36,14 @@ them as Doe source.
 
 The current advisory owners and next semantic split targets are:
 
-- Browser-release evidence owner: split browser claim admission, proof-surface
-  inspection, receipt validation, runtime-frontier bundle validation, and
-  their fixture-heavy tests by artifact family. This covers
-  `bench/gates/claim_index_browser_release*.py`,
+- Browser-release evidence owner: receipt validation now belongs to
+  `bench/browser/release/`, shared by claim admission and readiness reporting.
+  Execution, comparison, proof-page, gallery, and artifact checks have narrow
+  owners; the existing command and receipt contracts remain unchanged.
+  Next split targets are claim admission, proof-surface inspection,
+  runtime-frontier bundle validation, and their fixture-heavy tests. This covers
+  `bench/gates/claim_index_browser_release.py`,
+  `bench/gates/claim_index_browser_release_proof.py`,
   `bench/tools/check_browser_published_proof_surface.py`,
   `bench/tools/check_browser_release_artifact_bundle.py`, and the matching
   browser release/frontier tests.
@@ -203,26 +211,30 @@ qualification.
 
 ## Classification
 
-| Surface | Classification | Boundary decision |
-| --- | --- | --- |
-| `src/contracts/` | Canonical | Shared semantic contracts. New consumers should import these rather than backend or model-specific copies. |
-| `src/compiler/wgsl/` | Canonical | WGSL parsing, IR, transforms, proofs, and target emission. `mod.zig` is the compatibility facade; runtime code imports narrow `pipeline/` stages. Keep lowering separate from native execution. |
-| `src/compiler/tsir/` | Diagnostic/canonical research path | Doe-owned portability path with real contracts, but broad target execution is not yet promoted. |
-| `src/backend/common/` | Canonical shared implementation | The current helpers import canonical contracts and are reused by backend paths; no merge is justified from this audit. |
-| `src/backend/metal/`, `vulkan/`, `d3d12/` | Canonical platform components | Keep separate because the native APIs, synchronization, memory, and failure models differ. Reuse policy, contracts, tracing, and common helpers. |
-| `src/backend/ports/provider_adapter.zig` | Canonical compile-time leaf adapter | Binds provider functions directly into capability-specific ports; it creates no catch-all runtime execution interface. |
-| `src/backend/ports/` | Canonical outbound contracts | Application and runtime execution depend on these narrow capability ports, never concrete providers. Unsupported capability paths must fail explicitly. |
-| `src/composition/execution_session.zig` | Canonical composition root | Owns policy, provider selection, concrete provider lifetime, port assembly, and destruction. |
-| `src/native/` | Canonical runtime | Doe-native WebGPU objects, resource ownership, commands, and lifecycle. Backend mechanics should remain below shared runtime contracts. |
-| `src/runtime/` | Canonical shared services | Queues, cache, device, lifecycle, diagnostics, execution policy, and trace services shared by runtime paths. |
-| `src/core/` | Canonical compute core | Narrower WebGPU/compute ABI and shared core behavior. It must not become a second full-runtime implementation. |
-| `src/full/` | Mixed: canonical full surface plus module incubation | Full WebGPU behavior is a valid surface; `src/full/modules/rendering` and `services` are reachable through `module-core-runner`, package tooling, and module gates, but are not native GPU execution evidence. |
-| `src/dropin/` and `src/compat/` | Compatibility surfaces | Keep only for declared consumers and tests. Facades need removal conditions, not silent permanence. |
-| `src/spatial/` | Diagnostic target path | HostPlan/CSL tooling is Doe-owned, but simulator or bootstrap output is not general hardware evidence. |
-| `src/integrations/` | Repo-only integration seams | Keep external adapters isolated from the runtime product contract. |
-| `src/plan/`, `src/command/`, `src/quirk/`, `src/verification/` | Supporting runtime layers | Keep separate where they own distinct policy, normalization, or proof boundaries. |
-| `src/cli/`, `runtime/zig/tools/`, `runtime/zig/bench/` | Tooling | Not runtime product code; do not use their size as evidence of runtime capability. |
-| `src/core/abi/generated/` | Generated | Maintain through the generator contract; do not hand-refactor generated ABI. |
+The ownership inventory is generated in
+[`runtime/zig/src/README.md`](../../runtime/zig/src/README.md). Use it to locate
+WebGPU ABI commands, native object/resource/lifecycle implementations, shared
+execution services, and backend mechanics. The runtime README links to that
+inventory instead of maintaining a second directory map.
+
+Build reachability is independently classified by the manifest's named views.
+`full/modules/` remains module incubation; `core/` and `full/` are historical
+capability partitions for ABI commands. `native/` owns WebGPU objects and native
+provider integration. None of these directory names alone establishes shipment
+or physical qualification. Compatibility facades retain their manifest-owned
+consumers and removal conditions.
+
+Browser receipt validation is organized by artifact responsibility under
+`bench/browser/release/`; the admission gate and readiness builder consume the
+same implementation. Its behavior-preserving move and the original stale
+positive-fixture failure are retained in
+`bench/out/organization/20260905-browser-receipts/`.
+Remaining archive/proof/frontier workflows still need their named semantic
+splits. Retained historical evidence is not duplicate implementation.
+
+Nursery is archive navigation under `config/tool-surfaces.json`. Current CI
+uses `browser/chromium/` and `bench/cts/`; AGENTS and the nursery README agree
+with those consumers. Old source paths remain in historical receipts.
 
 ## Reuse and deduplication findings
 

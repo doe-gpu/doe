@@ -1,8 +1,11 @@
 # Nursery archive
 
-Historical and experimental surfaces that are intentionally outside the active
-runtime, package, and benchmark contracts.
+This directory retains archive navigation. It has no current executable CI
+consumers. Its classification comes from
+[`config/tool-surfaces.json`](../config/tool-surfaces.json).
 
-Treat this directory as archive material unless a nested README or current
-tracked issue says otherwise. Active Chromium and browser-lane work lives under
-`browser/`.
+Active Chromium integration lives in
+[`browser/chromium/`](../browser/chromium/README.md); CTS provider tooling lives
+in [`bench/cts/`](../bench/cts/README.md). Their current workflow consumers live
+in [`.github/workflows/`](../.github/workflows/). Historical nursery paths in
+retained evidence describe the checkout that produced that evidence.

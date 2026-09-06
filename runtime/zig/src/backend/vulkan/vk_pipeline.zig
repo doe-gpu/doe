@@ -274,7 +274,14 @@ pub fn set_compute_shader_spirv_with_hashes(
     bindings: ?[]const model_compute_types.KernelBinding,
     initialize_buffers_on_create: bool,
 ) !void {
-    if (!self.has_pipeline or pipeline_hash != self.current_pipeline_hash) {
+    const request = shared.Request{
+        .words = words,
+        .entry_point = entry_point orelse "main",
+        .bindings = bindings orelse &.{},
+        .required_subgroup_size = required_subgroup_size_for_pipeline(self, words),
+    };
+    const cache_hash = try vk_pipeline_cache.resolve_compute_state_hash(self, pipeline_hash, request);
+    if (!self.has_pipeline or cache_hash != self.current_pipeline_hash) {
         const previous_pipeline_hash = self.current_pipeline_hash;
         const had_active_state = has_active_compute_state(self);
         if (had_active_state) {
@@ -283,8 +290,8 @@ pub fn set_compute_shader_spirv_with_hashes(
         errdefer if (had_active_state and self.current_pipeline_hash == 0) {
             _ = activate_cached_compute_state(self, previous_pipeline_hash);
         };
-        if (!activate_cached_compute_state(self, pipeline_hash)) {
-            try build_pipeline_for_words(self, words, pipeline_hash, layout_hash, entry_point, bindings);
+        if (!activate_cached_compute_state(self, cache_hash)) {
+            try build_pipeline_for_request(self, request, cache_hash, layout_hash);
         }
     }
     try prepare_descriptor_sets(self, bindings, initialize_buffers_on_create, descriptor_bindings_hash);
@@ -305,37 +312,45 @@ pub fn build_pipeline_for_words(
     entry_point: ?[]const u8,
     bindings: ?[]const model_compute_types.KernelBinding,
 ) !void {
+    return build_pipeline_for_request(self, .{
+        .words = words,
+        .entry_point = entry_point orelse "main",
+        .bindings = bindings orelse &.{},
+        .required_subgroup_size = required_subgroup_size_for_pipeline(self, words),
+    }, pipeline_hash, layout_hash);
+}
+
+fn build_pipeline_for_request(self: anytype, request: shared.Request, pipeline_hash: u64, layout_hash: u64) !void {
+    const words = request.words;
+    const bindings = request.bindings;
+    const entry_name = request.entry_point;
     if (!self.recorded_submit_replay_active and (self.has_deferred_submissions or self.pending_uploads.items.len > 0)) {
         _ = try vk_upload.flush_queue(self);
     }
     // Guard: if no bindings were provided but SPIR-V declares descriptor bindings,
     // refuse to create the pipeline rather than letting the driver crash (RADV segfaults
     // when pipeline layout is empty but shader references descriptors).
-    if (bindings == null and spirv_has_descriptor_bindings(words)) {
+    if (bindings.len == 0 and spirv_has_descriptor_bindings(words)) {
         return error.InvalidArgument;
     }
-    try ensure_pipeline_layout_with_hash(self, bindings, layout_hash);
-    release_or_retire_pipeline_objects(self);
-    errdefer destroy_pipeline_objects(self);
-
-    const entry_name = entry_point orelse "main";
     // Defensive: RADV (and likely other drivers) segfault inside vkCreateComputePipelines
     // when the pName references an OpEntryPoint that doesn't exist in the module.
     // Doe must reject this at the boundary rather than crashing inside the driver.
     if (!spirv_has_entry_point(words, entry_name)) {
         return error.InvalidArgument;
     }
+    try ensure_pipeline_layout_with_hash(self, bindings, layout_hash);
+    release_or_retire_pipeline_objects(self);
+    errdefer {
+        destroy_pipeline_objects(self);
+        destroy_descriptor_state(self);
+    }
     const entry = try self.shared_pipelines.acquire(
         self.allocator,
         self.device,
         self.pipeline_cache.handleForPipelineCreation(),
         self.descriptor_set_layouts[0..self.descriptor_set_count],
-        .{
-            .words = words,
-            .entry_point = entry_name,
-            .bindings = bindings orelse &.{},
-            .required_subgroup_size = required_subgroup_size_for_pipeline(self, words),
-        },
+        request,
         build_options.vulkan_share_live_compute_pipelines,
     );
     self.shared_pipeline = entry;
@@ -490,7 +505,11 @@ fn ensure_pipeline_layout_with_hash(
     bindings: ?[]const model_compute_types.KernelBinding,
     layout_hash: u64,
 ) !void {
-    if (self.has_pipeline_layout and layout_hash == self.current_layout_hash) return;
+    if (self.has_pipeline_layout and layout_hash == self.current_layout_hash) {
+        if (self.shared_pipeline) |entry| {
+            if (try entry.matchesLayout(bindings orelse &.{})) return;
+        }
+    }
 
     release_or_retire_descriptor_state(self);
     errdefer destroy_descriptor_state(self);

@@ -6,6 +6,8 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
+from bench.browser.release.artifacts import failure, non_bool_int
+
 TIMING_PHASE_FIELDS = ("setupNs", "encodeNs", "submitWaitNs")
 EXPECTED_BACKEND_BY_RUNTIME = {
     "dawn": "webgpu-dawn",
@@ -13,14 +15,6 @@ EXPECTED_BACKEND_BY_RUNTIME = {
 }
 DAWN_LOWERING_MARKERS = ("wgsl", "tint", "dawn-native")
 DOE_FORBIDDEN_LOWERING_MARKERS = ("tint", "dawn-native")
-
-
-def failure(code: str, path: str, message: str) -> dict[str, str]:
-    return {"code": code, "path": path, "message": message}
-
-
-def non_bool_int(value: Any) -> bool:
-    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def strict_sha256(value: Any) -> bool:
@@ -108,7 +102,9 @@ def validate_source_shader_metadata_payload(
                 "execution receipt sourceShader.language must be wgsl",
             )
         )
-    if not isinstance(source_shader.get("entryPoint"), str) or not source_shader.get("entryPoint"):
+    if not isinstance(source_shader.get("entryPoint"), str) or not source_shader.get(
+        "entryPoint"
+    ):
         failures.append(
             failure(
                 "browser_release_proof_surface_receipt_source_mismatch",
@@ -499,13 +495,15 @@ def validate_comparison_policy_payload_binding(
     dawn_timing_class = _timing_class(dawn_payload)
     timing_policy = (
         dawn_timing_class
-        if dawn_timing_class is not None and dawn_timing_class == _timing_class(doe_payload)
+        if dawn_timing_class is not None
+        and dawn_timing_class == _timing_class(doe_payload)
         else None
     )
     command_policy = (
         "exact_match"
         if _command_coverage_identity(dawn_payload) is not None
-        and _command_coverage_identity(dawn_payload) == _command_coverage_identity(doe_payload)
+        and _command_coverage_identity(dawn_payload)
+        == _command_coverage_identity(doe_payload)
         else None
     )
     dawn_output_policy = _output_identity_policy_value(dawn_payload)

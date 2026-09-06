@@ -7,13 +7,12 @@ import json
 from pathlib import Path
 from typing import Any
 
-from bench.gates.claim_index_browser_release_receipts import (
+from bench.browser.release.artifacts import (
     failure,
     sha256_file,
     unsafe_repo_path_reason,
     validate_json_receipt_artifact_file,
 )
-
 
 BROWSER_PUBLIC_GALLERY_RECEIPT_KIND = "browser_public_gallery_receipt"
 
@@ -112,7 +111,11 @@ def validate_public_gallery_payload_fields(
             BROWSER_PUBLIC_GALLERY_RECEIPT_KIND,
             "artifactKind must be browser_public_gallery_receipt",
         ),
-        (payload.get("category"), row.get("category"), "category must match gallery page"),
+        (
+            payload.get("category"),
+            row.get("category"),
+            "category must match gallery page",
+        ),
         (payload.get("url"), row.get("url"), "URL must match gallery page"),
         (payload.get("method"), "GET", "method must be GET"),
         (payload.get("statusCode"), 200, "statusCode must be 200"),
@@ -131,8 +134,16 @@ def validate_public_gallery_payload_fields(
             row.get("workloadContractPath"),
             "workloadContractPath must match gallery page",
         ),
-        (payload.get("workloadIds"), row.get("workloadIds"), "workloadIds must match gallery page"),
-        (payload.get("receiptIds"), row.get("receiptIds"), "receiptIds must match gallery page"),
+        (
+            payload.get("workloadIds"),
+            row.get("workloadIds"),
+            "workloadIds must match gallery page",
+        ),
+        (
+            payload.get("receiptIds"),
+            row.get("receiptIds"),
+            "receiptIds must match gallery page",
+        ),
         (
             payload.get("receiptArtifactPaths"),
             receipt_artifact_paths(row),
@@ -159,7 +170,10 @@ def validate_public_gallery_payload_fields(
                     f"public gallery receipt requires {field}",
                 )
             )
-    if not (isinstance(payload.get("url"), str) and payload.get("url", "").startswith("https://")):
+    if not (
+        isinstance(payload.get("url"), str)
+        and payload.get("url", "").startswith("https://")
+    ):
         failures.append(
             failure(
                 "browser_release_proof_surface_public_gallery_receipt_mismatch",
@@ -167,16 +181,17 @@ def validate_public_gallery_payload_fields(
                 "public gallery receipt URL must be HTTPS",
             )
         )
-    if not isinstance(payload.get("contentLengthBytes"), int) or payload.get(
-        "contentLengthBytes"
-    ) <= 0:
+    if (
+        not isinstance(payload.get("contentLengthBytes"), int)
+        or payload.get("contentLengthBytes") <= 0
+    ):
         failures.append(
             failure(
                 "browser_release_proof_surface_public_gallery_receipt_incomplete",
                 proof_surface_path,
                 "public gallery receipt requires positive contentLengthBytes",
-                )
             )
+        )
     return failures
 
 
@@ -239,8 +254,12 @@ def gallery_visible_fragments(row: dict[str, Any]) -> list[tuple[str, str]]:
         values = row.get(field)
         if not isinstance(values, list):
             continue
-        fragments.extend((field, value) for value in values if isinstance(value, str) and value)
-    fragments.extend(("receiptArtifacts.path", path) for path in receipt_artifact_paths(row))
+        fragments.extend(
+            (field, value) for value in values if isinstance(value, str) and value
+        )
+    fragments.extend(
+        ("receiptArtifacts.path", path) for path in receipt_artifact_paths(row)
+    )
     return fragments
 
 
@@ -289,7 +308,9 @@ def comparison_visible_fragments(row: dict[str, Any]) -> list[tuple[str, str]]:
                 if isinstance(mode, str) and mode
             )
         if runner.get("emitsSideBySideReceipts") is True:
-            fragments.append(("runner.emitsSideBySideReceipts", "side_by_side_receipts"))
+            fragments.append(
+                ("runner.emitsSideBySideReceipts", "side_by_side_receipts")
+            )
     for field in ("dawnReceipt", "doeReceipt"):
         receipt = row.get(field)
         if not isinstance(receipt, dict):
@@ -384,7 +405,9 @@ def validate_claim_indexed_proof_surface_comparison_gallery_content(
         if not isinstance(row, dict):
             continue
         runner = row.get("runner")
-        page_artifact_path = runner.get("pageArtifactPath") if isinstance(runner, dict) else None
+        page_artifact_path = (
+            runner.get("pageArtifactPath") if isinstance(runner, dict) else None
+        )
         gallery_row = gallery_by_path.get(page_artifact_path)
         if not isinstance(gallery_row, dict):
             failures.append(
@@ -524,7 +547,9 @@ def validate_public_gallery_receipt_artifact(
             )
         ]
 
-    payload, failures = public_gallery_receipt_payload(root, artifact, proof_surface_path)
+    payload, failures = public_gallery_receipt_payload(
+        root, artifact, proof_surface_path
+    )
     if payload is None:
         return failures
     failures.extend(

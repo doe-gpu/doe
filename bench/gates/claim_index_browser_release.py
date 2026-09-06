@@ -13,7 +13,7 @@ from bench.gates.claim_index_browser_release_proof import (
     validate_claim_indexed_launch_matches_proof_surface,
     validate_claim_indexed_proof_surface,
 )
-from bench.gates import claim_index_browser_release_receipts as receipt_checks
+from bench.browser.release import receipts as receipt_checks
 from bench.lib.bench_utils import load_json_object
 from bench.tools._public_url import is_public_https_url
 

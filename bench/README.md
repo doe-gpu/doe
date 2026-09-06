@@ -87,12 +87,16 @@ backend policies, and claim rules. Do not copy mutable values into this README.
 | `bench/workloads/` | Workload definitions, assets, and metadata |
 | `bench/oracles/` | Independent correctness oracles |
 | `bench/runners/` | Governed orchestration |
+| `bench/browser/` | Browser smoke and release evidence validation |
 | `bench/gates/` | Blocking and advisory decisions |
 | `bench/tools/` | Builders, checkers, and reports |
 | `bench/docs/` | Focused operator and integration references |
 | `bench/out/` | Generated run artifacts and receipts |
 
 `config/tool-surfaces.json` owns whether any tool is public or repo-only.
+Browser release receipt ownership and existing admission commands are mapped in
+[`browser/README.md`](browser/README.md). Shared admission policy stays in the
+gates; artifact-family validation belongs to the workflow that consumes it.
 
 ## Comparability rules
 

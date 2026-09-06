@@ -15,15 +15,15 @@
     "compiler": "WGSL, TSIR, and compiler target descriptions",
     "composition": "composition roots, backend factory, and adapter assembly",
     "contracts": "neutral contracts shared by core and full runtime layers",
-    "core": "compute, resource, queue, replay, trace, and WebGPU ABI core",
+    "core": "WebGPU C ABI declarations/loading and compute, resource, and queue commands through that ABI",
     "dropin": "WebGPU drop-in symbol routing and behavior policy",
     "evidence": "evidence port, execution receipts, trace observer, oracle comparisons, and replay validation",
-    "full": "render, surface, and full-runtime command behavior",
+    "full": "render, surface, and lifecycle commands through the WebGPU ABI; separately classified module incubation under modules/",
     "integrations": "runtime integration anchors such as ONNX Runtime EP",
-    "native": "Doe-native WebGPU object and command implementation",
+    "native": "WebGPU API objects, reference ownership, encoded commands, and native provider integration",
     "plan": "direct execution-plan contracts and executors",
     "quirk": "quirk parsing, selection, and application",
-    "runtime": "shared execution, cache, device, queue, diagnostics, and trace services",
+    "runtime": "prepared-command execution and shared queue, cache, device, numerical policy, diagnostics, and trace services",
     "spatial": "HostPlan and CSL orchestration for spatial targets",
     "tooling": "I/O contexts shared by command-line tools",
     "verification": "runtime consumers of proof artifacts"
@@ -1330,15 +1330,15 @@
       },
       "src/backend/vulkan/vk_pipeline.zig": {
         "decision": "Keep",
-        "moduleSha256": "fb7c87082dfbbe6b0087f21df74442770f212c05a7a1aefc9839e4d721384368",
-        "reason": "Keep: compute preparation owns private layouts and descriptors while delegating immutable pipeline ownership to the device registry.",
-        "reviewer": "codex-execution-ownership/2026-09-05"
+        "moduleSha256": "cd45cbdf54f299dd263baff5baacc9e0076872ce986b82391434723b153f09fd",
+        "reason": "Keep: compute preparation resolves subgroup policy once and validates exact pipeline/layout identity before selecting reusable state; failed construction cleans partial descriptor ownership.",
+        "reviewer": "codex-pipeline-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_pipeline_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "0dc26c6c2405b206856e0ec8b83d972aaebd1bf7e7f44ee2cb0b19f4e73eeac9",
-        "reason": "Keep: cached compute state moves pipeline references with descriptor ownership and releases each reference exactly once.",
-        "reviewer": "codex-execution-ownership/2026-09-05"
+        "moduleSha256": "2709e4de63eac3246c4dd0f6be2a5de9fe64997c25e1a3b42cd199f032ab4ccc",
+        "reason": "Keep: local compute cache resolves colliding hash hints without discarding independently retained pipeline owners.",
+        "reviewer": "codex-pipeline-identity/2026-09-05"
       },
       "src/backend/vulkan/vk_pipeline_cache_persistent.zig": {
         "decision": "Keep",
@@ -4234,9 +4234,9 @@
       },
       "src/backend/vulkan/vk_shared_pipeline.zig": {
         "decision": "Keep",
-        "moduleSha256": "73b1ef700506366c2f517487324aa404cb17fc6ba22996b1959321be9cbfa04f",
-        "reason": "Keep: device-local native compute pipeline creation, exact identity, and reference-counted lifetime have one owner; descriptor mutation stays in private compute state.",
-        "reviewer": "codex-execution-ownership/2026-09-05"
+        "moduleSha256": "fb5ddf4288af5f1065c187937aa86d76fd0ebdea970d053b2e5c0fa9ba529b00",
+        "reason": "Keep: immutable pipeline and layout identity checks have one owner shared by device interning and local compute-state selection.",
+        "reviewer": "codex-pipeline-identity/2026-09-05"
       }
     },
     "linePolicy": {

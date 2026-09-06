@@ -69,6 +69,22 @@ classified and cannot be promoted by benchmark results.
   independent bindings, creator teardown, shader/layout changes, allocation
   failure, and device isolation. Public resource counters alone do not establish
   native pipeline reuse or reduced useful-operation latency.
+- Pipeline and layout hashes only locate candidates. Active, hot, and spilled
+  compute cache hits must check complete shader, entry-point, layout, and
+  effective subgroup identity. Collision regressions record distinct shaders
+  together, replay their exact output, and exercise policy changes and invalid
+  entry points without discarding previously owned state.
+- Browser claim admission and readiness reporting consume the same receipt
+  validators under `bench/browser/release/`; path/hash checks and execution,
+  comparison, proof-page, and gallery responsibilities remain separate.
+  The Python import boundary protects this package from path mutation while
+  preserving the existing directly executed browser gate commands.
+- Readiness accepts CTS receipt version 2 only after reconstructing its
+  published subset with the canonical receipt builder. Published artifact bytes,
+  identity, source hash, and selected query coverage must agree. Version 1 keeps
+  its legacy complete-ledger comparison; stale historical receipts cannot
+  inherit corrected status. This correction changes no receipt fields or
+  release eligibility rules.
 - Buffer registry publication must be reserved before initialization can queue
   GPU commands. Replacement drains prior work and preserves the old allocation
   until creation succeeds. Allocation-failure regressions verify that failed
