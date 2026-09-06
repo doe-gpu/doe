@@ -10,15 +10,18 @@ from typing import Any
 
 import jsonschema
 
-
+from bench.lib.compute_program_fixture import accepts, load_fixture
 from bench.lib.hash_utils import file_sha256 as digest
 from bench.lib.native_program_replay import validate_gpu_replays
-from bench.lib.compute_program_fixture import load_fixture, accepts
 from bench.native_compare_modules.reporting import format_stats
 
 TIMESTAMP_BYTES = struct.calcsize('<Q')
 TIMESTAMP_QUERY_COUNT = 2
 MAX_SAFE_TIMESTAMP_INTERVAL = (1 << 53) - 1
+
+
+def completion_mode(receipt: dict[str, Any]) -> str:
+    return receipt['completionMode'] if receipt['schemaVersion'] >= 5 else 'queue-then-map'
 
 
 def validate_gpu_timing(receipt: dict[str, Any], provider: str, policy: dict[str, Any],
@@ -137,6 +140,8 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
         all_samples = [report['cold'], *report['warmups'], *report['samples'], *report['lifecycleRuns']]
         if sequence and len(sequence['expected']) < len(all_samples):
             raise ValueError(f'{path}: frozen sequence is shorter than the declared execution')
+    if len({completion_mode(sample["receipt"]) for sample in all_samples}) != 1:
+        raise ValueError(f'{path}: mixed completion timing scopes')
     for index, sample in enumerate(all_samples):
         receipt = sample["receipt"]
         expected_run = 1 if index == 0 else index + 1 + (policy['warmupRuns'] if report['phase'] == 'measure' else 0)
@@ -181,15 +186,14 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
                     expected_origins[buffer['id']] = origin
         if receipt["programHash"] != program_hash or receipt["inputHashes"] != expected_hashes:
             raise ValueError(f"{path}: input or program receipt identity mismatch")
-        if receipt['schemaVersion'] >= 4:
-            if (receipt['inputOrigins'] != expected_origins
+        if receipt['schemaVersion'] >= 4 and (receipt['inputOrigins'] != expected_origins
                     or receipt['residentStateBefore'] != expected_state
                     or receipt['outputGeneration'] != expected_run
                     or receipt['programInstance'] != report['cold']['receipt']['programInstance']
                     or receipt['copiedInputBytes'] != 0
                     or receipt['submissionCount'] != 1
                     or receipt['readbackPath'] != 'mapAsync-copy-unmap'):
-                raise ValueError(f'{path}: invocation provenance or submission work mismatch')
+            raise ValueError(f'{path}: invocation provenance or submission work mismatch')
         if receipt["dispatchCount"] != len(program["steps"]):
             raise ValueError(f"{path}: declared dispatch count mismatch")
         buffers = program["buffers"]

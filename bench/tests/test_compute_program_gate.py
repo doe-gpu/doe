@@ -10,10 +10,17 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from bench.gates.compute_program_gate import digest, validate_run, validate_native_audit, validate_gpu_timing
-from bench.runners.run_compute_program_evidence import same_adapter
-from bench.native_compare_modules.reporting import format_stats
+import jsonschema
+
+from bench.gates.compute_program_gate import (
+    digest,
+    validate_gpu_timing,
+    validate_native_audit,
+    validate_run,
+)
 from bench.lib.compute_program_fixture import load_fixture
+from bench.native_compare_modules.reporting import format_stats
+from bench.runners.run_compute_program_evidence import comparison_rows, same_adapter
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -72,6 +79,34 @@ class ComputeProgramGateTests(unittest.TestCase):
         self.path.write_text(json.dumps(self.report))
         validate_run(self.path, ROOT, self.policy)
 
+    def test_completion_receipt_migration_and_timing_scope_parity(self) -> None:
+        receipt = copy.deepcopy(self.report['cold']['receipt'])
+        receipt.update(schemaVersion=5, gpuTiming=None, completionMode='queue-and-map',
+                       programInstance='6b9e2178-7a71-4671-afad-46a641a65413',
+                       inputOrigins={}, residentStateBefore={}, outputGeneration=1,
+                       copiedInputBytes=0, submissionCount=1)
+        schema = json.loads((ROOT / 'config/compute-program-run.schema.json').read_text())
+        validator = jsonschema.Draft202012Validator(schema)
+        validator.validate(receipt)
+        for mutation in [
+            {'completionMode': 'queue-only'},
+            {'schemaVersion': 4},
+            {'readbackPath': 'none'},
+        ]:
+            with self.assertRaises(jsonschema.ValidationError):
+                validator.validate(receipt | mutation)
+        validator.validate(receipt | {'readbackPath': 'none', 'completionMode': 'queue-only',
+                                      'readbackBytes': 0, 'outputHash': None,
+                                      'timingMs': receipt['timingMs'] | {'readback': 0}})
+        missing = dict(receipt)
+        del missing['completionMode']
+        with self.assertRaises(jsonschema.ValidationError):
+            validator.validate(missing)
+        validator.validate(missing | {'schemaVersion': 4})
+        self.report['samples'][0]['receipt'] = receipt
+        with self.assertRaisesRegex(ValueError, 'mixed completion timing scopes'):
+            comparison_rows([(self.path, self.report)], self.policy)
+
     def test_current_receipts_bind_provenance_and_actual_submissions(self) -> None:
         for sample in [self.report['cold'], *self.report['samples']]:
             receipt = sample['receipt']
@@ -119,9 +154,9 @@ class ComputeProgramGateTests(unittest.TestCase):
             expected_refs.append({'path': expected.name, 'hash': digest(expected)})
             sample['outputPath'] = str(output)
             receipt = sample['receipt']
-            def state(buffer: str) -> dict:
+            def state(buffer: str, generation: int = run - 1) -> dict:
                 return {'kind': 'program-state', 'programHash': identity, 'programInstance': instance,
-                        'buffer': buffer, 'generation': run - 1}
+                        'buffer': buffer, 'generation': generation}
             input_hash = receipt['inputHashes']['input']
             receipt.update(schemaVersion=4, programHash=identity, run=run, programInstance=instance,
                            gpuTiming=None, outputHash=digest(output), outputGeneration=run,

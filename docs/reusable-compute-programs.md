@@ -76,7 +76,24 @@ readback in the existing output mapping. Vulkan GPU recordings retain and
 validate the query pool as well as their buffers. Destroying a query invalidates
 replay before submission. Updates preserve the selected timing mode.
 
-Receipt schema version 4 retains nullable `gpuTiming`: source, compute-pass scope,
+Receipt schema version 5 requests queue completion and readback mapping together
+and waits for both before consuming bytes. `completionMode` is `queue-and-map`
+when output or timestamps need mapping, and `queue-only` otherwise. Failure
+waits for both operations to settle and unmaps any successfully mapped buffer
+before resource leases can be released. Cancellation checks still discard output
+and invalidate submitted resident state. This scheduling applies to every
+provider using the declared program interface.
+
+Version 5 `timingMs.submitWait` includes submission and concurrent mapping;
+`readback` includes byte copying, timestamp decoding, and unmapping. Versions
+1–4 retain their sequential queue-then-map timing meaning. Evaluation rejects
+mixed completion schedules, and historical receipts must not be relabeled.
+Complete useful-operation wall time remains the application metric. The
+[WebGPU promise ordering contract](https://gpuweb.github.io/gpuweb/#promise-ordering)
+does not permit assuming that either independently awaited operation completes
+the other; both remain explicit.
+
+Receipt schema version 5 retains nullable `gpuTiming`: source, compute-pass scope,
 begin/end values, period, counter width, and elapsed nanoseconds. Doe Vulkan
 resolves queries to nanoseconds on the GPU, including when another GPU command
 consumes the destination. Query-owned scratch storage and cached conversion

@@ -5,6 +5,46 @@ import { registerNativeProgramProvider } from '../../src/compute-program-native.
 import { timestampInfo, timestampResult } from '../../src/compute-program-timing.js';
 import { inputBatch, outputReference } from '../../src/compute-program-residency.js';
 import { sortedJsonValue } from '../../src/json-canonical.js';
+import { awaitProgramCompletion } from '../../src/compute-program-completion.js';
+
+for (const first of ['queue', 'map']) {
+  for (const failed of [null, 'queue', 'map']) {
+    const queue = Promise.withResolvers();
+    const map = Promise.withResolvers();
+    const failure = new Error(`${failed} failed`);
+    let mapRequested = false;
+    let unmapped = false;
+    let settled = false;
+    const completion = awaitProgramCompletion({ onSubmittedWorkDone: () => queue.promise }, {
+      mapAsync() { mapRequested = true; return map.promise; },
+      unmap() { unmapped = true; },
+    });
+    completion.then(() => { settled = true; }, () => { settled = true; });
+    await Promise.resolve();
+    assert(mapRequested);
+    const parts = { queue, map };
+    parts[first][failed === first ? 'reject' : 'resolve'](failure);
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.equal(settled, false, 'completion must retain ownership until both operations settle');
+    assert.equal(unmapped, false);
+    const second = first === 'queue' ? 'map' : 'queue';
+    parts[second][failed === second ? 'reject' : 'resolve'](failure);
+    if (failed) await assert.rejects(completion, (error) => error === failure);
+    else await completion;
+    assert.equal(unmapped, failed === 'queue', 'only a successful map needs failure cleanup');
+  }
+}
+const queueOnly = Promise.withResolvers();
+const completion = awaitProgramCompletion({ onSubmittedWorkDone: () => queueOnly.promise });
+queueOnly.resolve();
+await completion;
+const syncMapFailure = new Error('mapping rejected synchronously');
+await assert.rejects(awaitProgramCompletion({ onSubmittedWorkDone: () => Promise.resolve() }, {
+  mapAsync() { throw syncMapFailure; },
+  unmap() { assert.fail('failed mapping must not be unmapped'); },
+}), (error) => error === syncMapFailure);
+console.log('ok: concurrent completion retains ownership through either callback order and failures');
 
 const hashInput = JSON.parse('{"z":[{"é":null,"a":2}],"2":2,"10":10,"__proto__":{"b":1,"a":0},"a":true}');
 const originalHashInput = JSON.stringify(hashInput);

@@ -151,8 +151,9 @@ try {
       const result = await pending;
       assert.deepEqual([...new Uint32Array(result.output.buffer)], words);
       assert.equal(result.receipt.dispatchCount, 1);
+      assert.equal(result.receipt.completionMode, 'queue-and-map');
       if (timed) {
-        assert.equal(result.receipt.schemaVersion, 4);
+        assert.equal(result.receipt.schemaVersion, 5);
         assert.equal(result.receipt.gpuTiming.source, 'webgpu-nanoseconds');
         assert.equal(result.receipt.gpuTiming.periodNs, 1);
         assert.equal(result.receipt.gpuTiming.validBits, 64);
@@ -323,6 +324,7 @@ try {
     assert.equal(generated.output, null);
     assert.equal(generated.receipt.outputHash, null);
     assert.equal(generated.receipt.readbackPath, 'none');
+    assert.equal(generated.receipt.completionMode, 'queue-only');
     assert.equal(generated.receipt.readbackBytes, 0);
     assert.equal(generated.receipt.allocatedBufferBytes, 32);
     const leased = downstream.run({ input: producer.output() });

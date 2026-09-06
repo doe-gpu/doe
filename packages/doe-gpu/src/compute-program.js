@@ -3,12 +3,13 @@ import { performance } from 'node:perf_hooks';
 import { randomUUID } from 'node:crypto';
 import { setImmediate } from 'node:timers/promises';
 import { globals } from './vendor/webgpu/webgpu-constants.js';
+import { awaitProgramCompletion } from './compute-program-completion.js';
 import { nativeProgramProvider } from './compute-program-native.js';
 import { hashBytes, programError, validateComputeProgram, validateProgramOptions } from './compute-program-contract.js';
 import { lifetime, outputReference, releaseEntry, inputBatch } from './compute-program-residency.js';
 import { QUERY_COUNT, QUERY_BYTES, timestampInfo, timestampResult } from './compute-program-timing.js';
 
-const { GPUBufferUsage, GPUMapMode } = globals;
+const { GPUBufferUsage } = globals;
 const DEVICE_OPERATIONS = new WeakSet();
 const DEVICE_LOSS = new WeakMap();
 
@@ -240,6 +241,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
   async function execute(batch, signal) {
     const start = performance.now();
     let submitted = false;
+    let mapped = false;
     try {
       return await captureGpuErrors(device, async () => {
         if (signal?.aborted) throw programError('DOE_PROGRAM_CANCELLED', 'signal', 'active run', 'aborted before upload');
@@ -286,7 +288,8 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
             entry.inputOrigin = entry.origin;
           }
         }
-        await device.queue.onSubmittedWorkDone();
+        await awaitProgramCompletion(device.queue, readback);
+        mapped = Boolean(readback);
         const submitWaitMs = performance.now() - submitStart;
         if (signal) await setImmediate();
         assertExecutionActive(signal);
@@ -294,12 +297,11 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
         let output = null;
         let gpuTime = null;
         if (readback) {
-          await readback.mapAsync(GPUMapMode.READ);
           try {
             const bytes = readback.getMappedRange();
             if (outputReadbackSize) output = new Uint8Array(bytes, 0, outputReadbackSize).slice();
             if (clock) gpuTime = timestampResult(bytes, timestampOffset, clock);
-          } finally { readback.unmap(); }
+          } finally { readback.unmap(); mapped = false; }
         }
         assertExecutionActive(signal);
         const readbackMs = readback ? performance.now() - readStart : 0;
@@ -308,7 +310,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
         return {
           output,
           receipt: {
-            schemaVersion: 4, programHash: identity.programHash, programInstance, execution, run: runs,
+            schemaVersion: 5, programHash: identity.programHash, programInstance, execution, run: runs,
             inputHashes: batch.hashes, inputOrigins: batch.origins, residentStateBefore,
             outputHash: output ? hashBytes(output) : null, outputGeneration,
             dispatchCount: plan.steps.length,
@@ -318,6 +320,7 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
             submissionCount: recording && copyCommands ? 2 : 1,
             readbackBytes: outputReadbackSize + (clock ? QUERY_BYTES : 0),
             readbackPath: readback ? 'mapAsync-copy-unmap' : 'none',
+            completionMode: readback ? 'queue-and-map' : 'queue-only',
             allocatedBufferBytes: allocatedBytes,
             gpuTiming: gpuTime,
             timingMs: { upload: uploadMs, encode: encodeMs, submitWait: submitWaitMs,
@@ -335,7 +338,10 @@ async function buildComputeProgram(device, descriptor, options, previous = null)
         reason = error.message;
       }
       throw error;
-    } finally { batch.release(); }
+    } finally {
+      try { if (mapped) readback.unmap(); }
+      finally { batch.release(); }
+    }
   }
 
   const api = Object.freeze({

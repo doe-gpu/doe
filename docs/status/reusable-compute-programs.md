@@ -1,5 +1,17 @@
 # Reusable compute programs
 
+## Concurrent completion and readback
+
+The shared executor requests queue completion and mapping together, waits for
+both, and preserves cleanup on either callback failure or cancellation.
+Receipt version 5 names the completion mode and assigns mapping wait to
+`submitWait`; earlier receipt versions keep their original timing interpretation.
+Evaluation rejects mixed schedules. The retained scheduling experiment is under
+`bench/out/compute-program/20260905-completion-overlap-diagnostic/`; its candidate
+phase timings are diagnostic and must not be admitted as version 4 phase data.
+The Deno control includes avoidable serial waiting in earlier matrices; its
+large ratios cannot establish a runtime advantage.
+
 ## Exact descriptor cache identity
 
 Vulkan descriptor reuse checks complete bindings and actual native allocation
@@ -36,7 +48,12 @@ Prepared Doe, ordinary Doe, Dawn, and wgpu produced identical failing output
 bytes; controls are retained under
 `bench/out/compute-program/20260905-resident-sequence-numerical-controls/`.
 This is an open continuous-simulation numerical acceptance issue, not a
-prepared-command speed result. The frozen oracle and tolerances remain intact.
+prepared-command speed result. The frozen oracle and tolerances remain intact. A CPU arithmetic diagnostic
+reproduces the retained GPU bytes with a captured decay approximation and fused
+integration; alternative evaluation orders are compared against the frozen CPU
+oracle under `bench/out/compute-program/20260905-resident-arithmetic-localization/`.
+That diagnostic localizes the discrepancy without replacing the acceptance
+oracle.
 
 ## Current boundary
 
@@ -48,7 +65,7 @@ same-device program composition with resource leases and generation checks.
 Default invocation-local behavior remains compatible with descriptor version 1.
 Native contract version 2 accepts both descriptor versions.
 
-Receipt version 4 records instance and generation provenance, actual upload,
+Receipt version 5 preserves instance and generation provenance, actual upload,
 GPU input-copy, readback, and API submission work. Unobserved GPU bytes carry
 null content hashes. Storage inputs can be writable WGSL state; their original
 upload hash is never silently reused as a current-content assertion.
@@ -65,7 +82,7 @@ physical ticks to nanoseconds on the GPU under
 remain explicit. Other Doe backends and old addons fail timed preparation.
 
 The current local package candidate is retained under
-`bench/out/compute-program/20260905-descriptor-identity-package/summary.json`.
+`bench/out/compute-program/20260905-completion-overlap-package/summary.json`.
 Node, Bun, and Electron main processes install the same wrapper and platform
 archives. Qualification includes resident state, GPU output leases, writable
 inputs, stale references, cancellation, update rollback, timestamps, and
@@ -73,14 +90,14 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-descriptor-identity-matrix/summary.json`.
+`bench/out/compute-program/20260905-completion-overlap-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the new receipt contract. It does not measure a
 resident application sequence. Performance remains diagnostic; large Deno host
 ratios remain suspicious and require fairness review.
 Native replay and SPIR-V verification for this matrix are retained with the
-descriptor identity correction.
+completion overlap correction.
 
 ## Active acceptance gaps
 

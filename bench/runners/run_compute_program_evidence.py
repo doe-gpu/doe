@@ -13,9 +13,9 @@ from typing import Any
 
 import jsonschema
 
-from bench.gates.compute_program_gate import digest, validate_run
+from bench.gates.compute_program_gate import completion_mode, digest, validate_run
+from bench.lib.compute_program_fixture import fixture_references, load_fixture
 from bench.native_compare_modules.reporting import format_stats
-from bench.lib.compute_program_fixture import load_fixture, fixture_references
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -75,6 +75,13 @@ def comparison_rows(reports: list[tuple[Path, dict[str, Any]]], policy: dict[str
     rows = []
     reliability = json.loads((ROOT / 'config/benchmark-methodology-thresholds.json').read_text())['reliability']
     for application in policy["applications"]:
+        completion_modes = {
+            completion_mode(sample['receipt'])
+            for _, report in reports if report['application'] == application
+            for sample in [report['cold'], *report.get('warmups', []), *report['samples'], *report.get('lifecycleRuns', [])]
+        }
+        if len(completion_modes) != 1:
+            raise ValueError(f'{application}: mixed completion timing scopes')
         groups = {
             provider: [(path, report) for path, report in reports
                        if report["application"] == application and report["provider"] == provider

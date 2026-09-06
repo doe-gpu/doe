@@ -35,7 +35,7 @@ export interface ComputeProgramOutput {
 }
 
 export interface ComputeProgramReceipt {
-  schemaVersion: 4;
+  schemaVersion: 5;
   programInstance: string;
   programHash: string;
   execution: ComputeProgramExecution;
@@ -52,6 +52,7 @@ export interface ComputeProgramReceipt {
   uploadedBytes: number;
   readbackBytes: number;
   readbackPath: 'mapAsync-copy-unmap' | 'none';
+  completionMode: 'queue-and-map' | 'queue-only';
   allocatedBufferBytes: number;
   gpuTiming: null | {
     source: 'vulkan-query-ticks' | 'webgpu-nanoseconds' | 'wgpu-vulkan-query-ticks';

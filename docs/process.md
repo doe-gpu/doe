@@ -147,6 +147,13 @@ classified and cannot be promoted by benchmark results.
   spill, buffer aliases, resource replacement, and orphaned image views.
   Prepared programs reject changed resources before native submission. These
   internal identities preserve the public descriptor and receipt contracts.
+- Program receipt version 5 overlaps queue completion with readback mapping and
+  waits for both. Failure and cancellation tests must preserve ownership until
+  both settle, including either callback order and a rejected mapping. Mapping
+  belongs to `submitWait`; `readback` covers host copy, decoding, and unmap.
+  Earlier receipt versions retain sequential completion semantics. Evaluation
+  rejects mixed schedules before computing comparison rows; all providers use
+  the same completion treatment.
 - Program GPU timing is an explicit evaluation policy. Timestamp pass markers
   must bracket equivalent completion stages, and counter precision must be
   disclosed. The gate recomputes calibrated durations, percentile statistics,
