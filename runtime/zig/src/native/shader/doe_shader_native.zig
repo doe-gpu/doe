@@ -88,6 +88,9 @@ fn tryCreateCachedWgslShaderModule(wgsl: []const u8, source_hash: [32]u8) ?*anyo
     wgsl_shader_module_cache_mutex.unlock();
 
     const entry = cached orelse return null;
+    const source = retainWgslSource(wgsl) orelse return null;
+    var source_transferred = false;
+    defer if (!source_transferred) alloc.free(source);
     const sm = make(DoeShaderModule) orelse return null;
     const dispatch_preconditions = clone_dispatch_preconditions(entry.dispatch_preconditions) orelse {
         alloc.destroy(sm);
@@ -100,9 +103,10 @@ fn tryCreateCachedWgslShaderModule(wgsl: []const u8, source_hash: [32]u8) ?*anyo
         .wg_z = entry.wg_z,
         .needs_sizes_buf = entry.needs_sizes_buf,
         .dispatch_preconditions = dispatch_preconditions,
-        .wgsl_source = alloc.dupe(u8, wgsl) catch null,
+        .wgsl_source = source,
         .mtl_library_borrowed = true,
     };
+    source_transferred = true;
     set_module_info_from_diagnostic_directive(sm, wgsl);
     return toOpaque(sm);
 }
@@ -269,7 +273,10 @@ pub export fn doeNativeCheckShaderSource(code_ptr: ?[*]const u8, code_len: usize
 
 pub export fn doeNativeShaderModuleGetBindings(raw: ?*anyopaque, out_ptr: ?[*]native_shared.BindingInfo, out_len: usize) callconv(.c) usize {
     const sm = cast(DoeShaderModule, raw) orelse return 0;
-    ensureShaderBindings(sm);
+    ensureShaderBindings(sm) catch |err| {
+        capture_compile_error(err, "reflection", "shader binding extraction failed");
+        return std.math.maxInt(usize);
+    };
     const count: usize = sm.binding_count;
     if (out_ptr) |out| {
         const copy_len = @min(count, out_len);
@@ -289,7 +296,10 @@ pub export fn doeNativeShaderModuleGetBindingsForEntryPoint(
     const wgsl = sm.wgsl_source orelse return 0;
     const entry_point = (entry_ptr orelse return 0)[0..entry_len];
     var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_bindings.BindingMeta = undefined;
-    const count = wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch return 0;
+    const count = wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch |err| {
+        capture_compile_error(err, "reflection", "entry point binding extraction failed");
+        return std.math.maxInt(usize);
+    };
     if (out_ptr) |out| for (metadata[0..@min(count, out_len)], 0..) |binding, index| {
         out[index] = .{
             .group = binding.group,
@@ -337,22 +347,7 @@ fn offset_to_line_column(src: []const u8, offset: usize) struct { line: u32, col
     return .{ .line = line, .column = column };
 }
 
-fn set_module_compilation_message(
-    sm: *DoeShaderModule,
-    kind: CompilationMessageKind,
-    message: []const u8,
-    line: u32,
-    column: u32,
-) void {
-    if (sm.compilation_message) |existing| {
-        alloc.free(existing);
-        sm.compilation_message = null;
-    }
-    sm.compilation_message = alloc.dupe(u8, message) catch null;
-    sm.compilation_message_kind = kind;
-    sm.compilation_message_line = line;
-    sm.compilation_message_column = column;
-}
+const set_module_compilation_message = shader_binding_reflection.setCompilationMessage;
 
 fn set_module_info_from_diagnostic_directive(sm: *DoeShaderModule, wgsl: []const u8) void {
     const offset = std.mem.indexOf(u8, wgsl, "diagnostic") orelse return;
@@ -433,6 +428,9 @@ fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct)
 
     const source_hash = hash_wgsl_source(wgsl);
     if (tryCreateCachedWgslShaderModule(wgsl, source_hash)) |cached_module| return cached_module;
+    const source = retainWgslSource(wgsl) orelse return null;
+    var source_transferred = false;
+    defer if (!source_transferred) alloc.free(source);
 
     var cached_translation: ?shader_translation_cache.CachedTranslation = shader_translation_cache.lookupComputeTranslation(alloc, wgsl);
     var msl_buf: [msl_translation.MAX_OUTPUT]u8 = undefined;
@@ -493,7 +491,8 @@ fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct)
     sm.wg_x = translation_info.workgroup_size[0];
     sm.wg_y = translation_info.workgroup_size[1];
     sm.wg_z = translation_info.workgroup_size[2];
-    sm.wgsl_source = alloc.dupe(u8, wgsl) catch null;
+    sm.wgsl_source = source;
+    source_transferred = true;
     return toOpaque(sm);
 }
 // ============================================================
@@ -504,6 +503,9 @@ fn createFromWGSLVulkan(dev: *DoeDevice, wgsl: []const u8) ?*anyopaque {
     _ = dev;
     const sm = make(DoeShaderModule) orelse return null;
     sm.* = .{};
+    var complete = false;
+    defer if (!complete) doeNativeShaderModuleRelease(toOpaque(sm));
+    sm.wgsl_source = retainWgslSource(wgsl) orelse return null;
     set_module_info_from_diagnostic_directive(sm, wgsl);
     sm.binding_count = 0;
 
@@ -514,22 +516,16 @@ fn createFromWGSLVulkan(dev: *DoeDevice, wgsl: []const u8) ?*anyopaque {
     if (has_graphics) {
         vk_render.vulkan_create_graphics_shader_module(sm, wgsl) catch |err| {
             capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V graphics compilation failed");
-            if (sm.vertex_spirv_data) |s| alloc.free(s);
-            if (sm.fragment_spirv_data) |s| alloc.free(s);
-            alloc.destroy(sm);
             return null;
         };
     } else {
         const vk_compute = @import("../vulkan/vulkan_compute_native.zig");
         vk_compute.vulkan_create_shader_module(sm, wgsl) catch |err| {
             capture_compile_error(err, "native_shader_create", "Vulkan WGSL→SPIR-V compilation failed");
-            if (sm.dispatch_preconditions.len > 0) alloc.free(sm.dispatch_preconditions);
-            if (sm.texture_dispatch_preconditions.len > 0) alloc.free(sm.texture_dispatch_preconditions);
-            alloc.destroy(sm);
             return null;
         };
     }
-    sm.wgsl_source = alloc.dupe(u8, wgsl) catch null;
+    complete = true;
     return toOpaque(sm);
 }
 
@@ -694,7 +690,6 @@ pub export fn doeNativeShaderModuleRelease(raw: ?*anyopaque) callconv(.c) void {
         if (sm.fragment_spirv_data) |s| alloc.free(s);
         if (sm.hlsl_source) |h| alloc.free(h);
         if (sm.wgsl_source) |w| alloc.free(w);
-        if (sm.compilation_message) |message| alloc.free(message);
         alloc.destroy(sm);
     }
 }
@@ -880,6 +875,10 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
         }
         return null;
     }
+    if (sm.wgsl_source != null) ensureShaderBindings(sm) catch |err| {
+        capture_compile_error(err, "reflection", "compute pipeline binding extraction failed");
+        return null;
+    };
 
     var entries: [MAX_OVERRIDE_ENTRIES]wgsl_ir.OverrideEntry = undefined;
     const override_slice = if (d.compute.constantCount > 0 and d.compute.constants != null)
@@ -1024,4 +1023,13 @@ pub export fn doeNativeComputePipelineRelease(raw: ?*anyopaque) callconv(.c) voi
         vk_compute.vulkan_release_compute_pipeline(p);
         alloc.destroy(p);
     }
+}
+
+fn retainWgslSource(wgsl: []const u8) ?[]const u8 {
+    return alloc.dupe(u8, wgsl) catch {
+        set_last_error_stage_name("native_shader_create");
+        set_last_error_kind("OutOfMemory");
+        set_last_error("retaining required WGSL source failed: OutOfMemory");
+        return null;
+    };
 }

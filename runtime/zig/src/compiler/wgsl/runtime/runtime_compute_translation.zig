@@ -54,8 +54,8 @@ pub fn vulkan_compute_runtime_robustness_config() robustness.Config {
     };
 }
 
-fn emitSpirv(module_ir: *ir.Module, out: []u8) analysis.TranslateError!usize {
-    try translate_spirv.prepareComputeIr(module_ir);
+fn emitSpirv(module_ir: *ir.Module, out: []u8, diagnostic: *analysis.Diagnostic) analysis.TranslateError!usize {
+    try translate_spirv.prepareComputeIrWithDiagnostic(module_ir, diagnostic);
     return emit_spirv.emit(module_ir, out) catch |err| {
         const kind: analysis.TranslateError = switch (err) {
             error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
@@ -63,57 +63,34 @@ fn emitSpirv(module_ir: *ir.Module, out: []u8) analysis.TranslateError!usize {
             error.InvalidIr => analysis.TranslateError.InvalidIr,
             error.OutOfMemory => analysis.TranslateError.OutOfMemory,
         };
-        analysis.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
+        diagnostic.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
         return kind;
     };
 }
 
-pub fn translateToMslForComputeRuntime(
-    allocator: std.mem.Allocator,
-    wgsl: []const u8,
-    out: []u8,
-    overrides: ?[*]const ir.OverrideEntry,
-    override_count: usize,
-) analysis.TranslateError!TranslationResult {
-    const timed = try translateToMslForComputeRuntimeTimed(
-        allocator,
-        wgsl,
-        out,
-        overrides,
-        override_count,
-    );
+pub fn translateToMslForComputeRuntimeWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, overrides: ?[*]const ir.OverrideEntry, override_count: usize, diagnostic: *analysis.Diagnostic) analysis.TranslateError!TranslationResult {
+    const timed = try translateToMslForComputeRuntimeTimedWithDiagnostic(allocator, wgsl, out, overrides, override_count, diagnostic);
     return .{
         .len = timed.len,
         .info = timed.info,
     };
 }
 
-pub fn translateToMslForComputeRuntimeTimed(
-    allocator: std.mem.Allocator,
-    wgsl: []const u8,
-    out: []u8,
-    overrides: ?[*]const ir.OverrideEntry,
-    override_count: usize,
-) analysis.TranslateError!TimedTranslationResult {
+pub fn translateToMslForComputeRuntimeTimedWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, overrides: ?[*]const ir.OverrideEntry, override_count: usize, diagnostic: *analysis.Diagnostic) analysis.TranslateError!TimedTranslationResult {
     const total_start_ns = nowNs();
     const override_slice = if (overrides != null and override_count > 0)
         overrides.?[0..override_count]
     else
         &.{};
-    var analyzed = try analysis.analyzeToIrWithConfigTimedAndOverrides(
-        allocator,
-        wgsl,
-        compute_runtime_robustness_config(),
-        override_slice,
-    );
+    var analyzed = try analysis.analyzeToIrWithConfigTimedAndOverridesWithDiagnostic(allocator, wgsl, compute_runtime_robustness_config(), override_slice, diagnostic);
     defer analyzed.module.deinit();
 
     if (override_slice.len > 0) override_values.applyOverrides(&analyzed.module, override_slice);
 
     const emit_start_ns = nowNs();
-    const len = emit_msl.emit(&analyzed.module, out) catch |err| return switch (err) {
-        error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
-        error.InvalidIr => analysis.TranslateError.InvalidIr,
+    const len = emit_msl.emit(&analyzed.module, out) catch |err| {
+        diagnostic.setLastError(.msl_emit, err, null, null);
+        return err;
     };
     const emit_end_ns = nowNs();
     var phase_timings_ns = analyzed.phase_timings_ns;
@@ -126,34 +103,26 @@ pub fn translateToMslForComputeRuntimeTimed(
     };
 }
 
-pub fn translateToSpirvForComputeRuntime(
-    allocator: std.mem.Allocator,
-    wgsl: []const u8,
-    out: []u8,
-) analysis.TranslateError!TranslationResult {
-    var module_ir = try analysis.analyzeToIrWithConfig(allocator, wgsl, compute_runtime_robustness_config());
+pub fn translateToSpirvForComputeRuntimeWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, diagnostic: *analysis.Diagnostic) analysis.TranslateError!TranslationResult {
+    var module_ir = try analysis.analyzeToIrWithConfigWithDiagnostic(allocator, wgsl, compute_runtime_robustness_config(), diagnostic);
     defer module_ir.deinit();
 
-    const len = try emitSpirv(&module_ir, out);
+    const len = try emitSpirv(&module_ir, out, diagnostic);
     return .{
         .len = len,
         .info = try translation_info.buildTranslationInfo(allocator, &module_ir),
     };
 }
 
-pub fn translateToSpirvTimed(
-    allocator: std.mem.Allocator,
-    wgsl: []const u8,
-    out: []u8,
-) analysis.TranslateError!TimedTranslationResult {
+pub fn translateToSpirvTimedWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, diagnostic: *analysis.Diagnostic) analysis.TranslateError!TimedTranslationResult {
     var arena = std.heap.ArenaAllocator.init(allocator);
     defer arena.deinit();
 
     const total_start_ns = nowNs();
-    var analyzed = try analysis.analyzeToIrTimed(arena.allocator(), wgsl);
+    var analyzed = try analysis.analyzeToIrTimedWithDiagnostic(arena.allocator(), wgsl, diagnostic);
 
     const emit_start_ns = nowNs();
-    const len = try emitSpirv(&analyzed.module, out);
+    const len = try emitSpirv(&analyzed.module, out, diagnostic);
     const emit_end_ns = nowNs();
     var phase_timings_ns = analyzed.phase_timings_ns;
     phase_timings_ns.emit = elapsedNs(emit_start_ns, emit_end_ns);
@@ -165,38 +134,47 @@ pub fn translateToSpirvTimed(
     };
 }
 
-pub fn translateToSpirvForVulkanComputeRuntime(
-    allocator: std.mem.Allocator,
-    wgsl: []const u8,
-    out: []u8,
-) analysis.TranslateError!TranslationResult {
-    return translateToSpirvForVulkanComputeRuntimeWithOverrides(allocator, wgsl, out, null, 0);
+pub fn translateToSpirvForVulkanComputeRuntimeWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, diagnostic: *analysis.Diagnostic) analysis.TranslateError!TranslationResult {
+    return translateToSpirvForVulkanComputeRuntimeWithOverridesWithDiagnostic(allocator, wgsl, out, null, 0, diagnostic);
 }
 
-pub fn translateToSpirvForVulkanComputeRuntimeWithOverrides(
-    allocator: std.mem.Allocator,
-    wgsl: []const u8,
-    out: []u8,
-    overrides: ?[*]const ir.OverrideEntry,
-    override_count: usize,
-) analysis.TranslateError!TranslationResult {
+pub fn translateToSpirvForVulkanComputeRuntimeWithOverridesWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, overrides: ?[*]const ir.OverrideEntry, override_count: usize, diagnostic: *analysis.Diagnostic) analysis.TranslateError!TranslationResult {
     const override_slice = if (overrides != null and override_count > 0)
         overrides.?[0..override_count]
     else
         &.{};
-    var module_ir = try analysis.analyzeToIrWithConfigAndOverrides(
-        allocator,
-        wgsl,
-        vulkan_compute_runtime_robustness_config(),
-        override_slice,
-    );
+    var module_ir = try analysis.analyzeToIrWithConfigAndOverridesWithDiagnostic(allocator, wgsl, vulkan_compute_runtime_robustness_config(), override_slice, diagnostic);
     defer module_ir.deinit();
 
     if (override_slice.len > 0) override_values.applyOverrides(&module_ir, override_slice);
 
-    const len = try emitSpirv(&module_ir, out);
+    const len = try emitSpirv(&module_ir, out, diagnostic);
     return .{
         .len = len,
         .info = try translation_info.buildTranslationInfo(allocator, &module_ir),
     };
+}
+
+pub fn translateToMslForComputeRuntime(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, overrides: ?[*]const ir.OverrideEntry, override_count: usize) analysis.TranslateError!TranslationResult {
+    return translateToMslForComputeRuntimeWithDiagnostic(allocator, wgsl, out, overrides, override_count, analysis.compatibilityDiagnostic());
+}
+
+pub fn translateToMslForComputeRuntimeTimed(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, overrides: ?[*]const ir.OverrideEntry, override_count: usize) analysis.TranslateError!TimedTranslationResult {
+    return translateToMslForComputeRuntimeTimedWithDiagnostic(allocator, wgsl, out, overrides, override_count, analysis.compatibilityDiagnostic());
+}
+
+pub fn translateToSpirvForComputeRuntime(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8) analysis.TranslateError!TranslationResult {
+    return translateToSpirvForComputeRuntimeWithDiagnostic(allocator, wgsl, out, analysis.compatibilityDiagnostic());
+}
+
+pub fn translateToSpirvTimed(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8) analysis.TranslateError!TimedTranslationResult {
+    return translateToSpirvTimedWithDiagnostic(allocator, wgsl, out, analysis.compatibilityDiagnostic());
+}
+
+pub fn translateToSpirvForVulkanComputeRuntime(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8) analysis.TranslateError!TranslationResult {
+    return translateToSpirvForVulkanComputeRuntimeWithDiagnostic(allocator, wgsl, out, analysis.compatibilityDiagnostic());
+}
+
+pub fn translateToSpirvForVulkanComputeRuntimeWithOverrides(allocator: std.mem.Allocator, wgsl: []const u8, out: []u8, overrides: ?[*]const ir.OverrideEntry, override_count: usize) analysis.TranslateError!TranslationResult {
+    return translateToSpirvForVulkanComputeRuntimeWithOverridesWithDiagnostic(allocator, wgsl, out, overrides, override_count, analysis.compatibilityDiagnostic());
 }

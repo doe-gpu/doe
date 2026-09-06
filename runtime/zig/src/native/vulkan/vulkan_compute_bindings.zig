@@ -48,38 +48,7 @@ pub fn textureResourceHandle(view: *const DoeTextureView) u64 {
     return view.tex.vk_id;
 }
 
-fn shaderBufferBindingType(
-    shader_module: ?*DoeShaderModule,
-    group: u32,
-    binding: u32,
-) u32 {
-    const sm = shader_module orelse
-        return model_binding_types.WGPUBufferBindingType_Storage;
-    shader_binding_reflection.ensureShaderBindings(sm);
-    const count: usize = @min(
-        @as(usize, @intCast(sm.binding_count)),
-        native_shared.MAX_SHADER_BINDINGS,
-    );
-    for (sm.bindings[0..count]) |meta| {
-        if (meta.group != group or
-            meta.binding != binding or
-            meta.kind != BINDING_KIND_BUFFER) continue;
-        if (meta.addr_space == ADDRESS_SPACE_UNIFORM) {
-            return model_binding_types.WGPUBufferBindingType_Uniform;
-        }
-        if (meta.addr_space == ADDRESS_SPACE_STORAGE and
-            meta.access == ACCESS_READ)
-        {
-            return model_binding_types.WGPUBufferBindingType_ReadOnlyStorage;
-        }
-        if (meta.addr_space == ADDRESS_SPACE_STORAGE and
-            meta.access == ACCESS_READ_WRITE)
-        {
-            return model_binding_types.WGPUBufferBindingType_Storage;
-        }
-    }
-    return model_binding_types.WGPUBufferBindingType_Storage;
-}
+const shaderBufferBindingType = shader_binding_reflection.shaderBufferBindingType;
 
 fn appendRecordedBindingAtSlot(
     pip: *const DoeComputePipeline,

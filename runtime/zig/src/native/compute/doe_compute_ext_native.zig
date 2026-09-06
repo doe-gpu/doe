@@ -312,7 +312,7 @@ pub export fn doeNativeComputePipelineGetBindGroupLayout(pip_raw: ?*anyopaque, g
         }
     }
     const sm: *DoeShaderModule = pip.shader_module orelse return null;
-    shader_native.ensureShaderBindings(sm);
+    shader_native.ensureShaderBindings(sm) catch return null;
     const binding_count = clamped_binding_count(pip);
     var entry_count: usize = 0;
     for (sm.bindings[0..binding_count]) |b| {

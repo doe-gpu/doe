@@ -52,8 +52,8 @@ fn markFunctionResources(module_ir: *const ir.Module, function_id: usize, visite
     };
 }
 
-pub fn extractBindingsForEntryPoint(allocator: std.mem.Allocator, wgsl: []const u8, entry_point: []const u8, out: []BindingMeta) analysis.TranslateError!usize {
-    var module_ir = try analysis.analyzeToIr(allocator, wgsl);
+pub fn extractBindingsForEntryPointWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, entry_point: []const u8, out: []BindingMeta, diagnostic: *analysis.Diagnostic) analysis.TranslateError!usize {
+    var module_ir = try analysis.analyzeToIrWithDiagnostic(allocator, wgsl, diagnostic);
     defer module_ir.deinit();
     const visited = try allocator.alloc(bool, module_ir.functions.items.len);
     defer allocator.free(visited);
@@ -75,7 +75,20 @@ pub fn extractBindingsForEntryPoint(allocator: std.mem.Allocator, wgsl: []const 
     var count: usize = 0;
     for (module_ir.globals.items, globals) |global, used| {
         if (!used or global.binding == null) continue;
-        if (count >= out.len) break;
+        if (count >= out.len) return error.OutputTooLarge;
+        out[count] = bindingMeta(&module_ir, global);
+        count += 1;
+    }
+    return count;
+}
+
+pub fn extractBindingsWithDiagnostic(allocator: std.mem.Allocator, wgsl: []const u8, out: []BindingMeta, diagnostic: *analysis.Diagnostic) analysis.TranslateError!usize {
+    var module_ir = try analysis.analyzeToIrWithDiagnostic(allocator, wgsl, diagnostic);
+    defer module_ir.deinit();
+    var count: usize = 0;
+    for (module_ir.globals.items) |global| {
+        if (global.binding == null) continue;
+        if (count >= out.len) return error.OutputTooLarge;
         out[count] = bindingMeta(&module_ir, global);
         count += 1;
     }
@@ -83,14 +96,9 @@ pub fn extractBindingsForEntryPoint(allocator: std.mem.Allocator, wgsl: []const 
 }
 
 pub fn extractBindings(allocator: std.mem.Allocator, wgsl: []const u8, out: []BindingMeta) analysis.TranslateError!usize {
-    var module_ir = try analysis.analyzeToIr(allocator, wgsl);
-    defer module_ir.deinit();
-    var count: usize = 0;
-    for (module_ir.globals.items) |global| {
-        if (global.binding == null) continue;
-        if (count >= out.len) break;
-        out[count] = bindingMeta(&module_ir, global);
-        count += 1;
-    }
-    return count;
+    return extractBindingsWithDiagnostic(allocator, wgsl, out, analysis.compatibilityDiagnostic());
+}
+
+pub fn extractBindingsForEntryPoint(allocator: std.mem.Allocator, wgsl: []const u8, entry_point: []const u8, out: []BindingMeta) analysis.TranslateError!usize {
+    return extractBindingsForEntryPointWithDiagnostic(allocator, wgsl, entry_point, out, analysis.compatibilityDiagnostic());
 }

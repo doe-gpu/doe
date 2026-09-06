@@ -22,7 +22,7 @@ pub const FailureContext = struct {
     token_idx: ?u32 = null,
 };
 
-var last_failure_context = FailureContext{};
+threadlocal var last_failure_context = FailureContext{};
 
 pub fn resetLastFailureContext() void {
     last_failure_context = .{};
@@ -33,14 +33,18 @@ pub fn lastFailureContext() FailureContext {
 }
 
 pub fn build(allocator: std.mem.Allocator, tree: *const Ast, semantic: *const sema.SemanticModule) BuildError!ir.Module {
-    resetLastFailureContext();
+    return buildWithContext(allocator, tree, semantic, &last_failure_context);
+}
+
+pub fn buildWithContext(allocator: std.mem.Allocator, tree: *const Ast, semantic: *const sema.SemanticModule, failure: *FailureContext) BuildError!ir.Module {
+    failure.* = .{};
     var module = ir.Module.init(allocator);
     errdefer module.deinit();
 
     try module.types.items.appendSlice(allocator, semantic.types.items.items);
     try copy_structs(allocator, &module, semantic);
-    try copy_globals(allocator, tree, &module, semantic);
-    try copy_functions(allocator, tree, &module, semantic);
+    try copy_globals(allocator, tree, &module, semantic, failure);
+    try copy_functions(allocator, tree, &module, semantic, failure);
     return module;
 }
 
@@ -60,22 +64,22 @@ fn copy_structs(allocator: std.mem.Allocator, module: *ir.Module, semantic: *con
     }
 }
 
-fn copy_globals(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Module, semantic: *const sema.SemanticModule) BuildError!void {
+fn copy_globals(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Module, semantic: *const sema.SemanticModule, failure: *FailureContext) BuildError!void {
     for (semantic.globals.items) |global_info| {
-        captureFailureNode(tree, global_info.node_idx);
+        captureFailureNode(failure, tree, global_info.node_idx);
         const node = tree.nodes.items[global_info.node_idx];
         var initializer: ?ir.ConstantValue = null;
         switch (node.tag) {
             .global_var => {
                 const init_node = tree.extra_data.items[node.data.rhs + 3];
-                if (init_node != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, init_node, 0);
+                if (init_node != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, failure, init_node, 0);
             },
             .const_decl => {
-                if (node.data.rhs != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, node.data.rhs, 0);
+                if (node.data.rhs != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, failure, node.data.rhs, 0);
             },
             .override_decl => {
                 const init_node = tree.extra_data.items[node.data.lhs + 2];
-                if (init_node != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, init_node, 0);
+                if (init_node != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, failure, init_node, 0);
             },
             else => {},
         }
@@ -99,9 +103,9 @@ fn copy_globals(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Modu
     }
 }
 
-fn copy_functions(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Module, semantic: *const sema.SemanticModule) BuildError!void {
+fn copy_functions(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Module, semantic: *const sema.SemanticModule, failure: *FailureContext) BuildError!void {
     for (semantic.functions.items, 0..) |function_info, function_index| {
-        captureFailureNode(tree, function_info.node_idx);
+        captureFailureNode(failure, tree, function_info.node_idx);
         var function = ir.Function{
             .name = try ir.dup_string(allocator, function_info.name),
             .return_type = function_info.return_type,
@@ -129,6 +133,7 @@ fn copy_functions(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Mo
         }
 
         var builder = FunctionBuilder{
+            .failure = failure,
             .allocator = allocator,
             .tree = tree,
             .semantic = semantic,
@@ -152,6 +157,7 @@ fn copy_functions(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Mo
 }
 
 const FunctionBuilder = struct {
+    failure: *FailureContext,
     allocator: std.mem.Allocator,
     tree: *const Ast,
     semantic: *const sema.SemanticModule,
@@ -159,7 +165,7 @@ const FunctionBuilder = struct {
     next_local_index: u32 = 0,
 
     fn lower_stmt(self: *FunctionBuilder, node_idx: u32) BuildError!ir.StmtId {
-        captureFailureNode(self.tree, node_idx);
+        captureFailureNode(self.failure, self.tree, node_idx);
         const node = self.tree.nodes.items[node_idx];
         return switch (node.tag) {
             .block => try self.lower_block(node),
@@ -345,7 +351,7 @@ const FunctionBuilder = struct {
     }
 
     fn lower_expr(self: *FunctionBuilder, node_idx: u32) BuildError!ir.ExprId {
-        captureFailureNode(self.tree, node_idx);
+        captureFailureNode(self.failure, self.tree, node_idx);
         const node = self.tree.nodes.items[node_idx];
         const ty = self.semantic.nodeType(node_idx);
         const category = self.semantic.nodeCategory(node_idx);
@@ -603,10 +609,11 @@ fn constant_from_node(
     allocator: std.mem.Allocator,
     tree: *const Ast,
     semantic: *const sema.SemanticModule,
+    failure: *FailureContext,
     node_idx: u32,
     depth: u8,
 ) BuildError!?ir.ConstantValue {
-    captureFailureNode(tree, node_idx);
+    captureFailureNode(failure, tree, node_idx);
     if (depth >= 16) return error.UnsupportedConstruct;
     const node = tree.nodes.items[node_idx];
     return switch (node.tag) {
@@ -625,11 +632,11 @@ fn constant_from_node(
                 else => NULL_NODE,
             };
             if (init_node == NULL_NODE) break :blk null;
-            break :blk try constant_from_node(allocator, tree, semantic, init_node, depth + 1);
+            break :blk try constant_from_node(allocator, tree, semantic, failure, init_node, depth + 1);
         },
         .unary_expr => switch (tree.tokens.items[node.main_token].tag) {
             .@"-" => blk: {
-                const inner = try constant_from_node(allocator, tree, semantic, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
+                const inner = try constant_from_node(allocator, tree, semantic, failure, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
                 switch (inner) {
                     .int => |value| break :blk ir.ConstantValue{ .int = (~value) +% 1 },
                     .float => |value| break :blk ir.ConstantValue{ .float = -value },
@@ -639,8 +646,8 @@ fn constant_from_node(
             else => error.UnsupportedConstruct,
         },
         .binary_expr => blk: {
-            const lhs = try constant_from_node(allocator, tree, semantic, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
-            const rhs = try constant_from_node(allocator, tree, semantic, node.data.rhs, depth + 1) orelse return error.UnsupportedConstruct;
+            const lhs = try constant_from_node(allocator, tree, semantic, failure, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
+            const rhs = try constant_from_node(allocator, tree, semantic, failure, node.data.rhs, depth + 1) orelse return error.UnsupportedConstruct;
             break :blk try fold_scalar_binary(map_binary_op(tree.tokens.items[node.main_token].tag), lhs, rhs);
         },
         .construct_expr => blk: {
@@ -649,7 +656,7 @@ fn constant_from_node(
                 switch (semantic.types.get(semantic.nodeType(node_idx))) {
                     .scalar => {
                         const arg_node = tree.extra_data.items[span.start];
-                        break :blk try constant_from_node(allocator, tree, semantic, arg_node, depth + 1);
+                        break :blk try constant_from_node(allocator, tree, semantic, failure, arg_node, depth + 1);
                     },
                     else => {},
                 }
@@ -662,7 +669,7 @@ fn constant_from_node(
             }
             while (initialized < span.len) : (initialized += 1) {
                 const arg_node = tree.extra_data.items[span.start + initialized];
-                values[initialized] = try constant_from_node(allocator, tree, semantic, arg_node, depth + 1) orelse return error.UnsupportedConstruct;
+                values[initialized] = try constant_from_node(allocator, tree, semantic, failure, arg_node, depth + 1) orelse return error.UnsupportedConstruct;
             }
             break :blk ir.ConstantValue{ .composite = values };
         },
@@ -674,10 +681,10 @@ fn fold_scalar_binary(op: ir.BinaryOp, lhs: ir.ConstantValue, rhs: ir.ConstantVa
     return ir_const_eval.fold_scalar_binary(op, lhs, rhs) catch error.UnsupportedConstruct;
 }
 
-fn captureFailureNode(tree: *const Ast, node_idx: u32) void {
+fn captureFailureNode(failure: *FailureContext, tree: *const Ast, node_idx: u32) void {
     if (node_idx == NULL_NODE or node_idx >= tree.nodes.items.len) return;
     const node = tree.nodes.items[node_idx];
-    last_failure_context = .{
+    failure.* = .{
         .node_idx = node_idx,
         .token_idx = if (node.main_token < tree.tokens.items.len) node.main_token else null,
     };

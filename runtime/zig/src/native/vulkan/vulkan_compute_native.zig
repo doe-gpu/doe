@@ -219,27 +219,9 @@ test "prepared binding cache retains identity and reloads state" {
     try std.testing.expectEqual(@as(u32, 1), bg.ref_count);
 }
 
-fn reflected_buffer_binding_type(meta: wgsl_bindings.BindingMeta) u32 {
-    if (meta.kind != .buffer) return model_binding_types.WGPUBufferBindingType_Storage;
-    if (meta.addr_space == .uniform) return model_binding_types.WGPUBufferBindingType_Uniform;
-    if (meta.addr_space == .storage and meta.access == .read) return model_binding_types.WGPUBufferBindingType_ReadOnlyStorage;
-    return model_binding_types.WGPUBufferBindingType_Storage;
-}
+const shader_buffer_binding_type = shader_binding_reflection.shaderBufferBindingType;
 
-fn shader_buffer_binding_type(shader_module: ?*DoeShaderModule, group: u32, binding: u32) u32 {
-    const sm = shader_module orelse return model_binding_types.WGPUBufferBindingType_Storage;
-    shader_binding_reflection.ensureShaderBindings(sm);
-    const count: usize = @min(@as(usize, @intCast(sm.binding_count)), native_shared.MAX_SHADER_BINDINGS);
-    for (sm.bindings[0..count]) |meta| {
-        if (meta.group != group or meta.binding != binding or meta.kind != BINDING_KIND_BUFFER) continue;
-        if (meta.addr_space == ADDRESS_SPACE_UNIFORM) return model_binding_types.WGPUBufferBindingType_Uniform;
-        if (meta.addr_space == ADDRESS_SPACE_STORAGE and meta.access == ACCESS_READ) return model_binding_types.WGPUBufferBindingType_ReadOnlyStorage;
-        if (meta.addr_space == ADDRESS_SPACE_STORAGE and meta.access == ACCESS_READ_WRITE) return model_binding_types.WGPUBufferBindingType_Storage;
-    }
-    return model_binding_types.WGPUBufferBindingType_Storage;
-}
-
-fn populate_pipeline_buffer_binding_types(pip: *DoeComputePipeline, shader_module: ?*DoeShaderModule) void {
+fn populate_pipeline_buffer_binding_types(pip: *DoeComputePipeline, shader_module: ?*DoeShaderModule) wgsl_analysis.TranslateError!void {
     @memset(&pip.vk_flat_buffer_binding_types, model_binding_types.WGPUBufferBindingType_Storage);
     const sm = shader_module orelse {
         pip.vk_flat_buffer_binding_types_ready = true;
@@ -254,11 +236,11 @@ fn populate_pipeline_buffer_binding_types(pip: *DoeComputePipeline, shader_modul
         return;
     };
     var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_bindings.BindingMeta = undefined;
-    const count = wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch 0;
+    const count = try wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata);
     for (metadata[0..count]) |meta| {
         if (meta.group >= MAX_COMPUTE_BIND_GROUPS or meta.binding >= MAX_BIND) continue;
         const slot = (meta.group * MAX_BIND) + meta.binding;
-        pip.vk_flat_buffer_binding_types[slot] = reflected_buffer_binding_type(meta);
+        pip.vk_flat_buffer_binding_types[slot] = shader_binding_reflection.bufferBindingType(shader_binding_reflection.bindingInfo(meta));
     }
     pip.vk_flat_buffer_binding_types_ready = true;
 }
@@ -380,12 +362,12 @@ pub fn vulkan_create_shader_module(
 pub fn vulkan_copy_pipeline_spirv(
     pip: *DoeComputePipeline,
     shader: *DoeShaderModule,
-) error{ OutOfMemory, InvalidShaderModule }!void {
+) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
+    try populate_pipeline_buffer_binding_types(pip, shader);
     const src = shader.spirv_data orelse return error.InvalidShaderModule;
     pip.spirv_data = alloc.dupe(u32, src) catch return error.OutOfMemory;
     pip.vk_spirv_hash = std.hash.Wyhash.hash(0, std.mem.sliceAsBytes(src));
     pip.vk_spirv_hash_ready = true;
-    populate_pipeline_buffer_binding_types(pip, shader);
     precompute_pipeline_static_hashes(pip);
 }
 
@@ -394,6 +376,7 @@ pub fn vulkan_compile_pipeline_spirv_with_overrides(
     shader: *DoeShaderModule,
     overrides: []const wgsl_ir.OverrideEntry,
 ) (wgsl_analysis.TranslateError || error{InvalidShaderModule})!void {
+    try populate_pipeline_buffer_binding_types(pip, shader);
     const wgsl = shader.wgsl_source orelse return error.InvalidShaderModule;
     var spirv_buf = alloc.alloc(u8, spirv_translation.MAX_OUTPUT) catch return error.OutOfMemory;
     defer alloc.free(spirv_buf);
@@ -430,7 +413,6 @@ pub fn vulkan_compile_pipeline_spirv_with_overrides(
     pip.texture_dispatch_preconditions = translation.info.texture_dispatch_preconditions;
     translation.info.dispatch_preconditions = &.{};
     translation.info.texture_dispatch_preconditions = &.{};
-    populate_pipeline_buffer_binding_types(pip, shader);
     precompute_pipeline_static_hashes(pip);
 }
 

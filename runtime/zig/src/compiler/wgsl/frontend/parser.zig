@@ -41,7 +41,7 @@ pub const FailureContext = struct {
     loc: ?Token.Loc = null,
 };
 
-var last_failure_context = FailureContext{};
+threadlocal var last_failure_context = FailureContext{};
 
 pub fn resetLastFailureContext() void {
     last_failure_context = .{};
@@ -59,6 +59,7 @@ pub const ParseError = error{
 pub const AttrSpan = parser_attrs.AttrSpan;
 
 pub const Parser = struct {
+    failure_context: FailureContext = .{},
     tree: *Ast,
     token_idx: u32,
     /// Scratch buffer for collecting child indices before committing to extra_data.
@@ -138,7 +139,7 @@ pub const Parser = struct {
             .kw_alias => parser_decl.parseAliasDecl(self),
             // const_assert is recognised but not yet implemented; reject explicitly.
             .kw_const_assert => {
-                last_failure_context = .{
+                self.failure_context = .{
                     .token_idx = self.token_idx,
                     .loc = if (self.token_idx < self.tree.tokens.items.len)
                         self.tree.tokens.items[self.token_idx].loc
@@ -155,7 +156,7 @@ pub const Parser = struct {
             else => {
                 // Reject unexpected tokens at the top level; valid WGSL
                 // top-level constructs always start with a keyword or attribute.
-                last_failure_context = .{
+                self.failure_context = .{
                     .token_idx = self.token_idx,
                     .loc = if (self.token_idx < self.tree.tokens.items.len)
                         self.tree.tokens.items[self.token_idx].loc
@@ -196,7 +197,7 @@ pub const Parser = struct {
             self.tree.tokens.items[self.token_idx].loc
         else
             null;
-        last_failure_context = .{ .token_idx = self.token_idx, .loc = fail_loc };
+        self.failure_context = .{ .token_idx = self.token_idx, .loc = fail_loc };
         return ParseError.UnexpectedToken;
     }
 
@@ -210,7 +211,11 @@ pub const Parser = struct {
 // ============================================================
 
 pub fn parseSource(allocator: std.mem.Allocator, source: []const u8) !Ast {
-    resetLastFailureContext();
+    return parseSourceWithContext(allocator, source, &last_failure_context);
+}
+
+pub fn parseSourceWithContext(allocator: std.mem.Allocator, source: []const u8, failure: *FailureContext) !Ast {
+    failure.* = .{};
     var tree = Ast.init(allocator);
     errdefer tree.deinit();
 
@@ -218,6 +223,7 @@ pub fn parseSource(allocator: std.mem.Allocator, source: []const u8) !Ast {
 
     var parser = Parser.init(&tree, allocator);
     defer parser.deinit();
+    errdefer failure.* = parser.failure_context;
 
     _ = try parser.parse();
     return tree;

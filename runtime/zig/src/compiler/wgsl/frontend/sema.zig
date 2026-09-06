@@ -32,7 +32,7 @@ pub const FailureContext = struct {
     token_idx: ?u32 = null,
 };
 
-var last_failure_context = FailureContext{};
+threadlocal var last_failure_context = FailureContext{};
 
 pub fn resetLastFailureContext() void {
     last_failure_context = .{};
@@ -49,7 +49,11 @@ pub fn analyzeWithOverrides(
     tree: *const Ast,
     overrides: []const ir.OverrideEntry,
 ) !SemanticModule {
-    resetLastFailureContext();
+    return analyzeWithContext(allocator, tree, overrides, &last_failure_context);
+}
+
+pub fn analyzeWithContext(allocator: std.mem.Allocator, tree: *const Ast, overrides: []const ir.OverrideEntry, failure: *FailureContext) !SemanticModule {
+    failure.* = .{};
     var module = SemanticModule{
         .allocator = allocator,
         .tree = tree,
@@ -61,7 +65,7 @@ pub fn analyzeWithOverrides(
     try module.node_info.resize(allocator, tree.nodes.items.len);
     @memset(module.node_info.items, NodeInfo{});
 
-    var analyzer = Analyzer{ .module = &module, .overrides = overrides };
+    var analyzer = Analyzer{ .module = &module, .overrides = overrides, .failure = failure };
     try analyzer.run();
     return module;
 }
@@ -114,6 +118,7 @@ const BodyAnalyzer = struct {
 };
 
 const Analyzer = struct {
+    failure: *FailureContext,
     module: *SemanticModule,
     overrides: []const ir.OverrideEntry = &.{},
 
@@ -147,7 +152,7 @@ const Analyzer = struct {
     }
 
     fn register_top_level(self: *Analyzer, node_idx: u32) !void {
-        captureFailureNode(self.module.tree, node_idx);
+        sema_typeutils.captureFailureNode(self.module.tree, node_idx, self.failure);
         const node = self.module.tree.nodes.items[node_idx];
         switch (node.tag) {
             .struct_decl => try self.register_struct(node),
@@ -159,7 +164,7 @@ const Analyzer = struct {
     }
 
     fn resolve_top_level(self: *Analyzer, node_idx: u32) !void {
-        captureFailureNode(self.module.tree, node_idx);
+        sema_typeutils.captureFailureNode(self.module.tree, node_idx, self.failure);
         const node = self.module.tree.nodes.items[node_idx];
         switch (node.tag) {
             .struct_decl => try self.resolve_struct(node),
@@ -369,7 +374,7 @@ const Analyzer = struct {
     }
 
     fn analyze_stmt(self: *Analyzer, node_idx: u32, body: *BodyAnalyzer) !void {
-        captureFailureNode(self.module.tree, node_idx);
+        sema_typeutils.captureFailureNode(self.module.tree, node_idx, self.failure);
         const node = self.module.tree.nodes.items[node_idx];
         switch (node.tag) {
             .block => {
@@ -489,7 +494,7 @@ const Analyzer = struct {
     }
 
     fn analyze_local_decl(self: *Analyzer, node_idx: u32, node: Node, body: *BodyAnalyzer) !void {
-        captureFailureNode(self.module.tree, node_idx);
+        sema_typeutils.captureFailureNode(self.module.tree, node_idx, self.failure);
         const name = self.module.tree.tokenSlice(node.main_token + 1);
         const explicit_type = if (node.data.lhs != NULL_NODE) try self.resolve_type_node(node.data.lhs) else ir.INVALID_TYPE;
         const init_ty = if (node.data.rhs != NULL_NODE) try self.analyze_expr(node.data.rhs, body) else ir.INVALID_TYPE;
@@ -512,7 +517,7 @@ const Analyzer = struct {
     }
 
     fn analyze_expr(self: *Analyzer, node_idx: u32, body: ?*BodyAnalyzer) AnalyzeError!ir.TypeId {
-        captureFailureNode(self.module.tree, node_idx);
+        sema_typeutils.captureFailureNode(self.module.tree, node_idx, self.failure);
         const existing = self.module.node_info.items[node_idx];
         if (existing.ty != ir.INVALID_TYPE) return existing.ty;
 
@@ -705,7 +710,7 @@ const Analyzer = struct {
     }
 
     pub fn resolve_type_node(self: *Analyzer, node_idx: u32) AnalyzeError!ir.TypeId {
-        captureFailureNode(self.module.tree, node_idx);
+        sema_typeutils.captureFailureNode(self.module.tree, node_idx, self.failure);
         const node = self.module.tree.nodes.items[node_idx];
         return switch (node.tag) {
             .type_name => try self.resolve_type_name(self.module.tree.tokenSlice(node.main_token)),
@@ -789,10 +794,6 @@ const Analyzer = struct {
         };
     }
 };
-
-fn captureFailureNode(tree: *const Ast, node_idx: u32) void {
-    sema_typeutils.captureFailureNode(tree, node_idx, &last_failure_context);
-}
 
 const bitcast_types_compatible = sema_typeutils.bitcast_types_compatible;
 const is_handle_type = sema_typeutils.is_handle_type;
