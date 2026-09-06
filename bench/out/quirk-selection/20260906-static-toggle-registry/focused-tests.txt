@@ -1,0 +1,54 @@
+Zig source architecture review signals:
+src/backend/vulkan/native_runtime.zig: 1007 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_render.zig: 980 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_resources.zig: 1018 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_upload.zig: 843 lines exceeds advisory review signal 800
+src/backend/vulkan/vulkan_surface.zig: 808 lines exceeds advisory review signal 800
+src/compiler/tsir/digest.zig: 999 lines exceeds advisory review signal 800
+src/compiler/tsir/emit_kernel_body.zig: 895 lines exceeds advisory review signal 800
+src/compiler/tsir/frontend.zig: 885 lines exceeds advisory review signal 800
+src/compiler/tsir/reference_extended_ops.zig: 841 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig: 989 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig: 895 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig: 837 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig: 888 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_layout.zig: 911 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/msl/emit_msl_ir.zig: 973 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig: 839 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig: 1005 lines exceeds advisory review signal 800
+src/compiler/wgsl/frontend/parser_expr.zig: 851 lines exceeds advisory review signal 800
+src/compiler/wgsl/frontend/sema.zig: 804 lines exceeds advisory review signal 800
+src/compiler/wgsl/ir/ir_transform_robustness.zig: 984 lines exceeds advisory review signal 800
+src/compiler/wgsl/proof/dispatch_proof_match.zig: 890 lines exceeds advisory review signal 800
+src/compiler/wgsl/proof/dispatch_uniform_bounds.zig: 878 lines exceeds advisory review signal 800
+src/dropin/dropin_browser_shared_memory.zig: 806 lines exceeds advisory review signal 800
+src/native/compute/doe_compute_fast.zig: 1120 lines exceeds advisory review signal 800
+src/native/queue/doe_queue_submit_metal.zig: 824 lines exceeds advisory review signal 800
+src/native/resource/doe_texture_sampler_native.zig: 827 lines exceeds advisory review signal 800
+src/native/shader/doe_shader_native.zig: 1027 lines exceeds advisory review signal 800
+src/native/vulkan/vulkan_compute_native.zig: 1064 lines exceeds advisory review signal 800
+src/runtime/trace/trace.zig: 879 lines exceeds advisory review signal 800
+src/spatial/csl/csl_host_plan_tool.zig: 828 lines exceeds advisory review signal 800
+test
++- run test
+   +- compile test ReleaseFast native 1 errors
+.zig-cache/c/d07c7f9dcfcbce03a0f3a3789aea6691/options.zig:27:97: error: expected expression, found 'pub'
+pub const quirk_toggle_registry: []const build.QuirkToggleConfig = &[_]build.QuirkToggleConfig {
+                                                                                                ^
+error: the following command failed with 1 compilation errors:
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/zig test /home/x/deco/doe/runtime/zig/src/backend/d3d12/d3d12_bridge_stubs.c -lvulkan /home/x/deco/doe/runtime/zig/src/backend/metal/metal_bridge_stubs.c -OReleaseFast -I /home/x/deco/doe/runtime/zig/src/backend/d3d12 -I /home/x/deco/doe/runtime/zig/src/backend/metal -I /home/x/deco/doe/runtime/zig/vendor/webgpu-headers -I /home/x/deco/doe/runtime/zig/src/backend/d3d12 -I /home/x/deco/doe/runtime/zig/src/backend/metal --dep build_options -Mroot=/home/x/deco/doe/runtime/zig/test_suite.zig -Mbuild_options=.zig-cache/c/d07c7f9dcfcbce03a0f3a3789aea6691/options.zig -lc --test-filter quirk --cache-dir .zig-cache --global-cache-dir /home/x/.cache/zig --name test --zig-lib-dir /home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/ --listen=-
+
+Build Summary: 7/10 steps succeeded; 1 failed
+test transitive failure
++- run python3 success 792ms MaxRSS:13M
++- run python3 success 425ms MaxRSS:27M
++- run python3 success 43ms MaxRSS:21M
++- run python3 success 48ms MaxRSS:20M
++- run python3 success 36ms MaxRSS:22M
++- run python3 success 79ms MaxRSS:12M
++- run test transitive failure
+   +- compile test ReleaseFast native 1 errors
+      +- options success
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/4c90c5d2aabab29ebc2d0fe78ed7a93b/build /home/x/.local/zig/zig-x86_64-linux-0.15.2/zig /home/x/.local/zig/zig-x86_64-linux-0.15.2/lib /home/x/deco/doe/runtime/zig .zig-cache /home/x/.cache/zig --seed 0x3b7a3fe0 -Z958059cfc5e23663 test -Dtest-filter=quirk -Doptimize=ReleaseFast --summary all

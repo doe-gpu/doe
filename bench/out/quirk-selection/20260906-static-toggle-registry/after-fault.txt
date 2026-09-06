@@ -1,0 +1,14 @@
+1/1 after-fault-probe.test.allocation fault does not publish strings from released parser storage...fault	0	true	false	0
+fault	1	true	false	0
+fault	2	true	false	0
+fault	3	true	false	0
+fault	4	true	false	0
+fault	5	true	false	0
+fault	6	true	false	0
+fault	7	true	false	0
+fault	8	true	false	0
+fault	9	true	false	0
+fault	10	true	false	0
+fault	11	true	false	0
+OK
+All 1 tests passed.

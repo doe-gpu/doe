@@ -114,6 +114,13 @@ refer to that artifact rather than restating counts.
 
 ## Execution model
 
+The [source-layout manifest](../runtime/zig/source-layout.json) owns module
+responsibilities and dependency permissions; its [generated source map](../runtime/zig/src/README.md)
+is the navigation surface. The [proposed user journeys](thesis.md#proposed-user-journeys)
+exercise these owners rather than defining separate product subsystems. An
+image-processing integration supplies shaders, declared work, and acceptance
+tests; image-editor policy does not belong in resource management.
+
 The optional `doe-gpu/compute-program` contract binds inline WGSL, fixed buffer
 sizes and roles, ordered dispatches, and a readback output. Preparation retains
 private allocations, shaders, pipelines, and bindings. Explicit `gpu-recorded`
@@ -132,6 +139,37 @@ An atomic update shares only resources with identical declaration keys, records
 the replacement plan, and closes the old program after successful preparation.
 Source, shape, resource changes, and device loss therefore cannot silently reuse
 stale command assumptions. See [`reusable-compute-programs.md`](reusable-compute-programs.md).
+
+Keep immutable program descriptions, device-specific prepared resources, and
+mutable invocation state distinct. A borrowed `PreparedOperation` is valid only
+within its synchronous execution and callback scope. Deferred use owns an
+`OwnedPreparedOperation` snapshot. CPU scope exit cannot establish GPU
+completion: command recording, submission, completion, and final resource
+release must each preserve the owner's lifetime obligations. Updates prepare
+replacement state before publishing it, and failure preserves the old owner.
+
+Compatibility adapters translate host values, C layouts, callbacks, and errors
+at explicit interfaces. They consume native ownership rules and expose the
+cost and lifetime of host copies. Compiler transformations preserve source
+locations and operation identity; diagnostics belong to the compilation that
+produced them. Neither evidence collection nor workaround selection may become
+a competing execution implementation.
+
+Resolve build configuration, device discovery, and invocation-dependent checks
+at their respective lifetimes. Toggle classifications are compiled from the
+versioned registry into immutable storage; physical GPU and driver matching
+remain runtime inputs. Device allocators, queues, caches, and resource identities
+retain device ownership. Future bounded scheduling belongs above those devices,
+with explicit transfers. Browser and application-engine adapters supply host
+requirements without adding browser or widget policy to shared GPU contracts.
+
+The active journeys reuse the existing package qualification, declared-program
+applications, and compiler regressions. Their accepted behavior, physical
+support, failure cases, and measurements stay with those executable workloads.
+Pure-logic and allocation-failure tests complement retained-binary tests across
+mapping, callbacks, submission, cancellation, and cleanup. Structural changes
+preserve behavior; arithmetic or synchronization changes require separately
+identified acceptance evidence.
 
 Doe is designed around explicit runtime behavior:
 

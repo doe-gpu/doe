@@ -1,0 +1,3 @@
+   text	   data	    bss	    dec	    hex	filename
+  78116	   3880	   3397	  85393	  14d91	bench/out/quirk-selection/20260906-static-toggle-registry/baseline-lookup
+  51824	   1936	   2893	  56653	   dd4d	bench/out/quirk-selection/20260906-static-toggle-registry/after-lookup

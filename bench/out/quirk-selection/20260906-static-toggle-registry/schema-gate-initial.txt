@@ -1,0 +1,2 @@
+FAIL: schema gate
+  config/zig-test-inventory.json: suites.aggregate.entries.68.path: 'build.zig' does not match '^(tests|src)/.+\\.zig$'

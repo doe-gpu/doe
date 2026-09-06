@@ -3934,9 +3934,9 @@
       },
       "src/quirk/toggle_registry.zig": {
         "decision": "Keep",
-        "moduleSha256": "dc44382b95baa9aa9a36199888f1864e3036a3d51d7af788deb1c2466f50b72b",
-        "reason": "Keep: reachable quirk implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "3e2a2c9c06daa41b6849576f7e59a914e277486dc8f9e3d9ea42c741233883d4",
+        "reason": "Keep: immutable toggle lookup owns runtime effect types and queries build-generated configuration without persistent allocation or initialization state.",
+        "reviewer": "codex-static-toggle-registry/2026-09-06"
       },
       "src/runtime/cache/pipeline_cache.zig": {
         "decision": "Keep",

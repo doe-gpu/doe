@@ -1,0 +1,44 @@
+Zig source architecture review signals:
+src/backend/vulkan/native_runtime.zig: 1007 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_render.zig: 980 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_resources.zig: 1018 lines exceeds advisory review signal 800
+src/backend/vulkan/vk_upload.zig: 843 lines exceeds advisory review signal 800
+src/backend/vulkan/vulkan_surface.zig: 808 lines exceeds advisory review signal 800
+src/compiler/tsir/digest.zig: 999 lines exceeds advisory review signal 800
+src/compiler/tsir/emit_kernel_body.zig: 895 lines exceeds advisory review signal 800
+src/compiler/tsir/frontend.zig: 885 lines exceeds advisory review signal 800
+src/compiler/tsir/reference_extended_ops.zig: 841 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig: 989 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig: 895 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig: 837 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig: 888 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/csl/emit_csl_layout.zig: 911 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/msl/emit_msl_ir.zig: 973 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig: 839 lines exceeds advisory review signal 800
+src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig: 1005 lines exceeds advisory review signal 800
+src/compiler/wgsl/frontend/parser_expr.zig: 851 lines exceeds advisory review signal 800
+src/compiler/wgsl/frontend/sema.zig: 804 lines exceeds advisory review signal 800
+src/compiler/wgsl/ir/ir_transform_robustness.zig: 984 lines exceeds advisory review signal 800
+src/compiler/wgsl/proof/dispatch_proof_match.zig: 890 lines exceeds advisory review signal 800
+src/compiler/wgsl/proof/dispatch_uniform_bounds.zig: 878 lines exceeds advisory review signal 800
+src/dropin/dropin_browser_shared_memory.zig: 806 lines exceeds advisory review signal 800
+src/native/compute/doe_compute_fast.zig: 1120 lines exceeds advisory review signal 800
+src/native/queue/doe_queue_submit_metal.zig: 824 lines exceeds advisory review signal 800
+src/native/resource/doe_texture_sampler_native.zig: 827 lines exceeds advisory review signal 800
+src/native/shader/doe_shader_native.zig: 1027 lines exceeds advisory review signal 800
+src/native/vulkan/vulkan_compute_native.zig: 1064 lines exceeds advisory review signal 800
+src/runtime/trace/trace.zig: 879 lines exceeds advisory review signal 800
+src/spatial/csl/csl_host_plan_tool.zig: 828 lines exceeds advisory review signal 800
+
+Build Summary: 10/10 steps succeeded; 31/31 tests passed
+test success
++- run python3 success 803ms MaxRSS:14M
++- run python3 success 411ms MaxRSS:28M
++- run python3 success 46ms MaxRSS:21M
++- run python3 success 46ms MaxRSS:21M
++- run python3 success 38ms MaxRSS:21M
++- run python3 success 89ms MaxRSS:12M
++- run test 31 passed 336ms MaxRSS:3M
+   +- compile test ReleaseFast native success 29s MaxRSS:633M
+      +- options cached
+

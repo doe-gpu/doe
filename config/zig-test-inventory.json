@@ -296,6 +296,10 @@
             "linux"
           ],
           "kind": "inline"
+        },
+        {
+          "path": "tests/core/quirk_registry_build_test.zig",
+          "kind": "integration"
         }
       ]
     },

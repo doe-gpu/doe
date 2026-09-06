@@ -20,6 +20,13 @@ failure, parity, allocation, and preparation-cost evidence lives in
 [`quirk selection`](../../bench/out/quirk-selection/20260906-direct-accumulation/README.md).
 This CPU preparation evidence does not promote backend or application performance.
 
+Toggle classifications now use immutable build-generated storage from the
+existing configuration. Lookup has no parser arena, persistent allocation,
+initialization lock, or readiness flag. Actual device matching remains a runtime
+decision. The decoded-string failure reproduction, generated-value parity,
+allocation-failure tests, and build-tier evidence are retained in
+[`static toggle registry`](../../bench/out/quirk-selection/20260906-static-toggle-registry/README.md).
+
 ## Current ABI approval boundary
 
 Recomposition ABI approval is symbol-scoped. The reviewed PCI-identity

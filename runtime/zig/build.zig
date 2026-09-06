@@ -5,6 +5,54 @@ const APP_ICON_SOURCE_SVG = "../../assets/doe-logo.svg";
 const APP_ICON_PRECOMPILED_ICNS = "../../assets/doe-logo.icns";
 const ABSENT_PROOF_ARTIFACT_SHA256 = "0000000000000000000000000000000000000000000000000000000000000000";
 const MAX_LEAN_PROOF_ARTIFACT_BYTES: usize = 1024 * 1024;
+const MAX_QUIRK_TOGGLE_REGISTRY_BYTES: usize = 64 * 1024;
+const QUIRK_TOGGLE_REGISTRY_SCHEMA_VERSION: u32 = 1;
+
+const QuirkToggleConfig = struct {
+    toggle_name: []const u8,
+    effect: []const u8,
+    description: []const u8,
+};
+const QuirkToggleRegistry = struct {
+    schemaVersion: u32,
+    toggles: []const QuirkToggleConfig,
+};
+
+pub fn parseQuirkToggleRegistry(allocator: std.mem.Allocator, json: []const u8) !std.json.Parsed(QuirkToggleRegistry) {
+    const parsed = try std.json.parseFromSlice(QuirkToggleRegistry, allocator, json, .{});
+    errdefer parsed.deinit();
+    if (parsed.value.schemaVersion != QUIRK_TOGGLE_REGISTRY_SCHEMA_VERSION) return error.InvalidToggleRegistryVersion;
+    const Effect = enum { behavioral, informational };
+    for (parsed.value.toggles) |entry| {
+        if (entry.toggle_name.len == 0) return error.EmptyToggleName;
+        if (std.meta.stringToEnum(Effect, entry.effect) == null) return error.InvalidToggleEffect;
+    }
+    return parsed;
+}
+
+fn addQuirkToggleRegistryOptions(options: *std.Build.Step.Options, json: []const u8, registry: QuirkToggleRegistry) void {
+    // Zig's Options serializer does not emit slices of struct values correctly.
+    writeQuirkToggleRegistry(options.step.owner.allocator, &options.contents, registry.toggles) catch
+        @panic("failed to emit quirk toggle registry build options");
+    options.addOption([]const u8, "quirk_toggle_registry_json", json);
+}
+
+pub fn writeQuirkToggleRegistry(allocator: std.mem.Allocator, output: *std.ArrayList(u8), entries: []const QuirkToggleConfig) !void {
+    try output.appendSlice(allocator,
+        \\pub const quirk_toggle_registry = [_]struct {
+        \\    toggle_name: []const u8,
+        \\    effect: []const u8,
+        \\    description: []const u8,
+        \\}{
+        \\
+    );
+    for (entries) |entry| {
+        try output.print(allocator, "    .{{ .toggle_name = \"{f}\", .effect = \"{f}\", .description = \"{f}\" }},\n", .{
+            std.zig.fmtString(entry.toggle_name), std.zig.fmtString(entry.effect), std.zig.fmtString(entry.description),
+        });
+    }
+    try output.appendSlice(allocator, "};\n");
+}
 
 fn fileExists(path: []const u8) bool {
     std.fs.cwd().access(path, .{}) catch return false;
@@ -356,6 +404,13 @@ pub fn build(b: *std.Build) void {
     const proof_provenance = loadProofProvenance(b.allocator);
     const shader_translation_provenance = loadShaderTranslationProvenance(b.allocator);
 
+    const quirk_registry_json = std.fs.cwd().readFileAlloc(b.allocator, "../../config/quirk-toggle-registry.json", MAX_QUIRK_TOGGLE_REGISTRY_BYTES) catch
+        @panic("failed to read config/quirk-toggle-registry.json");
+    defer b.allocator.free(quirk_registry_json);
+    const quirk_registry = parseQuirkToggleRegistry(b.allocator, quirk_registry_json) catch |err|
+        std.debug.panic("invalid config/quirk-toggle-registry.json: {s}", .{@errorName(err)});
+    defer quirk_registry.deinit();
+
     const lean_verified = b.option(bool, "lean-verified", "Embed Lean proof artifact and validate at comptime") orelse false;
     const build_options = b.addOptions();
     addComputeProgramContract(build_options, b.allocator);
@@ -402,14 +457,7 @@ pub fn build(b: *std.Build) void {
             @panic("failed to read dropin-symbol-ownership.json");
         build_options.addOption([]const u8, "dropin_symbol_ownership_config_json", json);
     }
-    {
-        const f = std.fs.cwd().openFile("../../config/quirk-toggle-registry.json", .{}) catch
-            @panic("config/quirk-toggle-registry.json not found");
-        defer f.close();
-        const json = f.readToEndAlloc(b.allocator, 64 * 1024) catch
-            @panic("failed to read quirk-toggle-registry.json");
-        build_options.addOption([]const u8, "quirk_toggle_registry_json", json);
-    }
+    addQuirkToggleRegistryOptions(build_options, quirk_registry_json, quirk_registry.value);
 
     const build_options_module = build_options.createModule();
     const doe_module = b.createModule(.{
@@ -1244,11 +1292,7 @@ pub fn build(b: *std.Build) void {
         defer f.close();
         compute_build_options.addOption([]const u8, "dropin_symbol_ownership_config_json", f.readToEndAlloc(b.allocator, 64 * 1024) catch @panic("failed to read dropin-symbol-ownership.json"));
     }
-    {
-        const f = std.fs.cwd().openFile("../../config/quirk-toggle-registry.json", .{}) catch @panic("config/quirk-toggle-registry.json not found");
-        defer f.close();
-        compute_build_options.addOption([]const u8, "quirk_toggle_registry_json", f.readToEndAlloc(b.allocator, 64 * 1024) catch @panic("failed to read quirk-toggle-registry.json"));
-    }
+    addQuirkToggleRegistryOptions(compute_build_options, quirk_registry_json, quirk_registry.value);
     const compute_build_options_module = compute_build_options.createModule();
     const compute_doe_module = b.createModule(.{
         .root_source_file = b.path("src/mod.zig"),
@@ -1319,11 +1363,7 @@ pub fn build(b: *std.Build) void {
         defer f.close();
         full_build_options.addOption([]const u8, "dropin_symbol_ownership_config_json", f.readToEndAlloc(b.allocator, 64 * 1024) catch @panic("failed to read dropin-symbol-ownership.json"));
     }
-    {
-        const f = std.fs.cwd().openFile("../../config/quirk-toggle-registry.json", .{}) catch @panic("config/quirk-toggle-registry.json not found");
-        defer f.close();
-        full_build_options.addOption([]const u8, "quirk_toggle_registry_json", f.readToEndAlloc(b.allocator, 64 * 1024) catch @panic("failed to read quirk-toggle-registry.json"));
-    }
+    addQuirkToggleRegistryOptions(full_build_options, quirk_registry_json, quirk_registry.value);
     const full_build_options_module = full_build_options.createModule();
     const full_doe_module = b.createModule(.{
         .root_source_file = b.path("src/mod.zig"),

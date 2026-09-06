@@ -1,0 +1,3 @@
+variant	first_lookup_ns	median_repeated_lookup_ns	binary_bytes	identity_sha256	configured_entries
+baseline	69200	32.69007	1182920	4e47cc1db4147269ed14cd3c8ba9f613549434a7cf9fba0323f44b2853ef7320	12
+after	601	26.27679	250232	4e47cc1db4147269ed14cd3c8ba9f613549434a7cf9fba0323f44b2853ef7320	12

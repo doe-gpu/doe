@@ -1,0 +1,16 @@
+1/1 baseline-fault-probe.test.allocation fault does not publish strings from released parser storage...fault	0	false	false	0
+fault	1	false	false	1
+fault	2	false	false	2
+fault	3	false	false	3
+fault	4	false	false	4
+fault	5	true	true	5
+fault	6	true	true	6
+fault	7	true	false	7
+fault	8	true	false	7
+fault	9	true	false	7
+fault	10	true	false	7
+fault	11	true	false	7
+FAIL (TestUnexpectedResult)
+0 passed; 0 skipped; 1 failed.
+error: the following test command failed with exit code 1:
+/home/x/.cache/zig/o/0fdc99bafff6ec96064f2c2d2b38b7dd/root --seed=0x287164ee

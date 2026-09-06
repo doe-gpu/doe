@@ -59,6 +59,12 @@ classified and cannot be promoted by benchmark results.
   measuring preparation. A selector microbenchmark does not establish GPU or
   application latency, and compile-time specialization must also account for
   generated code and build cost.
+- Toggle registry generation validates the versioned configuration during the
+  build and emits immutable runtime entries. Build-parser allocation failures,
+  decoded strings, invalid classifications, and generated-value parity remain
+  blocking regressions. Runtime lookup preserves case-insensitive first-match
+  behavior and explicit unknown results without initialization or fallback
+  state. Device matching is still evaluated against the actual runtime profile.
 - Declared reusable-program evaluations freeze numerical oracles before tuning,
   measure preparation separately, include persistent/batched incumbent controls,
   and test reset, source/shape updates, cancellation, and recovery. Package
