@@ -297,6 +297,33 @@ class ComputeProgramGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'missing native dispatch'):
             validate_native_audit(self.path, self.program, 2)
 
+    def test_comparisons_reject_mixed_installed_and_workspace_executors(self) -> None:
+        changed = copy.deepcopy(self.report)
+        changed['packageQualification'] = {'path': 'qualification.json', 'hash': 'a' * 64}
+        changed['packageRoot'] = '/installed/node_modules/doe-gpu'
+        with self.assertRaisesRegex(ValueError, 'mixed package execution sources'):
+            comparison_rows([(self.path, self.report), (self.path, changed)], self.policy)
+
+    def test_evaluation_package_fields_are_paired_and_versioned(self) -> None:
+        report = copy.deepcopy(self.report)
+        report.update(schemaVersion=5, inputPaths={'input': report['inputPath']}, fixturePath=None,
+                      providerAddonArtifact=None, timestampCalibrationArtifact=None, gpuStatsNs=None,
+                      warmups=[], lifecycleRuns=[], failedRun=None,
+                      packageQualification=None, packageRoot=None)
+        schema = json.loads((ROOT / 'config/compute-program-run.schema.json').read_text())
+        validator = jsonschema.Draft202012Validator(schema)
+        validator.validate(report)
+        for mutation in [
+            {'schemaVersion': 4},
+            {'packageRoot': '/unexpected-install'},
+            {'packageQualification': {'path': 'qualification.json', 'hash': 'a' * 64}},
+        ]:
+            with self.assertRaises(jsonschema.ValidationError):
+                validator.validate(report | mutation)
+        del report['packageRoot']
+        with self.assertRaises(jsonschema.ValidationError):
+            validator.validate(report)
+
     def test_adapter_labels_are_normalized_without_accepting_a_different_device(self) -> None:
         doe = {'isFallbackAdapter': False, 'vendor': 'AMD', 'device': 'Radeon Fixture GPU', 'vendorID': 4098, 'deviceID': 7}
         dawn = {'isFallbackAdapter': False, 'vendor': 'amd', 'device': 'radeon-fixture-gpu-', 'vendorID': None, 'deviceID': None}

@@ -11,6 +11,7 @@ from typing import Any
 import jsonschema
 
 from bench.lib.compute_program_fixture import accepts, load_fixture
+from bench.lib.compute_program_package import load_qualification, validate_package_root
 from bench.lib.hash_utils import file_sha256 as digest
 from bench.lib.native_program_replay import validate_gpu_replays
 from bench.native_compare_modules.reporting import format_stats
@@ -95,6 +96,15 @@ def validate_run(path: Path, root: Path, policy: dict[str, Any]) -> dict[str, An
     artifact = report["providerArtifact"]
     if digest(Path(artifact["path"])) != artifact["hash"]:
         raise ValueError(f"{path}: provider bytes changed")
+    if report.get('packageQualification') is not None:
+        reference = report['packageQualification']
+        qualification_path = root / reference['path']
+        if digest(qualification_path) != reference['hash']:
+            raise ValueError(f'{path}: package qualification changed')
+        qualification = load_qualification(qualification_path, root)
+        validate_package_root(Path(report['packageRoot']), qualification)
+        if report['provider'].startswith('doe-') and artifact['hash'] != qualification['hosts'][0]['libraryHash']:
+            raise ValueError(f'{path}: provider differs from qualified library')
     if report['schemaVersion'] >= 3 and report['provider'].startswith('doe-'):
         addon = report.get('providerAddonArtifact')
         if not addon or digest(Path(addon['path'])) != addon['hash']:

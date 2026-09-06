@@ -237,6 +237,13 @@ artifact identities. A passing compiler suite or a numerically failing incumbent
 does not qualify an application comparison. Policy migration and target scope
 are documented in [`shader-compiler-architecture.md`](shader-compiler-architecture.md).
 
+Retained-package application evaluation binds the installed package to a passed
+Node/Bun/Electron qualification. Archive hashes, installed files, loaded native
+library identity, and common executor source are blocking checks. A workspace
+library run cannot substitute for that installation evidence. Evaluation
+artifact migration is documented in
+[`reusable-compute-programs.md`](reusable-compute-programs.md).
+
 ## Refactor law
 
 Behavior-preserving refactors follow this evidence sequence:

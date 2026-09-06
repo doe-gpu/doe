@@ -25,8 +25,11 @@ External application reproduction starts at
 build identity, policy gates, workload execution, and receipt routing; a
 passing command is still not a public claim.
 
-Declared compute programs use `program prepare-lif`, `program evaluate`, `program qualify-package`,
-`program verify`, and `program verify-native`. Their policy and evidence boundaries are documented in
+Declared compute programs use `program prepare-lif`, `program evaluate`,
+`program qualify-package`, `program verify`, and `program verify-native`.
+Use `program evaluate --package-qualification <summary.json>` to compare
+applications using the exact archives retained by package qualification.
+Their policy and evidence boundaries are documented in
 [`reusable-compute-programs.md`](../docs/reusable-compute-programs.md).
 
 ## First benchmark matrix

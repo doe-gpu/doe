@@ -385,7 +385,8 @@
             1,
             2,
             3,
-            4
+            4,
+            5
           ]
         },
         "kind": {
@@ -997,6 +998,37 @@
               "type": "null"
             }
           ]
+        },
+        "packageQualification": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "path",
+                "hash"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "packageRoot": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
         }
       },
       "allOf": [
@@ -1040,7 +1072,7 @@
           "if": {
             "properties": {
               "schemaVersion": {
-                "const": 4
+                "minimum": 4
               }
             }
           },
@@ -1070,6 +1102,76 @@
                   ]
                 }
               ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "schemaVersion": {
+                "minimum": 5
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "packageQualification",
+              "packageRoot"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "packageQualification"
+                  ]
+                },
+                {
+                  "required": [
+                    "packageRoot"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "packageQualification"
+            ],
+            "properties": {
+              "packageQualification": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "packageRoot": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "packageQualification"
+            ],
+            "properties": {
+              "packageQualification": {
+                "type": "object"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "packageRoot": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         }
@@ -1322,6 +1424,8 @@
     "warmups": {},
     "lifecycleRuns": {},
     "failedRun": {},
-    "completionMode": {}
+    "completionMode": {},
+    "packageQualification": {},
+    "packageRoot": {}
   }
 }

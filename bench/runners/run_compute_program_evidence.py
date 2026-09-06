@@ -15,6 +15,11 @@ import jsonschema
 
 from bench.gates.compute_program_gate import completion_mode, digest, validate_run
 from bench.lib.compute_program_fixture import fixture_references, load_fixture
+from bench.lib.compute_program_package import (
+    install_qualification,
+    load_qualification,
+    validate_package_root,
+)
 from bench.native_compare_modules.reporting import format_stats
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,16 +40,23 @@ def same_adapter(candidate: dict[str, Any], control: dict[str, Any]) -> bool:
 def run_child(
     provider: str, application: str, phase: str, output: Path,
     policy_path: Path, policy: dict[str, Any], backend: str,
-    node: str, deno: str, native_library: Path,
+    node: str, deno: str, native_library: Path | None,
+    package_root: Path | None = None, package_qualification: Path | None = None,
 ) -> dict[str, Any]:
     command = [node]
     environment = dict(os.environ)
+    if package_root is not None:
+        environment = {key: value for key, value in environment.items()
+                       if not key.startswith('DOE_') and key not in ('NODE_PATH', 'NODE_OPTIONS', 'ELECTRON_RUN_AS_NODE')}
     environment.pop("DOE_PROGRAM_IDENTITY_TRACE_PATH", None)
     if provider == "wgpu":
         command = [deno, "run", "--allow-all", "--unstable-webgpu"]
         environment["DENO_WEBGPU_BACKEND"] = backend
     if provider.startswith("doe-"):
-        environment["DOE_WEBGPU_LIB"] = str(native_library)
+        if package_root is None:
+            if native_library is None:
+                raise ValueError('Doe evaluation requires a native library or a qualified package')
+            environment["DOE_WEBGPU_LIB"] = str(native_library)
         if phase == "audit" and backend == "vulkan":
             journal = Path(f"{output}.native.jsonl")
             journal.write_text("", encoding="utf-8")
@@ -54,6 +66,8 @@ def run_child(
         f"--application={application}", f"--phase={phase}",
         f"--output={output}", f"--policy={policy_path}", f"--backend={backend}",
     ]
+    if package_root is not None:
+        command += [f'--package-root={package_root}', f'--package-qualification={package_qualification}']
     if policy.get('gpuTiming', 'off') != 'off' and backend == 'vulkan':
         command.append(f'--hardware={output.parent / "hardware-profile.json"}')
     result = subprocess.run(command, cwd=ROOT, env=environment, capture_output=True,
@@ -82,6 +96,13 @@ def comparison_rows(reports: list[tuple[Path, dict[str, Any]]], policy: dict[str
         }
         if len(completion_modes) != 1:
             raise ValueError(f'{application}: mixed completion timing scopes')
+        package_sources = {
+            (report.get('packageQualification', {}).get('hash') if report.get('packageQualification') else None,
+             report.get('packageRoot'))
+            for _, report in reports if report['application'] == application
+        }
+        if len(package_sources) != 1:
+            raise ValueError(f'{application}: mixed package execution sources')
         groups = {
             provider: [(path, report) for path, report in reports
                        if report["application"] == application and report["provider"] == provider
@@ -129,7 +150,9 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True, help="New evidence directory")
     parser.add_argument("--node", default="node", help="Node-compatible runtime executable")
     parser.add_argument("--deno", required=True, help="Pinned Deno executable for wgpu control")
-    parser.add_argument("--native-library", type=Path, required=True, help="Built Doe native library")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--native-library", type=Path, help="Built Doe native library")
+    source.add_argument("--package-qualification", type=Path, help="Passed qualify-package summary; installs those exact retained archives")
     parser.add_argument("--policy", type=Path, default=ROOT / "config/compute-program-evaluation.json", help="Frozen evaluation policy")
     args = parser.parse_args()
     policy = json.loads(args.policy.read_text(encoding="utf-8"))
@@ -186,6 +209,9 @@ def main() -> int:
     source_paths += list((ROOT / 'runtime/bridge/webgpu-addon').glob('*.h'))
     source_paths += list((ROOT / 'config').glob('compute-program*.schema.json'))
     source_paths += [ROOT / reference['path'] for reference in policy.get('timestampSources', [])]
+    source_paths += [ROOT / 'bench/lib/compute_program_package.py', ROOT / 'config/compute-program-package.schema.json']
+    if args.package_qualification is not None:
+        source_paths.append(args.package_qualification.resolve())
     original_sources = []
     for path in sorted(set(source_paths)):
         source = path.resolve()
@@ -197,6 +223,13 @@ def main() -> int:
         original_sources.append({'path': str(source), 'hash': identity})
         summary['sources'].append({'path': str(retained), 'hash': identity})
     try:
+        package_root = None
+        if args.package_qualification is not None:
+            package_root = install_qualification(args.package_qualification.resolve(), output, ROOT, policy['processTimeoutMs'])
+            retained_qualification = output / 'package-qualification.json'
+            shutil.copyfile(args.package_qualification, retained_qualification)
+            args.package_qualification = retained_qualification
+        native_library = args.native_library.resolve() if args.native_library is not None else None
         inventory_command = ['vulkaninfo', '--summary'] if args.backend == 'vulkan' else ['system_profiler', 'SPDisplaysDataType', '-json']
         inventory = subprocess.run(inventory_command, capture_output=True, text=True, check=True, timeout=policy['processTimeoutMs'] / 1000)
         (output / 'hardware.txt').write_text(inventory.stdout + inventory.stderr)
@@ -209,7 +242,7 @@ def main() -> int:
             for provider in policy["providers"]:
                 path = output / f"{application}.{provider}.audit.json"
                 report = run_child(provider, application, "audit", path, args.policy, policy,
-                                   args.backend, args.node, args.deno, args.native_library.resolve())
+                                   args.backend, args.node, args.deno, native_library, package_root, args.package_qualification)
                 reports.append((path, report))
                 print(f"audit passed: {application}/{provider}", flush=True)
         for process_index in range(policy["processRuns"]):
@@ -219,9 +252,11 @@ def main() -> int:
                 for provider in rotated:
                     path = output / f"{application}.{provider}.process-{process_index}.json"
                     report = run_child(provider, application, "measure", path, args.policy, policy,
-                                       args.backend, args.node, args.deno, args.native_library.resolve())
+                                       args.backend, args.node, args.deno, native_library, package_root, args.package_qualification)
                     reports.append((path, report))
                     print(f"measured: {application}/{provider}/process-{process_index}", flush=True)
+        if package_root is not None:
+            validate_package_root(package_root, load_qualification(args.package_qualification, ROOT))
         summary["rows"] = comparison_rows(reports, policy)
         summary["status"] = "diagnostic"
     except (ValueError, OSError, subprocess.SubprocessError, jsonschema.ValidationError) as error:

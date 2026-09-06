@@ -1,5 +1,24 @@
 # Reusable compute programs
 
+## Application execution from qualified packages
+
+The existing evaluator accepts `--package-qualification` to install and execute
+the exact archives retained by `program qualify-package`. Every provider uses
+the installed executor; Doe loads its native library from the same installation.
+Archive, installed-file, library, and source-parity checks accompany evaluation
+artifact version 5. Workspace evaluation remains explicit and cannot satisfy
+installed-package evidence.
+
+The verified invocation-local matrix is
+`bench/out/compute-program/20260905-installed-package-matrix/summary.json`.
+The full frozen resident sequence also passes through that installation across
+fresh Doe processes; reports are under
+`bench/out/compute-program/20260905-installed-package-resident/`.
+Dawn and wgpu still fail the unchanged resident oracle, so their resident
+comparison remains inadmissible. This is repetition on the same AMD host,
+not independent reproduction. Validation records are under
+`bench/out/compute-program/20260905-installed-package-correction/`.
+
 ## Resident numerical correction
 
 SPIR-V compute lowering now applies the versioned scalar arithmetic policy in
@@ -99,7 +118,7 @@ lifecycle recovery by explicit device destruction. This is AMD Vulkan evidence;
 registry release admission and other platforms do not inherit it.
 
 The application matrix is
-`bench/out/compute-program/20260905-resident-fusion-matrix/summary.json`.
+`bench/out/compute-program/20260905-installed-package-matrix/summary.json`.
 It preserves the image, heat, and adapted external HoloScript LIF oracles and
 compares ordinary Doe, prepared Doe, Dawn, and Deno/wgpu. It validates legacy
 invocation-local work under the current arithmetic and receipt contracts.

@@ -1,12 +1,10 @@
 // One physical provider/process run; comparison and promotion are separate.
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, realpathSync } from 'node:fs';
+import { resolve, dirname, relative, isAbsolute } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import process from 'node:process';
-import { prepareComputeProgram } from '../../packages/doe-gpu/src/compute-program.js';
-import { registerTimestampSource } from '../../packages/doe-gpu/src/compute-program-timing.js';
-import { imageEdgesProgram, heatDiffusionProgram } from '../../packages/doe-gpu/examples/compute-programs.js';
 import { imageEdgesOracle, heatDiffusionOracle, compareNumerical } from '../oracles/compute-programs.mjs';
 import { stats } from '../shared/lib/stats.js';
 
@@ -16,9 +14,20 @@ const args = Object.fromEntries(process.argv.slice(2).map((arg) => {
   return [arg.slice(2, split), arg.slice(split + 1)];
 }));
 const allowed = new Set(['provider', 'application', 'policy', 'output', 'phase', 'backend']);
-if (Object.keys(args).some((key) => !allowed.has(key) && key !== 'hardware') || [...allowed].some((key) => !(key in args))) {
+const optional = new Set(['hardware', 'package-root', 'package-qualification']);
+if (Object.keys(args).some((key) => !allowed.has(key) && !optional.has(key)) || [...allowed].some((key) => !(key in args))) {
   throw new Error('Required: --provider= --application= --policy= --output= --phase=audit|measure --backend=vulkan|metal');
 }
+if (Boolean(args['package-root']) !== Boolean(args['package-qualification'])) {
+  throw new Error('Package root and qualification must be supplied together');
+}
+const packageRoot = resolve(args['package-root'] ?? 'packages/doe-gpu');
+const packageModule = (path) => pathToFileURL(resolve(packageRoot, path)).href;
+const { prepareComputeProgram } = await import(packageModule('src/compute-program.js'));
+const { registerTimestampSource } = await import(packageModule('src/compute-program-timing.js'));
+const { imageEdgesProgram, heatDiffusionProgram } = await import(packageModule('examples/compute-programs.js'));
+const qualificationBytes = args['package-qualification'] ? readFileSync(args['package-qualification']) : null;
+const qualification = qualificationBytes ? JSON.parse(qualificationBytes) : null;
 const policyBytes = readFileSync(args.policy);
 const policy = JSON.parse(policyBytes);
 const gpuTiming = policy.gpuTiming ?? 'off';
@@ -84,7 +93,9 @@ const inputPaths = Object.fromEntries(Object.entries(inputs).map(([id, value]) =
 }));
 writeFileSync(`${args.output}.expected.f64`, new Uint8Array(Float64Array.from(expected).buffer));
 const report = {
-  schemaVersion: 4, kind: 'compute_program_evaluation', claimStatus: 'diagnostic',
+  schemaVersion: 5, kind: 'compute_program_evaluation', claimStatus: 'diagnostic',
+  packageQualification: qualification ? { path: resolve(args['package-qualification']), hash: hash(qualificationBytes) } : null,
+  packageRoot: qualification ? packageRoot : null,
   provider: args.provider, application: args.application, phase: args.phase, backend: args.backend,
   policyHash: hash(policyBytes), programPath: `${args.output}.program.json`, inputPaths,
   fixturePath: fixtureReference?.path ?? null,
@@ -109,13 +120,27 @@ let providerOwner;
 try {
   const startup = performance.now();
   if (args.provider.startsWith('doe-')) {
-    const native = await import('../../packages/doe-gpu/src/native.js');
+    const native = await import(packageModule('src/native.js'));
     const adapter = await native.requestAdapter({ backend: args.backend });
     device = await adapter.requestDevice(deviceDescriptor);
     const provider = native.providerInfo();
     report.providerArtifact = { path: provider.doeLibraryPath, hash: hash(readFileSync(provider.doeLibraryPath)) };
+    if (qualification) {
+      const libraryRelative = relative(realpathSync(dirname(packageRoot)), realpathSync(provider.doeLibraryPath));
+      if (libraryRelative.startsWith('..') || isAbsolute(libraryRelative)
+          || qualification.status !== 'passed' || qualification.hosts.length !== 3
+          || qualification.hosts.some((host) => host.libraryHash !== report.providerArtifact.hash)) {
+        throw new Error('Loaded provider differs from the qualified package installation');
+      }
+    }
     const addonPath = process.report?.getReport().sharedObjects.find((path) => path.endsWith('/doe_napi.node'));
     if (!addonPath) throw new Error('Loaded Doe addon identity is unavailable from this host');
+    if (qualification) {
+      const addonRelative = relative(realpathSync(dirname(packageRoot)), realpathSync(addonPath));
+      if (addonRelative.startsWith('..') || isAbsolute(addonRelative)) {
+        throw new Error('Loaded Doe addon escaped the qualified package installation');
+      }
+    }
     const addonHash = hash(readFileSync(addonPath));
     const retainedAddon = resolve(dirname(args.output), `doe.${addonHash}.addon.node`);
     if (!existsSync(retainedAddon)) writeFileSync(retainedAddon, readFileSync(addonPath), { flag: 'wx' });

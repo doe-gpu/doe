@@ -272,6 +272,23 @@ in fresh directories, and exercise Node, Bun, and Electron. That harness runs
 the ordinary provider, repeated lifecycle, and plan regressions from the
 installed package. It grants neither registry publication nor release admission.
 
+Pass that retained summary to the existing evaluator with
+`program evaluate --package-qualification <summary.json>` instead of
+`--native-library`. The evaluator installs the same wrapper and platform
+archives offline with install scripts enabled, loads the installed program
+executor for every provider, and loads Doe's native library from that
+installation. The gate checks archive hashes, every packaged file, the
+qualification's host/library agreement, and the actual loaded library. Changed
+package bytes and mixed package sources fail before comparisons are admitted.
+Installed files, archives, install logs, and execution artifacts remain in the
+evaluation directory.
+
+Evaluation artifact version 5 adds `packageQualification` and `packageRoot`.
+Both are null for workspace-library evaluation; package evaluation binds the
+qualification hash and the installed wrapper path. Earlier evaluation versions
+retain their meanings and cannot carry these fields. This changes repository
+evaluation artifacts, not public compute-program descriptors or run receipts.
+
 ## Migration and evidence boundaries
 
 The Vulkan pipeline cache now treats precomputed hashes as lookup hints, not
