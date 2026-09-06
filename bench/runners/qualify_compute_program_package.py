@@ -82,6 +82,7 @@ def main() -> int:
                 shutil.copyfile(fixtures / 'native-release-candidate.mjs', scratch / 'candidate.mjs')
                 shutil.copyfile(fixtures / 'native-clean-install-lifecycle.mjs', scratch / 'lifecycle.mjs')
                 replacements = {'../../src/native.js': 'doe-gpu/native',
+                                '../../examples/live-simulation/': './node_modules/doe-gpu/examples/live-simulation/',
                                 '../../src/bun.js': 'doe-gpu',
                                 '../../src/compute-program.js': 'doe-gpu/compute-program',
                                 '../../src/vendor/webgpu/webgpu-constants.js': 'doe-gpu/native'}
@@ -97,6 +98,8 @@ def main() -> int:
                                ('normalization', 'timestamp-normalization')]
                 if args.platform_package == 'doe-gpu-linux-x64':
                     regressions.append(('resources', 'native-resource-retention'))
+                if host == 'node':
+                    regressions.append(('live-simulation', 'live-simulation'))
                 helper = (ROOT / 'packages/doe-gpu/test/integration/native-addon-test-helper.js').read_text()
                 for original, replacement in replacements.items():
                     helper = helper.replace(original, replacement)

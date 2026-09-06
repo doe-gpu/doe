@@ -80,6 +80,17 @@ is an explicit persistent-resource control. See `examples/compute-program.js`
 and `examples/compute-programs.js` for grayscale image processing and heat
 diffusion. This additive API does not establish an application speed claim.
 
+The Node terminal example `examples/live-simulation.js` keeps a heat field
+resident while checking edited shaders in a separate process. Generate a shader
+with `node examples/live-simulation.js --write-shader heat.wgsl`, then start with
+`node examples/live-simulation.js --backend vulkan --execution gpu-recorded`.
+Enter `edit heat.wgsl` after editing, `rate 0.1` to change parameters, or `quit`
+to close. `format new-format` proposes a state reset requiring `approve id` or
+`decline id`. Candidate tests and every active frame use an independent CPU
+reference. Activation pauses at an iteration boundary and reports that pause;
+candidate process cancellation does not preempt a GPU kernel. This application
+example is qualified separately from provider support on other hosts.
+
 Pass `gpuTiming: 'timestamp-query'` to opt into compute-pass GPU timing on a
 device with `timestamp-query` enabled. Current Doe calibration supports Vulkan
 with a matching addon and runtime. Vulkan query results are normalized on the

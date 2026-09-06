@@ -1,6 +1,7 @@
 // Provider-neutral DoeProof process execution for unchanged Node WebGPU apps.
 
 import { spawn } from 'node:child_process';
+import { terminateProcess } from './node-process-termination.js';
 import { createHash } from 'node:crypto';
 import { realpathSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
@@ -388,22 +389,6 @@ function normalizeOptions(options) {
   };
 }
 
-function terminateProcess(child, terminationScope) {
-  if (!child?.pid) return;
-  if (terminationScope === 'process-group') {
-    try {
-      process.kill(-child.pid, 'SIGKILL');
-      return;
-    } catch {
-      // Fall through to the direct child when the group is already gone.
-    }
-  }
-  try {
-    child.kill('SIGKILL');
-  } catch {
-    // The child already terminated.
-  }
-}
 
 function spawnProcess(configuration, provider, abortSignal, programObservation) {
   return new Promise((resolveProcess) => {

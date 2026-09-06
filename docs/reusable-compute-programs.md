@@ -25,6 +25,33 @@ external-application portfolio or general WebGPU conformance requirements.
 
 ## Execution and lifetime
 
+The shipped Node example at
+[`packages/doe-gpu/examples/live-simulation.js`](../packages/doe-gpu/examples/live-simulation.js)
+provides a terminal workspace for resident heat diffusion. Generate editable
+WGSL with `node packages/doe-gpu/examples/live-simulation.js --write-shader heat.wgsl`,
+then start the workspace with `--backend vulkan --execution gpu-recorded`.
+Enter `edit heat.wgsl` after changing the file, or `rate 0.1` to change the next
+iteration's parameter. `format new-format` proposes an explicitly different
+state interpretation; `approve id` and `decline id` resolve its reset decision.
+`cancel`, `save path.wgsl`, `status`, and `quit` manage the workspace.
+
+Candidates run in a separate bounded process against the unchanged independent
+heat reference and configured adversarial inputs while the old simulation
+continues. The active process pauses at an iteration boundary for assessment
+and activation; destructive edits stay paused for the exact reset decision.
+Activation prepares the replacement on the original device and reports its
+pause. The compiler is not made asynchronous by this example. Numerical failure
+in an active frame stops the workspace because already modified GPU state is
+not assumed recoverable. Cancellation closes candidate processes or waits for
+bounded active submissions; it does not preempt a kernel.
+
+Migration: this is an additive Node example using the existing program API.
+`config/live-simulation.json` owns its dimensions, reference tolerances, inputs,
+and process limits, with matching shipped assets. Heap limits constrain the
+JavaScript heap; reported worker RSS is host process memory, not GPU memory.
+The application fixes its GPU buffer extents and has no automatic backend
+fallback. Physical Metal and other hosts require separate application testing.
+
 Pass a device and select `gpu-recorded`, `native-recorded`, or `webgpu`. The recorded modes accept
 the registered Doe Node addon provider, also usable through Bun's Node addon
 support. It requires a native contract version supporting the declaration, derived at

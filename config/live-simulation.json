@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "width": 32,
+  "height": 32,
+  "rate": 0.125,
+  "minimumRate": 0,
+  "maximumRate": 0.25,
+  "frameIntervalMs": 20,
+  "statusEveryFrames": 25,
+  "requestTimeoutMs": 10000,
+  "maximumShaderBytes": 65536,
+  "maximumProcessOutputBytes": 1048576,
+  "maximumHeapMiB": 128,
+  "candidateSteps": 8,
+  "candidateRates": [
+    0,
+    0.125,
+    0.25
+  ],
+  "candidateInputs": [
+    "zero",
+    "hotspot",
+    "ramp",
+    "checkerboard"
+  ],
+  "absoluteTolerance": 1e-05,
+  "relativeTolerance": 1e-05
+}

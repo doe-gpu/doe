@@ -133,6 +133,13 @@ classified and cannot be promoted by benchmark results.
   approved, stale and forged approvals, identical-size format changes, version
   downgrade, and failed preparation with the original state still executable.
   Earlier descriptor versions retain their documented update behavior.
+- Live-edit applications preflight candidates against frozen independent tests
+  outside the process owning active state. Candidate authors supply WGSL, not
+  replacement acceptance code. Obsolete candidates, numerical rejection, exact
+  reset decisions, activation failure, cancellation, and reopening require
+  regressions across the actual package boundary. Continued simulation during
+  preflight does not imply asynchronous pipeline creation during activation.
+  Bounded submissions and process deadlines do not imply GPU kernel preemption.
 - Shader compilation failures preserve the responsible compiler stage, cause,
   and available WGSL source location through native wrappers and
   `getCompilationInfo()`. Regression coverage checks that subsequent compilations

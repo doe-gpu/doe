@@ -1,5 +1,23 @@
 # Reusable compute programs
 
+## Live simulation editing
+
+The shipped Node terminal example has a resident heat simulation, parameter
+changes, candidate preflight in a bounded process, obsolete-edit cancellation,
+independent numerical acceptance, explicit reset decisions, and activation at
+an iteration boundary. Every active frame is checked against the CPU stencil.
+The original simulation advances during preflight; replacement preparation on
+its device still pauses execution and reports its duration. This is an
+application loop over the existing program contract, with policy outside Zig.
+
+`packages/doe-gpu/test/integration/test-integration-live-simulation.js` exercises
+invalid and numerically wrong shaders, overlapping edits, unchanged state,
+changed state interpretation, stale/declined/approved resets, cancellation, and
+reopening. Package qualification runs the application on Node only. Physical
+Metal, prolonged memory testing, and an application performance advantage
+remain separate acceptance work. Commands and limits are in
+[reusable compute programs](../reusable-compute-programs.md).
+
 ## Explicit simulation state changes
 
 Descriptor version 3 adds application-owned resident state formats and exact-edit
@@ -15,8 +33,8 @@ Addon reflection failure qualification is retained in
 `bench/out/compute-program/20260906-explicit-failures-qualified/summary.json`;
 earlier package hashes retain their original scope. Subsequent native rendering
 ownership acceptance is tracked in [compiler and WebGPU](compiler-and-webgpu.md).
-Background preparation and a live-edit application remain the next integration
-work; this contract alone does not establish interactive responsiveness.
+The live-edit example above supplies application preflight and activation;
+this contract alone does not establish asynchronous pipeline preparation.
 
 ## Native recorded command ownership
 
