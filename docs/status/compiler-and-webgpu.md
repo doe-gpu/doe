@@ -3,6 +3,22 @@
 This is the live status front door for the non-TSIR WGSL compiler and WebGPU
 runtime path. Artifacts and executable tests own pass/fail state.
 
+## Active pass ownership
+
+The encoder's recording state now identifies its active pass. End unlocks the
+encoder; nested passes, encoder copy/query commands inside a pass, finish with
+an open pass, repeated end, and calls through an earlier ended pass invalidate
+recording. Releasing the caller's pass reference does not imply end. Draw state,
+bundles, pass queries, immediate-data entrypoints, and debug-marker entrypoints
+check the same owner before accessing retained pass state.
+
+Canonical regressions, the failing pre-fix C-boundary reproduction, corrected
+physical execution, and exact-package qualification are indexed at
+`bench/out/compute-program/20260906-pass-lifecycle/README.md`.
+This is pass-lifecycle acceptance, not complete WebGPU validation: debug-group
+nesting, query semantics, descriptor validation, and capability coverage still
+need their respective tests and implementation.
+
 ## Recording failures and submission ordering
 
 Ordinary encoders, render bundles, and query recording now retain explicit

@@ -5,6 +5,15 @@
 // These WebGPU-facing exports receive a logical DoeRenderPass. Dynamic state is
 // recorded with each draw and applied later to the backend command encoder.
 
+const recording = @import("../command/doe_command_recording.zig");
+const helpers = @import("../support/doe_native_object_helpers.zig");
+const objects = @import("../support/doe_native_object_types.zig");
+
+fn validatePass(raw: ?*anyopaque) void {
+    const pass = helpers.cast(objects.DoeRenderPass, raw) orelse return;
+    _ = recording.requirePass(pass.enc, @intFromPtr(pass));
+}
+
 extern fn doeNativeRenderPassRecordViewportState(
     pass_raw: ?*anyopaque,
     x: f64,
@@ -107,7 +116,7 @@ pub export fn doeNativeRenderPassPushDebugGroup(
 ) callconv(.c) void {
     // Debug labels do not affect execution and the logical pass does not own a
     // backend encoder until queue submission.
-    _ = encoder_raw;
+    validatePass(encoder_raw);
     _ = label_ptr;
     _ = label_len;
 }
@@ -119,7 +128,7 @@ pub export fn doeNativeRenderPassPushDebugGroup(
 pub export fn doeNativeRenderPassPopDebugGroup(
     encoder_raw: ?*anyopaque,
 ) callconv(.c) void {
-    _ = encoder_raw;
+    validatePass(encoder_raw);
 }
 
 // ============================================================
@@ -131,7 +140,7 @@ pub export fn doeNativeRenderPassInsertDebugMarker(
     label_ptr: ?[*]const u8,
     label_len: usize,
 ) callconv(.c) void {
-    _ = encoder_raw;
+    validatePass(encoder_raw);
     _ = label_ptr;
     _ = label_len;
 }

@@ -3,6 +3,7 @@
 // the core command/resource path modules.
 
 const std = @import("std");
+const recording = @import("doe_command_recording.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const render_bundle = @import("../../runtime/render/render_bundle.zig");
@@ -81,6 +82,7 @@ pub export fn doeNativeComputePassSetImmediates(
     data_len: usize,
 ) callconv(.c) void {
     const encoder = native_helpers.cast(native_types.DoeComputePass, encoder_raw) orelse return;
+    if (!recording.requirePass(encoder.enc, @intFromPtr(encoder))) return;
     const layout = if (encoder.pipeline) |pipeline| pipeline.layout else null;
     log_immediate_validation("compute", layout, index, data_ptr, data_len);
 }
@@ -92,6 +94,7 @@ pub export fn doeNativeRenderPassSetImmediates(
     data_len: usize,
 ) callconv(.c) void {
     const encoder = native_helpers.cast(native_types.DoeRenderPass, encoder_raw) orelse return;
+    if (!recording.requirePass(encoder.enc, @intFromPtr(encoder))) return;
     const layout = if (encoder.pipeline) |pipeline| pipeline.layout else null;
     log_immediate_validation("render pass", layout, index, data_ptr, data_len);
 }

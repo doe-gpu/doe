@@ -187,7 +187,7 @@ fn tryRepeatLastRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline
 
 pub export fn doeNativeComputePassSetPipeline(pass_raw: ?*anyopaque, pip_raw: ?*anyopaque) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     setPassPipeline(pass, cast(DoeComputePipeline, pip_raw));
 }
 
@@ -195,12 +195,12 @@ pub export fn doeNativeComputePassSetBindGroup(pass_raw: ?*anyopaque, index: u32
     _ = dyn_count;
     _ = dyn_offsets;
     const pass = cast(DoeComputePass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (index < MAX_COMPUTE_BIND_GROUPS) setPassBindGroup(pass, @intCast(index), cast(DoeBindGroup, bg_raw));
 }
 
 fn appendRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline, x: u32, y: u32, z: u32) void {
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (tryRepeatLastRecordedDispatch(pass, pip, x, y, z)) return;
     if (!validate_dispatch_preconditions(pass, pip, .{ x, y, z })) return;
     var cmd = RecordedCmd{ .dispatch = .{
@@ -243,7 +243,7 @@ fn appendRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline, x: u3
 
 pub export fn doeNativeComputePassDispatch(pass_raw: ?*anyopaque, x: u32, y: u32, z: u32) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     const pip = pass.pipeline orelse return;
     appendRecordedDispatch(pass, pip, x, y, z);
 }
@@ -257,7 +257,7 @@ pub export fn doeNativeComputePassDispatchBound(
     z: u32,
 ) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     const pip = cast(DoeComputePipeline, pip_raw) orelse return;
     setPassPipeline(pass, pip);
     setPassBindGroup(pass, 0, cast(DoeBindGroup, bg0_raw));
@@ -266,7 +266,8 @@ pub export fn doeNativeComputePassDispatchBound(
 
 pub export fn doeNativeComputePassEnd(raw: ?*anyopaque) callconv(.c) void {
     const pass = cast(DoeComputePass, raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
+    defer recording.endPass(pass.enc, @intFromPtr(pass));
     const query_set = pass.timestamp_end_query_set orelse return;
     const write_index = pass.timestamp_end_write_index;
     pass.timestamp_end_query_set = null;
@@ -282,20 +283,29 @@ pub export fn doeNativeComputePassEnd(raw: ?*anyopaque) callconv(.c) void {
 // ============================================================
 
 pub export fn doeNativeComputePassInsertDebugMarker(
-    _: ?*anyopaque,
+    raw: ?*anyopaque,
     _: ?[*]const u8,
     _: usize,
-) callconv(.c) void {}
+) callconv(.c) void {
+    const object = cast(DoeComputePass, raw) orelse return;
+    _ = recording.requirePass(object.enc, @intFromPtr(object));
+}
 
 pub export fn doeNativeComputePassPushDebugGroup(
-    _: ?*anyopaque,
+    raw: ?*anyopaque,
     _: ?[*]const u8,
     _: usize,
-) callconv(.c) void {}
+) callconv(.c) void {
+    const object = cast(DoeComputePass, raw) orelse return;
+    _ = recording.requirePass(object.enc, @intFromPtr(object));
+}
 
 pub export fn doeNativeComputePassPopDebugGroup(
-    _: ?*anyopaque,
-) callconv(.c) void {}
+    raw: ?*anyopaque,
+) callconv(.c) void {
+    const object = cast(DoeComputePass, raw) orelse return;
+    _ = recording.requirePass(object.enc, @intFromPtr(object));
+}
 
 pub export fn doeNativeComputePassRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeComputePass, raw)) |p| {
@@ -358,7 +368,7 @@ pub export fn doeNativeComputePipelineGetBindGroupLayout(pip_raw: ?*anyopaque, g
 
 pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_raw: ?*anyopaque, offset: u64) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     const pip = pass.pipeline orelse return;
     const indirect_buf = cast(DoeBuffer, buf_raw) orelse return;
     if (indirect_buf.error_object or indirect_buf.destroyed) return;

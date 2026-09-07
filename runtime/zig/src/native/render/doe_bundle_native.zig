@@ -343,6 +343,7 @@ test "failed bundle cannot replay into a valid command recording" {
     var device = DoeDevice{};
     var commands = native_types.DoeCommandEncoder{ .dev = &device };
     var pass = DoeRenderPass{ .enc = &commands };
+    pass.enc.state = .{ .pass = @intFromPtr(&pass) };
     const bundles = [_]?*anyopaque{result};
     doeNativeRenderPassExecuteBundles(toOpaque(&pass), bundles.len, &bundles);
     try std.testing.expectEqual(error.InvalidArgument, commands.state.failed);
@@ -370,20 +371,29 @@ pub export fn doeNativeRenderPipelineGetBindGroupLayout(
 // ============================================================
 
 pub export fn doeNativeRenderBundleEncoderInsertDebugMarker(
-    _: ?*anyopaque,
+    raw: ?*anyopaque,
     _: ?[*]const u8,
     _: usize,
-) callconv(.c) void {}
+) callconv(.c) void {
+    const object = bundle.cast_bundle_encoder(raw) orelse return;
+    _ = requireBundleOpen(object);
+}
 
 pub export fn doeNativeRenderBundleEncoderPushDebugGroup(
-    _: ?*anyopaque,
+    raw: ?*anyopaque,
     _: ?[*]const u8,
     _: usize,
-) callconv(.c) void {}
+) callconv(.c) void {
+    const object = bundle.cast_bundle_encoder(raw) orelse return;
+    _ = requireBundleOpen(object);
+}
 
 pub export fn doeNativeRenderBundleEncoderPopDebugGroup(
-    _: ?*anyopaque,
-) callconv(.c) void {}
+    raw: ?*anyopaque,
+) callconv(.c) void {
+    const object = bundle.cast_bundle_encoder(raw) orelse return;
+    _ = requireBundleOpen(object);
+}
 
 // ============================================================
 // Render pass: executeBundles
@@ -569,7 +579,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
     bundles: [*]const ?*anyopaque,
 ) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     const is_vulkan = pass.enc.dev.backend == .vulkan;
 
     for (bundles[0..bundle_count]) |raw| {

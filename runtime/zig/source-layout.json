@@ -3490,15 +3490,15 @@
       },
       "src/native/command/doe_encoder_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "69c933e41d7ad6082e853f5c50056d872b21e05b4cc075d67a4958b2e9274d3f",
-        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
-        "reviewer": "codex-recording-ownership/2026-09-06"
+        "moduleSha256": "337f2d760871add06a5d20abf080c5725e031641b1818a3f6093377c6816e718",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/command/doe_immediates_external_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "d80f37b28127656b6d7fdf82b397c01afc587d73b2aba04c2ab39452dee23cac",
-        "reason": "Keep: native immediate-data extension ABI boundary with independent validation semantics.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "89755976915d62036776b1f5f16b7a02ee283d9f07e9ab99576395643fae3b85",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/compute/doe_compute_bind_groups.zig": {
         "decision": "Keep",
@@ -3508,9 +3508,9 @@
       },
       "src/native/compute/doe_compute_ext_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "e132a9378588b9e9b879b64a27d4a3d16757a3a38cac6f0f6ef0f754143108dd",
-        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
-        "reviewer": "codex-recording-ownership/2026-09-06"
+        "moduleSha256": "09cf00f185789bfc76fa0eded288229a0e56d75598e1c8713d867ebf1b737d6f",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/compute/doe_compute_fast.zig": {
         "decision": "Keep",
@@ -3616,21 +3616,21 @@
       },
       "src/native/render/doe_bundle_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "ed09e36af017d24fd64ed13bfb34f50c60ceb19f21bcd2f114d449e086b1c571",
-        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
-        "reviewer": "codex-recording-ownership/2026-09-06"
+        "moduleSha256": "d87b6efc508220eaa950bcbe03c49c7adf06be3c892ab9ec66e99cfd9cfca1e4",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/render/doe_render_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "60373808388e6107cc6ac0257006d1cc6e4f851bbd3fa76b2140461a2cd13796",
-        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
-        "reviewer": "codex-recording-ownership/2026-09-06"
+        "moduleSha256": "7adc8da7c689dbb24cb3e014b5b0e2eb5bf2345f486bb3a25b034012c27c15b0",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/render/doe_render_pass_controls_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "1db22754e0008c1f10c9b21159e8adf9898f3d1b8cf38beebc3fcfe930aab94b",
-        "reason": "Keep: render-pass control extension ABI capsule.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "72090a2a8cfc74f48a16d2b6ba56fc28c063f25eecdf7e06677580c300769243",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/render/doe_render_pipeline_native.zig": {
         "decision": "Keep",
@@ -3670,9 +3670,9 @@
       },
       "src/native/resource/doe_query_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "bdcbb4196790f8d85bf4ce0694b2a405c8be537e5788f43a9077048145a161bd",
-        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
-        "reviewer": "codex-recording-ownership/2026-09-06"
+        "moduleSha256": "57b587586f5f4adff3d457c69fb5bc68d4e3d951ac160d2d9445da0efb6ee83c",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/resource/doe_texture_sampler_native.zig": {
         "decision": "Keep",
@@ -4306,15 +4306,15 @@
       },
       "src/contracts/command_recording.zig": {
         "decision": "Keep",
-        "moduleSha256": "a3084a364295d0ddbb3e2f0901f332134422db46141e5614ab78a497c4e1c986",
-        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
-        "reviewer": "codex-recording-ownership/2026-09-06"
+        "moduleSha256": "25f33482d0f54cd275c39b05aa47405c8953fdd68b00668a5d4f8b8a183d642e",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       },
       "src/native/command/doe_command_recording.zig": {
         "decision": "Keep",
-        "moduleSha256": "3798fd6861660681ad2bb262b7d23eed1948493125ba5651489751e79b568002",
-        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
-        "reviewer": "codex-recording-ownership/2026-09-06"
+        "moduleSha256": "0b7a6468a8366506d01d5a1d722f62390f35d1068606f46060752323d0e5658b",
+        "reason": "Keep: the encoder owns pass identity and recording lifetime; native adapters validate operations against that single state.",
+        "reviewer": "codex-pass-lifecycle/2026-09-06"
       }
     },
     "linePolicy": {

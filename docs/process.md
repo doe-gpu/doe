@@ -222,6 +222,13 @@ classified and cannot be promoted by benchmark results.
   execute only at submission, with source GPU writes visible at the recorded
   position. The native regression must reject an abandoned-copy side effect and
   check the submitted dispatch/texture-copy/readback result after caller release.
+  A command encoder owns exactly one active pass identity. Pass operations must
+  match it; end returns the encoder to open recording, while caller release does
+  not end a pass. Nested passes, finish during a pass, encoder commands inside a
+  pass, and stale or repeated pass operations invalidate the recording. Canonical
+  and native C-boundary tests must check rejected recording and submission, then
+  execute valid work on the same device. Debug and immediate-data entrypoints
+  must validate pass lifetime before reading its retained state.
   Native-direct package tests also reject duplicate and consumed submissions,
   verify writable mapping copy-back and read-only mapping isolation, and require
   mapped-range detachment on unmap. Run the same test in every qualified host.

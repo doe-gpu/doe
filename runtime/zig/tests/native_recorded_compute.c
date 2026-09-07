@@ -29,6 +29,64 @@ static void map_ready(WGPUMapAsyncStatus status, WGPUStringView message, void* r
     *(bool*)result = status == WGPUMapAsyncStatus_Success;
 }
 
+static void scope_ready(WGPUPopErrorScopeStatus status, WGPUErrorType type, WGPUStringView message,
+                        void* result, void* unused) {
+    (void)message; (void)unused;
+    *(bool*)result = status == WGPUPopErrorScopeStatus_Success && type == WGPUErrorType_Validation;
+}
+
+static bool pop_validation(WGPUInstance instance, WGPUDevice device) {
+    bool validation = false;
+    WGPUPopErrorScopeCallbackInfo callback = WGPU_POP_ERROR_SCOPE_CALLBACK_INFO_INIT;
+    callback.mode = WGPUCallbackMode_AllowSpontaneous;
+    callback.callback = scope_ready;
+    callback.userdata1 = &validation;
+    wgpuDevicePopErrorScope(device, callback);
+    wgpuInstanceProcessEvents(instance);
+    return validation;
+}
+
+static bool invalid_pass_lifetimes(WGPUInstance instance, WGPUDevice device, WGPUQueue queue) {
+    enum { FINISH_OPEN, END_TWICE, STALE_PASS, NESTED_PASS, PASS_CASE_COUNT };
+    for (unsigned scenario = 0; scenario < PASS_CASE_COUNT; ++scenario) {
+        WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, NULL);
+        if (!encoder) return false;
+        WGPUComputePassEncoder pass = wgpuCommandEncoderBeginComputePass(encoder, NULL);
+        if (!pass) { wgpuCommandEncoderRelease(encoder); return false; }
+        WGPUComputePassEncoder next = NULL;
+        wgpuDevicePushErrorScope(device, WGPUErrorFilter_Validation);
+        if (scenario == END_TWICE) {
+            wgpuComputePassEncoderEnd(pass);
+            wgpuComputePassEncoderEnd(pass);
+        } else if (scenario == STALE_PASS) {
+            wgpuComputePassEncoderEnd(pass);
+            next = wgpuCommandEncoderBeginComputePass(encoder, NULL);
+            wgpuComputePassEncoderInsertDebugMarker(pass, (WGPUStringView){"stale", 5});
+        } else if (scenario == NESTED_PASS) {
+            next = wgpuCommandEncoderBeginComputePass(encoder, NULL);
+        }
+        WGPUCommandBuffer commands = wgpuCommandEncoderFinish(encoder, NULL);
+        const bool rejected_recording = pop_validation(instance, device);
+        if (next) wgpuComputePassEncoderRelease(next);
+        wgpuComputePassEncoderRelease(pass);
+        wgpuCommandEncoderRelease(encoder);
+        bool rejected_submit = false;
+        if (commands) {
+            wgpuDevicePushErrorScope(device, WGPUErrorFilter_Validation);
+            wgpuQueueSubmit(queue, 1, &commands);
+            rejected_submit = pop_validation(instance, device);
+            wgpuCommandBufferRelease(commands);
+        }
+        if (!rejected_recording || !rejected_submit) {
+            fprintf(stderr, "native pass lifecycle failed: case=%u recording=%u submission=%u\n",
+                scenario, rejected_recording, rejected_submit);
+            return false;
+        }
+    }
+    printf("passed: open, ended, stale, and nested passes reject recording and submission\n");
+    return true;
+}
+
 static bool texture_is_zero(WGPUInstance instance, WGPUDevice device, WGPUQueue queue,
                             WGPUTexture texture, WGPUBuffer readback) {
     WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, NULL);
@@ -235,7 +293,7 @@ int main(void) {
     wgpuInstanceProcessEvents(instance);
     if (!device) goto cleanup;
     queue = wgpuDeviceGetQueue(device);
-    if (queue && execute(instance, device, queue, false, false) &&
+    if (queue && invalid_pass_lifetimes(instance, device, queue) && execute(instance, device, queue, false, false) &&
         execute(instance, device, queue, true, false) && execute(instance, device, queue, false, true)) result = 0;
 cleanup:
     if (queue) wgpuQueueRelease(queue);

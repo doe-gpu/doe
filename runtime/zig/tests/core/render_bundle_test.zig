@@ -314,6 +314,7 @@ test "executeBundles replays indexed indirect bundles with fresh replay state" {
     defer command_references.releaseAll(&cmd_enc.references);
 
     var render_pass = make_native_render_pass(&cmd_enc);
+    render_pass.enc.state = .{ .pass = @intFromPtr(&render_pass) };
 
     var pipeline_token_a: u8 = 0;
     var vertex_token_a: u8 = 0;
@@ -402,6 +403,7 @@ test "executeBundles skips indexed indirect draws without an index buffer" {
     defer command_references.releaseAll(&cmd_enc.references);
 
     var render_pass = make_native_render_pass(&cmd_enc);
+    render_pass.enc.state = .{ .pass = @intFromPtr(&render_pass) };
 
     var indirect_token: u8 = 0;
 
@@ -427,6 +429,7 @@ test "executeBundles preserves render pass ops and bundle pipeline metadata" {
     defer command_references.releaseAll(&cmd_enc.references);
 
     var render_pass = make_native_render_pass(&cmd_enc);
+    render_pass.enc.state = .{ .pass = @intFromPtr(&render_pass) };
     render_pass.color_load_op = 0x00000002;
     render_pass.color_store_op = 0x00000001;
     render_pass.clear_a = 1;

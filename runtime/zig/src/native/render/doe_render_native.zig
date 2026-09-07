@@ -85,7 +85,7 @@ fn renderPassMaxDrawCount(desc: *const abi_pipeline.WGPURenderPassDescriptor) u6
 }
 
 fn reserve_render_draw(pass: *DoeRenderPass) bool {
-    if (!recording.requireOpen(pass.enc)) return false;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return false;
     if (pass.recorded_draw_count >= pass.max_draw_count) {
         std.log.err("doe: render pass draw rejected: maxDrawCount={} exhausted", .{pass.max_draw_count});
         return false;
@@ -111,6 +111,7 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
         .owns_encoder = true,
         .recorded_command_start = enc.cmds.items.len,
     };
+    enc.state = .{ .pass = @intFromPtr(pass) };
     if (desc) |d| {
         pass.max_draw_count = renderPassMaxDrawCount(d);
         pass.occlusion_query_set = d.occlusionQuerySet;
@@ -176,7 +177,7 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
 
 pub export fn doeNativeRenderPassSetPipeline(pass_raw: ?*anyopaque, pip_raw: ?*anyopaque) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     pass.pipeline = cast(DoeRenderPipeline, pip_raw);
     if (pass.pipeline) |pipeline| {
         if (!recording.reserve(pass.enc, 0, 1)) return;
@@ -196,7 +197,7 @@ pub export fn doeNativeRenderPassRecordViewportState(
     max_depth: f64,
 ) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     pass.viewport_x = @floatCast(x);
     pass.viewport_y = @floatCast(y);
     pass.viewport_width = @floatCast(width);
@@ -213,7 +214,7 @@ pub export fn doeNativeRenderPassRecordScissorState(
     height: u32,
 ) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     pass.scissor_x = x;
     pass.scissor_y = y;
     pass.scissor_width = width;
@@ -228,7 +229,7 @@ pub export fn doeNativeRenderPassRecordBlendConstantState(
     a: f64,
 ) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     pass.blend_constant = .{
         @floatCast(r),
         @floatCast(g),
@@ -242,13 +243,13 @@ pub export fn doeNativeRenderPassRecordStencilReferenceState(
     reference: u32,
 ) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     pass.stencil_reference = reference;
 }
 
 pub export fn doeNativeRenderPassDraw(pass_raw: ?*anyopaque, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (!reserve_render_draw(pass)) return;
     if (pass.enc.dev.backend == .vulkan) {
         const vk_render = @import("../vulkan/vulkan_render_native.zig");
@@ -269,7 +270,7 @@ pub export fn doeNativeRenderPassDraw(pass_raw: ?*anyopaque, vertex_count: u32, 
 
 pub export fn doeNativeRenderPassSetVertexBuffer(pass_raw: ?*anyopaque, slot: u32, buffer_raw: ?*anyopaque, offset: u64, size: u64) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (slot >= native_shared.MAX_VERTEX_BUFFERS) return;
     const buffer = cast(DoeBuffer, buffer_raw);
     if (buffer != null and buffer.?.error_object) return;
@@ -284,7 +285,7 @@ pub export fn doeNativeRenderPassSetVertexBuffer(pass_raw: ?*anyopaque, slot: u3
 
 pub export fn doeNativeRenderPassSetIndexBuffer(pass_raw: ?*anyopaque, buffer_raw: ?*anyopaque, format: u32, offset: u64, size: u64) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     const buffer = cast(DoeBuffer, buffer_raw);
     if (buffer != null and buffer.?.error_object) return;
     if (buffer) |value| {
@@ -299,7 +300,7 @@ pub export fn doeNativeRenderPassSetIndexBuffer(pass_raw: ?*anyopaque, buffer_ra
 
 pub export fn doeNativeRenderPassSetBindGroup(pass_raw: ?*anyopaque, group_index: u32, group_raw: ?*anyopaque, dynamic_offset_count: usize, dynamic_offsets: ?[*]const u32) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (group_index >= native_shared.MAX_RENDER_BIND_GROUPS) return;
     pass.bind_groups[group_index] = cast(DoeBindGroup, group_raw);
     if (pass.bind_groups[group_index]) |group| {
@@ -312,7 +313,7 @@ pub export fn doeNativeRenderPassSetBindGroup(pass_raw: ?*anyopaque, group_index
 
 pub export fn doeNativeRenderPassDrawIndexed(pass_raw: ?*anyopaque, index_count: u32, instance_count: u32, first_index: u32, base_vertex: i32, first_instance: u32) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (!reserve_render_draw(pass)) return;
     if (pass.enc.dev.backend == .vulkan) {
         const vk_render = @import("../vulkan/vulkan_render_native.zig");
@@ -428,7 +429,7 @@ fn base_render_cmd(pass: *DoeRenderPass, pip: ?*DoeRenderPipeline) RecordedRende
 
 pub export fn doeNativeRenderPassDrawIndirect(pass_raw: ?*anyopaque, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (!reserve_render_draw(pass)) return;
     if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| {
         if (!recording.reserve(pass.enc, 0, 1)) return;
@@ -451,7 +452,7 @@ pub export fn doeNativeRenderPassDrawIndirect(pass_raw: ?*anyopaque, indirect_bu
 
 pub export fn doeNativeRenderPassDrawIndexedIndirect(pass_raw: ?*anyopaque, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     if (!reserve_render_draw(pass)) return;
     if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| {
         if (!recording.reserve(pass.enc, 0, 1)) return;
@@ -479,7 +480,8 @@ pub export fn doeNativeRenderPassDrawIndexedIndirect(pass_raw: ?*anyopaque, indi
 
 pub export fn doeNativeRenderPassEnd(raw: ?*anyopaque) callconv(.c) void {
     const pass = cast(DoeRenderPass, raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
+    defer recording.endPass(pass.enc, @intFromPtr(pass));
     if (pass.enc.dev.backend == .vulkan) {
         const vk_render = @import("../vulkan/vulkan_render_native.zig");
         vk_render.vulkan_render_pass_end(pass);
@@ -552,6 +554,7 @@ test "Metal render commands snapshot logical dynamic state" {
     var enc: DoeCommandEncoder = .{ .dev = &dev };
     defer enc.cmds.deinit(alloc);
     var pass: DoeRenderPass = .{ .enc = &enc };
+    enc.state = .{ .pass = @intFromPtr(&pass) };
 
     doeNativeRenderPassRecordViewportState(toOpaque(&pass), 1, 2, 31, 29, 0.25, 0.75);
     doeNativeRenderPassRecordScissorState(toOpaque(&pass), 3, 4, 23, 19);

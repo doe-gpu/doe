@@ -1,0 +1,5 @@
+backend=6 adapter=4 vendor=4098 device=5510 GPU=Radeon 8060S Graphics (RADV STRIX_HALO) description=Radeon 8060S Graphics (RADV STRIX_HALO)
+passed: open, ended, stale, and nested passes reject recording and submission
+passed: single native constructor, failed construction, caller release, dispatch/copy/readback
+passed: batch native constructor, failed construction, caller release, dispatch/copy/readback
+passed: abandoned texture copy, caller release, ordered GPU dispatch/texture copy/readback

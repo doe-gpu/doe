@@ -18,8 +18,24 @@ pub fn requireOpen(encoder: *objects.DoeCommandEncoder) bool {
     return false;
 }
 
+pub fn requireRecording(encoder: *objects.DoeCommandEncoder) bool {
+    if (encoder.state == .open or encoder.state == .pass) return true;
+    fail(encoder, error.InvalidState);
+    return false;
+}
+
+pub fn requirePass(encoder: *objects.DoeCommandEncoder, identity: usize) bool {
+    if (encoder.state == .pass and encoder.state.pass == identity) return true;
+    fail(encoder, error.InvalidState);
+    return false;
+}
+
+pub fn endPass(encoder: *objects.DoeCommandEncoder, identity: usize) void {
+    if (encoder.state == .pass and encoder.state.pass == identity) encoder.state = .open;
+}
+
 pub fn reserve(encoder: *objects.DoeCommandEncoder, command_count: usize, reference_count: usize) bool {
-    if (!requireOpen(encoder)) return false;
+    if (!requireRecording(encoder)) return false;
     encoder.cmds.ensureUnusedCapacity(encoder.allocator, command_count) catch |err| {
         fail(encoder, err);
         return false;

@@ -68,6 +68,7 @@ pub export fn doeNativeCommandEncoderBeginComputePass(enc_raw: ?*anyopaque, desc
         recording.fail(enc, err);
         return null;
     };
+    enc.state = .{ .pass = @intFromPtr(pass) };
     var timestamp_end_query_set: ?*anyopaque = null;
     var timestamp_end_write_index = native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX;
     if (desc) |d| {
@@ -232,20 +233,29 @@ pub export fn doeNativeCommandBufferRelease(raw: ?*anyopaque) callconv(.c) void 
 // ============================================================
 
 pub export fn doeNativeCommandEncoderInsertDebugMarker(
-    _: ?*anyopaque,
+    raw: ?*anyopaque,
     _: ?[*]const u8,
     _: usize,
-) callconv(.c) void {}
+) callconv(.c) void {
+    const object = cast(DoeCommandEncoder, raw) orelse return;
+    _ = recording.requireOpen(object);
+}
 
 pub export fn doeNativeCommandEncoderPushDebugGroup(
-    _: ?*anyopaque,
+    raw: ?*anyopaque,
     _: ?[*]const u8,
     _: usize,
-) callconv(.c) void {}
+) callconv(.c) void {
+    const object = cast(DoeCommandEncoder, raw) orelse return;
+    _ = recording.requireOpen(object);
+}
 
 pub export fn doeNativeCommandEncoderPopDebugGroup(
-    _: ?*anyopaque,
-) callconv(.c) void {}
+    raw: ?*anyopaque,
+) callconv(.c) void {
+    const object = cast(DoeCommandEncoder, raw) orelse return;
+    _ = recording.requireOpen(object);
+}
 
 test "recorded copies transfer resource ownership to command buffers" {
     var device = DoeDevice{};
@@ -450,4 +460,81 @@ test "failed recording finishes as an error object and cannot submit or resume" 
     try std.testing.expectEqual(error.InvalidState, valid_encoder.state.failed);
     try std.testing.expectEqual(@as(usize, 0), valid_encoder.cmds.items.len);
     try std.testing.expectEqual(@as(u32, 1), buffer.ref_count);
+}
+
+test "an ended pass cannot mutate a later pass sharing its encoder" {
+    const compute = @import("../compute/doe_compute_ext_native.zig");
+    const render = @import("../render/doe_render_native.zig");
+    var device = DoeDevice{};
+    var pipeline = native_types.DoeComputePipeline{};
+    const encoder = try createEncoder(std.testing.allocator, &device);
+    defer doeNativeCommandEncoderRelease(toOpaque(encoder));
+    const old_pass = doeNativeCommandEncoderBeginComputePass(toOpaque(encoder), null).?;
+    defer compute.doeNativeComputePassRelease(old_pass);
+    compute.doeNativeComputePassEnd(old_pass);
+    try std.testing.expect(encoder.state == .open);
+    const next_pass = render.doeNativeCommandEncoderBeginRenderPass(toOpaque(encoder), null).?;
+    defer render.doeNativeRenderPassRelease(next_pass);
+    try std.testing.expectEqual(@intFromPtr(next_pass), encoder.state.pass);
+    compute.doeNativeComputePassSetPipeline(old_pass, toOpaque(&pipeline));
+    try std.testing.expectEqual(error.InvalidState, encoder.state.failed);
+    try std.testing.expectEqual(@as(u32, 1), pipeline.ref_count);
+    const commands = doeNativeCommandEncoderFinish(toOpaque(encoder), null).?;
+    defer doeNativeCommandBufferRelease(commands);
+    try std.testing.expect(cast(DoeCommandBuffer, commands).?.error_object);
+}
+
+test "open passes reject encoder commands nested passes and finish without implicit end" {
+    const compute = @import("../compute/doe_compute_ext_native.zig");
+    const render = @import("../render/doe_render_native.zig");
+    const InvalidOperation = enum { copy, timestamp, nested_compute, nested_render, finish, second_end };
+    var device = DoeDevice{};
+    var buffer = DoeBuffer{ .size = 32 };
+    var query = query_native.DoeQuerySet{ .count = 1 };
+    for (std.enums.values(InvalidOperation)) |operation| {
+        const encoder = try createEncoder(std.testing.allocator, &device);
+        defer doeNativeCommandEncoderRelease(toOpaque(encoder));
+        const pass = doeNativeCommandEncoderBeginComputePass(toOpaque(encoder), null).?;
+        defer compute.doeNativeComputePassRelease(pass);
+        switch (operation) {
+            .copy => doeNativeCopyBufferToBuffer(toOpaque(encoder), toOpaque(&buffer), 0, toOpaque(&buffer), 16, 16),
+            .timestamp => query_native.doeNativeCommandEncoderWriteTimestamp(toOpaque(encoder), toOpaque(&query), 0),
+            .nested_compute => try std.testing.expect(doeNativeCommandEncoderBeginComputePass(toOpaque(encoder), null) == null),
+            .nested_render => try std.testing.expect(render.doeNativeCommandEncoderBeginRenderPass(toOpaque(encoder), null) == null),
+            .finish => {},
+            .second_end => {
+                compute.doeNativeComputePassEnd(pass);
+                compute.doeNativeComputePassEnd(pass);
+            },
+        }
+        const commands = doeNativeCommandEncoderFinish(toOpaque(encoder), null).?;
+        defer doeNativeCommandBufferRelease(commands);
+        try std.testing.expect(cast(DoeCommandBuffer, commands).?.error_object);
+        try std.testing.expectEqual(@as(usize, 0), cast(DoeCommandBuffer, commands).?.cmds.items.len);
+    }
+    try std.testing.expectEqual(@as(u32, 1), buffer.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), query.ref_count);
+    try std.testing.expectEqual(@as(u32, 1), device.ref_count);
+}
+
+test "ended render passes reject stale draws and release does not imply end" {
+    const render = @import("../render/doe_render_native.zig");
+    var device = DoeDevice{};
+    const encoder = try createEncoder(std.testing.allocator, &device);
+    defer doeNativeCommandEncoderRelease(toOpaque(encoder));
+    const pass = render.doeNativeCommandEncoderBeginRenderPass(toOpaque(encoder), null).?;
+    render.doeNativeRenderPassEnd(pass);
+    try std.testing.expect(encoder.state == .open);
+    const before = encoder.cmds.items.len;
+    render.doeNativeRenderPassDraw(pass, 3, 1, 0, 0);
+    try std.testing.expectEqual(error.InvalidState, encoder.state.failed);
+    try std.testing.expectEqual(before, encoder.cmds.items.len);
+    render.doeNativeRenderPassRelease(pass);
+    const abandoned = try createEncoder(std.testing.allocator, &device);
+    defer doeNativeCommandEncoderRelease(toOpaque(abandoned));
+    const unfinished = render.doeNativeCommandEncoderBeginRenderPass(toOpaque(abandoned), null).?;
+    render.doeNativeRenderPassRelease(unfinished);
+    const commands = doeNativeCommandEncoderFinish(toOpaque(abandoned), null).?;
+    defer doeNativeCommandBufferRelease(commands);
+    try std.testing.expect(cast(DoeCommandBuffer, commands).?.error_object);
 }

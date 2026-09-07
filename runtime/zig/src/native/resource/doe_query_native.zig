@@ -124,7 +124,9 @@ pub fn doeNativeCommandEncoderWriteTimestampWithPosition(
     position: native_cmds.TimestampWritePosition,
 ) void {
     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
-    if (!recording.requireOpen(enc)) return;
+    if (position == .command) {
+        if (!recording.requireOpen(enc)) return;
+    } else if (!recording.requireRecording(enc)) return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     if (qs.destroyed or query_index >= qs.count) return;
     if (!recording.reserve(enc, 1, 1)) return;
@@ -448,7 +450,7 @@ pub export fn doeNativeRenderPassBeginOcclusionQuery(
     query_index: u32,
 ) callconv(.c) void {
     const pass = native_helpers.cast(native_types.DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     const qs_raw = pass.occlusion_query_set orelse return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     if (qs.query_type != WGPU_QUERY_TYPE_OCCLUSION) return;
@@ -468,7 +470,7 @@ pub export fn doeNativeRenderPassEndOcclusionQuery(
     pass_raw: ?*anyopaque,
 ) callconv(.c) void {
     const pass = native_helpers.cast(native_types.DoeRenderPass, pass_raw) orelse return;
-    if (!recording.requireOpen(pass.enc)) return;
+    if (!recording.requirePass(pass.enc, @intFromPtr(pass))) return;
     pass.occlusion_query_active = false;
 }
 const log = std.log.scoped(.doe_query_native);

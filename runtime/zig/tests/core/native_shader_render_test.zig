@@ -476,6 +476,7 @@ test "doeNativeRenderPassDraw records D3D12 attachment view metadata" {
         .blend_constant = .{ 0.1, 0.2, 0.3, 0.4 },
         .stencil_reference = 9,
     };
+    pass.enc.state = .{ .pass = @intFromPtr(&pass) };
 
     render.doeNativeRenderPassDraw(native.toOpaque(&pass), 6, 2, 1, 0);
 
@@ -529,6 +530,7 @@ test "Metal render pass records one encoder boundary across multiple draws" {
         .color_load_op = 2,
         .color_store_op = 1,
     };
+    pass.enc.state = .{ .pass = @intFromPtr(&pass) };
 
     render.doeNativeRenderPassDraw(native.toOpaque(&pass), 3, 1, 0, 0);
     render.doeNativeRenderPassDraw(native.toOpaque(&pass), 6, 2, 0, 0);
@@ -563,6 +565,7 @@ test "Metal empty render pass records attachment operations" {
         .color_store_op = 1,
         .clear_r = 0.25,
     };
+    pass.enc.state = .{ .pass = @intFromPtr(&pass) };
 
     render.doeNativeRenderPassEnd(native.toOpaque(&pass));
 
@@ -789,6 +792,7 @@ test "doeNativeRenderPass occlusion query toggles pass state for occlusion query
     var dev = native.DoeDevice{};
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     var pass = native.DoeRenderPass{ .enc = &enc };
+    pass.enc.state = .{ .pass = @intFromPtr(&pass) };
     var qs = query.DoeQuerySet{
         .count = 3,
         .query_type = WGPU_QUERY_TYPE_OCCLUSION,
@@ -808,6 +812,7 @@ test "doeNativeRenderPassBeginOcclusionQuery ignores non-occlusion query sets" {
     var dev = native.DoeDevice{};
     var enc = native.DoeCommandEncoder{ .dev = &dev };
     var pass = native.DoeRenderPass{ .enc = &enc };
+    pass.enc.state = .{ .pass = @intFromPtr(&pass) };
     var qs = query.DoeQuerySet{
         .count = 3,
         .query_type = types.WGPUQueryType_Timestamp,
@@ -1316,6 +1321,7 @@ test "DoeRenderPass default bind_groups are all null" {
     dev.* = .{};
     var enc = native.DoeCommandEncoder{ .dev = dev };
     const pass = native.DoeRenderPass{ .enc = &enc };
+    pass.enc.state = .{ .pass = @intFromPtr(&pass) };
     for (pass.bind_groups) |bg| {
         try std.testing.expect(bg == null);
     }

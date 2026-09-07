@@ -1,0 +1,37 @@
+thread 2230237 panic: required file not found
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/std/posix.zig:1861:23: 0x11295a7 in openatZ (std.zig)
+            .NOENT => return error.FileNotFound,
+                      ^
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/std/fs/Dir.zig:904:16: 0x110f3e2 in openFileZ (std.zig)
+    const fd = try posix.openatZ(self.fd, sub_path, os_flags, 0);
+               ^
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/std/fs/Dir.zig:851:5: 0x10d2fe5 in openFile (std.zig)
+    return self.openFileZ(&path_c, flags);
+    ^
+/home/x/deco/doe/runtime/zig/build.zig:138:9: 0x137029e in readFileAlloc (build.zig)
+        @panic("required file not found");
+        ^
+/home/x/deco/doe/runtime/zig/build.zig:228:31: 0x12d62b4 in loadLeanToolchainRefAlloc (build.zig)
+    const json = readFileAlloc(allocator, "../../config/toolchains.json", 64 * 1024);
+                              ^
+/home/x/deco/doe/runtime/zig/build.zig:244:56: 0x1292b00 in loadProofProvenance (build.zig)
+        .lean_toolchain_ref = loadLeanToolchainRefAlloc(allocator),
+                                                       ^
+/home/x/deco/doe/runtime/zig/build.zig:404:49: 0x12255d0 in build (build.zig)
+    const proof_provenance = loadProofProvenance(b.allocator);
+                                                ^
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/std/Build.zig:2214:33: 0x11f60da in runBuild__anon_23568 (std.zig)
+        .void => build_zig.build(b),
+                                ^
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/compiler/build_runner.zig:366:29: 0x11dbff1 in main (build_runner.zig)
+        try builder.runBuild(root);
+                            ^
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/std/start.zig:627:37: 0x11e2c69 in posixCallMainAndExit (std.zig)
+            const result = root.main() catch |err| {
+                                    ^
+/home/x/.local/zig/zig-x86_64-linux-0.15.2/lib/std/start.zig:232:5: 0x11c1351 in _start (std.zig)
+    asm volatile (switch (native_arch) {
+    ^
+???:?:?: 0x0 in ??? (???)
+error: the following build command crashed:
+runtime/zig/.zig-cache/o/9fe38702b4a0f029bfbe48991750e32b/build /home/x/.local/zig/zig-x86_64-linux-0.15.2/zig /home/x/.local/zig/zig-x86_64-linux-0.15.2/lib runtime/zig runtime/zig/.zig-cache /home/x/.cache/zig --seed 0xc630c5f8 -Z90bb96e45d1ac862 test test-wgsl --summary all

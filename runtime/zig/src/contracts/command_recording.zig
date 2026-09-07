@@ -2,6 +2,7 @@ pub const Failure = error{ OutOfMemory, InvalidState, InvalidArgument };
 
 pub const State = union(enum) {
     open,
+    pass: usize,
     failed: Failure,
     finished,
 
