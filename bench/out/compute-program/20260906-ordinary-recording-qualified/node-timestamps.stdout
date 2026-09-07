@@ -1,0 +1,5 @@
+ok: timestamp run 0, fresh ordered queries and exact shader output
+ok: timestamp run 1, fresh ordered queries and exact shader output
+ok: timestamp run 2, fresh ordered queries and exact shader output
+ok: timestamp run 3, fresh ordered queries and exact shader output
+ok: native query nanoseconds agree with independent CPU completion bounds

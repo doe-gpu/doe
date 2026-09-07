@@ -87,9 +87,9 @@ pub const Builder = struct {
         vulkan.populateRecordedDispatchBindingState(pipeline, &request.bind_groups, &command.dispatch);
         if (commands.tryMergeDispatchIntoLast(&buffer.cmds, &command)) return;
         try reserve(buffer, reference_count);
-        references.retainPipeline(buffer.allocator, &buffer.references, pipeline);
+        references.retainPipelineAssumeCapacity(&buffer.references, pipeline);
         for (request.bind_groups) |maybe_group| if (maybe_group) |group| {
-            references.retainBindGroup(buffer.allocator, &buffer.references, group);
+            references.retainBindGroupAssumeCapacity(&buffer.references, group);
         };
         buffer.cmds.appendAssumeCapacity(command);
     }
@@ -102,8 +102,8 @@ pub const Builder = struct {
         if (source.error_object or source.destroyed or destination.error_object or destination.destroyed)
             return error.InvalidArgument;
         try reserve(buffer, 2);
-        references.retainBuffer(buffer.allocator, &buffer.references, source);
-        references.retainBuffer(buffer.allocator, &buffer.references, destination);
+        references.retainBufferAssumeCapacity(&buffer.references, source);
+        references.retainBufferAssumeCapacity(&buffer.references, destination);
         buffer.cmds.appendAssumeCapacity(.{ .copy_buf = .{
             .src = helpers.toOpaque(source),
             .src_off = request.source_offset,

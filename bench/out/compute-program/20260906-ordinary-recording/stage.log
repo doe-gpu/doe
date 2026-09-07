@@ -1,0 +1,4 @@
+node ../doe-gpu/scripts/stage-platform-package.js
+cwd: packages/doe-gpu-linux-x64
+exit: 0
+doe-gpu: staged doe-gpu-linux-x64 from workspace artifacts

@@ -212,6 +212,16 @@ classified and cannot be promoted by benchmark results.
   single and batched constructor outputs after caller release. Its library hash
   must match the retained package. The addon's ordinary encoding helper is a
   different path and cannot stand in for this native-constructor check.
+  Ordinary encoder, bundle, and query recording failures must poison recording
+  instead of aborting or publishing usable partial work. Fault-injection tests
+  cover recording and finish allocations, retained references, invalid bundle
+  replay, rejected queue submission, and a subsequent valid encoder. Error
+  command buffers cannot enter prepared execution. This changes failure handling
+  behind existing WebGPU signatures and error categories; no public descriptor,
+  config, trace, or receipt fields are added. Vulkan buffer-to-texture copies
+  execute only at submission, with source GPU writes visible at the recorded
+  position. The native regression must reject an abandoned-copy side effect and
+  check the submitted dispatch/texture-copy/readback result after caller release.
   Native-direct package tests also reject duplicate and consumed submissions,
   verify writable mapping copy-back and read-only mapping isolation, and require
   mapped-range detachment on unmap. Run the same test in every qualified host.

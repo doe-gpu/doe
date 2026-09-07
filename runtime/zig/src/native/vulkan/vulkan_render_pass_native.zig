@@ -1,3 +1,4 @@
+const recording = @import("../command/doe_command_recording.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const binding_contract = @import("../../contracts/binding.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
@@ -189,11 +190,11 @@ fn base_vulkan_render_cmd(pass: *shared.DoeRenderPass) model_render_types.Render
 }
 
 fn recordRender(pass: *shared.DoeRenderPass, cmd: model_render_types.RenderDrawCommand, clear_only: bool) void {
-    pass.enc.cmds.append(native_helpers.alloc, .{ .vulkan_render = .{
+    if (!recording.append(pass.enc, .{ .vulkan_render = .{
         .command = cmd,
         .pipeline = if (pass.pipeline) |pipeline| native_helpers.toOpaque(pipeline) else null,
         .clear_only = clear_only,
-    } }) catch std.debug.panic("Vulkan render: OOM recording draw state", .{});
+    } })) return;
     pass.attachments_started = true;
 }
 

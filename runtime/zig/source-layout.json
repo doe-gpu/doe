@@ -952,9 +952,9 @@
       },
       "src/backend/dropin_queue_submit.zig": {
         "decision": "Keep",
-        "moduleSha256": "5b55a113b36c798a71d6788229a058143eaa4303398ad5fa0b6ee35693b283c6",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "c7f3cd38273f5cfbdcaa84e3391d11f1737d2dd329beb7b7936098bf55f6fcc5",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/backend/dropin_render_state.zig": {
         "decision": "Keep",
@@ -964,9 +964,9 @@
       },
       "src/backend/dropin_resource_ops.zig": {
         "decision": "Keep",
-        "moduleSha256": "8a01ee713a71432ec54065371209b9d1e4e6a3a8a9c65ef050094fb49079748a",
-        "reason": "Keep: typed resource seam exposes Vulkan timestamp normalization while retaining platform import boundaries.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "b4ca1a088ec0d77ee4b30e05a41fb4254c6294f5fe6c4d0907f5e7c43b62bcb9",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/backend/dropin_surface_ops.zig": {
         "decision": "Keep",
@@ -1270,9 +1270,9 @@
       },
       "src/backend/vulkan/vk_constants.zig": {
         "decision": "Keep",
-        "moduleSha256": "b021630d1dcfd7b0b20d15c21f2dde35855b53eb5a2cd601860ae7335c965d2d",
-        "reason": "Keep: Vulkan ABI values have one backend-local owner, including depth/stencil layout and synchronization bits.",
-        "reviewer": "codex-depth-ownership/2026-09-06"
+        "moduleSha256": "92c57c53dabcc58182a349031a9aa956446f2315ece1eebe5a0adcb45ba71628",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_device.zig": {
         "decision": "Keep",
@@ -1312,9 +1312,9 @@
       },
       "src/backend/vulkan/vk_formats.zig": {
         "decision": "Keep",
-        "moduleSha256": "27c788a47b15a11e9b752ea0b2ef1c6db55c1d76aab79bf5e53f5185abe2f6ad",
-        "reviewer": "codex-render-submission/2026-09-06",
-        "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
+        "moduleSha256": "83b0f0358d827552ee0b1d40ca9505e16e5017c8347d531c5cfb87df8b4e4a90",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_functions.zig": {
         "decision": "Keep",
@@ -1408,9 +1408,9 @@
       },
       "src/backend/vulkan/vk_texture_commands.zig": {
         "decision": "Keep",
-        "moduleSha256": "6e659c6f67c55afd3586dcd22d4361934efc884f3ebbfa177c1c6e260e091efb",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-gigi-compatibility/2026-08-15"
+        "moduleSha256": "a79c1d8b65e44b8aefd027f2446588140e224708181cc42e4ffdc4d38a7f1440",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_upload.zig": {
         "decision": "Keep",
@@ -3490,9 +3490,9 @@
       },
       "src/native/command/doe_encoder_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "46951f4f059864627f6e2db777eae94138d7280a6c0ddbf961c1bf3e19b4b56e",
-        "reason": "Keep: native command buffers release all command storage through their explicit owning allocator.",
-        "reviewer": "codex-recorded-allocation/2026-09-06"
+        "moduleSha256": "69c933e41d7ad6082e853f5c50056d872b21e05b4cc075d67a4958b2e9274d3f",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/command/doe_immediates_external_native.zig": {
         "decision": "Keep",
@@ -3508,9 +3508,9 @@
       },
       "src/native/compute/doe_compute_ext_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "3df3a450f320d801015ef3537a91e2aa691386ac813041fb3344d34c567a9aee",
-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
-        "reviewer": "codex-render-ownership/2026-09-06"
+        "moduleSha256": "e132a9378588b9e9b879b64a27d4a3d16757a3a38cac6f0f6ef0f754143108dd",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/compute/doe_compute_fast.zig": {
         "decision": "Keep",
@@ -3598,9 +3598,9 @@
       },
       "src/native/queue/doe_queue_submit_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "10f3dc2fa4e148c88ff76aac752c0d7aee081da2668bde74e35c1c4ec4fd357c",
-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
-        "reviewer": "codex-gpu-program/2026-09-05"
+        "moduleSha256": "8314c6c6d7b53a2901af602c83d8eacebddfc942d5184c2186132df86a14189a",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/queue/doe_queue_submit_shared.zig": {
         "decision": "Keep",
@@ -3610,21 +3610,21 @@
       },
       "src/native/queue/doe_queue_submit_vulkan.zig": {
         "decision": "Keep",
-        "moduleSha256": "f43881ae7df3a7e38b3587ebafbc722d854351e0197c5f38a6f751797410c367",
-        "reason": "Keep: snapshot Vulkan draw inputs at recording and execute them in submission order, retaining native resources and matching attachment dimensions.",
-        "reviewer": "codex-render-submission/2026-09-06"
+        "moduleSha256": "81678a6d03ea0520cb9bac9e6283239894e75e073f715af9f3047137fa61be52",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/render/doe_bundle_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "2b167abd6f7df36a3c9420e391806c6e603444b25442eaeb55e322cb63a8366d",
-        "reason": "Keep: render owners validate shader device and bundle signature, retain recorded resources, and finalize only after the last lease.",
-        "reviewer": "codex-native-ownership/2026-09-06"
+        "moduleSha256": "ed09e36af017d24fd64ed13bfb34f50c60ceb19f21bcd2f114d449e086b1c571",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/render/doe_render_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "4f7d52096d87eb1787d947961dbe0b3840f94f5f69c69874870018510e12114f",
-        "reason": "Keep: render objects and bundles retain dependencies through command ownership and release only their final references; allocator and device lifetimes are explicit.",
-        "reviewer": "codex-render-ownership/2026-09-06"
+        "moduleSha256": "60373808388e6107cc6ac0257006d1cc6e4f851bbd3fa76b2140461a2cd13796",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/render/doe_render_pass_controls_native.zig": {
         "decision": "Keep",
@@ -3658,9 +3658,9 @@
       },
       "src/native/resource/doe_command_texture_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "d5ff9406e62fdb703d5f76b25175e9ad8fd805dcaed7893b204258756f89d01e",
-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
-        "reviewer": "codex-render-ownership/2026-09-06"
+        "moduleSha256": "b7bc9a4ce909892d9ed08c55e2dc2b1e4c020fd32360c632ed6f7dc7ab60c89d",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/resource/doe_external_texture_native.zig": {
         "decision": "Keep",
@@ -3670,9 +3670,9 @@
       },
       "src/native/resource/doe_query_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "2a16a9b2f7f52fdf4c1f0ad02abeefa028e67c4e825f9bcf5f7fbd83e6644b6e",
-        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
-        "reviewer": "codex-native-ownership/2026-09-06"
+        "moduleSha256": "bdcbb4196790f8d85bf4ce0694b2a405c8be537e5788f43a9077048145a161bd",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/resource/doe_texture_sampler_native.zig": {
         "decision": "Keep",
@@ -3748,15 +3748,15 @@
       },
       "src/native/support/doe_native_object_helpers.zig": {
         "decision": "Keep",
-        "moduleSha256": "ee7028417449234063c804916ed886a056db007a5bdb6dbbc2f17ec748296b56",
-        "reason": "Keep: native object and neutral lease owners centralize atomic reference counts and synchronized label mutation without changing handle layout.",
-        "reviewer": "codex-native-ownership/2026-09-06"
+        "moduleSha256": "c95edc18651caf612cef1c21aa3d8f6ef6b02d1e1d71e1978ea7ad409a9213ae",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/support/doe_native_object_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "0301f5ba72a450f94bdf6bcb9b6a4607f9a2937e3d057badfb752943f22dd756",
-        "reason": "Keep: command buffers carry the allocator that owns their object and recorded storage through release.",
-        "reviewer": "codex-recorded-allocation/2026-09-06"
+        "moduleSha256": "524ae75393b1cc10d8c2d153cf2ca1e848a1fcf4607763d4cd152cb83f94eaa0",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/support/doe_native_runtime_helpers.zig": {
         "decision": "Keep",
@@ -3814,9 +3814,9 @@
       },
       "src/native/vulkan/vulkan_render_pass_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "fce8a1d729bd8cf7304879e88b956f51452e4074cb03b51ddda03f1b42ce26c1",
-        "reason": "Keep: native Vulkan recording snapshots retained color/depth views and first-use load semantics, preserving read-only attachments and subsequent draws.",
-        "reviewer": "codex-depth-ownership/2026-09-06"
+        "moduleSha256": "6413b196da4204532f5eee5886f18ae3519284fd8a077fc81a418b1df1dd170b",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
         "decision": "Keep",
@@ -4090,9 +4090,9 @@
       },
       "src/runtime/render/render_bundle.zig": {
         "decision": "Keep",
-        "moduleSha256": "4d29ba6ec0d4e9d76d734844bbb4a4d94d44422b486e66359b1c25ded48a0e10",
-        "reason": "Keep: render owners validate shader device and bundle signature, retain recorded resources, and finalize only after the last lease.",
-        "reviewer": "codex-native-ownership/2026-09-06"
+        "moduleSha256": "89d24b1ca9d0cc191dfb751e3d05877f6f92974304e398fb4458a6ed9d1fcbc6",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/runtime/security/wgpu_sandbox_guard.zig": {
         "decision": "Keep",
@@ -4228,9 +4228,9 @@
       },
       "src/native/compute/doe_compute_program_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "0b363cb64bbf198dba9e19081c48d006fa238b7569cc5900e59384266cc34520",
-        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
-        "reviewer": "codex-native-ownership/2026-09-06"
+        "moduleSha256": "2255f7196299e51270712659587aa4e47a01b082b2b1954fdbdb074dc5437f91",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/backend/vulkan/vk_shared_pipeline.zig": {
         "decision": "Keep",
@@ -4264,9 +4264,9 @@
       },
       "src/native/command/doe_command_references.zig": {
         "decision": "Keep",
-        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
-        "moduleSha256": "97cb5ad4017203689cc6d78db37ee5562c21329b6ed21c2096302c01c8fd58e7",
-        "reviewer": "codex-native-ownership/2026-09-06"
+        "moduleSha256": "3c801dc8da77cca8ddc814d8aa1594765905a0009d5aee431c21858f720b8f1f",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       },
       "src/compiler/wgsl/pipeline/diagnostic.zig": {
         "decision": "Keep",
@@ -4300,9 +4300,21 @@
       },
       "src/native/compute/doe_compute_recorded.zig": {
         "decision": "Keep",
-        "moduleSha256": "76c82a35457e448fc2db1bba410c60111f135b3601ddccf0adc0dabd6856f887",
-        "reason": "Keep: private command construction owns allocation, retained dependencies, rollback, and publication for fused compute entrypoints.",
-        "reviewer": "codex-recorded-allocation/2026-09-06"
+        "moduleSha256": "ebe494e7f41615581dd85fef995fe5336226436ddd6bb5781ce263c0c3af1b37",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
+      },
+      "src/contracts/command_recording.zig": {
+        "decision": "Keep",
+        "moduleSha256": "a3084a364295d0ddbb3e2f0901f332134422db46141e5614ab78a497c4e1c986",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
+      },
+      "src/native/command/doe_command_recording.zig": {
+        "decision": "Keep",
+        "moduleSha256": "3798fd6861660681ad2bb262b7d23eed1948493125ba5651489751e79b568002",
+        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
+        "reviewer": "codex-recording-ownership/2026-09-06"
       }
     },
     "linePolicy": {

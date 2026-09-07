@@ -1,3 +1,4 @@
+const recording = @import("doe_command_recording.zig");
 // doe_encoder_native.zig — Bind group layout, bind group, pipeline layout,
 // command encoder, and command buffer exports for Doe native Metal backend.
 // Sharded from doe_wgpu_native.zig to stay under the line-limit policy.
@@ -10,7 +11,6 @@ const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const query_native = @import("../resource/doe_query_native.zig");
 const references = @import("doe_command_references.zig");
 const native_exports = @import("../support/doe_native_exports.zig");
-const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 
 const alloc = native_helpers.alloc;
 const make = native_helpers.make;
@@ -32,12 +32,20 @@ const DoeTexture = native_types.DoeTexture;
 
 pub export fn doeNativeDeviceCreateCommandEncoder(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUCommandEncoderDescriptor) callconv(.c) ?*anyopaque {
     const dev = cast(DoeDevice, dev_raw) orelse return null;
-    const enc = make(DoeCommandEncoder) orelse return null;
-    native_helpers.object_add_ref(DoeDevice, dev_raw);
-    enc.* = .{ .dev = dev, .device_ref = dev };
+    const enc = createEncoder(alloc, dev) catch {
+        dev.error_scopes.deliver(@import("../../runtime/diagnostics/error_scope.zig").ERROR_TYPE_OUT_OF_MEMORY, "command encoder allocation failed");
+        return null;
+    };
     const result = toOpaque(enc);
     if (desc) |d| label_store.set(result, d.label.data, d.label.length);
     return result;
+}
+
+pub fn createEncoder(allocator: std.mem.Allocator, device: *DoeDevice) !*DoeCommandEncoder {
+    const encoder = try native_helpers.create(DoeCommandEncoder, allocator);
+    native_helpers.object_add_ref(DoeDevice, toOpaque(device));
+    encoder.* = .{ .allocator = allocator, .dev = device, .device_ref = device };
+    return encoder;
 }
 
 pub export fn doeNativeCommandEncoderRelease(raw: ?*anyopaque) callconv(.c) void {
@@ -45,16 +53,21 @@ pub export fn doeNativeCommandEncoderRelease(raw: ?*anyopaque) callconv(.c) void
         if (!native_helpers.object_should_destroy(e)) return;
         label_store.remove(raw);
         query_native.releaseRecordedCommandReferences(e.cmds.items);
-        e.cmds.deinit(alloc);
-        references.releaseAll(&e.references);
+        e.cmds.deinit(e.allocator);
+        @import("../../contracts/resource_lease.zig").releaseAll(e.allocator, &e.references);
         if (e.device_ref) |dev| native_exports.doeNativeDeviceRelease(toOpaque(dev));
-        alloc.destroy(e);
+        const allocator = e.allocator;
+        allocator.destroy(e);
     }
 }
 
 pub export fn doeNativeCommandEncoderBeginComputePass(enc_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUComputePassDescriptor) callconv(.c) ?*anyopaque {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return null;
-    const pass = make(DoeComputePass) orelse return null;
+    if (!recording.requireOpen(enc)) return null;
+    const pass = native_helpers.create(DoeComputePass, enc.allocator) catch |err| {
+        recording.fail(enc, err);
+        return null;
+    };
     var timestamp_end_query_set: ?*anyopaque = null;
     var timestamp_end_write_index = native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX;
     if (desc) |d| {
@@ -90,18 +103,21 @@ pub export fn doeNativeCommandEncoderBeginComputePass(enc_raw: ?*anyopaque, desc
 
 pub export fn doeNativeCopyBufferToBuffer(enc_raw: ?*anyopaque, src_raw: ?*anyopaque, src_off: u64, dst_raw: ?*anyopaque, dst_off: u64, size: u64) callconv(.c) void {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
+    if (!recording.requireOpen(enc)) return;
     const src = cast(DoeBuffer, src_raw) orelse return;
     const dst = cast(DoeBuffer, dst_raw) orelse return;
     if (src.error_object or dst.error_object or src.destroyed or dst.destroyed) return;
-    references.retainBuffer(alloc, &enc.references, src);
-    references.retainBuffer(alloc, &enc.references, dst);
-    enc.cmds.append(alloc, .{ .copy_buf = .{
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, src);
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, dst);
+    if (!recording.append(enc, .{ .copy_buf = .{
         .src = @ptrCast(src),
         .src_off = src_off,
         .dst = @ptrCast(dst),
         .dst_off = dst_off,
         .size = size,
-    } }) catch std.debug.panic("doe_encoder_native: OOM recording copy command", .{});
+    } })) return;
 }
 
 pub export fn doeNativeCommandEncoderCopyBufferToTexture(
@@ -117,36 +133,26 @@ pub export fn doeNativeCommandEncoderCopyBufferToTexture(
     depth_or_array_layers: u32,
 ) callconv(.c) void {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
+    if (!recording.requireOpen(enc)) return;
     const src_buffer = cast(DoeBuffer, src_buffer_raw) orelse return;
     const dst_texture = cast(DoeTexture, dst_texture_raw) orelse return;
     if (src_buffer.error_object or src_buffer.destroyed or dst_texture.error_object) return;
-    references.retainBuffer(alloc, &enc.references, src_buffer);
-    references.retainTexture(alloc, &enc.references, dst_texture);
-    if (resource_ops.handleVulkanCopyBufferToTexture(
-        enc,
-        src_buffer,
-        src_offset,
-        src_bytes_per_row,
-        src_rows_per_image,
-        dst_texture,
-        dst_mip_level,
-        width,
-        height,
-        depth_or_array_layers,
-    )) {
-        return;
-    }
-    enc.cmds.append(alloc, .{ .copy_buffer_to_texture = .{
-        .src_buffer = src_buffer.mtl,
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, src_buffer);
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainTextureAssumeCapacity(&enc.references, dst_texture);
+    const vulkan = enc.dev.backend == .vulkan;
+    if (!recording.append(enc, .{ .copy_buffer_to_texture = .{
+        .src_buffer = if (vulkan) toOpaque(src_buffer) else src_buffer.mtl,
         .src_offset = src_offset,
         .src_bytes_per_row = src_bytes_per_row,
         .src_rows_per_image = src_rows_per_image,
-        .dst_texture = dst_texture.mtl,
+        .dst_texture = if (vulkan) toOpaque(dst_texture) else dst_texture.mtl,
         .dst_mip_level = dst_mip_level,
         .width = width,
         .height = height,
         .depth_or_array_layers = depth_or_array_layers,
-    } }) catch std.debug.panic("doe_encoder_native: OOM recording buffer-to-texture copy command", .{});
+    } })) return;
 }
 
 pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
@@ -162,13 +168,16 @@ pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
     depth_or_array_layers: u32,
 ) callconv(.c) void {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
+    if (!recording.requireOpen(enc)) return;
     const src_texture = cast(DoeTexture, src_texture_raw) orelse return;
     const dst_buffer = cast(DoeBuffer, dst_buffer_raw) orelse return;
     if (src_texture.error_object or dst_buffer.error_object or dst_buffer.destroyed) return;
-    references.retainTexture(alloc, &enc.references, src_texture);
-    references.retainBuffer(alloc, &enc.references, dst_buffer);
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainTextureAssumeCapacity(&enc.references, src_texture);
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, dst_buffer);
     const vulkan = enc.dev.backend == .vulkan;
-    enc.cmds.append(alloc, .{ .copy_texture_to_buffer = .{
+    if (!recording.append(enc, .{ .copy_texture_to_buffer = .{
         .src_texture = if (vulkan) @ptrCast(src_texture) else src_texture.mtl,
         .src_mip_level = src_mip_level,
         .dst_buffer = if (vulkan) @ptrCast(dst_buffer) else dst_buffer.mtl,
@@ -178,15 +187,20 @@ pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
         .width = width,
         .height = height,
         .depth_or_array_layers = depth_or_array_layers,
-    } }) catch std.debug.panic("doe_encoder_native: OOM recording texture copy command", .{});
+    } })) return;
 }
 
 pub export fn doeNativeCommandEncoderFinish(enc_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUCommandBufferDescriptor) callconv(.c) ?*anyopaque {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return null;
-    const cb = make(DoeCommandBuffer) orelse return null;
+    const valid = recording.requireOpen(enc);
+    const cb = native_helpers.create(DoeCommandBuffer, enc.allocator) catch |err| {
+        recording.fail(enc, err);
+        return null;
+    };
     native_helpers.object_add_ref(DoeDevice, toOpaque(enc.dev));
     cb.* = .{
-        .allocator = alloc,
+        .allocator = enc.allocator,
+        .error_object = !valid,
         .dev = enc.dev,
         .device_ref = enc.dev,
         .cmds = enc.cmds,
@@ -194,6 +208,7 @@ pub export fn doeNativeCommandEncoderFinish(enc_raw: ?*anyopaque, desc: ?*const 
     };
     enc.cmds = .{}; // Transfer ownership.
     enc.references = .{};
+    enc.state = .finished;
     const result = toOpaque(cb);
     if (desc) |d| label_store.set(result, d.label.data, d.label.length);
     return result;
@@ -324,4 +339,115 @@ test "render recording retains caller-released state until command buffer releas
     try std.testing.expectEqual(@as(u32, 1), index.ref_count);
     try std.testing.expectEqual(@as(u32, 1), indirect.ref_count);
     try std.testing.expectEqual(@as(u32, 1), device.ref_count);
+}
+
+const RecordingFixture = enum { compute, render, copy, query };
+
+fn recordingAllocationScenario(allocator: std.mem.Allocator, fixture: RecordingFixture) !void {
+    const compute = @import("../compute/doe_compute_ext_native.zig");
+    const render = @import("../render/doe_render_native.zig");
+    var device = DoeDevice{};
+    var pipeline = native_types.DoeComputePipeline{};
+    var render_pipeline = native_types.DoeRenderPipeline{};
+    var group = DoeBindGroup{};
+    var buffer = DoeBuffer{ .size = 512 };
+    var texture = DoeTexture{};
+    var view = native_types.DoeTextureView{ .tex = &texture };
+    var query = query_native.DoeQuerySet{ .count = 2 };
+    defer {
+        for ([_]u32{ device.ref_count, pipeline.ref_count, render_pipeline.ref_count, group.ref_count, buffer.ref_count, texture.ref_count, view.ref_count, query.ref_count }) |count|
+            std.testing.expectEqual(@as(u32, 1), count) catch @panic("ordinary recording leaked a caller reference");
+    }
+    const encoder = try createEncoder(allocator, &device);
+    defer doeNativeCommandEncoderRelease(toOpaque(encoder));
+    const repetitions = 17;
+    switch (fixture) {
+        .compute => {
+            const pass = doeNativeCommandEncoderBeginComputePass(toOpaque(encoder), null) orelse return error.OutOfMemory;
+            defer compute.doeNativeComputePassRelease(pass);
+            for (0..repetitions) |index| {
+                compute.doeNativeComputePassSetPipeline(pass, toOpaque(&pipeline));
+                compute.doeNativeComputePassSetBindGroup(pass, 0, toOpaque(&group), 0, null);
+                compute.doeNativeComputePassDispatch(pass, @intCast(index + 1), 1, 1);
+            }
+            compute.doeNativeComputePassEnd(pass);
+        },
+        .render => {
+            var attachment = std.mem.zeroes(abi_pipeline.WGPURenderPassColorAttachment);
+            attachment.view = @ptrCast(&view);
+            var descriptor = std.mem.zeroes(abi_pipeline.WGPURenderPassDescriptor);
+            descriptor.colorAttachmentCount = 1;
+            descriptor.colorAttachments = @ptrCast(&attachment);
+            const pass = render.doeNativeCommandEncoderBeginRenderPass(toOpaque(encoder), &descriptor) orelse return error.OutOfMemory;
+            defer render.doeNativeRenderPassRelease(pass);
+            for (0..repetitions) |_| {
+                render.doeNativeRenderPassSetPipeline(pass, toOpaque(&render_pipeline));
+                render.doeNativeRenderPassSetBindGroup(pass, 0, toOpaque(&group), 0, null);
+                render.doeNativeRenderPassSetVertexBuffer(pass, 0, toOpaque(&buffer), 0, 16);
+                render.doeNativeRenderPassSetIndexBuffer(pass, toOpaque(&buffer), 2, 0, 16);
+                render.doeNativeRenderPassDrawIndirect(pass, toOpaque(&buffer), 0);
+            }
+            render.doeNativeRenderPassEnd(pass);
+        },
+        .copy => for (0..repetitions) |_| {
+            doeNativeCopyBufferToBuffer(toOpaque(encoder), toOpaque(&buffer), 0, toOpaque(&buffer), 16, 16);
+            doeNativeCommandEncoderCopyBufferToTexture(toOpaque(encoder), toOpaque(&buffer), 0, 256, 1, toOpaque(&texture), 0, 1, 1, 1);
+            doeNativeCommandEncoderCopyTextureToBuffer(toOpaque(encoder), toOpaque(&texture), 0, toOpaque(&buffer), 0, 256, 1, 1, 1, 1);
+        },
+        .query => for (0..repetitions) |_| {
+            query_native.doeNativeCommandEncoderWriteTimestamp(toOpaque(encoder), toOpaque(&query), 0);
+            query_native.doeNativeCommandEncoderResolveQuerySet(toOpaque(encoder), toOpaque(&query), 0, 1, toOpaque(&buffer), 0);
+        },
+    }
+    if (encoder.state == .failed) return encoder.state.failed;
+    const commands = doeNativeCommandEncoderFinish(toOpaque(encoder), null) orelse return error.OutOfMemory;
+    defer doeNativeCommandBufferRelease(commands);
+    try std.testing.expect(!cast(DoeCommandBuffer, commands).?.error_object);
+    try std.testing.expect(cast(DoeCommandBuffer, commands).?.cmds.items.len >= repetitions);
+}
+
+test "ordinary command recording cleans up every allocation failure across command families" {
+    for (std.enums.values(RecordingFixture)) |fixture|
+        try std.testing.checkAllAllocationFailures(std.testing.allocator, recordingAllocationScenario, .{fixture});
+}
+
+test "failed recording finishes as an error object and cannot submit or resume" {
+    const errors = @import("../../runtime/diagnostics/error_scope.zig");
+    const Capture = struct {
+        kind: u32 = errors.ERROR_TYPE_NO_ERROR,
+        fn receive(kind: u32, _: @import("../../core/abi/wgpu_handle_types.zig").WGPUStringView, userdata: ?*anyopaque, _: ?*anyopaque) callconv(.c) void {
+            const self: *@This() = @ptrCast(@alignCast(userdata.?));
+            self.kind = kind;
+        }
+    };
+    var device = DoeDevice{};
+    var queue = native_types.DoeQueue{ .dev = &device };
+    var buffer = DoeBuffer{ .size = 32 };
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{});
+    const encoder = try createEncoder(failing.allocator(), &device);
+    defer doeNativeCommandEncoderRelease(toOpaque(encoder));
+    device.error_scopes.push(errors.FILTER_OUT_OF_MEMORY);
+    failing.fail_index = failing.alloc_index;
+    doeNativeCopyBufferToBuffer(toOpaque(encoder), toOpaque(&buffer), 0, toOpaque(&buffer), 16, 16);
+    try std.testing.expectEqual(error.OutOfMemory, encoder.state.failed);
+    var capture = Capture{};
+    try std.testing.expect(device.error_scopes.pop(.{ .callback = Capture.receive, .userdata1 = &capture }));
+    try std.testing.expectEqual(errors.ERROR_TYPE_OUT_OF_MEMORY, capture.kind);
+    failing.fail_index = std.math.maxInt(usize);
+    const invalid = doeNativeCommandEncoderFinish(toOpaque(encoder), null).?;
+    defer doeNativeCommandBufferRelease(invalid);
+    try std.testing.expect(cast(DoeCommandBuffer, invalid).?.error_object);
+    const valid_encoder = try createEncoder(std.testing.allocator, &device);
+    defer doeNativeCommandEncoderRelease(toOpaque(valid_encoder));
+    const valid = doeNativeCommandEncoderFinish(toOpaque(valid_encoder), null).?;
+    defer doeNativeCommandBufferRelease(valid);
+    device.error_scopes.push(errors.FILTER_VALIDATION);
+    const submitted = [_]?*anyopaque{ valid, invalid };
+    @import("../queue/doe_queue_submit_native.zig").doeNativeQueueSubmit(toOpaque(&queue), submitted.len, &submitted);
+    try std.testing.expect(device.error_scopes.pop(.{ .callback = Capture.receive, .userdata1 = &capture }));
+    try std.testing.expectEqual(errors.ERROR_TYPE_VALIDATION, capture.kind);
+    doeNativeCopyBufferToBuffer(toOpaque(valid_encoder), toOpaque(&buffer), 0, toOpaque(&buffer), 16, 16);
+    try std.testing.expectEqual(error.InvalidState, valid_encoder.state.failed);
+    try std.testing.expectEqual(@as(usize, 0), valid_encoder.cmds.items.len);
+    try std.testing.expectEqual(@as(u32, 1), buffer.ref_count);
 }

@@ -255,6 +255,8 @@ pub const DoeCommandEncoder = struct {
     pub const TYPE_MAGIC = MAGIC_CMD_ENCODER;
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
+    allocator: std.mem.Allocator = @import("doe_native_object_helpers.zig").alloc,
+    state: @import("../../contracts/command_recording.zig").State = .open,
     dev: *DoeDevice,
     device_ref: ?*DoeDevice = null,
     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},
@@ -285,6 +287,7 @@ pub const DoeCommandBuffer = struct {
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     allocator: std.mem.Allocator,
+    error_object: bool = false,
     dev: *DoeDevice,
     device_ref: ?*DoeDevice = null,
     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},

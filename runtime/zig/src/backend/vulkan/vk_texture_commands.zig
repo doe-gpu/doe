@@ -23,6 +23,129 @@ fn texture_read_copy_extent(width: u32, height: u32) TextureReadExtent {
     return .{ .width = width, .height = height };
 }
 
+pub const BufferCopy = struct {
+    offset: u64,
+    bytes_per_row: u32,
+    rows_per_image: u32,
+    mip: u32,
+    width: u32,
+    height: u32,
+    depth_or_layers: u32,
+};
+
+pub fn buffer_copy_region(source_size: u64, texture: vk_resources.TextureResource, copy: BufferCopy) !c.VkBufferImageCopy {
+    if (copy.mip >= texture.mip_levels or copy.mip >= @bitSizeOf(u32) or texture.sample_count != 1)
+        return error.InvalidArgument;
+    if (texture.format == model_gpu_types.WGPUTextureFormat_Depth24Plus or
+        texture.format == model_gpu_types.WGPUTextureFormat_Depth24PlusStencil8 or
+        texture.format == model_gpu_types.WGPUTextureFormat_Depth32FloatStencil8)
+        return error.UnsupportedFeature;
+    const shift: u5 = @intCast(copy.mip);
+    const mip_width = @max(texture.width >> shift, 1);
+    const mip_height = @max(texture.height >> shift, 1);
+    const is_3d = texture.dimension == model_gpu_types.WGPUTextureDimension_3D;
+    const layers = if (is_3d) @max(texture.depth_or_array_layers >> shift, 1) else texture.depth_or_array_layers;
+    if (copy.width > mip_width or copy.height > mip_height or copy.depth_or_layers > layers)
+        return error.InvalidArgument;
+    const block = vk_formats.copy_block_extent(texture.format);
+    const bytes = try vk_formats.bytes_per_pixel(texture.format);
+    if ((copy.width % block[0] != 0 and copy.width != mip_width) or
+        (copy.height % block[1] != 0 and copy.height != mip_height) or copy.offset % bytes != 0)
+        return error.InvalidArgument;
+    const columns = std.math.divCeil(u64, copy.width, block[0]) catch unreachable;
+    const rows = std.math.divCeil(u64, copy.height, block[1]) catch unreachable;
+    const row_bytes = columns * bytes;
+    const pitch = if (copy.bytes_per_row == 0) row_bytes else copy.bytes_per_row;
+    const image_rows = if (copy.rows_per_image == 0) rows else copy.rows_per_image;
+    if (pitch < row_bytes or pitch % bytes != 0 or image_rows < rows) return error.InvalidArgument;
+    var required: u64 = 0;
+    if (copy.width != 0 and copy.height != 0 and copy.depth_or_layers != 0) {
+        const image_stride = try std.math.mul(u64, pitch, image_rows);
+        required = try std.math.mul(u64, image_stride, copy.depth_or_layers - 1);
+        required = try std.math.add(u64, required, try std.math.mul(u64, pitch, rows - 1));
+        required = try std.math.add(u64, required, row_bytes);
+    }
+    if (copy.offset > source_size or required > source_size - copy.offset) return error.InvalidArgument;
+    const row_length = std.math.cast(u32, (pitch / bytes) * block[0]) orelse return error.InvalidArgument;
+    const image_height = std.math.cast(u32, image_rows * block[1]) orelse return error.InvalidArgument;
+    return .{
+        .bufferOffset = copy.offset,
+        .bufferRowLength = row_length,
+        .bufferImageHeight = image_height,
+        .imageSubresource = .{
+            .aspectMask = vk_formats.aspect_mask_for_format(texture.format),
+            .mipLevel = copy.mip,
+            .baseArrayLayer = 0,
+            .layerCount = if (is_3d) 1 else copy.depth_or_layers,
+        },
+        .imageOffset = .{ .x = 0, .y = 0, .z = 0 },
+        .imageExtent = .{ .width = copy.width, .height = copy.height, .depth = if (is_3d) copy.depth_or_layers else 1 },
+    };
+}
+
+pub fn record_buffer_copy(self: anytype, source: vk_resources.ComputeBuffer, texture: *vk_resources.TextureResource, copy: BufferCopy) !void {
+    const region = try buffer_copy_region(source.size, texture.*, copy);
+    if (copy.width == 0 or copy.height == 0 or copy.depth_or_layers == 0) return;
+    const command_buffer = try self.begin_prepared_dispatch_replay();
+    const barrier = c.VkMemoryBarrier{
+        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+        .pNext = null,
+        .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT | c.VK_ACCESS_TRANSFER_WRITE_BIT,
+        .dstAccessMask = c.VK_ACCESS_TRANSFER_READ_BIT,
+    };
+    c.vkCmdPipelineBarrier(command_buffer, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 1, @ptrCast(&barrier), 0, null, 0, null);
+    vk_resources.transition_texture_layout(command_buffer, texture.*, texture.layout, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, c.VK_ACCESS_MEMORY_READ_BIT | c.VK_ACCESS_MEMORY_WRITE_BIT, c.VK_ACCESS_TRANSFER_WRITE_BIT, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT);
+    c.vkCmdCopyBufferToImage(command_buffer, source.buffer, texture.image, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, @ptrCast(&region));
+    vk_resources.transition_texture_layout(command_buffer, texture.*, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, c.VK_IMAGE_LAYOUT_GENERAL, c.VK_ACCESS_TRANSFER_WRITE_BIT, c.VK_ACCESS_MEMORY_READ_BIT | c.VK_ACCESS_MEMORY_WRITE_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+    vk_resources.mark_texture_image_layout(self, texture.image, c.VK_IMAGE_LAYOUT_GENERAL);
+}
+
+test "buffer image copy validates the last accessed byte and mip-relative layers" {
+    var texture = std.mem.zeroes(vk_resources.TextureResource);
+    texture.width = 8;
+    texture.height = 4;
+    texture.depth_or_array_layers = 3;
+    texture.mip_levels = 3;
+    texture.sample_count = 1;
+    texture.dimension = model_gpu_types.WGPUTextureDimension_2D;
+    texture.format = model_gpu_types.WGPUTextureFormat_RGBA8Unorm;
+    var copy = BufferCopy{ .offset = 16, .bytes_per_row = 256, .rows_per_image = 3, .mip = 1, .width = 4, .height = 2, .depth_or_layers = 2 };
+    const minimum_source_size = 16 + 256 * 3 + 256 + 16;
+    const region = try buffer_copy_region(minimum_source_size, texture, copy);
+    try std.testing.expectEqual(@as(u32, 4), region.imageExtent.width);
+    try std.testing.expectEqual(@as(u32, 2), region.imageSubresource.layerCount);
+    try std.testing.expectEqual(@as(u32, 1), region.imageExtent.depth);
+    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(minimum_source_size - 1, texture, copy));
+    copy.width = 5;
+    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(minimum_source_size, texture, copy));
+    copy.width = 4;
+    texture.dimension = model_gpu_types.WGPUTextureDimension_3D;
+    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(minimum_source_size, texture, copy));
+    texture.depth_or_array_layers = 4;
+    const volume = try buffer_copy_region(minimum_source_size, texture, copy);
+    try std.testing.expectEqual(@as(u32, 1), volume.imageSubresource.layerCount);
+    try std.testing.expectEqual(@as(u32, 2), volume.imageExtent.depth);
+    copy.offset = std.math.maxInt(u64) - 3;
+    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(std.math.maxInt(u64), texture, copy));
+}
+
+test "compressed buffer copy converts block rows to Vulkan texels" {
+    var texture = std.mem.zeroes(vk_resources.TextureResource);
+    texture.width = 10;
+    texture.height = 12;
+    texture.depth_or_array_layers = 1;
+    texture.mip_levels = 1;
+    texture.sample_count = 1;
+    texture.dimension = model_gpu_types.WGPUTextureDimension_2D;
+    texture.format = model_gpu_types.WGPUTextureFormat_ASTC5x4Unorm;
+    const copy = BufferCopy{ .offset = 0, .bytes_per_row = 256, .rows_per_image = 3, .mip = 0, .width = 10, .height = 12, .depth_or_layers = 1 };
+    const region = try buffer_copy_region(256 * 2 + 32, texture, copy);
+    try std.testing.expectEqual(@as(u32, 80), region.bufferRowLength);
+    try std.testing.expectEqual(@as(u32, 12), region.bufferImageHeight);
+    texture.format = model_gpu_types.WGPUTextureFormat_Depth24PlusStencil8;
+    try std.testing.expectError(error.UnsupportedFeature, buffer_copy_region(1024, texture, copy));
+}
+
 pub fn texture_write(self: anytype, cmd_arg: model_texture_types.TextureWriteCommand) !void {
     const resource = try vk_resources.ensure_texture_resource(self, cmd_arg.texture);
     if (cmd_arg.data.len == 0) {

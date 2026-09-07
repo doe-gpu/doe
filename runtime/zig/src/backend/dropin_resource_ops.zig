@@ -64,39 +64,6 @@ fn failVulkanResourceError(dev: *DoeDevice, comptime operation: []const u8, err:
     return failVulkanResourceOp(dev, operation, @errorName(err));
 }
 
-pub fn handleVulkanCopyBufferToTexture(
-    enc: *DoeCommandEncoder,
-    src_buffer: *DoeBuffer,
-    src_offset: u64,
-    src_bytes_per_row: u32,
-    src_rows_per_image: u32,
-    dst_texture: *DoeTexture,
-    dst_mip_level: u32,
-    width: u32,
-    height: u32,
-    depth_or_array_layers: u32,
-) bool {
-    _ = width;
-    if (enc.dev.backend != .vulkan) return false;
-    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "backend compiled without Vulkan support");
-    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
-        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "device has no Vulkan runtime");
-    if (src_buffer.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer has no Vulkan resource");
-    if (dst_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "destination texture has no Vulkan resource");
-    const scb = rt.compute_buffers.get(src_buffer.vk_id) orelse
-        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer resource is not registered");
-    const mapped_ptr = scb.mapped orelse
-        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer resource is not CPU-mapped");
-    const rows = if (src_rows_per_image > 0) src_rows_per_image else height;
-    const byte_count: usize = @intCast(@as(u64, src_bytes_per_row) * rows * depth_or_array_layers);
-    const base_off: usize = @intCast(src_offset);
-    const raw: [*]const u8 = @ptrCast(mapped_ptr);
-    const copy_res = copyTextureResource(dst_texture, dst_mip_level, src_bytes_per_row, rows);
-    rt.texture_write(.{ .texture = copy_res, .data = raw[base_off .. base_off + byte_count] }) catch |err|
-        return failVulkanResourceError(enc.dev, "copyBufferToTexture", err);
-    return true;
-}
-
 pub fn handleVulkanCopyTextureToBuffer(
     enc: *DoeCommandEncoder,
     src_texture: *DoeTexture,

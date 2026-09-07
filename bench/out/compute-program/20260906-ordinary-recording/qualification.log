@@ -1,0 +1,4 @@
+qualified retained package: node
+qualified retained package: bun
+qualified retained package: electron
+{"status": "passed", "error": null, "summary": "/home/x/deco/doe/bench/out/compute-program/20260906-ordinary-recording-qualified/summary.json"}

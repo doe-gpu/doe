@@ -1,0 +1,2663 @@
+diff --git a/docs/process.md b/docs/process.md
+index 1a3c25449..e410075d3 100644
+--- a/docs/process.md
++++ b/docs/process.md
+@@ -212,6 +212,16 @@ classified and cannot be promoted by benchmark results.
+   single and batched constructor outputs after caller release. Its library hash
+   must match the retained package. The addon's ordinary encoding helper is a
+   different path and cannot stand in for this native-constructor check.
++  Ordinary encoder, bundle, and query recording failures must poison recording
++  instead of aborting or publishing usable partial work. Fault-injection tests
++  cover recording and finish allocations, retained references, invalid bundle
++  replay, rejected queue submission, and a subsequent valid encoder. Error
++  command buffers cannot enter prepared execution. This changes failure handling
++  behind existing WebGPU signatures and error categories; no public descriptor,
++  config, trace, or receipt fields are added. Vulkan buffer-to-texture copies
++  execute only at submission, with source GPU writes visible at the recorded
++  position. The native regression must reject an abandoned-copy side effect and
++  check the submitted dispatch/texture-copy/readback result after caller release.
+   Native-direct package tests also reject duplicate and consumed submissions,
+   verify writable mapping copy-back and read-only mapping isolation, and require
+   mapped-range detachment on unmap. Run the same test in every qualified host.
+diff --git a/docs/status/compiler-and-webgpu.md b/docs/status/compiler-and-webgpu.md
+index 102fbae00..c3e56c040 100644
+--- a/docs/status/compiler-and-webgpu.md
++++ b/docs/status/compiler-and-webgpu.md
+@@ -3,6 +3,26 @@
+ This is the live status front door for the non-TSIR WGSL compiler and WebGPU
+ runtime path. Artifacts and executable tests own pass/fail state.
+ 
++## Recording failures and submission ordering
++
++Ordinary encoders, render bundles, and query recording now retain explicit
++failure state. Allocation failures report through existing device error scopes;
++finish produces an error command object when allocation permits, and queue
++submission rejects it before executing the submitted list. Commands, passes,
++bundles, and retained dependencies keep their owning allocator through cleanup.
++Fault-injection tests cover recording growth, abandoned state, failed finish,
++rejected replay/submission, and subsequent valid recording.
++
++Vulkan buffer-to-texture copies execute at their recorded queue position using
++the source GPU buffer. An abandoned recording cannot change its destination.
++Copy layout validation checks mip-relative extents, block geometry, layers,
++strides, and the last accessed source byte. The physical regression retains the
++pre-fix failure and verifies dispatch/copy/readback after caller reference release.
++Source, canonical tests, and exact Node/Bun/Electron main-process packages are
++indexed at `bench/out/compute-program/20260906-ordinary-recording/README.md`.
++This does not establish complete pass-state validation, texture-copy conformance,
++concurrent queue safety, physical Metal/D3D12 behavior, or a performance advantage.
++
+ ## Transactional fused command construction
+ 
+ The native fused compute entrypoints now use a typed recording builder that
+@@ -20,9 +40,8 @@ It uses the same library bytes as retained-package qualification; the addon's
+ similarly named helper uses ordinary encoding and is separate evidence.
+ The implementation, canonical tests, and retained-package regressions are indexed at
+ `bench/out/compute-program/20260906-recorded-allocation/README.md`.
+-Ordinary encoder, render bundle, and query recording still contain allocation
+-failure paths requiring repair; this checkpoint does not qualify those paths or
+-physical non-Vulkan execution.
++That earlier checkpoint covers the fused constructors. Ordinary recording and
++its distinct native entrypoints are covered by the checkpoint above.
+ 
+ ## Depth attachment ownership
+ 
+diff --git a/runtime/zig/source-layout.json b/runtime/zig/source-layout.json
+index 2d95bbf83..a10ce67fb 100644
+--- a/runtime/zig/source-layout.json
++++ b/runtime/zig/source-layout.json
+@@ -952,9 +952,9 @@
+       },
+       "src/backend/dropin_queue_submit.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "5b55a113b36c798a71d6788229a058143eaa4303398ad5fa0b6ee35693b283c6",
+-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+-        "reviewer": "codex-gpu-program/2026-09-05"
++        "moduleSha256": "c7f3cd38273f5cfbdcaa84e3391d11f1737d2dd329beb7b7936098bf55f6fcc5",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/backend/dropin_render_state.zig": {
+         "decision": "Keep",
+@@ -964,9 +964,9 @@
+       },
+       "src/backend/dropin_resource_ops.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "8a01ee713a71432ec54065371209b9d1e4e6a3a8a9c65ef050094fb49079748a",
+-        "reason": "Keep: typed resource seam exposes Vulkan timestamp normalization while retaining platform import boundaries.",
+-        "reviewer": "codex-gpu-program/2026-09-05"
++        "moduleSha256": "b4ca1a088ec0d77ee4b30e05a41fb4254c6294f5fe6c4d0907f5e7c43b62bcb9",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/backend/dropin_surface_ops.zig": {
+         "decision": "Keep",
+@@ -1270,9 +1270,9 @@
+       },
+       "src/backend/vulkan/vk_constants.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "b021630d1dcfd7b0b20d15c21f2dde35855b53eb5a2cd601860ae7335c965d2d",
+-        "reason": "Keep: Vulkan ABI values have one backend-local owner, including depth/stencil layout and synchronization bits.",
+-        "reviewer": "codex-depth-ownership/2026-09-06"
++        "moduleSha256": "92c57c53dabcc58182a349031a9aa956446f2315ece1eebe5a0adcb45ba71628",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_device.zig": {
+         "decision": "Keep",
+@@ -1312,9 +1312,9 @@
+       },
+       "src/backend/vulkan/vk_formats.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "27c788a47b15a11e9b752ea0b2ef1c6db55c1d76aab79bf5e53f5185abe2f6ad",
+-        "reviewer": "codex-render-submission/2026-09-06",
+-        "reason": "Keep: shared vertex-format identity is checked against the pinned WebGPU header; native backend conversion and recorded execution remain owned by their existing components."
++        "moduleSha256": "83b0f0358d827552ee0b1d40ca9505e16e5017c8347d531c5cfb87df8b4e4a90",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_functions.zig": {
+         "decision": "Keep",
+@@ -1408,9 +1408,9 @@
+       },
+       "src/backend/vulkan/vk_texture_commands.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "6e659c6f67c55afd3586dcd22d4361934efc884f3ebbfa177c1c6e260e091efb",
+-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+-        "reviewer": "codex-gigi-compatibility/2026-08-15"
++        "moduleSha256": "a79c1d8b65e44b8aefd027f2446588140e224708181cc42e4ffdc4d38a7f1440",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_upload.zig": {
+         "decision": "Keep",
+@@ -3490,9 +3490,9 @@
+       },
+       "src/native/command/doe_encoder_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "46951f4f059864627f6e2db777eae94138d7280a6c0ddbf961c1bf3e19b4b56e",
+-        "reason": "Keep: native command buffers release all command storage through their explicit owning allocator.",
+-        "reviewer": "codex-recorded-allocation/2026-09-06"
++        "moduleSha256": "69c933e41d7ad6082e853f5c50056d872b21e05b4cc075d67a4958b2e9274d3f",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/command/doe_immediates_external_native.zig": {
+         "decision": "Keep",
+@@ -3508,9 +3508,9 @@
+       },
+       "src/native/compute/doe_compute_ext_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "3df3a450f320d801015ef3537a91e2aa691386ac813041fb3344d34c567a9aee",
+-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+-        "reviewer": "codex-render-ownership/2026-09-06"
++        "moduleSha256": "e132a9378588b9e9b879b64a27d4a3d16757a3a38cac6f0f6ef0f754143108dd",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/compute/doe_compute_fast.zig": {
+         "decision": "Keep",
+@@ -3598,9 +3598,9 @@
+       },
+       "src/native/queue/doe_queue_submit_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "10f3dc2fa4e148c88ff76aac752c0d7aee081da2668bde74e35c1c4ec4fd357c",
+-        "reason": "Keep: explicit resource ownership and prepared execution preserve ordinary provider semantics; validated by program and queue-ordering regressions.",
+-        "reviewer": "codex-gpu-program/2026-09-05"
++        "moduleSha256": "8314c6c6d7b53a2901af602c83d8eacebddfc942d5184c2186132df86a14189a",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/queue/doe_queue_submit_shared.zig": {
+         "decision": "Keep",
+@@ -3610,21 +3610,21 @@
+       },
+       "src/native/queue/doe_queue_submit_vulkan.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "f43881ae7df3a7e38b3587ebafbc722d854351e0197c5f38a6f751797410c367",
+-        "reason": "Keep: snapshot Vulkan draw inputs at recording and execute them in submission order, retaining native resources and matching attachment dimensions.",
+-        "reviewer": "codex-render-submission/2026-09-06"
++        "moduleSha256": "81678a6d03ea0520cb9bac9e6283239894e75e073f715af9f3047137fa61be52",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/render/doe_bundle_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "2b167abd6f7df36a3c9420e391806c6e603444b25442eaeb55e322cb63a8366d",
+-        "reason": "Keep: render owners validate shader device and bundle signature, retain recorded resources, and finalize only after the last lease.",
+-        "reviewer": "codex-native-ownership/2026-09-06"
++        "moduleSha256": "ed09e36af017d24fd64ed13bfb34f50c60ceb19f21bcd2f114d449e086b1c571",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/render/doe_render_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "4f7d52096d87eb1787d947961dbe0b3840f94f5f69c69874870018510e12114f",
+-        "reason": "Keep: render objects and bundles retain dependencies through command ownership and release only their final references; allocator and device lifetimes are explicit.",
+-        "reviewer": "codex-render-ownership/2026-09-06"
++        "moduleSha256": "60373808388e6107cc6ac0257006d1cc6e4f851bbd3fa76b2140461a2cd13796",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/render/doe_render_pass_controls_native.zig": {
+         "decision": "Keep",
+@@ -3658,9 +3658,9 @@
+       },
+       "src/native/resource/doe_command_texture_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "d5ff9406e62fdb703d5f76b25175e9ad8fd805dcaed7893b204258756f89d01e",
+-        "reason": "Keep: existing native responsibility is preserved while command leases share a neutral contract and receive an explicit recording allocator.",
+-        "reviewer": "codex-render-ownership/2026-09-06"
++        "moduleSha256": "b7bc9a4ce909892d9ed08c55e2dc2b1e4c020fd32360c632ed6f7dc7ab60c89d",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/resource/doe_external_texture_native.zig": {
+         "decision": "Keep",
+@@ -3670,9 +3670,9 @@
+       },
+       "src/native/resource/doe_query_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "2a16a9b2f7f52fdf4c1f0ad02abeefa028e67c4e825f9bcf5f7fbd83e6644b6e",
+-        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+-        "reviewer": "codex-native-ownership/2026-09-06"
++        "moduleSha256": "bdcbb4196790f8d85bf4ce0694b2a405c8be537e5788f43a9077048145a161bd",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/resource/doe_texture_sampler_native.zig": {
+         "decision": "Keep",
+@@ -3748,15 +3748,15 @@
+       },
+       "src/native/support/doe_native_object_helpers.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "ee7028417449234063c804916ed886a056db007a5bdb6dbbc2f17ec748296b56",
+-        "reason": "Keep: native object and neutral lease owners centralize atomic reference counts and synchronized label mutation without changing handle layout.",
+-        "reviewer": "codex-native-ownership/2026-09-06"
++        "moduleSha256": "c95edc18651caf612cef1c21aa3d8f6ef6b02d1e1d71e1978ea7ad409a9213ae",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/support/doe_native_object_types.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "0301f5ba72a450f94bdf6bcb9b6a4607f9a2937e3d057badfb752943f22dd756",
+-        "reason": "Keep: command buffers carry the allocator that owns their object and recorded storage through release.",
+-        "reviewer": "codex-recorded-allocation/2026-09-06"
++        "moduleSha256": "524ae75393b1cc10d8c2d153cf2ca1e848a1fcf4607763d4cd152cb83f94eaa0",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/support/doe_native_runtime_helpers.zig": {
+         "decision": "Keep",
+@@ -3814,9 +3814,9 @@
+       },
+       "src/native/vulkan/vulkan_render_pass_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "fce8a1d729bd8cf7304879e88b956f51452e4074cb03b51ddda03f1b42ce26c1",
+-        "reason": "Keep: native Vulkan recording snapshots retained color/depth views and first-use load semantics, preserving read-only attachments and subsequent draws.",
+-        "reviewer": "codex-depth-ownership/2026-09-06"
++        "moduleSha256": "6413b196da4204532f5eee5886f18ae3519284fd8a077fc81a418b1df1dd170b",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/native/vulkan/vulkan_render_pipeline_native.zig": {
+         "decision": "Keep",
+@@ -4090,9 +4090,9 @@
+       },
+       "src/runtime/render/render_bundle.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "4d29ba6ec0d4e9d76d734844bbb4a4d94d44422b486e66359b1c25ded48a0e10",
+-        "reason": "Keep: render owners validate shader device and bundle signature, retain recorded resources, and finalize only after the last lease.",
+-        "reviewer": "codex-native-ownership/2026-09-06"
++        "moduleSha256": "89d24b1ca9d0cc191dfb751e3d05877f6f92974304e398fb4458a6ed9d1fcbc6",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/runtime/security/wgpu_sandbox_guard.zig": {
+         "decision": "Keep",
+@@ -4228,9 +4228,9 @@
+       },
+       "src/native/compute/doe_compute_program_native.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "0b363cb64bbf198dba9e19081c48d006fa238b7569cc5900e59384266cc34520",
+-        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+-        "reviewer": "codex-native-ownership/2026-09-06"
++        "moduleSha256": "2255f7196299e51270712659587aa4e47a01b082b2b1954fdbdb074dc5437f91",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/backend/vulkan/vk_shared_pipeline.zig": {
+         "decision": "Keep",
+@@ -4264,9 +4264,9 @@
+       },
+       "src/native/command/doe_command_references.zig": {
+         "decision": "Keep",
+-        "reason": "Keep: retain the existing resource owner and backend boundary while recorded commands and concurrent shader creation use explicit, atomic lifetime operations.",
+-        "moduleSha256": "97cb5ad4017203689cc6d78db37ee5562c21329b6ed21c2096302c01c8fd58e7",
+-        "reviewer": "codex-native-ownership/2026-09-06"
++        "moduleSha256": "3c801dc8da77cca8ddc814d8aa1594765905a0009d5aee431c21858f720b8f1f",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       },
+       "src/compiler/wgsl/pipeline/diagnostic.zig": {
+         "decision": "Keep",
+@@ -4300,9 +4300,21 @@
+       },
+       "src/native/compute/doe_compute_recorded.zig": {
+         "decision": "Keep",
+-        "moduleSha256": "76c82a35457e448fc2db1bba410c60111f135b3601ddccf0adc0dabd6856f887",
+-        "reason": "Keep: private command construction owns allocation, retained dependencies, rollback, and publication for fused compute entrypoints.",
+-        "reviewer": "codex-recorded-allocation/2026-09-06"
++        "moduleSha256": "ebe494e7f41615581dd85fef995fe5336226436ddd6bb5781ce263c0c3af1b37",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
++      },
++      "src/contracts/command_recording.zig": {
++        "decision": "Keep",
++        "moduleSha256": "a3084a364295d0ddbb3e2f0901f332134422db46141e5614ab78a497c4e1c986",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
++      },
++      "src/native/command/doe_command_recording.zig": {
++        "decision": "Keep",
++        "moduleSha256": "3798fd6861660681ad2bb262b7d23eed1948493125ba5651489751e79b568002",
++        "reason": "Keep: explicit recording state and owned resources preserve failure and submission ordering at the existing component boundary.",
++        "reviewer": "codex-recording-ownership/2026-09-06"
+       }
+     },
+     "linePolicy": {
+diff --git a/runtime/zig/src/backend/dropin_queue_submit.zig b/runtime/zig/src/backend/dropin_queue_submit.zig
+index f4d111c2a..cabe9a1ff 100644
+--- a/runtime/zig/src/backend/dropin_queue_submit.zig
++++ b/runtime/zig/src/backend/dropin_queue_submit.zig
+@@ -1,4 +1,5 @@
+ pub const metal_bridge = @import("metal/metal_bridge_decls.zig");
++pub const vulkan_texture_commands = @import("vulkan/vk_texture_commands.zig");
+ pub const vulkan_upload = @import("vulkan/vk_upload.zig");
+ pub const vulkan_compute_program = @import("vulkan/vk_compute_program.zig");
+ pub const d3d12_bridge = @import("d3d12/d3d12_bridge_decls.zig");
+diff --git a/runtime/zig/src/backend/dropin_resource_ops.zig b/runtime/zig/src/backend/dropin_resource_ops.zig
+index 7f5470fdd..79f57964a 100644
+--- a/runtime/zig/src/backend/dropin_resource_ops.zig
++++ b/runtime/zig/src/backend/dropin_resource_ops.zig
+@@ -64,39 +64,6 @@ fn failVulkanResourceError(dev: *DoeDevice, comptime operation: []const u8, err:
+     return failVulkanResourceOp(dev, operation, @errorName(err));
+ }
+ 
+-pub fn handleVulkanCopyBufferToTexture(
+-    enc: *DoeCommandEncoder,
+-    src_buffer: *DoeBuffer,
+-    src_offset: u64,
+-    src_bytes_per_row: u32,
+-    src_rows_per_image: u32,
+-    dst_texture: *DoeTexture,
+-    dst_mip_level: u32,
+-    width: u32,
+-    height: u32,
+-    depth_or_array_layers: u32,
+-) bool {
+-    _ = width;
+-    if (enc.dev.backend != .vulkan) return false;
+-    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "backend compiled without Vulkan support");
+-    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
+-        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "device has no Vulkan runtime");
+-    if (src_buffer.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer has no Vulkan resource");
+-    if (dst_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "destination texture has no Vulkan resource");
+-    const scb = rt.compute_buffers.get(src_buffer.vk_id) orelse
+-        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer resource is not registered");
+-    const mapped_ptr = scb.mapped orelse
+-        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer resource is not CPU-mapped");
+-    const rows = if (src_rows_per_image > 0) src_rows_per_image else height;
+-    const byte_count: usize = @intCast(@as(u64, src_bytes_per_row) * rows * depth_or_array_layers);
+-    const base_off: usize = @intCast(src_offset);
+-    const raw: [*]const u8 = @ptrCast(mapped_ptr);
+-    const copy_res = copyTextureResource(dst_texture, dst_mip_level, src_bytes_per_row, rows);
+-    rt.texture_write(.{ .texture = copy_res, .data = raw[base_off .. base_off + byte_count] }) catch |err|
+-        return failVulkanResourceError(enc.dev, "copyBufferToTexture", err);
+-    return true;
+-}
+-
+ pub fn handleVulkanCopyTextureToBuffer(
+     enc: *DoeCommandEncoder,
+     src_texture: *DoeTexture,
+diff --git a/runtime/zig/src/backend/vulkan/vk_constants.zig b/runtime/zig/src/backend/vulkan/vk_constants.zig
+index 3717c6b26..a7706ca58 100644
+--- a/runtime/zig/src/backend/vulkan/vk_constants.zig
++++ b/runtime/zig/src/backend/vulkan/vk_constants.zig
+@@ -346,6 +346,8 @@ pub const VK_ACCESS_TRANSFER_READ_BIT: u32 = 0x00000800;
+ pub const VK_ACCESS_TRANSFER_WRITE_BIT: u32 = 0x00001000;
+ pub const VK_ACCESS_HOST_READ_BIT: u32 = 0x00002000;
+ pub const VK_ACCESS_HOST_WRITE_BIT: u32 = 0x00004000;
++pub const VK_ACCESS_MEMORY_READ_BIT: u32 = 0x00008000;
++pub const VK_ACCESS_MEMORY_WRITE_BIT: u32 = 0x00010000;
+ 
+ // --- Descriptor types ---
+ pub const VK_DESCRIPTOR_TYPE_SAMPLER: u32 = 0;
+diff --git a/runtime/zig/src/backend/vulkan/vk_formats.zig b/runtime/zig/src/backend/vulkan/vk_formats.zig
+index 21208ec26..19d3697fd 100644
+--- a/runtime/zig/src/backend/vulkan/vk_formats.zig
++++ b/runtime/zig/src/backend/vulkan/vk_formats.zig
+@@ -406,6 +406,27 @@ pub fn bytes_per_pixel(format: model_gpu_types.WGPUTextureFormat) !u32 {
+     };
+ }
+ 
++pub fn copy_block_extent(format: model_gpu_types.WGPUTextureFormat) [2]u32 {
++    return switch (format) {
++        model_gpu_types.WGPUTextureFormat_BC1RGBAUnorm...model_gpu_types.WGPUTextureFormat_EACRG11Snorm => .{ 4, 4 },
++        model_gpu_types.WGPUTextureFormat_ASTC4x4Unorm, model_gpu_types.WGPUTextureFormat_ASTC4x4UnormSrgb => .{ 4, 4 },
++        model_gpu_types.WGPUTextureFormat_ASTC5x4Unorm, model_gpu_types.WGPUTextureFormat_ASTC5x4UnormSrgb => .{ 5, 4 },
++        model_gpu_types.WGPUTextureFormat_ASTC5x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC5x5UnormSrgb => .{ 5, 5 },
++        model_gpu_types.WGPUTextureFormat_ASTC6x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC6x5UnormSrgb => .{ 6, 5 },
++        model_gpu_types.WGPUTextureFormat_ASTC6x6Unorm, model_gpu_types.WGPUTextureFormat_ASTC6x6UnormSrgb => .{ 6, 6 },
++        model_gpu_types.WGPUTextureFormat_ASTC8x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC8x5UnormSrgb => .{ 8, 5 },
++        model_gpu_types.WGPUTextureFormat_ASTC8x6Unorm, model_gpu_types.WGPUTextureFormat_ASTC8x6UnormSrgb => .{ 8, 6 },
++        model_gpu_types.WGPUTextureFormat_ASTC8x8Unorm, model_gpu_types.WGPUTextureFormat_ASTC8x8UnormSrgb => .{ 8, 8 },
++        model_gpu_types.WGPUTextureFormat_ASTC10x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x5UnormSrgb => .{ 10, 5 },
++        model_gpu_types.WGPUTextureFormat_ASTC10x6Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x6UnormSrgb => .{ 10, 6 },
++        model_gpu_types.WGPUTextureFormat_ASTC10x8Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x8UnormSrgb => .{ 10, 8 },
++        model_gpu_types.WGPUTextureFormat_ASTC10x10Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x10UnormSrgb => .{ 10, 10 },
++        model_gpu_types.WGPUTextureFormat_ASTC12x10Unorm, model_gpu_types.WGPUTextureFormat_ASTC12x10UnormSrgb => .{ 12, 10 },
++        model_gpu_types.WGPUTextureFormat_ASTC12x12Unorm, model_gpu_types.WGPUTextureFormat_ASTC12x12UnormSrgb => .{ 12, 12 },
++        else => .{ 1, 1 },
++    };
++}
++
+ /// Returns the Vulkan image aspect mask for a WebGPU texture format.
+ /// Color formats use COLOR_BIT; depth and depth-stencil formats use the
+ /// appropriate depth/stencil combination.
+diff --git a/runtime/zig/src/backend/vulkan/vk_texture_commands.zig b/runtime/zig/src/backend/vulkan/vk_texture_commands.zig
+index 512d07804..03200b59c 100644
+--- a/runtime/zig/src/backend/vulkan/vk_texture_commands.zig
++++ b/runtime/zig/src/backend/vulkan/vk_texture_commands.zig
+@@ -23,6 +23,129 @@ fn texture_read_copy_extent(width: u32, height: u32) TextureReadExtent {
+     return .{ .width = width, .height = height };
+ }
+ 
++pub const BufferCopy = struct {
++    offset: u64,
++    bytes_per_row: u32,
++    rows_per_image: u32,
++    mip: u32,
++    width: u32,
++    height: u32,
++    depth_or_layers: u32,
++};
++
++pub fn buffer_copy_region(source_size: u64, texture: vk_resources.TextureResource, copy: BufferCopy) !c.VkBufferImageCopy {
++    if (copy.mip >= texture.mip_levels or copy.mip >= @bitSizeOf(u32) or texture.sample_count != 1)
++        return error.InvalidArgument;
++    if (texture.format == model_gpu_types.WGPUTextureFormat_Depth24Plus or
++        texture.format == model_gpu_types.WGPUTextureFormat_Depth24PlusStencil8 or
++        texture.format == model_gpu_types.WGPUTextureFormat_Depth32FloatStencil8)
++        return error.UnsupportedFeature;
++    const shift: u5 = @intCast(copy.mip);
++    const mip_width = @max(texture.width >> shift, 1);
++    const mip_height = @max(texture.height >> shift, 1);
++    const is_3d = texture.dimension == model_gpu_types.WGPUTextureDimension_3D;
++    const layers = if (is_3d) @max(texture.depth_or_array_layers >> shift, 1) else texture.depth_or_array_layers;
++    if (copy.width > mip_width or copy.height > mip_height or copy.depth_or_layers > layers)
++        return error.InvalidArgument;
++    const block = vk_formats.copy_block_extent(texture.format);
++    const bytes = try vk_formats.bytes_per_pixel(texture.format);
++    if ((copy.width % block[0] != 0 and copy.width != mip_width) or
++        (copy.height % block[1] != 0 and copy.height != mip_height) or copy.offset % bytes != 0)
++        return error.InvalidArgument;
++    const columns = std.math.divCeil(u64, copy.width, block[0]) catch unreachable;
++    const rows = std.math.divCeil(u64, copy.height, block[1]) catch unreachable;
++    const row_bytes = columns * bytes;
++    const pitch = if (copy.bytes_per_row == 0) row_bytes else copy.bytes_per_row;
++    const image_rows = if (copy.rows_per_image == 0) rows else copy.rows_per_image;
++    if (pitch < row_bytes or pitch % bytes != 0 or image_rows < rows) return error.InvalidArgument;
++    var required: u64 = 0;
++    if (copy.width != 0 and copy.height != 0 and copy.depth_or_layers != 0) {
++        const image_stride = try std.math.mul(u64, pitch, image_rows);
++        required = try std.math.mul(u64, image_stride, copy.depth_or_layers - 1);
++        required = try std.math.add(u64, required, try std.math.mul(u64, pitch, rows - 1));
++        required = try std.math.add(u64, required, row_bytes);
++    }
++    if (copy.offset > source_size or required > source_size - copy.offset) return error.InvalidArgument;
++    const row_length = std.math.cast(u32, (pitch / bytes) * block[0]) orelse return error.InvalidArgument;
++    const image_height = std.math.cast(u32, image_rows * block[1]) orelse return error.InvalidArgument;
++    return .{
++        .bufferOffset = copy.offset,
++        .bufferRowLength = row_length,
++        .bufferImageHeight = image_height,
++        .imageSubresource = .{
++            .aspectMask = vk_formats.aspect_mask_for_format(texture.format),
++            .mipLevel = copy.mip,
++            .baseArrayLayer = 0,
++            .layerCount = if (is_3d) 1 else copy.depth_or_layers,
++        },
++        .imageOffset = .{ .x = 0, .y = 0, .z = 0 },
++        .imageExtent = .{ .width = copy.width, .height = copy.height, .depth = if (is_3d) copy.depth_or_layers else 1 },
++    };
++}
++
++pub fn record_buffer_copy(self: anytype, source: vk_resources.ComputeBuffer, texture: *vk_resources.TextureResource, copy: BufferCopy) !void {
++    const region = try buffer_copy_region(source.size, texture.*, copy);
++    if (copy.width == 0 or copy.height == 0 or copy.depth_or_layers == 0) return;
++    const command_buffer = try self.begin_prepared_dispatch_replay();
++    const barrier = c.VkMemoryBarrier{
++        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
++        .pNext = null,
++        .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT | c.VK_ACCESS_TRANSFER_WRITE_BIT,
++        .dstAccessMask = c.VK_ACCESS_TRANSFER_READ_BIT,
++    };
++    c.vkCmdPipelineBarrier(command_buffer, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 1, @ptrCast(&barrier), 0, null, 0, null);
++    vk_resources.transition_texture_layout(command_buffer, texture.*, texture.layout, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, c.VK_ACCESS_MEMORY_READ_BIT | c.VK_ACCESS_MEMORY_WRITE_BIT, c.VK_ACCESS_TRANSFER_WRITE_BIT, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT);
++    c.vkCmdCopyBufferToImage(command_buffer, source.buffer, texture.image, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, @ptrCast(&region));
++    vk_resources.transition_texture_layout(command_buffer, texture.*, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, c.VK_IMAGE_LAYOUT_GENERAL, c.VK_ACCESS_TRANSFER_WRITE_BIT, c.VK_ACCESS_MEMORY_READ_BIT | c.VK_ACCESS_MEMORY_WRITE_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT, c.VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
++    vk_resources.mark_texture_image_layout(self, texture.image, c.VK_IMAGE_LAYOUT_GENERAL);
++}
++
++test "buffer image copy validates the last accessed byte and mip-relative layers" {
++    var texture = std.mem.zeroes(vk_resources.TextureResource);
++    texture.width = 8;
++    texture.height = 4;
++    texture.depth_or_array_layers = 3;
++    texture.mip_levels = 3;
++    texture.sample_count = 1;
++    texture.dimension = model_gpu_types.WGPUTextureDimension_2D;
++    texture.format = model_gpu_types.WGPUTextureFormat_RGBA8Unorm;
++    var copy = BufferCopy{ .offset = 16, .bytes_per_row = 256, .rows_per_image = 3, .mip = 1, .width = 4, .height = 2, .depth_or_layers = 2 };
++    const minimum_source_size = 16 + 256 * 3 + 256 + 16;
++    const region = try buffer_copy_region(minimum_source_size, texture, copy);
++    try std.testing.expectEqual(@as(u32, 4), region.imageExtent.width);
++    try std.testing.expectEqual(@as(u32, 2), region.imageSubresource.layerCount);
++    try std.testing.expectEqual(@as(u32, 1), region.imageExtent.depth);
++    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(minimum_source_size - 1, texture, copy));
++    copy.width = 5;
++    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(minimum_source_size, texture, copy));
++    copy.width = 4;
++    texture.dimension = model_gpu_types.WGPUTextureDimension_3D;
++    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(minimum_source_size, texture, copy));
++    texture.depth_or_array_layers = 4;
++    const volume = try buffer_copy_region(minimum_source_size, texture, copy);
++    try std.testing.expectEqual(@as(u32, 1), volume.imageSubresource.layerCount);
++    try std.testing.expectEqual(@as(u32, 2), volume.imageExtent.depth);
++    copy.offset = std.math.maxInt(u64) - 3;
++    try std.testing.expectError(error.InvalidArgument, buffer_copy_region(std.math.maxInt(u64), texture, copy));
++}
++
++test "compressed buffer copy converts block rows to Vulkan texels" {
++    var texture = std.mem.zeroes(vk_resources.TextureResource);
++    texture.width = 10;
++    texture.height = 12;
++    texture.depth_or_array_layers = 1;
++    texture.mip_levels = 1;
++    texture.sample_count = 1;
++    texture.dimension = model_gpu_types.WGPUTextureDimension_2D;
++    texture.format = model_gpu_types.WGPUTextureFormat_ASTC5x4Unorm;
++    const copy = BufferCopy{ .offset = 0, .bytes_per_row = 256, .rows_per_image = 3, .mip = 0, .width = 10, .height = 12, .depth_or_layers = 1 };
++    const region = try buffer_copy_region(256 * 2 + 32, texture, copy);
++    try std.testing.expectEqual(@as(u32, 80), region.bufferRowLength);
++    try std.testing.expectEqual(@as(u32, 12), region.bufferImageHeight);
++    texture.format = model_gpu_types.WGPUTextureFormat_Depth24PlusStencil8;
++    try std.testing.expectError(error.UnsupportedFeature, buffer_copy_region(1024, texture, copy));
++}
++
+ pub fn texture_write(self: anytype, cmd_arg: model_texture_types.TextureWriteCommand) !void {
+     const resource = try vk_resources.ensure_texture_resource(self, cmd_arg.texture);
+     if (cmd_arg.data.len == 0) {
+diff --git a/runtime/zig/src/contracts/command_recording.zig b/runtime/zig/src/contracts/command_recording.zig
+new file mode 100644
+index 000000000..bcdff899e
+--- /dev/null
++++ b/runtime/zig/src/contracts/command_recording.zig
+@@ -0,0 +1,13 @@
++pub const Failure = error{ OutOfMemory, InvalidState, InvalidArgument };
++
++pub const State = union(enum) {
++    open,
++    failed: Failure,
++    finished,
++
++    pub fn fail(self: *State, cause: Failure) bool {
++        if (self.* == .failed) return false;
++        self.* = .{ .failed = cause };
++        return true;
++    }
++};
+diff --git a/runtime/zig/src/native/command/doe_command_recording.zig b/runtime/zig/src/native/command/doe_command_recording.zig
+new file mode 100644
+index 000000000..7373ba73a
+--- /dev/null
++++ b/runtime/zig/src/native/command/doe_command_recording.zig
+@@ -0,0 +1,38 @@
++const objects = @import("../support/doe_native_object_types.zig");
++const commands = @import("../support/doe_native_command_types.zig");
++const errors = @import("../../runtime/diagnostics/error_scope.zig");
++const contract = @import("../../contracts/command_recording.zig");
++
++pub fn fail(encoder: *objects.DoeCommandEncoder, cause: contract.Failure) void {
++    if (encoder.state.fail(cause))
++        encoder.dev.error_scopes.deliver(errors.zig_error_to_type(cause), switch (cause) {
++            error.OutOfMemory => "command recording could not allocate owned storage",
++            error.InvalidState => "command recording requires an open encoder",
++            error.InvalidArgument => "command recording received an invalid dependency",
++        });
++}
++
++pub fn requireOpen(encoder: *objects.DoeCommandEncoder) bool {
++    if (encoder.state == .open) return true;
++    fail(encoder, error.InvalidState);
++    return false;
++}
++
++pub fn reserve(encoder: *objects.DoeCommandEncoder, command_count: usize, reference_count: usize) bool {
++    if (!requireOpen(encoder)) return false;
++    encoder.cmds.ensureUnusedCapacity(encoder.allocator, command_count) catch |err| {
++        fail(encoder, err);
++        return false;
++    };
++    encoder.references.ensureUnusedCapacity(encoder.allocator, reference_count) catch |err| {
++        fail(encoder, err);
++        return false;
++    };
++    return true;
++}
++
++pub fn append(encoder: *objects.DoeCommandEncoder, command: commands.RecordedCmd) bool {
++    if (!reserve(encoder, 1, 0)) return false;
++    encoder.cmds.appendAssumeCapacity(command);
++    return true;
++}
+diff --git a/runtime/zig/src/native/command/doe_command_references.zig b/runtime/zig/src/native/command/doe_command_references.zig
+index 3f6287d0e..e8a225140 100644
+--- a/runtime/zig/src/native/command/doe_command_references.zig
++++ b/runtime/zig/src/native/command/doe_command_references.zig
+@@ -6,44 +6,44 @@ const exports = @import("../support/doe_native_exports.zig");
+ 
+ pub const List = std.ArrayListUnmanaged(commands.CommandReference);
+ 
+-fn retain(allocator: std.mem.Allocator, list: *List, object: anytype, release: *const fn (?*anyopaque) callconv(.c) void) void {
+-    list.append(allocator, .{
++fn retain(list: *List, object: anytype, release: *const fn (?*anyopaque) callconv(.c) void) void {
++    list.appendAssumeCapacity(.{
+         .handle = helpers.toOpaque(object),
+         .release = release,
+-    }) catch std.debug.panic("command references: OOM retaining recorded resource", .{});
++    });
+     helpers.object_add_ref(@TypeOf(object.*), helpers.toOpaque(object));
+ }
+ 
+-pub fn retainBuffer(allocator: std.mem.Allocator, list: *List, buffer: *objects.DoeBuffer) void {
+-    retain(allocator, list, buffer, exports.doeNativeBufferRelease);
++pub fn retainBufferAssumeCapacity(list: *List, buffer: *objects.DoeBuffer) void {
++    retain(list, buffer, exports.doeNativeBufferRelease);
+ }
+ 
+-pub fn retainTexture(allocator: std.mem.Allocator, list: *List, texture: *objects.DoeTexture) void {
+-    retain(allocator, list, texture, exports.doeNativeTextureRelease);
++pub fn retainTextureAssumeCapacity(list: *List, texture: *objects.DoeTexture) void {
++    retain(list, texture, exports.doeNativeTextureRelease);
+ }
+ 
+-pub fn retainTextureView(allocator: std.mem.Allocator, list: *List, view: *objects.DoeTextureView) void {
+-    retain(allocator, list, view, exports.doeNativeTextureViewRelease);
++pub fn retainTextureViewAssumeCapacity(list: *List, view: *objects.DoeTextureView) void {
++    retain(list, view, exports.doeNativeTextureViewRelease);
+ }
+ 
+-pub fn retainRenderPipeline(allocator: std.mem.Allocator, list: *List, pipeline: *objects.DoeRenderPipeline) void {
+-    retain(allocator, list, pipeline, exports.doeNativeRenderPipelineRelease);
++pub fn retainRenderPipelineAssumeCapacity(list: *List, pipeline: *objects.DoeRenderPipeline) void {
++    retain(list, pipeline, exports.doeNativeRenderPipelineRelease);
+ }
+ 
+-pub fn retainRenderBundle(allocator: std.mem.Allocator, list: *List, bundle: *@import("../../runtime/render/render_bundle.zig").DoeRenderBundle) void {
+-    retain(allocator, list, bundle, exports.doeNativeRenderBundleRelease);
++pub fn retainRenderBundleAssumeCapacity(list: *List, bundle: *@import("../../runtime/render/render_bundle.zig").DoeRenderBundle) void {
++    retain(list, bundle, exports.doeNativeRenderBundleRelease);
+ }
+ 
+-pub fn retainDevice(allocator: std.mem.Allocator, list: *List, device: *objects.DoeDevice) void {
+-    retain(allocator, list, device, exports.doeNativeDeviceRelease);
++pub fn retainDeviceAssumeCapacity(list: *List, device: *objects.DoeDevice) void {
++    retain(list, device, exports.doeNativeDeviceRelease);
+ }
+ 
+-pub fn retainPipeline(allocator: std.mem.Allocator, list: *List, pipeline: *objects.DoeComputePipeline) void {
+-    retain(allocator, list, pipeline, exports.doeNativeComputePipelineRelease);
++pub fn retainPipelineAssumeCapacity(list: *List, pipeline: *objects.DoeComputePipeline) void {
++    retain(list, pipeline, exports.doeNativeComputePipelineRelease);
+ }
+ 
+-pub fn retainBindGroup(allocator: std.mem.Allocator, list: *List, group: *objects.DoeBindGroup) void {
+-    retain(allocator, list, group, exports.doeNativeBindGroupRelease);
++pub fn retainBindGroupAssumeCapacity(list: *List, group: *objects.DoeBindGroup) void {
++    retain(list, group, exports.doeNativeBindGroupRelease);
+ }
+ 
+ pub fn releaseAll(references: *List) void {
+diff --git a/runtime/zig/src/native/command/doe_encoder_native.zig b/runtime/zig/src/native/command/doe_encoder_native.zig
+index 5b26dfb6e..c336cd844 100644
+--- a/runtime/zig/src/native/command/doe_encoder_native.zig
++++ b/runtime/zig/src/native/command/doe_encoder_native.zig
+@@ -1,3 +1,4 @@
++const recording = @import("doe_command_recording.zig");
+ // doe_encoder_native.zig — Bind group layout, bind group, pipeline layout,
+ // command encoder, and command buffer exports for Doe native Metal backend.
+ // Sharded from doe_wgpu_native.zig to stay under the line-limit policy.
+@@ -10,7 +11,6 @@ const native_helpers = @import("../support/doe_native_object_helpers.zig");
+ const query_native = @import("../resource/doe_query_native.zig");
+ const references = @import("doe_command_references.zig");
+ const native_exports = @import("../support/doe_native_exports.zig");
+-const resource_ops = @import("../../backend/dropin_resource_ops.zig");
+ 
+ const alloc = native_helpers.alloc;
+ const make = native_helpers.make;
+@@ -32,29 +32,42 @@ const DoeTexture = native_types.DoeTexture;
+ 
+ pub export fn doeNativeDeviceCreateCommandEncoder(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUCommandEncoderDescriptor) callconv(.c) ?*anyopaque {
+     const dev = cast(DoeDevice, dev_raw) orelse return null;
+-    const enc = make(DoeCommandEncoder) orelse return null;
+-    native_helpers.object_add_ref(DoeDevice, dev_raw);
+-    enc.* = .{ .dev = dev, .device_ref = dev };
++    const enc = createEncoder(alloc, dev) catch {
++        dev.error_scopes.deliver(@import("../../runtime/diagnostics/error_scope.zig").ERROR_TYPE_OUT_OF_MEMORY, "command encoder allocation failed");
++        return null;
++    };
+     const result = toOpaque(enc);
+     if (desc) |d| label_store.set(result, d.label.data, d.label.length);
+     return result;
+ }
+ 
++pub fn createEncoder(allocator: std.mem.Allocator, device: *DoeDevice) !*DoeCommandEncoder {
++    const encoder = try native_helpers.create(DoeCommandEncoder, allocator);
++    native_helpers.object_add_ref(DoeDevice, toOpaque(device));
++    encoder.* = .{ .allocator = allocator, .dev = device, .device_ref = device };
++    return encoder;
++}
++
+ pub export fn doeNativeCommandEncoderRelease(raw: ?*anyopaque) callconv(.c) void {
+     if (cast(DoeCommandEncoder, raw)) |e| {
+         if (!native_helpers.object_should_destroy(e)) return;
+         label_store.remove(raw);
+         query_native.releaseRecordedCommandReferences(e.cmds.items);
+-        e.cmds.deinit(alloc);
+-        references.releaseAll(&e.references);
++        e.cmds.deinit(e.allocator);
++        @import("../../contracts/resource_lease.zig").releaseAll(e.allocator, &e.references);
+         if (e.device_ref) |dev| native_exports.doeNativeDeviceRelease(toOpaque(dev));
+-        alloc.destroy(e);
++        const allocator = e.allocator;
++        allocator.destroy(e);
+     }
+ }
+ 
+ pub export fn doeNativeCommandEncoderBeginComputePass(enc_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUComputePassDescriptor) callconv(.c) ?*anyopaque {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return null;
+-    const pass = make(DoeComputePass) orelse return null;
++    if (!recording.requireOpen(enc)) return null;
++    const pass = native_helpers.create(DoeComputePass, enc.allocator) catch |err| {
++        recording.fail(enc, err);
++        return null;
++    };
+     var timestamp_end_query_set: ?*anyopaque = null;
+     var timestamp_end_write_index = native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX;
+     if (desc) |d| {
+@@ -90,18 +103,21 @@ pub export fn doeNativeCommandEncoderBeginComputePass(enc_raw: ?*anyopaque, desc
+ 
+ pub export fn doeNativeCopyBufferToBuffer(enc_raw: ?*anyopaque, src_raw: ?*anyopaque, src_off: u64, dst_raw: ?*anyopaque, dst_off: u64, size: u64) callconv(.c) void {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
++    if (!recording.requireOpen(enc)) return;
+     const src = cast(DoeBuffer, src_raw) orelse return;
+     const dst = cast(DoeBuffer, dst_raw) orelse return;
+     if (src.error_object or dst.error_object or src.destroyed or dst.destroyed) return;
+-    references.retainBuffer(alloc, &enc.references, src);
+-    references.retainBuffer(alloc, &enc.references, dst);
+-    enc.cmds.append(alloc, .{ .copy_buf = .{
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, src);
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, dst);
++    if (!recording.append(enc, .{ .copy_buf = .{
+         .src = @ptrCast(src),
+         .src_off = src_off,
+         .dst = @ptrCast(dst),
+         .dst_off = dst_off,
+         .size = size,
+-    } }) catch std.debug.panic("doe_encoder_native: OOM recording copy command", .{});
++    } })) return;
+ }
+ 
+ pub export fn doeNativeCommandEncoderCopyBufferToTexture(
+@@ -117,36 +133,26 @@ pub export fn doeNativeCommandEncoderCopyBufferToTexture(
+     depth_or_array_layers: u32,
+ ) callconv(.c) void {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
++    if (!recording.requireOpen(enc)) return;
+     const src_buffer = cast(DoeBuffer, src_buffer_raw) orelse return;
+     const dst_texture = cast(DoeTexture, dst_texture_raw) orelse return;
+     if (src_buffer.error_object or src_buffer.destroyed or dst_texture.error_object) return;
+-    references.retainBuffer(alloc, &enc.references, src_buffer);
+-    references.retainTexture(alloc, &enc.references, dst_texture);
+-    if (resource_ops.handleVulkanCopyBufferToTexture(
+-        enc,
+-        src_buffer,
+-        src_offset,
+-        src_bytes_per_row,
+-        src_rows_per_image,
+-        dst_texture,
+-        dst_mip_level,
+-        width,
+-        height,
+-        depth_or_array_layers,
+-    )) {
+-        return;
+-    }
+-    enc.cmds.append(alloc, .{ .copy_buffer_to_texture = .{
+-        .src_buffer = src_buffer.mtl,
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, src_buffer);
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainTextureAssumeCapacity(&enc.references, dst_texture);
++    const vulkan = enc.dev.backend == .vulkan;
++    if (!recording.append(enc, .{ .copy_buffer_to_texture = .{
++        .src_buffer = if (vulkan) toOpaque(src_buffer) else src_buffer.mtl,
+         .src_offset = src_offset,
+         .src_bytes_per_row = src_bytes_per_row,
+         .src_rows_per_image = src_rows_per_image,
+-        .dst_texture = dst_texture.mtl,
++        .dst_texture = if (vulkan) toOpaque(dst_texture) else dst_texture.mtl,
+         .dst_mip_level = dst_mip_level,
+         .width = width,
+         .height = height,
+         .depth_or_array_layers = depth_or_array_layers,
+-    } }) catch std.debug.panic("doe_encoder_native: OOM recording buffer-to-texture copy command", .{});
++    } })) return;
+ }
+ 
+ pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
+@@ -162,13 +168,16 @@ pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
+     depth_or_array_layers: u32,
+ ) callconv(.c) void {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
++    if (!recording.requireOpen(enc)) return;
+     const src_texture = cast(DoeTexture, src_texture_raw) orelse return;
+     const dst_buffer = cast(DoeBuffer, dst_buffer_raw) orelse return;
+     if (src_texture.error_object or dst_buffer.error_object or dst_buffer.destroyed) return;
+-    references.retainTexture(alloc, &enc.references, src_texture);
+-    references.retainBuffer(alloc, &enc.references, dst_buffer);
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainTextureAssumeCapacity(&enc.references, src_texture);
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, dst_buffer);
+     const vulkan = enc.dev.backend == .vulkan;
+-    enc.cmds.append(alloc, .{ .copy_texture_to_buffer = .{
++    if (!recording.append(enc, .{ .copy_texture_to_buffer = .{
+         .src_texture = if (vulkan) @ptrCast(src_texture) else src_texture.mtl,
+         .src_mip_level = src_mip_level,
+         .dst_buffer = if (vulkan) @ptrCast(dst_buffer) else dst_buffer.mtl,
+@@ -178,15 +187,20 @@ pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
+         .width = width,
+         .height = height,
+         .depth_or_array_layers = depth_or_array_layers,
+-    } }) catch std.debug.panic("doe_encoder_native: OOM recording texture copy command", .{});
++    } })) return;
+ }
+ 
+ pub export fn doeNativeCommandEncoderFinish(enc_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUCommandBufferDescriptor) callconv(.c) ?*anyopaque {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return null;
+-    const cb = make(DoeCommandBuffer) orelse return null;
++    const valid = recording.requireOpen(enc);
++    const cb = native_helpers.create(DoeCommandBuffer, enc.allocator) catch |err| {
++        recording.fail(enc, err);
++        return null;
++    };
+     native_helpers.object_add_ref(DoeDevice, toOpaque(enc.dev));
+     cb.* = .{
+-        .allocator = alloc,
++        .allocator = enc.allocator,
++        .error_object = !valid,
+         .dev = enc.dev,
+         .device_ref = enc.dev,
+         .cmds = enc.cmds,
+@@ -194,6 +208,7 @@ pub export fn doeNativeCommandEncoderFinish(enc_raw: ?*anyopaque, desc: ?*const
+     };
+     enc.cmds = .{}; // Transfer ownership.
+     enc.references = .{};
++    enc.state = .finished;
+     const result = toOpaque(cb);
+     if (desc) |d| label_store.set(result, d.label.data, d.label.length);
+     return result;
+@@ -325,3 +340,114 @@ test "render recording retains caller-released state until command buffer releas
+     try std.testing.expectEqual(@as(u32, 1), indirect.ref_count);
+     try std.testing.expectEqual(@as(u32, 1), device.ref_count);
+ }
++
++const RecordingFixture = enum { compute, render, copy, query };
++
++fn recordingAllocationScenario(allocator: std.mem.Allocator, fixture: RecordingFixture) !void {
++    const compute = @import("../compute/doe_compute_ext_native.zig");
++    const render = @import("../render/doe_render_native.zig");
++    var device = DoeDevice{};
++    var pipeline = native_types.DoeComputePipeline{};
++    var render_pipeline = native_types.DoeRenderPipeline{};
++    var group = DoeBindGroup{};
++    var buffer = DoeBuffer{ .size = 512 };
++    var texture = DoeTexture{};
++    var view = native_types.DoeTextureView{ .tex = &texture };
++    var query = query_native.DoeQuerySet{ .count = 2 };
++    defer {
++        for ([_]u32{ device.ref_count, pipeline.ref_count, render_pipeline.ref_count, group.ref_count, buffer.ref_count, texture.ref_count, view.ref_count, query.ref_count }) |count|
++            std.testing.expectEqual(@as(u32, 1), count) catch @panic("ordinary recording leaked a caller reference");
++    }
++    const encoder = try createEncoder(allocator, &device);
++    defer doeNativeCommandEncoderRelease(toOpaque(encoder));
++    const repetitions = 17;
++    switch (fixture) {
++        .compute => {
++            const pass = doeNativeCommandEncoderBeginComputePass(toOpaque(encoder), null) orelse return error.OutOfMemory;
++            defer compute.doeNativeComputePassRelease(pass);
++            for (0..repetitions) |index| {
++                compute.doeNativeComputePassSetPipeline(pass, toOpaque(&pipeline));
++                compute.doeNativeComputePassSetBindGroup(pass, 0, toOpaque(&group), 0, null);
++                compute.doeNativeComputePassDispatch(pass, @intCast(index + 1), 1, 1);
++            }
++            compute.doeNativeComputePassEnd(pass);
++        },
++        .render => {
++            var attachment = std.mem.zeroes(abi_pipeline.WGPURenderPassColorAttachment);
++            attachment.view = @ptrCast(&view);
++            var descriptor = std.mem.zeroes(abi_pipeline.WGPURenderPassDescriptor);
++            descriptor.colorAttachmentCount = 1;
++            descriptor.colorAttachments = @ptrCast(&attachment);
++            const pass = render.doeNativeCommandEncoderBeginRenderPass(toOpaque(encoder), &descriptor) orelse return error.OutOfMemory;
++            defer render.doeNativeRenderPassRelease(pass);
++            for (0..repetitions) |_| {
++                render.doeNativeRenderPassSetPipeline(pass, toOpaque(&render_pipeline));
++                render.doeNativeRenderPassSetBindGroup(pass, 0, toOpaque(&group), 0, null);
++                render.doeNativeRenderPassSetVertexBuffer(pass, 0, toOpaque(&buffer), 0, 16);
++                render.doeNativeRenderPassSetIndexBuffer(pass, toOpaque(&buffer), 2, 0, 16);
++                render.doeNativeRenderPassDrawIndirect(pass, toOpaque(&buffer), 0);
++            }
++            render.doeNativeRenderPassEnd(pass);
++        },
++        .copy => for (0..repetitions) |_| {
++            doeNativeCopyBufferToBuffer(toOpaque(encoder), toOpaque(&buffer), 0, toOpaque(&buffer), 16, 16);
++            doeNativeCommandEncoderCopyBufferToTexture(toOpaque(encoder), toOpaque(&buffer), 0, 256, 1, toOpaque(&texture), 0, 1, 1, 1);
++            doeNativeCommandEncoderCopyTextureToBuffer(toOpaque(encoder), toOpaque(&texture), 0, toOpaque(&buffer), 0, 256, 1, 1, 1, 1);
++        },
++        .query => for (0..repetitions) |_| {
++            query_native.doeNativeCommandEncoderWriteTimestamp(toOpaque(encoder), toOpaque(&query), 0);
++            query_native.doeNativeCommandEncoderResolveQuerySet(toOpaque(encoder), toOpaque(&query), 0, 1, toOpaque(&buffer), 0);
++        },
++    }
++    if (encoder.state == .failed) return encoder.state.failed;
++    const commands = doeNativeCommandEncoderFinish(toOpaque(encoder), null) orelse return error.OutOfMemory;
++    defer doeNativeCommandBufferRelease(commands);
++    try std.testing.expect(!cast(DoeCommandBuffer, commands).?.error_object);
++    try std.testing.expect(cast(DoeCommandBuffer, commands).?.cmds.items.len >= repetitions);
++}
++
++test "ordinary command recording cleans up every allocation failure across command families" {
++    for (std.enums.values(RecordingFixture)) |fixture|
++        try std.testing.checkAllAllocationFailures(std.testing.allocator, recordingAllocationScenario, .{fixture});
++}
++
++test "failed recording finishes as an error object and cannot submit or resume" {
++    const errors = @import("../../runtime/diagnostics/error_scope.zig");
++    const Capture = struct {
++        kind: u32 = errors.ERROR_TYPE_NO_ERROR,
++        fn receive(kind: u32, _: @import("../../core/abi/wgpu_handle_types.zig").WGPUStringView, userdata: ?*anyopaque, _: ?*anyopaque) callconv(.c) void {
++            const self: *@This() = @ptrCast(@alignCast(userdata.?));
++            self.kind = kind;
++        }
++    };
++    var device = DoeDevice{};
++    var queue = native_types.DoeQueue{ .dev = &device };
++    var buffer = DoeBuffer{ .size = 32 };
++    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{});
++    const encoder = try createEncoder(failing.allocator(), &device);
++    defer doeNativeCommandEncoderRelease(toOpaque(encoder));
++    device.error_scopes.push(errors.FILTER_OUT_OF_MEMORY);
++    failing.fail_index = failing.alloc_index;
++    doeNativeCopyBufferToBuffer(toOpaque(encoder), toOpaque(&buffer), 0, toOpaque(&buffer), 16, 16);
++    try std.testing.expectEqual(error.OutOfMemory, encoder.state.failed);
++    var capture = Capture{};
++    try std.testing.expect(device.error_scopes.pop(.{ .callback = Capture.receive, .userdata1 = &capture }));
++    try std.testing.expectEqual(errors.ERROR_TYPE_OUT_OF_MEMORY, capture.kind);
++    failing.fail_index = std.math.maxInt(usize);
++    const invalid = doeNativeCommandEncoderFinish(toOpaque(encoder), null).?;
++    defer doeNativeCommandBufferRelease(invalid);
++    try std.testing.expect(cast(DoeCommandBuffer, invalid).?.error_object);
++    const valid_encoder = try createEncoder(std.testing.allocator, &device);
++    defer doeNativeCommandEncoderRelease(toOpaque(valid_encoder));
++    const valid = doeNativeCommandEncoderFinish(toOpaque(valid_encoder), null).?;
++    defer doeNativeCommandBufferRelease(valid);
++    device.error_scopes.push(errors.FILTER_VALIDATION);
++    const submitted = [_]?*anyopaque{ valid, invalid };
++    @import("../queue/doe_queue_submit_native.zig").doeNativeQueueSubmit(toOpaque(&queue), submitted.len, &submitted);
++    try std.testing.expect(device.error_scopes.pop(.{ .callback = Capture.receive, .userdata1 = &capture }));
++    try std.testing.expectEqual(errors.ERROR_TYPE_VALIDATION, capture.kind);
++    doeNativeCopyBufferToBuffer(toOpaque(valid_encoder), toOpaque(&buffer), 0, toOpaque(&buffer), 16, 16);
++    try std.testing.expectEqual(error.InvalidState, valid_encoder.state.failed);
++    try std.testing.expectEqual(@as(usize, 0), valid_encoder.cmds.items.len);
++    try std.testing.expectEqual(@as(u32, 1), buffer.ref_count);
++}
+diff --git a/runtime/zig/src/native/compute/doe_compute_ext_native.zig b/runtime/zig/src/native/compute/doe_compute_ext_native.zig
+index 94c7fbbfa..ec5d9167f 100644
+--- a/runtime/zig/src/native/compute/doe_compute_ext_native.zig
++++ b/runtime/zig/src/native/compute/doe_compute_ext_native.zig
+@@ -1,3 +1,4 @@
++const recording = @import("../command/doe_command_recording.zig");
+ // doe_compute_ext_native.zig — Compute pass and pipeline extensions for Doe native Metal backend.
+ // Sharded from doe_wgpu_native.zig: compute pass operations, getBindGroupLayout, dispatchIndirect.
+ 
+@@ -133,7 +134,10 @@ fn bumpPassState(pass: *DoeComputePass) void {
+ 
+ fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
+     if (pass.pipeline == pip) return;
+-    if (pip) |pipeline| references.retainPipeline(alloc, &pass.enc.references, pipeline);
++    if (pip) |pipeline| {
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainPipelineAssumeCapacity(&pass.enc.references, pipeline);
++    }
+     pass.pipeline = pip;
+     bumpPassState(pass);
+ }
+@@ -141,7 +145,10 @@ fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
+ fn setPassBindGroup(pass: *DoeComputePass, index: usize, bg: ?*DoeBindGroup) void {
+     if (index >= pass.bind_groups.len) return;
+     if (pass.bind_groups[index] == bg) return;
+-    if (bg) |group| references.retainBindGroup(alloc, &pass.enc.references, group);
++    if (bg) |group| {
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainBindGroupAssumeCapacity(&pass.enc.references, group);
++    }
+     pass.bind_groups[index] = bg;
+     bumpPassState(pass);
+ }
+@@ -180,6 +187,7 @@ fn tryRepeatLastRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline
+ 
+ pub export fn doeNativeComputePassSetPipeline(pass_raw: ?*anyopaque, pip_raw: ?*anyopaque) callconv(.c) void {
+     const pass = cast(DoeComputePass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     setPassPipeline(pass, cast(DoeComputePipeline, pip_raw));
+ }
+ 
+@@ -187,10 +195,12 @@ pub export fn doeNativeComputePassSetBindGroup(pass_raw: ?*anyopaque, index: u32
+     _ = dyn_count;
+     _ = dyn_offsets;
+     const pass = cast(DoeComputePass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (index < MAX_COMPUTE_BIND_GROUPS) setPassBindGroup(pass, @intCast(index), cast(DoeBindGroup, bg_raw));
+ }
+ 
+ fn appendRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline, x: u32, y: u32, z: u32) void {
++    if (!recording.requireOpen(pass.enc)) return;
+     if (tryRepeatLastRecordedDispatch(pass, pip, x, y, z)) return;
+     if (!validate_dispatch_preconditions(pass, pip, .{ x, y, z })) return;
+     var cmd = RecordedCmd{ .dispatch = .{
+@@ -227,13 +237,13 @@ fn appendRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline, x: u3
+         rememberLastRecordedDispatch(pass, pip, x, y, z);
+         return;
+     }
+-    pass.enc.cmds.append(alloc, cmd) catch
+-        std.debug.panic("doe_compute_ext_native: OOM recording dispatch command", .{});
++    if (!recording.append(pass.enc, cmd)) return;
+     rememberLastRecordedDispatch(pass, pip, x, y, z);
+ }
+ 
+ pub export fn doeNativeComputePassDispatch(pass_raw: ?*anyopaque, x: u32, y: u32, z: u32) callconv(.c) void {
+     const pass = cast(DoeComputePass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     const pip = pass.pipeline orelse return;
+     appendRecordedDispatch(pass, pip, x, y, z);
+ }
+@@ -247,6 +257,7 @@ pub export fn doeNativeComputePassDispatchBound(
+     z: u32,
+ ) callconv(.c) void {
+     const pass = cast(DoeComputePass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     const pip = cast(DoeComputePipeline, pip_raw) orelse return;
+     setPassPipeline(pass, pip);
+     setPassBindGroup(pass, 0, cast(DoeBindGroup, bg0_raw));
+@@ -255,6 +266,7 @@ pub export fn doeNativeComputePassDispatchBound(
+ 
+ pub export fn doeNativeComputePassEnd(raw: ?*anyopaque) callconv(.c) void {
+     const pass = cast(DoeComputePass, raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     const query_set = pass.timestamp_end_query_set orelse return;
+     const write_index = pass.timestamp_end_write_index;
+     pass.timestamp_end_query_set = null;
+@@ -293,8 +305,9 @@ pub export fn doeNativeComputePassRelease(raw: ?*anyopaque) callconv(.c) void {
+             query_native.doeNativeQuerySetRelease(query_set);
+         }
+         native_helpers.label_store.remove(raw);
++        const allocator = p.enc.allocator;
+         if (p.owns_encoder) native_exports.doeNativeCommandEncoderRelease(toOpaque(p.enc));
+-        alloc.destroy(p);
++        allocator.destroy(p);
+     }
+ }
+ 
+@@ -345,6 +358,7 @@ pub export fn doeNativeComputePipelineGetBindGroupLayout(pip_raw: ?*anyopaque, g
+ 
+ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_raw: ?*anyopaque, offset: u64) callconv(.c) void {
+     const pass = cast(DoeComputePass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     const pip = pass.pipeline orelse return;
+     const indirect_buf = cast(DoeBuffer, buf_raw) orelse return;
+     if (indirect_buf.error_object or indirect_buf.destroyed) return;
+@@ -384,7 +398,7 @@ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_ra
+             pass.bind_groups[0..],
+         );
+     }
+-    references.retainBuffer(alloc, &pass.enc.references, indirect_buf);
+-    pass.enc.cmds.append(alloc, cmd) catch
+-        std.debug.panic("doe_compute_ext_native: OOM recording indirect dispatch command", .{});
++    if (!recording.reserve(pass.enc, 0, 1)) return;
++    references.retainBufferAssumeCapacity(&pass.enc.references, indirect_buf);
++    if (!recording.append(pass.enc, cmd)) return;
+ }
+diff --git a/runtime/zig/src/native/compute/doe_compute_program_native.zig b/runtime/zig/src/native/compute/doe_compute_program_native.zig
+index b2c4f2c4a..db8f395f5 100644
+--- a/runtime/zig/src/native/compute/doe_compute_program_native.zig
++++ b/runtime/zig/src/native/compute/doe_compute_program_native.zig
+@@ -190,6 +190,7 @@ pub export fn doeNativeComputeProgramPrepare(queue_raw: ?*anyopaque, commands_ra
+     if (comptime builtin.os.tag != .linux) return null;
+     const queue = helpers.cast(objects.DoeQueue, queue_raw) orelse return null;
+     const commands = helpers.cast(objects.DoeCommandBuffer, commands_raw) orelse return null;
++    if (commands.error_object) return null;
+     if (commands.dev != queue.dev or queue.dev.backend != .vulkan) {
+         errors.deliverInternalError(queue.dev, "compute program: expected Vulkan commands from the selected device", .{});
+         return null;
+diff --git a/runtime/zig/src/native/compute/doe_compute_recorded.zig b/runtime/zig/src/native/compute/doe_compute_recorded.zig
+index ec2ba603c..a882207ed 100644
+--- a/runtime/zig/src/native/compute/doe_compute_recorded.zig
++++ b/runtime/zig/src/native/compute/doe_compute_recorded.zig
+@@ -87,9 +87,9 @@ pub const Builder = struct {
+         vulkan.populateRecordedDispatchBindingState(pipeline, &request.bind_groups, &command.dispatch);
+         if (commands.tryMergeDispatchIntoLast(&buffer.cmds, &command)) return;
+         try reserve(buffer, reference_count);
+-        references.retainPipeline(buffer.allocator, &buffer.references, pipeline);
++        references.retainPipelineAssumeCapacity(&buffer.references, pipeline);
+         for (request.bind_groups) |maybe_group| if (maybe_group) |group| {
+-            references.retainBindGroup(buffer.allocator, &buffer.references, group);
++            references.retainBindGroupAssumeCapacity(&buffer.references, group);
+         };
+         buffer.cmds.appendAssumeCapacity(command);
+     }
+@@ -102,8 +102,8 @@ pub const Builder = struct {
+         if (source.error_object or source.destroyed or destination.error_object or destination.destroyed)
+             return error.InvalidArgument;
+         try reserve(buffer, 2);
+-        references.retainBuffer(buffer.allocator, &buffer.references, source);
+-        references.retainBuffer(buffer.allocator, &buffer.references, destination);
++        references.retainBufferAssumeCapacity(&buffer.references, source);
++        references.retainBufferAssumeCapacity(&buffer.references, destination);
+         buffer.cmds.appendAssumeCapacity(.{ .copy_buf = .{
+             .src = helpers.toOpaque(source),
+             .src_off = request.source_offset,
+diff --git a/runtime/zig/src/native/queue/doe_queue_submit_native.zig b/runtime/zig/src/native/queue/doe_queue_submit_native.zig
+index 9149cf0b3..f8cc9d25c 100644
+--- a/runtime/zig/src/native/queue/doe_queue_submit_native.zig
++++ b/runtime/zig/src/native/queue/doe_queue_submit_native.zig
+@@ -39,6 +39,16 @@ pub export fn doeNativeQueueSubmit(
+     cmd_bufs: [*]const ?*anyopaque,
+ ) callconv(.c) void {
+     const q = cast(DoeQueue, q_raw) orelse return;
++    for (cmd_bufs[0..count]) |raw| {
++        const buffer = cast(native_types.DoeCommandBuffer, raw) orelse {
++            q.dev.error_scopes.deliver(@import("../../runtime/diagnostics/error_scope.zig").ERROR_TYPE_VALIDATION, "queue submission requires valid command buffers");
++            return;
++        };
++        if (buffer.error_object or buffer.dev != q.dev) {
++            q.dev.error_scopes.deliver(@import("../../runtime/diagnostics/error_scope.zig").ERROR_TYPE_VALIDATION, "queue submission rejected failed recording or a different device");
++            return;
++        }
++    }
+     if (q.dev.backend == .vulkan) {
+         vulkan_submit.submit_vulkan_commands(q, count, cmd_bufs);
+         return;
+diff --git a/runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig b/runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig
+index ff56592d5..a8cd70268 100644
+--- a/runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig
++++ b/runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig
+@@ -243,7 +243,31 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
+                     };
+                     recorded_replay_work = true;
+                 },
+-                .copy_buffer_to_texture => {},
++                .copy_buffer_to_texture => |copy| {
++                    const source = cast(native_types.DoeBuffer, copy.src_buffer) orelse return;
++                    const destination = cast(native_types.DoeTexture, copy.dst_texture) orelse return;
++                    const source_resource = rt.compute_buffers.get(source.vk_id) orelse {
++                        shared.deliverInternalError(q.dev, "Vulkan copyBufferToTexture: source resource unavailable", .{});
++                        return;
++                    };
++                    const texture = rt.textures.getPtr(destination.vk_id) orelse {
++                        shared.deliverInternalError(q.dev, "Vulkan copyBufferToTexture: destination resource unavailable", .{});
++                        return;
++                    };
++                    queue_submit_ops.vulkan_texture_commands.record_buffer_copy(rt, source_resource, texture, .{
++                        .offset = copy.src_offset,
++                        .bytes_per_row = copy.src_bytes_per_row,
++                        .rows_per_image = copy.src_rows_per_image,
++                        .mip = copy.dst_mip_level,
++                        .width = copy.width,
++                        .height = copy.height,
++                        .depth_or_layers = copy.depth_or_array_layers,
++                    }) catch |err| {
++                        shared.deliverInternalError(q.dev, "Vulkan copyBufferToTexture: {s}", .{@errorName(err)});
++                        return;
++                    };
++                    recorded_replay_work = true;
++                },
+                 .render_pass => {
+                     shared.deliverInternalError(q.dev, "Vulkan submission received commands recorded for another backend", .{});
+                     return;
+diff --git a/runtime/zig/src/native/render/doe_bundle_native.zig b/runtime/zig/src/native/render/doe_bundle_native.zig
+index 831caca40..9237c87c7 100644
+--- a/runtime/zig/src/native/render/doe_bundle_native.zig
++++ b/runtime/zig/src/native/render/doe_bundle_native.zig
+@@ -10,6 +10,8 @@ const native_cmds = @import("../support/doe_native_command_types.zig");
+ const native_helpers = @import("../support/doe_native_object_helpers.zig");
+ const references = @import("../command/doe_command_references.zig");
+ const leases = @import("../../contracts/resource_lease.zig");
++const recording = @import("../command/doe_command_recording.zig");
++const recording_contract = @import("../../contracts/command_recording.zig");
+ const bundle = @import("../../runtime/render/render_bundle.zig");
+ 
+ const alloc = native_helpers.alloc;
+@@ -49,9 +51,13 @@ pub export fn doeNativeDeviceCreateRenderBundleEncoder(
+         if (d.sampleCount == 0) 1 else d.sampleCount,
+         d.depthReadOnly != 0,
+         d.stencilReadOnly != 0,
+-    ) orelse return null;
++    ) orelse {
++        dev.error_scopes.deliver(error_scope.ERROR_TYPE_OUT_OF_MEMORY, "render bundle encoder allocation failed");
++        return null;
++    };
+     enc.backend = dev.backend;
+-    references.retainDevice(enc.allocator, &enc.references, dev);
++    native_helpers.object_add_ref(DoeDevice, dev_raw);
++    enc.device_lease = .{ .handle = dev_raw, .release = @import("../support/doe_native_exports.zig").doeNativeDeviceRelease };
+     return @ptrCast(enc);
+ }
+ 
+@@ -59,12 +65,40 @@ pub export fn doeNativeRenderBundleEncoderRelease(raw: ?*anyopaque) callconv(.c)
+     const enc = bundle.cast_bundle_encoder(raw) orelse return;
+     if (!native_helpers.object_should_destroy(enc)) return;
+     leases.releaseAll(enc.allocator, &enc.references);
++    if (enc.device_lease) |lease| lease.release(lease.handle);
+     native_helpers.label_store.remove(raw);
+     const a = enc.allocator;
+     enc.cmds.deinit(a);
+     a.destroy(enc);
+ }
+ 
++fn failBundle(encoder: *bundle.DoeBundleEncoder, cause: recording_contract.Failure) void {
++    _ = encoder.state.fail(cause);
++    if (encoder.device_lease) |lease| {
++        const device = cast(DoeDevice, lease.handle) orelse return;
++        device.error_scopes.deliver(error_scope.zig_error_to_type(cause), switch (cause) {
++            error.OutOfMemory => "render bundle recording could not allocate owned storage",
++            error.InvalidState => "render bundle recording requires an open encoder",
++            error.InvalidArgument => "render bundle recording received an invalid dependency",
++        });
++    }
++}
++
++fn requireBundleOpen(encoder: *bundle.DoeBundleEncoder) bool {
++    if (encoder.state == .open) return true;
++    if (encoder.state == .finished) failBundle(encoder, error.InvalidState);
++    return false;
++}
++
++fn reserveBundleReferences(encoder: *bundle.DoeBundleEncoder, count: usize) bool {
++    if (!requireBundleOpen(encoder)) return false;
++    encoder.references.ensureUnusedCapacity(encoder.allocator, count) catch |err| {
++        failBundle(encoder, err);
++        return false;
++    };
++    return true;
++}
++
+ // ============================================================
+ // Bundle encoder: record commands
+ // ============================================================
+@@ -74,13 +108,15 @@ pub export fn doeNativeRenderBundleEncoderSetPipeline(
+     pip_raw: ?*anyopaque,
+ ) callconv(.c) void {
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     const pip = cast(DoeRenderPipeline, pip_raw) orelse return;
+-    references.retainRenderPipeline(enc.allocator, &enc.references, pip);
++    if (!reserveBundleReferences(enc, 1)) return;
++    references.retainRenderPipelineAssumeCapacity(&enc.references, pip);
+     const pipeline_handle = if (enc.backend == .vulkan) toOpaque(pip) else pip.mtl_pso;
+     bundle.bundle_encoder_push(enc, .{ .set_pipeline = .{
+         .pipeline_handle = pipeline_handle,
+         .pipeline_object_handle = toOpaque(pip),
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ pub export fn doeNativeRenderBundleEncoderSetBindGroup(
+@@ -93,8 +129,10 @@ pub export fn doeNativeRenderBundleEncoderSetBindGroup(
+     _ = dynamic_offset_count;
+     _ = dynamic_offsets;
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     const bg = cast(DoeBindGroup, bg_raw) orelse return;
+-    references.retainBindGroup(enc.allocator, &enc.references, bg);
++    if (!reserveBundleReferences(enc, 1)) return;
++    references.retainBindGroupAssumeCapacity(&enc.references, bg);
+ 
+     var bg_entry = bundle.BundleBindGroup{
+         .entries = undefined,
+@@ -111,7 +149,7 @@ pub export fn doeNativeRenderBundleEncoderSetBindGroup(
+         .group = group_index,
+         .bg_handle = if (enc.backend == .vulkan) toOpaque(bg) else null,
+         .bg = bg_entry,
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ pub export fn doeNativeRenderBundleEncoderSetVertexBuffer(
+@@ -122,16 +160,18 @@ pub export fn doeNativeRenderBundleEncoderSetVertexBuffer(
+     size: u64,
+ ) callconv(.c) void {
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     const buf = cast(DoeBuffer, buf_raw) orelse return;
+     if (buf.error_object) return;
+-    references.retainBuffer(enc.allocator, &enc.references, buf);
++    if (!reserveBundleReferences(enc, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, buf);
+     const buffer_handle = if (enc.backend == .vulkan) toOpaque(buf) else buf.mtl;
+     bundle.bundle_encoder_push(enc, .{ .set_vertex_buffer = .{
+         .slot = slot,
+         .buffer_handle = buffer_handle,
+         .offset = offset,
+         .size = size,
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ pub export fn doeNativeRenderBundleEncoderSetIndexBuffer(
+@@ -142,16 +182,18 @@ pub export fn doeNativeRenderBundleEncoderSetIndexBuffer(
+     size: u64,
+ ) callconv(.c) void {
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     const buf = cast(DoeBuffer, buf_raw) orelse return;
+     if (buf.error_object) return;
+-    references.retainBuffer(enc.allocator, &enc.references, buf);
++    if (!reserveBundleReferences(enc, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, buf);
+     const buffer_handle = if (enc.backend == .vulkan) toOpaque(buf) else buf.mtl;
+     bundle.bundle_encoder_push(enc, .{ .set_index_buffer = .{
+         .buffer_handle = buffer_handle,
+         .format = format,
+         .offset = offset,
+         .size = size,
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ pub export fn doeNativeRenderBundleEncoderDraw(
+@@ -162,12 +204,13 @@ pub export fn doeNativeRenderBundleEncoderDraw(
+     first_instance: u32,
+ ) callconv(.c) void {
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     bundle.bundle_encoder_push(enc, .{ .draw = .{
+         .vertex_count = vertex_count,
+         .instance_count = instance_count,
+         .first_vertex = first_vertex,
+         .first_instance = first_instance,
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ pub export fn doeNativeRenderBundleEncoderDrawIndexed(
+@@ -179,13 +222,14 @@ pub export fn doeNativeRenderBundleEncoderDrawIndexed(
+     first_instance: u32,
+ ) callconv(.c) void {
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     bundle.bundle_encoder_push(enc, .{ .draw_indexed = .{
+         .index_count = index_count,
+         .instance_count = instance_count,
+         .first_index = first_index,
+         .base_vertex = base_vertex,
+         .first_instance = first_instance,
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ pub export fn doeNativeRenderBundleEncoderDrawIndirect(
+@@ -194,14 +238,16 @@ pub export fn doeNativeRenderBundleEncoderDrawIndirect(
+     indirect_offset: u64,
+ ) callconv(.c) void {
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     const ibuf = cast(DoeBuffer, indirect_buf_raw) orelse return;
+     if (ibuf.error_object) return;
+-    references.retainBuffer(enc.allocator, &enc.references, ibuf);
++    if (!reserveBundleReferences(enc, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, ibuf);
+     const buffer_handle = if (enc.backend == .vulkan) toOpaque(ibuf) else ibuf.mtl;
+     bundle.bundle_encoder_push(enc, .{ .draw_indirect = .{
+         .indirect_buffer = buffer_handle,
+         .indirect_offset = indirect_offset,
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ pub export fn doeNativeRenderBundleEncoderDrawIndexedIndirect(
+@@ -210,14 +256,16 @@ pub export fn doeNativeRenderBundleEncoderDrawIndexedIndirect(
+     indirect_offset: u64,
+ ) callconv(.c) void {
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
++    if (!requireBundleOpen(enc)) return;
+     const ibuf = cast(DoeBuffer, indirect_buf_raw) orelse return;
+     if (ibuf.error_object) return;
+-    references.retainBuffer(enc.allocator, &enc.references, ibuf);
++    if (!reserveBundleReferences(enc, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, ibuf);
+     const buffer_handle = if (enc.backend == .vulkan) toOpaque(ibuf) else ibuf.mtl;
+     bundle.bundle_encoder_push(enc, .{ .draw_indexed_indirect = .{
+         .indirect_buffer = buffer_handle,
+         .indirect_offset = indirect_offset,
+-    } });
++    } }) catch |err| return failBundle(enc, err);
+ }
+ 
+ // ============================================================
+@@ -230,7 +278,15 @@ pub export fn doeNativeRenderBundleEncoderFinish(
+ ) callconv(.c) ?*anyopaque {
+     _ = desc;
+     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return null;
+-    const b = bundle.bundle_encoder_finish(enc) orelse return null;
++    _ = requireBundleOpen(enc);
++    const b = bundle.bundle_encoder_finish(enc) orelse {
++        failBundle(enc, error.OutOfMemory);
++        return null;
++    };
++    if (enc.device_lease) |lease| {
++        native_helpers.object_add_ref(DoeDevice, lease.handle);
++        b.device_lease = lease;
++    }
+     return @ptrCast(b);
+ }
+ 
+@@ -241,6 +297,58 @@ pub export fn doeNativeRenderBundleRelease(raw: ?*anyopaque) callconv(.c) void {
+     bundle.destroyReleasedBundle(b);
+ }
+ 
++fn bundleAllocationScenario(allocator: std.mem.Allocator) !void {
++    var device = DoeDevice{};
++    var pipeline = DoeRenderPipeline{};
++    var group = DoeBindGroup{};
++    var buffer = DoeBuffer{ .size = 64 };
++    defer {
++        for ([_]u32{ device.ref_count, pipeline.ref_count, group.ref_count, buffer.ref_count }) |count|
++            std.testing.expectEqual(@as(u32, 1), count) catch @panic("bundle recording leaked a caller reference");
++    }
++    const encoder = bundle.make_bundle_encoder(allocator, 0, 0, 1, false, false) orelse return error.OutOfMemory;
++    native_helpers.object_add_ref(DoeDevice, toOpaque(&device));
++    encoder.device_lease = .{ .handle = toOpaque(&device), .release = @import("../support/doe_native_exports.zig").doeNativeDeviceRelease };
++    defer doeNativeRenderBundleEncoderRelease(toOpaque(encoder));
++    const repetitions = 17;
++    for (0..repetitions) |_| {
++        doeNativeRenderBundleEncoderSetPipeline(toOpaque(encoder), toOpaque(&pipeline));
++        doeNativeRenderBundleEncoderSetBindGroup(toOpaque(encoder), 0, toOpaque(&group), 0, null);
++        doeNativeRenderBundleEncoderSetVertexBuffer(toOpaque(encoder), 0, toOpaque(&buffer), 0, 16);
++        doeNativeRenderBundleEncoderSetIndexBuffer(toOpaque(encoder), toOpaque(&buffer), 2, 0, 16);
++        doeNativeRenderBundleEncoderDrawIndirect(toOpaque(encoder), toOpaque(&buffer), 0);
++    }
++    if (encoder.state == .failed) return encoder.state.failed;
++    const result = doeNativeRenderBundleEncoderFinish(toOpaque(encoder), null) orelse return error.OutOfMemory;
++    defer doeNativeRenderBundleRelease(result);
++    try std.testing.expect(!bundle.cast_bundle(result).?.error_object);
++    try std.testing.expectEqual(@as(usize, repetitions * 5), bundle.cast_bundle(result).?.cmds.len);
++}
++
++test "native bundle recording and finish release dependencies after every allocation failure" {
++    try std.testing.checkAllAllocationFailures(std.testing.allocator, bundleAllocationScenario, .{});
++}
++
++test "failed bundle cannot replay into a valid command recording" {
++    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{});
++    const encoder = bundle.make_bundle_encoder(failing.allocator(), 0, 0, 1, false, false).?;
++    defer doeNativeRenderBundleEncoderRelease(toOpaque(encoder));
++    failing.fail_index = failing.alloc_index;
++    doeNativeRenderBundleEncoderDraw(toOpaque(encoder), 3, 1, 0, 0);
++    try std.testing.expectEqual(error.OutOfMemory, encoder.state.failed);
++    failing.fail_index = std.math.maxInt(usize);
++    const result = doeNativeRenderBundleEncoderFinish(toOpaque(encoder), null).?;
++    defer doeNativeRenderBundleRelease(result);
++    try std.testing.expect(bundle.cast_bundle(result).?.error_object);
++    var device = DoeDevice{};
++    var commands = native_types.DoeCommandEncoder{ .dev = &device };
++    var pass = DoeRenderPass{ .enc = &commands };
++    const bundles = [_]?*anyopaque{result};
++    doeNativeRenderPassExecuteBundles(toOpaque(&pass), bundles.len, &bundles);
++    try std.testing.expectEqual(error.InvalidArgument, commands.state.failed);
++    try std.testing.expectEqual(@as(usize, 0), commands.cmds.items.len);
++}
++
+ // ============================================================
+ // Render pipeline: getBindGroupLayout
+ // Returns a minimal DoeBindGroupLayout seeded with the group index.
+@@ -461,19 +569,23 @@ pub export fn doeNativeRenderPassExecuteBundles(
+     bundles: [*]const ?*anyopaque,
+ ) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     const is_vulkan = pass.enc.dev.backend == .vulkan;
+ 
+     for (bundles[0..bundle_count]) |raw| {
+-        const b = bundle.cast_bundle(raw) orelse continue;
++        const b = bundle.cast_bundle(raw) orelse return recording.fail(pass.enc, error.InvalidArgument);
+         bundle.check_compatibility(b, pass.target_format, pass.sample_count) catch |err| {
++            _ = pass.enc.state.fail(error.InvalidArgument);
+             pass.enc.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, @errorName(err));
+             return;
+         };
+         if (b.depth_stencil_format != pass.depth_stencil_format) {
++            _ = pass.enc.state.fail(error.InvalidArgument);
+             pass.enc.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "render bundle depth/stencil format differs from the render pass");
+             return;
+         }
+-        references.retainRenderBundle(alloc, &pass.enc.references, b);
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainRenderBundleAssumeCapacity(&pass.enc.references, b);
+         const saved_vulkan_state: ?SavedVulkanBundlePassState = if (is_vulkan)
+             SavedVulkanBundlePassState.capture(pass)
+         else
+@@ -534,8 +646,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
+                     rc.render_pass.instance_count = d.instance_count;
+                     rc.render_pass.first_vertex = d.first_vertex;
+                     rc.render_pass.first_instance = d.first_instance;
+-                    pass.enc.cmds.append(alloc, rc) catch
+-                        std.debug.panic("doe: executeBundles OOM", .{});
++                    if (!recording.append(pass.enc, rc)) return;
+                 },
+                 .draw_indexed => |d| {
+                     if (!require_index_buffer_for_bundle_draw(&state, "draw_indexed")) {
+@@ -561,8 +672,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
+                     // first_index converts to a byte offset into the index buffer.
+                     const bytes_per_index: u64 = if (state.index_format == 0x1) 2 else 4;
+                     rc.render_pass.index_offset = state.index_offset + @as(u64, d.first_index) * bytes_per_index;
+-                    pass.enc.cmds.append(alloc, rc) catch
+-                        std.debug.panic("doe: executeBundles OOM", .{});
++                    if (!recording.append(pass.enc, rc)) return;
+                 },
+                 .draw_indirect => |d| {
+                     if (pass.recorded_draw_count >= pass.max_draw_count) continue;
+@@ -578,8 +688,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
+                     rc.render_pass.indirect = true;
+                     rc.render_pass.indirect_buffer = d.indirect_buffer;
+                     rc.render_pass.indirect_offset = d.indirect_offset;
+-                    pass.enc.cmds.append(alloc, rc) catch
+-                        std.debug.panic("doe: executeBundles OOM", .{});
++                    if (!recording.append(pass.enc, rc)) return;
+                 },
+                 .draw_indexed_indirect => |d| {
+                     if (!require_index_buffer_for_bundle_draw(&state, "draw_indexed_indirect")) {
+@@ -602,8 +711,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
+                     rc.render_pass.index_format = state.index_format;
+                     rc.render_pass.indirect_buffer = d.indirect_buffer;
+                     rc.render_pass.indirect_offset = d.indirect_offset;
+-                    pass.enc.cmds.append(alloc, rc) catch
+-                        std.debug.panic("doe: executeBundles OOM", .{});
++                    if (!recording.append(pass.enc, rc)) return;
+                 },
+             }
+         }
+diff --git a/runtime/zig/src/native/render/doe_render_native.zig b/runtime/zig/src/native/render/doe_render_native.zig
+index f1e94397d..4df594d1e 100644
+--- a/runtime/zig/src/native/render/doe_render_native.zig
++++ b/runtime/zig/src/native/render/doe_render_native.zig
+@@ -1,3 +1,4 @@
++const recording = @import("../command/doe_command_recording.zig");
+ // doe_render_native.zig — Render Pass C ABI exports for the Doe native backend.
+ // Texture/Sampler ops sharded to doe_texture_sampler_native.zig.
+ // Render Pipeline ops sharded to doe_render_pipeline_native.zig.
+@@ -84,6 +85,7 @@ fn renderPassMaxDrawCount(desc: *const abi_pipeline.WGPURenderPassDescriptor) u6
+ }
+ 
+ fn reserve_render_draw(pass: *DoeRenderPass) bool {
++    if (!recording.requireOpen(pass.enc)) return false;
+     if (pass.recorded_draw_count >= pass.max_draw_count) {
+         std.log.err("doe: render pass draw rejected: maxDrawCount={} exhausted", .{pass.max_draw_count});
+         return false;
+@@ -98,7 +100,11 @@ fn reserve_render_draw(pass: *DoeRenderPass) bool {
+ 
+ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPURenderPassDescriptor) callconv(.c) ?*anyopaque {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return null;
+-    const pass = make(DoeRenderPass) orelse return null;
++    if (!recording.requireOpen(enc)) return null;
++    const pass = native_helpers.create(DoeRenderPass, enc.allocator) catch |err| {
++        recording.fail(enc, err);
++        return null;
++    };
+     native_helpers.object_add_ref(DoeCommandEncoder, enc_raw);
+     pass.* = .{
+         .enc = enc,
+@@ -114,7 +120,8 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
+                 const att = attachments[0];
+                 const tv = cast(DoeTextureView, att.view);
+                 if (tv) |v| {
+-                    references.retainTextureView(alloc, &enc.references, v);
++                    if (!recording.reserve(enc, 0, 1)) return toOpaque(pass);
++                    references.retainTextureViewAssumeCapacity(&enc.references, v);
+                     pass.target = if (texture_sampler.d3d12_texture_view_registry.contains(att.view))
+                         v.tex.mtl
+                     else if (v.handle) |handle|
+@@ -126,7 +133,8 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
+                     pass.sample_count = if (v.tex.sample_count != 0) v.tex.sample_count else 1;
+                 }
+                 if (cast(DoeTextureView, att.resolveTarget)) |resolve_view| {
+-                    references.retainTextureView(alloc, &enc.references, resolve_view);
++                    if (!recording.reserve(enc, 0, 1)) return toOpaque(pass);
++                    references.retainTextureViewAssumeCapacity(&enc.references, resolve_view);
+                     pass.resolve_target = resolve_view.tex.mtl;
+                     pass.resolve_target_view_handle = @intFromPtr(resolve_view);
+                 }
+@@ -142,7 +150,8 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
+         if (d.depthStencilAttachment != null) {
+             const depth_att: *const abi_pipeline.WGPURenderPassDepthStencilAttachment = @ptrCast(d.depthStencilAttachment);
+             if (cast(DoeTextureView, depth_att.view)) |v| {
+-                references.retainTextureView(alloc, &enc.references, v);
++                if (!recording.reserve(enc, 0, 1)) return toOpaque(pass);
++                references.retainTextureViewAssumeCapacity(&enc.references, v);
+                 pass.depth_target = if (texture_sampler.d3d12_texture_view_registry.contains(depth_att.view))
+                     v.tex.mtl
+                 else if (v.handle) |handle|
+@@ -167,9 +176,11 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
+ 
+ pub export fn doeNativeRenderPassSetPipeline(pass_raw: ?*anyopaque, pip_raw: ?*anyopaque) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     pass.pipeline = cast(DoeRenderPipeline, pip_raw);
+     if (pass.pipeline) |pipeline| {
+-        references.retainRenderPipeline(alloc, &pass.enc.references, pipeline);
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainRenderPipelineAssumeCapacity(&pass.enc.references, pipeline);
+         pass.depth_compare = pipeline.depth_compare;
+         pass.depth_write_enabled = pipeline.depth_write_enabled;
+     }
+@@ -185,6 +196,7 @@ pub export fn doeNativeRenderPassRecordViewportState(
+     max_depth: f64,
+ ) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     pass.viewport_x = @floatCast(x);
+     pass.viewport_y = @floatCast(y);
+     pass.viewport_width = @floatCast(width);
+@@ -201,6 +213,7 @@ pub export fn doeNativeRenderPassRecordScissorState(
+     height: u32,
+ ) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     pass.scissor_x = x;
+     pass.scissor_y = y;
+     pass.scissor_width = width;
+@@ -215,6 +228,7 @@ pub export fn doeNativeRenderPassRecordBlendConstantState(
+     a: f64,
+ ) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     pass.blend_constant = .{
+         @floatCast(r),
+         @floatCast(g),
+@@ -228,11 +242,13 @@ pub export fn doeNativeRenderPassRecordStencilReferenceState(
+     reference: u32,
+ ) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     pass.stencil_reference = reference;
+ }
+ 
+ pub export fn doeNativeRenderPassDraw(pass_raw: ?*anyopaque, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (!reserve_render_draw(pass)) return;
+     if (pass.enc.dev.backend == .vulkan) {
+         const vk_render = @import("../vulkan/vulkan_render_native.zig");
+@@ -247,17 +263,20 @@ pub export fn doeNativeRenderPassDraw(pass_raw: ?*anyopaque, vertex_count: u32,
+     cmd.first_instance = first_instance;
+     const recorded = native_cmds.RecordedCmd{ .render_pass = cmd };
+     if (!native_cmds.tryMergeRenderDrawIntoLast(&pass.enc.cmds, &recorded)) {
+-        pass.enc.cmds.append(alloc, recorded) catch
+-            std.debug.panic("doe_render_native: OOM recording render command", .{});
++        if (!recording.append(pass.enc, recorded)) return;
+     }
+ }
+ 
+ pub export fn doeNativeRenderPassSetVertexBuffer(pass_raw: ?*anyopaque, slot: u32, buffer_raw: ?*anyopaque, offset: u64, size: u64) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (slot >= native_shared.MAX_VERTEX_BUFFERS) return;
+     const buffer = cast(DoeBuffer, buffer_raw);
+     if (buffer != null and buffer.?.error_object) return;
+-    if (buffer) |value| references.retainBuffer(alloc, &pass.enc.references, value);
++    if (buffer) |value| {
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainBufferAssumeCapacity(&pass.enc.references, value);
++    }
+     pass.vertex_buffers[slot] = buffer;
+     pass.vertex_buffer_offsets[slot] = offset;
+     pass.vertex_buffer_sizes[slot] = size;
+@@ -265,9 +284,13 @@ pub export fn doeNativeRenderPassSetVertexBuffer(pass_raw: ?*anyopaque, slot: u3
+ 
+ pub export fn doeNativeRenderPassSetIndexBuffer(pass_raw: ?*anyopaque, buffer_raw: ?*anyopaque, format: u32, offset: u64, size: u64) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     const buffer = cast(DoeBuffer, buffer_raw);
+     if (buffer != null and buffer.?.error_object) return;
+-    if (buffer) |value| references.retainBuffer(alloc, &pass.enc.references, value);
++    if (buffer) |value| {
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainBufferAssumeCapacity(&pass.enc.references, value);
++    }
+     pass.index_buffer = buffer;
+     pass.index_format = format;
+     pass.index_offset = offset;
+@@ -276,15 +299,20 @@ pub export fn doeNativeRenderPassSetIndexBuffer(pass_raw: ?*anyopaque, buffer_ra
+ 
+ pub export fn doeNativeRenderPassSetBindGroup(pass_raw: ?*anyopaque, group_index: u32, group_raw: ?*anyopaque, dynamic_offset_count: usize, dynamic_offsets: ?[*]const u32) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (group_index >= native_shared.MAX_RENDER_BIND_GROUPS) return;
+     pass.bind_groups[group_index] = cast(DoeBindGroup, group_raw);
+-    if (pass.bind_groups[group_index]) |group| references.retainBindGroup(alloc, &pass.enc.references, group);
++    if (pass.bind_groups[group_index]) |group| {
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainBindGroupAssumeCapacity(&pass.enc.references, group);
++    }
+     _ = dynamic_offset_count;
+     _ = dynamic_offsets;
+ }
+ 
+ pub export fn doeNativeRenderPassDrawIndexed(pass_raw: ?*anyopaque, index_count: u32, instance_count: u32, first_index: u32, base_vertex: i32, first_instance: u32) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (!reserve_render_draw(pass)) return;
+     if (pass.enc.dev.backend == .vulkan) {
+         const vk_render = @import("../vulkan/vulkan_render_native.zig");
+@@ -303,8 +331,7 @@ pub export fn doeNativeRenderPassDrawIndexed(pass_raw: ?*anyopaque, index_count:
+     cmd.index_count = index_count;
+     cmd.first_index = first_index;
+     cmd.base_vertex = base_vertex;
+-    pass.enc.cmds.append(alloc, .{ .render_pass = cmd }) catch
+-        std.debug.panic("doe_render_native: OOM recording indexed render command", .{});
++    if (!recording.append(pass.enc, .{ .render_pass = cmd })) return;
+ }
+ 
+ fn populate_render_bindings(
+@@ -401,8 +428,12 @@ fn base_render_cmd(pass: *DoeRenderPass, pip: ?*DoeRenderPipeline) RecordedRende
+ 
+ pub export fn doeNativeRenderPassDrawIndirect(pass_raw: ?*anyopaque, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (!reserve_render_draw(pass)) return;
+-    if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| references.retainBuffer(alloc, &pass.enc.references, buffer);
++    if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| {
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainBufferAssumeCapacity(&pass.enc.references, buffer);
++    }
+     if (pass.enc.dev.backend == .vulkan) {
+         const vk_render = @import("../vulkan/vulkan_render_native.zig");
+         vk_render.vulkan_render_pass_draw_indirect(pass, indirect_buffer_raw, indirect_offset);
+@@ -415,14 +446,17 @@ pub export fn doeNativeRenderPassDrawIndirect(pass_raw: ?*anyopaque, indirect_bu
+     cmd.indirect = true;
+     cmd.indirect_buffer = indirect_buffer.mtl;
+     cmd.indirect_offset = indirect_offset;
+-    pass.enc.cmds.append(alloc, .{ .render_pass = cmd }) catch
+-        std.debug.panic("doe_render_native: OOM recording indirect draw command", .{});
++    if (!recording.append(pass.enc, .{ .render_pass = cmd })) return;
+ }
+ 
+ pub export fn doeNativeRenderPassDrawIndexedIndirect(pass_raw: ?*anyopaque, indirect_buffer_raw: ?*anyopaque, indirect_offset: u64) callconv(.c) void {
+     const pass = cast(DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (!reserve_render_draw(pass)) return;
+-    if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| references.retainBuffer(alloc, &pass.enc.references, buffer);
++    if (cast(DoeBuffer, indirect_buffer_raw)) |buffer| {
++        if (!recording.reserve(pass.enc, 0, 1)) return;
++        references.retainBufferAssumeCapacity(&pass.enc.references, buffer);
++    }
+     if (pass.enc.dev.backend == .vulkan) {
+         const vk_render = @import("../vulkan/vulkan_render_native.zig");
+         vk_render.vulkan_render_pass_draw_indexed_indirect(pass, indirect_buffer_raw, indirect_offset);
+@@ -440,12 +474,12 @@ pub export fn doeNativeRenderPassDrawIndexedIndirect(pass_raw: ?*anyopaque, indi
+     cmd.index_offset = pass.index_offset;
+     cmd.index_format = pass.index_format;
+     cmd.index_buffer_size = pass.index_buffer_size;
+-    pass.enc.cmds.append(alloc, .{ .render_pass = cmd }) catch
+-        std.debug.panic("doe_render_native: OOM recording indexed indirect draw command", .{});
++    if (!recording.append(pass.enc, .{ .render_pass = cmd })) return;
+ }
+ 
+ pub export fn doeNativeRenderPassEnd(raw: ?*anyopaque) callconv(.c) void {
+     const pass = cast(DoeRenderPass, raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     if (pass.enc.dev.backend == .vulkan) {
+         const vk_render = @import("../vulkan/vulkan_render_native.zig");
+         vk_render.vulkan_render_pass_end(pass);
+@@ -456,8 +490,7 @@ pub export fn doeNativeRenderPassEnd(raw: ?*anyopaque) callconv(.c) void {
+             var cmd = base_render_cmd(pass, null);
+             cmd.pass_start = true;
+             cmd.pass_end = true;
+-            pass.enc.cmds.append(alloc, .{ .render_pass = cmd }) catch
+-                std.debug.panic("doe_render_native: OOM recording empty render pass", .{});
++            if (!recording.append(pass.enc, .{ .render_pass = cmd })) return;
+         }
+         return;
+     }
+@@ -472,8 +505,9 @@ pub export fn doeNativeRenderPassRelease(raw: ?*anyopaque) callconv(.c) void {
+     if (cast(DoeRenderPass, raw)) |p| {
+         if (!native_helpers.object_should_destroy(p)) return;
+         label_store.remove(raw);
++        const allocator = p.enc.allocator;
+         if (p.owns_encoder) native_exports.doeNativeCommandEncoderRelease(toOpaque(p.enc));
+-        alloc.destroy(p);
++        allocator.destroy(p);
+     }
+ }
+ 
+diff --git a/runtime/zig/src/native/resource/doe_command_texture_native.zig b/runtime/zig/src/native/resource/doe_command_texture_native.zig
+index ecdf970b1..70ca0c793 100644
+--- a/runtime/zig/src/native/resource/doe_command_texture_native.zig
++++ b/runtime/zig/src/native/resource/doe_command_texture_native.zig
+@@ -1,3 +1,4 @@
++const recording = @import("../command/doe_command_recording.zig");
+ // doe_command_texture_native.zig — clearBuffer, copyTextureToTexture, writeTexture C-ABI exports.
+ // Sharded from doe_wgpu_native.zig to keep texture command concerns cohesive.
+ 
+@@ -29,6 +30,7 @@ pub export fn doeNativeCommandEncoderClearBuffer(
+     size: u64,
+ ) callconv(.c) void {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
++    if (!recording.requireOpen(enc)) return;
+     const buf = cast(DoeBuffer, buffer_raw) orelse return;
+     if (buf.error_object or buf.destroyed) return;
+     // Resolve WGPU_WHOLE_SIZE sentinel: if size is u64 max, fill to end of buffer.
+@@ -37,12 +39,13 @@ pub export fn doeNativeCommandEncoderClearBuffer(
+     else
+         size;
+     if (fill_size == 0) return;
+-    references.retainBuffer(alloc, &enc.references, buf);
+-    enc.cmds.append(alloc, .{ .clear_buffer = .{
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, buf);
++    if (!recording.append(enc, .{ .clear_buffer = .{
+         .buffer = if (enc.dev.backend == .vulkan) toOpaque(buf) else buf.mtl,
+         .offset = offset,
+         .size = fill_size,
+-    } }) catch std.debug.panic("doe_command_texture_native: OOM recording clearBuffer command", .{});
++    } })) return;
+ }
+ 
+ // ============================================================
+@@ -69,12 +72,15 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
+     depth_or_layers: u32,
+ ) callconv(.c) void {
+     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
++    if (!recording.requireOpen(enc)) return;
+     const src = cast(DoeTexture, src_texture_raw) orelse return;
+     const dst = cast(DoeTexture, dst_texture_raw) orelse return;
+     if (src.error_object or dst.error_object) return;
+-    references.retainTexture(alloc, &enc.references, src);
+-    references.retainTexture(alloc, &enc.references, dst);
+-    enc.cmds.append(alloc, .{ .copy_texture_to_texture = .{
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainTextureAssumeCapacity(&enc.references, src);
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainTextureAssumeCapacity(&enc.references, dst);
++    if (!recording.append(enc, .{ .copy_texture_to_texture = .{
+         .src_texture = if (enc.dev.backend == .vulkan) toOpaque(src) else src.mtl,
+         .src_mip = src_mip,
+         .src_slice = src_slice,
+@@ -90,7 +96,7 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
+         .width = width,
+         .height = height,
+         .depth_or_layers = depth_or_layers,
+-    } }) catch std.debug.panic("doe_command_texture_native: OOM recording copyTextureToTexture command", .{});
++    } })) return;
+ }
+ 
+ // ============================================================
+diff --git a/runtime/zig/src/native/resource/doe_query_native.zig b/runtime/zig/src/native/resource/doe_query_native.zig
+index cd1d322ec..922f8c09e 100644
+--- a/runtime/zig/src/native/resource/doe_query_native.zig
++++ b/runtime/zig/src/native/resource/doe_query_native.zig
+@@ -1,3 +1,4 @@
++const recording = @import("../command/doe_command_recording.zig");
+ // doe_query_native.zig — QuerySet (GPU timestamp query) support for Doe Metal and Vulkan backends.
+ //
+ // Metal: Uses MTLCounterSampleBuffer for GPU timeline timestamps.
+@@ -123,29 +124,31 @@ pub fn doeNativeCommandEncoderWriteTimestampWithPosition(
+     position: native_cmds.TimestampWritePosition,
+ ) void {
+     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
++    if (!recording.requireOpen(enc)) return;
+     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
+     if (qs.destroyed or query_index >= qs.count) return;
++    if (!recording.reserve(enc, 1, 1)) return;
+     native_helpers.object_add_ref(DoeQuerySet, qs_raw);
+ 
+     if (comptime has_vulkan) {
+         if (qs.backend == .vulkan) {
+-            enc.cmds.append(native_helpers.alloc, .{ .write_timestamp = .{
++            if (!recording.append(enc, .{ .write_timestamp = .{
+                 .counter_buffer = null,
+                 .query_set = qs_raw,
+                 .query_index = query_index,
+                 .position = position,
+-            } }) catch std.debug.panic("doe_query_native: OOM recording vulkan write_timestamp", .{});
++            } })) return;
+             return;
+         }
+     }
+ 
+     // Metal: record for deferred execution at submit.
+-    enc.cmds.append(native_helpers.alloc, .{ .write_timestamp = .{
++    if (!recording.append(enc, .{ .write_timestamp = .{
+         .counter_buffer = qs.counter_sample_buffer,
+         .query_set = qs_raw,
+         .query_index = query_index,
+         .position = position,
+-    } }) catch std.debug.panic("doe_query_native: OOM recording write_timestamp", .{});
++    } })) return;
+ }
+ 
+ // ============================================================
+@@ -161,6 +164,7 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
+     dst_offset: u64,
+ ) callconv(.c) void {
+     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
++    if (!recording.requireOpen(enc)) return;
+     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
+     const dst = native_helpers.cast(native_types.DoeBuffer, dst_raw) orelse return;
+     if (qs.destroyed or dst.error_object or dst.destroyed) return;
+@@ -170,13 +174,15 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
+     const copy_bytes = @as(usize, query_count) * TIMESTAMP_BYTES;
+     const d_off: usize = @intCast(dst_offset);
+     if (d_off + copy_bytes > @as(usize, @intCast(dst.size))) return;
++    if (!recording.reserve(enc, 1, 1)) return;
+     native_helpers.object_add_ref(DoeQuerySet, qs_raw);
+ 
+-    references.retainBuffer(native_helpers.alloc, &enc.references, dst);
++    if (!recording.reserve(enc, 0, 1)) return;
++    references.retainBufferAssumeCapacity(&enc.references, dst);
+ 
+     if (comptime has_vulkan) {
+         if (qs.backend == .vulkan) {
+-            enc.cmds.append(native_helpers.alloc, .{ .resolve_query_set = .{
++            if (!recording.append(enc, .{ .resolve_query_set = .{
+                 .counter_buffer = null,
+                 .query_set = qs_raw,
+                 .first_query = first_query,
+@@ -184,13 +190,13 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
+                 .dst_mtl = null,
+                 .dst_buffer = dst_raw,
+                 .dst_offset = dst_offset,
+-            } }) catch std.debug.panic("doe_query_native: OOM recording vulkan resolve_query_set", .{});
++            } })) return;
+             return;
+         }
+     }
+ 
+     // Metal: record for deferred execution at submit.
+-    enc.cmds.append(native_helpers.alloc, .{ .resolve_query_set = .{
++    if (!recording.append(enc, .{ .resolve_query_set = .{
+         .counter_buffer = qs.counter_sample_buffer,
+         .query_set = qs_raw,
+         .first_query = first_query,
+@@ -198,7 +204,7 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
+         .dst_mtl = dst.mtl,
+         .dst_buffer = dst_raw,
+         .dst_offset = dst_offset,
+-    } }) catch std.debug.panic("doe_query_native: OOM recording resolve_query_set", .{});
++    } })) return;
+ }
+ 
+ pub fn vulkanRecordWriteTimestamp(
+@@ -442,6 +448,7 @@ pub export fn doeNativeRenderPassBeginOcclusionQuery(
+     query_index: u32,
+ ) callconv(.c) void {
+     const pass = native_helpers.cast(native_types.DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     const qs_raw = pass.occlusion_query_set orelse return;
+     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
+     if (qs.query_type != WGPU_QUERY_TYPE_OCCLUSION) return;
+@@ -452,8 +459,8 @@ pub export fn doeNativeRenderPassBeginOcclusionQuery(
+ 
+ pub fn retainRecordedReference(enc: *native_types.DoeCommandEncoder, raw: ?*anyopaque) void {
+     _ = native_helpers.cast(DoeQuerySet, raw) orelse return;
+-    enc.references.append(native_helpers.alloc, .{ .handle = raw, .release = doeNativeQuerySetRelease }) catch
+-        std.debug.panic("doe_query_native: OOM retaining recorded query set", .{});
++    if (!recording.reserve(enc, 0, 1)) return;
++    enc.references.appendAssumeCapacity(.{ .handle = raw, .release = doeNativeQuerySetRelease });
+     native_helpers.object_add_ref(DoeQuerySet, raw);
+ }
+ 
+@@ -461,6 +468,7 @@ pub export fn doeNativeRenderPassEndOcclusionQuery(
+     pass_raw: ?*anyopaque,
+ ) callconv(.c) void {
+     const pass = native_helpers.cast(native_types.DoeRenderPass, pass_raw) orelse return;
++    if (!recording.requireOpen(pass.enc)) return;
+     pass.occlusion_query_active = false;
+ }
+ const log = std.log.scoped(.doe_query_native);
+diff --git a/runtime/zig/src/native/support/doe_native_object_helpers.zig b/runtime/zig/src/native/support/doe_native_object_helpers.zig
+index c3049cd4f..92469e857 100644
+--- a/runtime/zig/src/native/support/doe_native_object_helpers.zig
++++ b/runtime/zig/src/native/support/doe_native_object_helpers.zig
+@@ -8,7 +8,11 @@ pub const alloc = gpa.allocator();
+ pub const label_store = @import("doe_label_store.zig");
+ 
+ pub fn make(comptime T: type) ?*T {
+-    const object = alloc.create(T) catch return null;
++    return create(T, alloc) catch null;
++}
++
++pub fn create(comptime T: type, allocator: std.mem.Allocator) std.mem.Allocator.Error!*T {
++    const object = try allocator.create(T);
+     program_identity_trace.recordNativeObjectCreate(T, object);
+     return object;
+ }
+diff --git a/runtime/zig/src/native/support/doe_native_object_types.zig b/runtime/zig/src/native/support/doe_native_object_types.zig
+index e4ea033b1..985ab76a4 100644
+--- a/runtime/zig/src/native/support/doe_native_object_types.zig
++++ b/runtime/zig/src/native/support/doe_native_object_types.zig
+@@ -255,6 +255,8 @@ pub const DoeCommandEncoder = struct {
+     pub const TYPE_MAGIC = MAGIC_CMD_ENCODER;
+     magic: u32 = TYPE_MAGIC,
+     ref_count: u32 = 1,
++    allocator: std.mem.Allocator = @import("doe_native_object_helpers.zig").alloc,
++    state: @import("../../contracts/command_recording.zig").State = .open,
+     dev: *DoeDevice,
+     device_ref: ?*DoeDevice = null,
+     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},
+@@ -285,6 +287,7 @@ pub const DoeCommandBuffer = struct {
+     magic: u32 = TYPE_MAGIC,
+     ref_count: u32 = 1,
+     allocator: std.mem.Allocator,
++    error_object: bool = false,
+     dev: *DoeDevice,
+     device_ref: ?*DoeDevice = null,
+     cmds: std.ArrayListUnmanaged(command_types.RecordedCmd) = .{},
+diff --git a/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig b/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
+index 7660f3296..1d3645374 100644
+--- a/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
++++ b/runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig
+@@ -1,3 +1,4 @@
++const recording = @import("../command/doe_command_recording.zig");
+ const model_render_types = @import("../../contracts/model/model_render_types.zig");
+ const binding_contract = @import("../../contracts/binding.zig");
+ const native_helpers = @import("../support/doe_native_object_helpers.zig");
+@@ -189,11 +190,11 @@ fn base_vulkan_render_cmd(pass: *shared.DoeRenderPass) model_render_types.Render
+ }
+ 
+ fn recordRender(pass: *shared.DoeRenderPass, cmd: model_render_types.RenderDrawCommand, clear_only: bool) void {
+-    pass.enc.cmds.append(native_helpers.alloc, .{ .vulkan_render = .{
++    if (!recording.append(pass.enc, .{ .vulkan_render = .{
+         .command = cmd,
+         .pipeline = if (pass.pipeline) |pipeline| native_helpers.toOpaque(pipeline) else null,
+         .clear_only = clear_only,
+-    } }) catch std.debug.panic("Vulkan render: OOM recording draw state", .{});
++    } })) return;
+     pass.attachments_started = true;
+ }
+ 
+diff --git a/runtime/zig/src/runtime/render/render_bundle.zig b/runtime/zig/src/runtime/render/render_bundle.zig
+index 25490d051..40c4b3bf6 100644
+--- a/runtime/zig/src/runtime/render/render_bundle.zig
++++ b/runtime/zig/src/runtime/render/render_bundle.zig
+@@ -18,6 +18,7 @@
+ // actionable error rather than a silent misfire.
+ 
+ const std = @import("std");
++const recording = @import("../../contracts/command_recording.zig");
+ const leases = @import("../../contracts/resource_lease.zig");
+ const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
+ const backend_contract = @import("../../contracts/backend.zig");
+@@ -121,6 +122,8 @@ pub const BundleCmd = union(BundleCmdTag) {
+ 
+ pub const DoeBundleEncoder = struct {
+     pub const TYPE_MAGIC = MAGIC_BUNDLE_ENCODER;
++    state: recording.State = .open,
++    device_lease: ?leases.ResourceLease = null,
+     magic: u32 = TYPE_MAGIC,
+     allocator: std.mem.Allocator,
+     ref_count: u32 = 1,
+@@ -142,6 +145,8 @@ pub const DoeBundleEncoder = struct {
+ 
+ pub const DoeRenderBundle = struct {
+     pub const TYPE_MAGIC = MAGIC_BUNDLE;
++    error_object: bool = false,
++    device_lease: ?leases.ResourceLease = null,
+     magic: u32 = TYPE_MAGIC,
+     allocator: std.mem.Allocator,
+     ref_count: u32 = 1,
+@@ -210,6 +215,7 @@ extern fn metal_bridge_render_encoder_draw_indexed_indirect(
+ // ============================================================
+ 
+ pub const ReplayError = error{
++    InvalidBundle,
+     FormatMismatch,
+     SampleCountMismatch,
+ };
+@@ -220,6 +226,7 @@ pub fn check_compatibility(
+     pass_color_format: abi_texture.WGPUTextureFormat,
+     pass_sample_count: u32,
+ ) ReplayError!void {
++    if (b.error_object) return error.InvalidBundle;
+     if (b.color_format != 0 and b.color_format != pass_color_format) {
+         return ReplayError.FormatMismatch;
+     }
+@@ -545,19 +552,28 @@ pub fn make_bundle_encoder(
+     return enc;
+ }
+ 
+-pub fn bundle_encoder_push(enc: *DoeBundleEncoder, cmd: BundleCmd) void {
+-    enc.cmds.append(enc.allocator, cmd) catch
+-        std.debug.panic("render_bundle: OOM recording bundle command", .{});
++pub fn bundle_encoder_push(enc: *DoeBundleEncoder, cmd: BundleCmd) recording.Failure!void {
++    if (enc.state != .open) return error.InvalidState;
++    enc.cmds.append(enc.allocator, cmd) catch |err| {
++        _ = enc.state.fail(err);
++        return err;
++    };
+ }
+ 
+ pub fn bundle_encoder_finish(enc: *DoeBundleEncoder) ?*DoeRenderBundle {
+     const a = enc.allocator;
+-    const bundle = a.create(DoeRenderBundle) catch return null;
+-    const cmds_slice = enc.cmds.toOwnedSlice(a) catch {
++    const valid = enc.state == .open;
++    const bundle = a.create(DoeRenderBundle) catch |err| {
++        _ = enc.state.fail(err);
++        return null;
++    };
++    const cmds_slice = enc.cmds.toOwnedSlice(a) catch |err| {
++        _ = enc.state.fail(err);
+         a.destroy(bundle);
+         return null;
+     };
+     bundle.* = .{
++        .error_object = !valid,
+         .allocator = a,
+         .backend = enc.backend,
+         .color_format = enc.color_format,
+@@ -567,6 +583,7 @@ pub fn bundle_encoder_finish(enc: *DoeBundleEncoder) ?*DoeRenderBundle {
+         .references = enc.references,
+     };
+     enc.references = .{};
++    enc.state = .finished;
+     return bundle;
+ }
+ 
+@@ -576,6 +593,7 @@ pub fn bundle_destroy(b: *DoeRenderBundle) void {
+ }
+ 
+ pub fn destroyReleasedBundle(b: *DoeRenderBundle) void {
++    if (b.device_lease) |lease| lease.release(lease.handle);
+     leases.releaseAll(b.allocator, &b.references);
+     const a = b.allocator;
+     a.free(b.cmds);
+diff --git a/runtime/zig/tests/core/render_bundle_test.zig b/runtime/zig/tests/core/render_bundle_test.zig
+index 55dcd7962..27eebb498 100644
+--- a/runtime/zig/tests/core/render_bundle_test.zig
++++ b/runtime/zig/tests/core/render_bundle_test.zig
+@@ -38,8 +38,8 @@ fn destroy_heap_encoder(enc: *DoeBundleEncoder) void {
+     allocator.destroy(enc);
+ }
+ 
+-fn push_draw(enc: *DoeBundleEncoder, vertex_count: u32, instance_count: u32) void {
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
++fn push_draw(enc: *DoeBundleEncoder, vertex_count: u32, instance_count: u32) !void {
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
+         .vertex_count = vertex_count,
+         .instance_count = instance_count,
+         .first_vertex = 0,
+@@ -86,7 +86,7 @@ test "push single draw command increments count" {
+     var enc = make_test_encoder(std.testing.allocator);
+     defer enc.cmds.deinit(enc.allocator);
+ 
+-    push_draw(&enc, 3, 1);
++    try push_draw(&enc, 3, 1);
+ 
+     try std.testing.expectEqual(@as(usize, 1), enc.cmds.items.len);
+     try std.testing.expectEqual(BundleCmdTag.draw, std.meta.activeTag(enc.cmds.items[0]));
+@@ -96,15 +96,15 @@ test "push multiple commands preserves order" {
+     var enc = make_test_encoder(std.testing.allocator);
+     defer enc.cmds.deinit(enc.allocator);
+ 
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
+-    push_draw(&enc, 6, 1);
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_vertex_buffer = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
++    try push_draw(&enc, 6, 1);
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_vertex_buffer = .{
+         .slot = 0,
+         .buffer_handle = null,
+         .offset = 0,
+         .size = 0,
+     } });
+-    push_draw(&enc, 12, 2);
++    try push_draw(&enc, 12, 2);
+ 
+     try std.testing.expectEqual(@as(usize, 4), enc.cmds.items.len);
+     try std.testing.expectEqual(BundleCmdTag.set_pipeline, std.meta.activeTag(enc.cmds.items[0]));
+@@ -117,7 +117,7 @@ test "draw command records vertex and instance counts" {
+     var enc = make_test_encoder(std.testing.allocator);
+     defer enc.cmds.deinit(enc.allocator);
+ 
+-    push_draw(&enc, 36, 4);
++    try push_draw(&enc, 36, 4);
+ 
+     const d = enc.cmds.items[0].draw;
+     try std.testing.expectEqual(@as(u32, 36), d.vertex_count);
+@@ -130,7 +130,7 @@ test "draw_indexed command records all parameters" {
+     var enc = make_test_encoder(std.testing.allocator);
+     defer enc.cmds.deinit(enc.allocator);
+ 
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed = .{
+         .index_count = 100,
+         .instance_count = 3,
+         .first_index = 10,
+@@ -157,7 +157,7 @@ test "set_bind_group records group index and entry count" {
+     bg.entries[0] = .{ .handle = null, .offset = 0 };
+     bg.entries[1] = .{ .handle = null, .offset = 64 };
+ 
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_bind_group = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_bind_group = .{
+         .group = 1,
+         .bg = bg,
+     } });
+@@ -173,7 +173,7 @@ test "set_index_buffer records format and offset" {
+     var enc = make_test_encoder(std.testing.allocator);
+     defer enc.cmds.deinit(enc.allocator);
+ 
+-    rb.bundle_encoder_push(&enc, BundleCmd{
++    try rb.bundle_encoder_push(&enc, BundleCmd{
+         .set_index_buffer = .{
+             .buffer_handle = null,
+             .format = 0x1, // uint16
+@@ -195,9 +195,9 @@ test "set_index_buffer records format and offset" {
+ test "finish produces bundle with correct command count and format" {
+     var enc = make_test_encoder(std.testing.allocator);
+ 
+-    push_draw(&enc, 3, 1);
+-    push_draw(&enc, 6, 1);
+-    push_draw(&enc, 9, 1);
++    try push_draw(&enc, 3, 1);
++    try push_draw(&enc, 6, 1);
++    try push_draw(&enc, 9, 1);
+ 
+     const bundle = finish_to_bundle(&enc);
+     defer std.testing.allocator.free(bundle.cmds);
+@@ -210,8 +210,8 @@ test "finish produces bundle with correct command count and format" {
+ test "finish transfers ownership of commands to bundle" {
+     var enc = make_test_encoder(std.testing.allocator);
+ 
+-    push_draw(&enc, 10, 1);
+-    push_draw(&enc, 20, 1);
++    try push_draw(&enc, 10, 1);
++    try push_draw(&enc, 20, 1);
+ 
+     const bundle = finish_to_bundle(&enc);
+     defer std.testing.allocator.free(bundle.cmds);
+@@ -266,21 +266,21 @@ test "replay produces correct command sequence for mixed commands" {
+     var enc = make_test_encoder(std.testing.allocator);
+ 
+     // Record: pipeline -> vertex buffer -> draw -> draw_indexed
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_vertex_buffer = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_vertex_buffer = .{
+         .slot = 0,
+         .buffer_handle = null,
+         .offset = 0,
+         .size = 0,
+     } });
+-    push_draw(&enc, 6, 1);
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_index_buffer = .{
++    try push_draw(&enc, 6, 1);
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_index_buffer = .{
+         .buffer_handle = null,
+         .format = 0x2,
+         .offset = 0,
+         .size = 1024,
+     } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed = .{
+         .index_count = 12,
+         .instance_count = 1,
+         .first_index = 0,
+@@ -322,20 +322,20 @@ test "executeBundles replays indexed indirect bundles with fresh replay state" {
+ 
+     var bundle_a_enc = make_test_encoder(std.testing.allocator);
+     defer bundle_a_enc.cmds.deinit(bundle_a_enc.allocator);
+-    rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = @ptrCast(&pipeline_token_a) } });
+-    rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .set_vertex_buffer = .{
++    try rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = @ptrCast(&pipeline_token_a) } });
++    try rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .set_vertex_buffer = .{
+         .slot = 0,
+         .buffer_handle = @ptrCast(&vertex_token_a),
+         .offset = 16,
+         .size = 0,
+     } });
+-    rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .set_index_buffer = .{
++    try rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .set_index_buffer = .{
+         .buffer_handle = @ptrCast(&index_token_a),
+         .format = 0x1,
+         .offset = 24,
+         .size = 128,
+     } });
+-    rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .draw_indexed_indirect = .{
++    try rb.bundle_encoder_push(&bundle_a_enc, BundleCmd{ .draw_indexed_indirect = .{
+         .indirect_buffer = @ptrCast(&indirect_token_a),
+         .indirect_offset = 64,
+     } });
+@@ -348,14 +348,14 @@ test "executeBundles replays indexed indirect bundles with fresh replay state" {
+ 
+     var bundle_b_enc = make_test_encoder(std.testing.allocator);
+     defer bundle_b_enc.cmds.deinit(bundle_b_enc.allocator);
+-    rb.bundle_encoder_push(&bundle_b_enc, BundleCmd{ .set_index_buffer = .{
++    try rb.bundle_encoder_push(&bundle_b_enc, BundleCmd{ .set_index_buffer = .{
+         .buffer_handle = @ptrCast(&index_token_b),
+         .format = 0x2,
+         .offset = 8,
+         .size = 256,
+     } });
+-    rb.bundle_encoder_push(&bundle_b_enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = @ptrCast(&pipeline_token_b) } });
+-    rb.bundle_encoder_push(&bundle_b_enc, BundleCmd{ .draw_indexed_indirect = .{
++    try rb.bundle_encoder_push(&bundle_b_enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = @ptrCast(&pipeline_token_b) } });
++    try rb.bundle_encoder_push(&bundle_b_enc, BundleCmd{ .draw_indexed_indirect = .{
+         .indirect_buffer = @ptrCast(&indirect_token_b),
+         .indirect_offset = 32,
+     } });
+@@ -407,7 +407,7 @@ test "executeBundles skips indexed indirect draws without an index buffer" {
+ 
+     var bundle_enc = make_test_encoder(std.testing.allocator);
+     defer bundle_enc.cmds.deinit(bundle_enc.allocator);
+-    rb.bundle_encoder_push(&bundle_enc, BundleCmd{ .draw_indexed_indirect = .{
++    try rb.bundle_encoder_push(&bundle_enc, BundleCmd{ .draw_indexed_indirect = .{
+         .indirect_buffer = @ptrCast(&indirect_token),
+         .indirect_offset = 48,
+     } });
+@@ -447,11 +447,11 @@ test "executeBundles preserves render pass ops and bundle pipeline metadata" {
+ 
+     var bundle_enc = make_test_encoder(std.testing.allocator);
+     defer bundle_enc.cmds.deinit(bundle_enc.allocator);
+-    rb.bundle_encoder_push(&bundle_enc, BundleCmd{ .set_pipeline = .{
++    try rb.bundle_encoder_push(&bundle_enc, BundleCmd{ .set_pipeline = .{
+         .pipeline_handle = pipeline.mtl_pso,
+         .pipeline_object_handle = @ptrCast(&pipeline),
+     } });
+-    push_draw(&bundle_enc, 3, 1);
++    try push_draw(&bundle_enc, 3, 1);
+     const bundle = finish_to_bundle(&bundle_enc);
+     defer std.testing.allocator.free(bundle.cmds);
+ 
+@@ -582,8 +582,8 @@ test "full lifecycle: create encoder, record, finish, destroy" {
+         return error.AllocationFailed;
+     defer destroy_heap_encoder(enc);
+ 
+-    rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
+         .vertex_count = 3,
+         .instance_count = 1,
+         .first_vertex = 0,
+@@ -649,41 +649,41 @@ test "all BundleCmdTag variants can be pushed and recovered" {
+     var enc = make_test_encoder(std.testing.allocator);
+     defer enc.cmds.deinit(enc.allocator);
+ 
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_bind_group = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_bind_group = .{
+         .group = 0,
+         .bg = .{ .entries = undefined, .count = 0 },
+     } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_vertex_buffer = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_vertex_buffer = .{
+         .slot = 0,
+         .buffer_handle = null,
+         .offset = 0,
+         .size = 0,
+     } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .set_index_buffer = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .set_index_buffer = .{
+         .buffer_handle = null,
+         .format = 0x2,
+         .offset = 0,
+         .size = 0,
+     } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .draw = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .draw = .{
+         .vertex_count = 1,
+         .instance_count = 1,
+         .first_vertex = 0,
+         .first_instance = 0,
+     } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed = .{
+         .index_count = 1,
+         .instance_count = 1,
+         .first_index = 0,
+         .base_vertex = 0,
+         .first_instance = 0,
+     } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indirect = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indirect = .{
+         .indirect_buffer = null,
+         .indirect_offset = 0,
+     } });
+-    rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed_indirect = .{
++    try rb.bundle_encoder_push(&enc, BundleCmd{ .draw_indexed_indirect = .{
+         .indirect_buffer = null,
+         .indirect_offset = 0,
+     } });
+@@ -737,16 +737,16 @@ test "replay sequence: all command types recorded and data preserved" {
+     defer destroy_heap_encoder(enc);
+ 
+     // 1. set_pipeline
+-    rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
++    try rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
+ 
+     // 2. set_bind_group (group 0, 2 entries)
+     var bg0 = rb.BundleBindGroup{ .entries = undefined, .count = 2 };
+     bg0.entries[0] = .{ .handle = null, .offset = 0 };
+     bg0.entries[1] = .{ .handle = null, .offset = 256 };
+-    rb.bundle_encoder_push(enc, BundleCmd{ .set_bind_group = .{ .group = 0, .bg = bg0 } });
++    try rb.bundle_encoder_push(enc, BundleCmd{ .set_bind_group = .{ .group = 0, .bg = bg0 } });
+ 
+     // 3. set_vertex_buffer (slot 0)
+-    rb.bundle_encoder_push(enc, BundleCmd{ .set_vertex_buffer = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .set_vertex_buffer = .{
+         .slot = 0,
+         .buffer_handle = null,
+         .offset = 0,
+@@ -754,7 +754,7 @@ test "replay sequence: all command types recorded and data preserved" {
+     } });
+ 
+     // 4. draw
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
+         .vertex_count = 36,
+         .instance_count = 1,
+         .first_vertex = 0,
+@@ -762,7 +762,7 @@ test "replay sequence: all command types recorded and data preserved" {
+     } });
+ 
+     // 5. set_index_buffer
+-    rb.bundle_encoder_push(enc, BundleCmd{ .set_index_buffer = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .set_index_buffer = .{
+         .buffer_handle = null,
+         .format = 0x2,
+         .offset = 0,
+@@ -770,7 +770,7 @@ test "replay sequence: all command types recorded and data preserved" {
+     } });
+ 
+     // 6. draw_indexed
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw_indexed = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw_indexed = .{
+         .index_count = 24,
+         .instance_count = 2,
+         .first_index = 0,
+@@ -779,13 +779,13 @@ test "replay sequence: all command types recorded and data preserved" {
+     } });
+ 
+     // 7. draw_indirect
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw_indirect = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw_indirect = .{
+         .indirect_buffer = null,
+         .indirect_offset = 64,
+     } });
+ 
+     // 8. draw_indexed_indirect
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw_indexed_indirect = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw_indexed_indirect = .{
+         .indirect_buffer = null,
+         .indirect_offset = 128,
+     } });
+@@ -881,10 +881,10 @@ test "replay sequence: multiple bind groups in replay order" {
+         while (j < bg.count) : (j += 1) {
+             bg.entries[j] = .{ .handle = null, .offset = @as(u64, i) * 1000 + @as(u64, j) * 64 };
+         }
+-        rb.bundle_encoder_push(enc, BundleCmd{ .set_bind_group = .{ .group = i, .bg = bg } });
++        try rb.bundle_encoder_push(enc, BundleCmd{ .set_bind_group = .{ .group = i, .bg = bg } });
+     }
+ 
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
+         .vertex_count = 3,
+         .instance_count = 1,
+         .first_vertex = 0,
+@@ -913,12 +913,12 @@ test "replay sequence: multiple vertex buffer slots" {
+         return error.AllocationFailed;
+     defer destroy_heap_encoder(enc);
+ 
+-    rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
++    try rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
+ 
+     // Record vertex buffers on slots 0..MAX_VTX_BUFS-1.
+     var slot: u32 = 0;
+     while (slot < rb.MAX_VTX_BUFS) : (slot += 1) {
+-        rb.bundle_encoder_push(enc, BundleCmd{ .set_vertex_buffer = .{
++        try rb.bundle_encoder_push(enc, BundleCmd{ .set_vertex_buffer = .{
+             .slot = slot,
+             .buffer_handle = null,
+             .offset = @as(u64, slot) * 128,
+@@ -926,7 +926,7 @@ test "replay sequence: multiple vertex buffer slots" {
+         } });
+     }
+ 
+-    rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
++    try rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
+         .vertex_count = 100,
+         .instance_count = 1,
+         .first_vertex = 0,
+diff --git a/runtime/zig/tests/native_recorded_compute.c b/runtime/zig/tests/native_recorded_compute.c
+index 0ad16b9aa..3b5a97825 100644
+--- a/runtime/zig/tests/native_recorded_compute.c
++++ b/runtime/zig/tests/native_recorded_compute.c
+@@ -29,13 +29,46 @@ static void map_ready(WGPUMapAsyncStatus status, WGPUStringView message, void* r
+     *(bool*)result = status == WGPUMapAsyncStatus_Success;
+ }
+ 
+-static bool execute(WGPUInstance instance, WGPUDevice device, WGPUQueue queue, bool batch) {
++static bool texture_is_zero(WGPUInstance instance, WGPUDevice device, WGPUQueue queue,
++                            WGPUTexture texture, WGPUBuffer readback) {
++    WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, NULL);
++    if (!encoder) return false;
++    WGPUTexelCopyTextureInfo source = WGPU_TEXEL_COPY_TEXTURE_INFO_INIT;
++    source.texture = texture;
++    WGPUTexelCopyBufferInfo target = WGPU_TEXEL_COPY_BUFFER_INFO_INIT;
++    target.buffer = readback;
++    target.layout.bytesPerRow = 256;
++    target.layout.rowsPerImage = 1;
++    WGPUExtent3D extent = {ELEMENT_COUNT, 1, 1};
++    wgpuCommandEncoderCopyTextureToBuffer(encoder, &source, &target, &extent);
++    WGPUCommandBuffer commands = wgpuCommandEncoderFinish(encoder, NULL);
++    wgpuCommandEncoderRelease(encoder);
++    if (!commands) return false;
++    wgpuQueueSubmit(queue, 1, &commands);
++    wgpuCommandBufferRelease(commands);
++    bool mapped = false;
++    WGPUBufferMapCallbackInfo mapping = WGPU_BUFFER_MAP_CALLBACK_INFO_INIT;
++    mapping.mode = WGPUCallbackMode_AllowSpontaneous;
++    mapping.callback = map_ready;
++    mapping.userdata1 = &mapped;
++    wgpuBufferMapAsync(readback, WGPUMapMode_Read, 0, ELEMENT_COUNT * sizeof(uint32_t), mapping);
++    wgpuInstanceProcessEvents(instance);
++    if (!mapped) return false;
++    const uint32_t* output = wgpuBufferGetConstMappedRange(readback, 0, ELEMENT_COUNT * sizeof(uint32_t));
++    bool zero = output != NULL;
++    for (size_t index = 0; output && index < ELEMENT_COUNT; ++index) zero &= output[index] == 0;
++    wgpuBufferUnmap(readback);
++    return zero;
++}
++
++static bool execute(WGPUInstance instance, WGPUDevice device, WGPUQueue queue, bool batch, bool via_texture) {
+     bool success = false, mapped = false;
+     WGPUShaderModule shader = NULL;
+     WGPUComputePipeline pipeline = NULL;
+     WGPUBindGroupLayout layout = NULL;
+     WGPUBindGroup group = NULL;
+     WGPUBuffer storage = NULL, readback = NULL;
++    WGPUTexture texture = NULL;
+     WGPUCommandBuffer commands = NULL;
+     const uint32_t input[ELEMENT_COUNT] = {17, 29, 43, 71};
+     static const char wgsl[] =
+@@ -62,6 +95,7 @@ static bool execute(WGPUInstance instance, WGPUDevice device, WGPUQueue queue, b
+     buffer_desc.size = sizeof(input);
+     buffer_desc.usage = WGPUBufferUsage_Storage | WGPUBufferUsage_CopySrc | WGPUBufferUsage_CopyDst;
+     storage = wgpuDeviceCreateBuffer(device, &buffer_desc);
++    if (via_texture) buffer_desc.size = 256;
+     buffer_desc.usage = WGPUBufferUsage_MapRead | WGPUBufferUsage_CopyDst;
+     readback = wgpuDeviceCreateBuffer(device, &buffer_desc);
+     REQUIRE(storage && readback);
+@@ -80,7 +114,44 @@ static bool execute(WGPUInstance instance, WGPUDevice device, WGPUQueue queue, b
+         device, pipeline, &group, 1, ELEMENT_COUNT, 1, 1, storage, 0, NULL, 0, sizeof(input));
+     if (invalid) wgpuCommandBufferRelease(invalid);
+     REQUIRE(!invalid);
+-    if (batch) {
++    if (via_texture) {
++        WGPUTextureDescriptor texture_desc = WGPU_TEXTURE_DESCRIPTOR_INIT;
++        texture_desc.size = (WGPUExtent3D){ELEMENT_COUNT, 1, 1};
++        texture_desc.dimension = WGPUTextureDimension_2D;
++        texture_desc.format = WGPUTextureFormat_RGBA8Unorm;
++        texture_desc.usage = WGPUTextureUsage_CopySrc | WGPUTextureUsage_CopyDst;
++        texture = wgpuDeviceCreateTexture(device, &texture_desc);
++        REQUIRE(texture);
++        WGPUTexelCopyTextureInfo image = WGPU_TEXEL_COPY_TEXTURE_INFO_INIT;
++        image.texture = texture;
++        WGPUTexelCopyBufferInfo source_buffer = WGPU_TEXEL_COPY_BUFFER_INFO_INIT;
++        source_buffer.buffer = storage;
++        source_buffer.layout.bytesPerRow = 256;
++        source_buffer.layout.rowsPerImage = 1;
++        WGPUTexelCopyBufferInfo target_buffer = source_buffer;
++        target_buffer.buffer = readback;
++        const uint32_t zeros[ELEMENT_COUNT] = {0};
++        wgpuQueueWriteTexture(queue, &image, zeros, sizeof(zeros), &source_buffer.layout, &texture_desc.size);
++        WGPUCommandEncoder abandoned = wgpuDeviceCreateCommandEncoder(device, NULL);
++        REQUIRE(abandoned);
++        wgpuCommandEncoderCopyBufferToTexture(abandoned, &source_buffer, &image, &texture_desc.size);
++        wgpuCommandEncoderRelease(abandoned);
++        REQUIRE(texture_is_zero(instance, device, queue, texture, readback));
++        WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, NULL);
++        REQUIRE(encoder);
++        WGPUComputePassEncoder pass = wgpuCommandEncoderBeginComputePass(encoder, NULL);
++        if (!pass) { wgpuCommandEncoderRelease(encoder); REQUIRE(pass); }
++        wgpuComputePassEncoderSetPipeline(pass, pipeline);
++        wgpuComputePassEncoderSetBindGroup(pass, 0, group, 0, NULL);
++        wgpuComputePassEncoderDispatchWorkgroups(pass, ELEMENT_COUNT, 1, 1);
++        wgpuComputePassEncoderEnd(pass);
++        wgpuComputePassEncoderRelease(pass);
++        wgpuCommandEncoderCopyBufferToTexture(encoder, &source_buffer, &image, &texture_desc.size);
++        wgpuCommandEncoderCopyTextureToBuffer(encoder, &image, &target_buffer, &texture_desc.size);
++        commands = wgpuCommandEncoderFinish(encoder, NULL);
++        wgpuCommandEncoderRelease(encoder);
++        wgpuTextureRelease(texture); texture = NULL;
++    } else if (batch) {
+         WGPUComputePipeline pipelines[] = {pipeline, pipeline};
+         WGPUBindGroup groups[2 * NATIVE_BIND_GROUP_STRIDE] = {0};
+         groups[0] = group;
+@@ -112,7 +183,10 @@ static bool execute(WGPUInstance instance, WGPUDevice device, WGPUQueue queue, b
+     REQUIRE(output);
+     for (size_t index = 0; index < ELEMENT_COUNT; ++index)
+         REQUIRE(output[index] == input[index] + (batch ? 2u : 1u));
+-    printf("passed: %s native constructor, failed construction, caller release, dispatch/copy/readback\n", batch ? "batch" : "single");
++    if (via_texture)
++        printf("passed: abandoned texture copy, caller release, ordered GPU dispatch/texture copy/readback\n");
++    else
++        printf("passed: %s native constructor, failed construction, caller release, dispatch/copy/readback\n", batch ? "batch" : "single");
+     success = true;
+ cleanup:
+     if (mapped && readback) wgpuBufferUnmap(readback);
+@@ -123,6 +197,7 @@ cleanup:
+     if (shader) wgpuShaderModuleRelease(shader);
+     if (storage) wgpuBufferRelease(storage);
+     if (readback) wgpuBufferRelease(readback);
++    if (texture) wgpuTextureRelease(texture);
+     return success;
+ #undef REQUIRE
+ }
+@@ -160,7 +235,8 @@ int main(void) {
+     wgpuInstanceProcessEvents(instance);
+     if (!device) goto cleanup;
+     queue = wgpuDeviceGetQueue(device);
+-    if (queue && execute(instance, device, queue, false) && execute(instance, device, queue, true)) result = 0;
++    if (queue && execute(instance, device, queue, false, false) &&
++        execute(instance, device, queue, true, false) && execute(instance, device, queue, false, true)) result = 0;
+ cleanup:
+     if (queue) wgpuQueueRelease(queue);
+     if (device) { wgpuDeviceDestroy(device); wgpuDeviceRelease(device); }

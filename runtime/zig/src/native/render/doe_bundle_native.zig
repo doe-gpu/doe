@@ -10,6 +10,8 @@ const native_cmds = @import("../support/doe_native_command_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const references = @import("../command/doe_command_references.zig");
 const leases = @import("../../contracts/resource_lease.zig");
+const recording = @import("../command/doe_command_recording.zig");
+const recording_contract = @import("../../contracts/command_recording.zig");
 const bundle = @import("../../runtime/render/render_bundle.zig");
 
 const alloc = native_helpers.alloc;
@@ -49,9 +51,13 @@ pub export fn doeNativeDeviceCreateRenderBundleEncoder(
         if (d.sampleCount == 0) 1 else d.sampleCount,
         d.depthReadOnly != 0,
         d.stencilReadOnly != 0,
-    ) orelse return null;
+    ) orelse {
+        dev.error_scopes.deliver(error_scope.ERROR_TYPE_OUT_OF_MEMORY, "render bundle encoder allocation failed");
+        return null;
+    };
     enc.backend = dev.backend;
-    references.retainDevice(enc.allocator, &enc.references, dev);
+    native_helpers.object_add_ref(DoeDevice, dev_raw);
+    enc.device_lease = .{ .handle = dev_raw, .release = @import("../support/doe_native_exports.zig").doeNativeDeviceRelease };
     return @ptrCast(enc);
 }
 
@@ -59,10 +65,38 @@ pub export fn doeNativeRenderBundleEncoderRelease(raw: ?*anyopaque) callconv(.c)
     const enc = bundle.cast_bundle_encoder(raw) orelse return;
     if (!native_helpers.object_should_destroy(enc)) return;
     leases.releaseAll(enc.allocator, &enc.references);
+    if (enc.device_lease) |lease| lease.release(lease.handle);
     native_helpers.label_store.remove(raw);
     const a = enc.allocator;
     enc.cmds.deinit(a);
     a.destroy(enc);
+}
+
+fn failBundle(encoder: *bundle.DoeBundleEncoder, cause: recording_contract.Failure) void {
+    _ = encoder.state.fail(cause);
+    if (encoder.device_lease) |lease| {
+        const device = cast(DoeDevice, lease.handle) orelse return;
+        device.error_scopes.deliver(error_scope.zig_error_to_type(cause), switch (cause) {
+            error.OutOfMemory => "render bundle recording could not allocate owned storage",
+            error.InvalidState => "render bundle recording requires an open encoder",
+            error.InvalidArgument => "render bundle recording received an invalid dependency",
+        });
+    }
+}
+
+fn requireBundleOpen(encoder: *bundle.DoeBundleEncoder) bool {
+    if (encoder.state == .open) return true;
+    if (encoder.state == .finished) failBundle(encoder, error.InvalidState);
+    return false;
+}
+
+fn reserveBundleReferences(encoder: *bundle.DoeBundleEncoder, count: usize) bool {
+    if (!requireBundleOpen(encoder)) return false;
+    encoder.references.ensureUnusedCapacity(encoder.allocator, count) catch |err| {
+        failBundle(encoder, err);
+        return false;
+    };
+    return true;
 }
 
 // ============================================================
@@ -74,13 +108,15 @@ pub export fn doeNativeRenderBundleEncoderSetPipeline(
     pip_raw: ?*anyopaque,
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     const pip = cast(DoeRenderPipeline, pip_raw) orelse return;
-    references.retainRenderPipeline(enc.allocator, &enc.references, pip);
+    if (!reserveBundleReferences(enc, 1)) return;
+    references.retainRenderPipelineAssumeCapacity(&enc.references, pip);
     const pipeline_handle = if (enc.backend == .vulkan) toOpaque(pip) else pip.mtl_pso;
     bundle.bundle_encoder_push(enc, .{ .set_pipeline = .{
         .pipeline_handle = pipeline_handle,
         .pipeline_object_handle = toOpaque(pip),
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 pub export fn doeNativeRenderBundleEncoderSetBindGroup(
@@ -93,8 +129,10 @@ pub export fn doeNativeRenderBundleEncoderSetBindGroup(
     _ = dynamic_offset_count;
     _ = dynamic_offsets;
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     const bg = cast(DoeBindGroup, bg_raw) orelse return;
-    references.retainBindGroup(enc.allocator, &enc.references, bg);
+    if (!reserveBundleReferences(enc, 1)) return;
+    references.retainBindGroupAssumeCapacity(&enc.references, bg);
 
     var bg_entry = bundle.BundleBindGroup{
         .entries = undefined,
@@ -111,7 +149,7 @@ pub export fn doeNativeRenderBundleEncoderSetBindGroup(
         .group = group_index,
         .bg_handle = if (enc.backend == .vulkan) toOpaque(bg) else null,
         .bg = bg_entry,
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 pub export fn doeNativeRenderBundleEncoderSetVertexBuffer(
@@ -122,16 +160,18 @@ pub export fn doeNativeRenderBundleEncoderSetVertexBuffer(
     size: u64,
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     const buf = cast(DoeBuffer, buf_raw) orelse return;
     if (buf.error_object) return;
-    references.retainBuffer(enc.allocator, &enc.references, buf);
+    if (!reserveBundleReferences(enc, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, buf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(buf) else buf.mtl;
     bundle.bundle_encoder_push(enc, .{ .set_vertex_buffer = .{
         .slot = slot,
         .buffer_handle = buffer_handle,
         .offset = offset,
         .size = size,
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 pub export fn doeNativeRenderBundleEncoderSetIndexBuffer(
@@ -142,16 +182,18 @@ pub export fn doeNativeRenderBundleEncoderSetIndexBuffer(
     size: u64,
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     const buf = cast(DoeBuffer, buf_raw) orelse return;
     if (buf.error_object) return;
-    references.retainBuffer(enc.allocator, &enc.references, buf);
+    if (!reserveBundleReferences(enc, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, buf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(buf) else buf.mtl;
     bundle.bundle_encoder_push(enc, .{ .set_index_buffer = .{
         .buffer_handle = buffer_handle,
         .format = format,
         .offset = offset,
         .size = size,
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 pub export fn doeNativeRenderBundleEncoderDraw(
@@ -162,12 +204,13 @@ pub export fn doeNativeRenderBundleEncoderDraw(
     first_instance: u32,
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     bundle.bundle_encoder_push(enc, .{ .draw = .{
         .vertex_count = vertex_count,
         .instance_count = instance_count,
         .first_vertex = first_vertex,
         .first_instance = first_instance,
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 pub export fn doeNativeRenderBundleEncoderDrawIndexed(
@@ -179,13 +222,14 @@ pub export fn doeNativeRenderBundleEncoderDrawIndexed(
     first_instance: u32,
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     bundle.bundle_encoder_push(enc, .{ .draw_indexed = .{
         .index_count = index_count,
         .instance_count = instance_count,
         .first_index = first_index,
         .base_vertex = base_vertex,
         .first_instance = first_instance,
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 pub export fn doeNativeRenderBundleEncoderDrawIndirect(
@@ -194,14 +238,16 @@ pub export fn doeNativeRenderBundleEncoderDrawIndirect(
     indirect_offset: u64,
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     const ibuf = cast(DoeBuffer, indirect_buf_raw) orelse return;
     if (ibuf.error_object) return;
-    references.retainBuffer(enc.allocator, &enc.references, ibuf);
+    if (!reserveBundleReferences(enc, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, ibuf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(ibuf) else ibuf.mtl;
     bundle.bundle_encoder_push(enc, .{ .draw_indirect = .{
         .indirect_buffer = buffer_handle,
         .indirect_offset = indirect_offset,
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 pub export fn doeNativeRenderBundleEncoderDrawIndexedIndirect(
@@ -210,14 +256,16 @@ pub export fn doeNativeRenderBundleEncoderDrawIndexedIndirect(
     indirect_offset: u64,
 ) callconv(.c) void {
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
+    if (!requireBundleOpen(enc)) return;
     const ibuf = cast(DoeBuffer, indirect_buf_raw) orelse return;
     if (ibuf.error_object) return;
-    references.retainBuffer(enc.allocator, &enc.references, ibuf);
+    if (!reserveBundleReferences(enc, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, ibuf);
     const buffer_handle = if (enc.backend == .vulkan) toOpaque(ibuf) else ibuf.mtl;
     bundle.bundle_encoder_push(enc, .{ .draw_indexed_indirect = .{
         .indirect_buffer = buffer_handle,
         .indirect_offset = indirect_offset,
-    } });
+    } }) catch |err| return failBundle(enc, err);
 }
 
 // ============================================================
@@ -230,7 +278,15 @@ pub export fn doeNativeRenderBundleEncoderFinish(
 ) callconv(.c) ?*anyopaque {
     _ = desc;
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return null;
-    const b = bundle.bundle_encoder_finish(enc) orelse return null;
+    _ = requireBundleOpen(enc);
+    const b = bundle.bundle_encoder_finish(enc) orelse {
+        failBundle(enc, error.OutOfMemory);
+        return null;
+    };
+    if (enc.device_lease) |lease| {
+        native_helpers.object_add_ref(DoeDevice, lease.handle);
+        b.device_lease = lease;
+    }
     return @ptrCast(b);
 }
 
@@ -239,6 +295,58 @@ pub export fn doeNativeRenderBundleRelease(raw: ?*anyopaque) callconv(.c) void {
     if (!native_helpers.object_should_destroy(b)) return;
     native_helpers.label_store.remove(raw);
     bundle.destroyReleasedBundle(b);
+}
+
+fn bundleAllocationScenario(allocator: std.mem.Allocator) !void {
+    var device = DoeDevice{};
+    var pipeline = DoeRenderPipeline{};
+    var group = DoeBindGroup{};
+    var buffer = DoeBuffer{ .size = 64 };
+    defer {
+        for ([_]u32{ device.ref_count, pipeline.ref_count, group.ref_count, buffer.ref_count }) |count|
+            std.testing.expectEqual(@as(u32, 1), count) catch @panic("bundle recording leaked a caller reference");
+    }
+    const encoder = bundle.make_bundle_encoder(allocator, 0, 0, 1, false, false) orelse return error.OutOfMemory;
+    native_helpers.object_add_ref(DoeDevice, toOpaque(&device));
+    encoder.device_lease = .{ .handle = toOpaque(&device), .release = @import("../support/doe_native_exports.zig").doeNativeDeviceRelease };
+    defer doeNativeRenderBundleEncoderRelease(toOpaque(encoder));
+    const repetitions = 17;
+    for (0..repetitions) |_| {
+        doeNativeRenderBundleEncoderSetPipeline(toOpaque(encoder), toOpaque(&pipeline));
+        doeNativeRenderBundleEncoderSetBindGroup(toOpaque(encoder), 0, toOpaque(&group), 0, null);
+        doeNativeRenderBundleEncoderSetVertexBuffer(toOpaque(encoder), 0, toOpaque(&buffer), 0, 16);
+        doeNativeRenderBundleEncoderSetIndexBuffer(toOpaque(encoder), toOpaque(&buffer), 2, 0, 16);
+        doeNativeRenderBundleEncoderDrawIndirect(toOpaque(encoder), toOpaque(&buffer), 0);
+    }
+    if (encoder.state == .failed) return encoder.state.failed;
+    const result = doeNativeRenderBundleEncoderFinish(toOpaque(encoder), null) orelse return error.OutOfMemory;
+    defer doeNativeRenderBundleRelease(result);
+    try std.testing.expect(!bundle.cast_bundle(result).?.error_object);
+    try std.testing.expectEqual(@as(usize, repetitions * 5), bundle.cast_bundle(result).?.cmds.len);
+}
+
+test "native bundle recording and finish release dependencies after every allocation failure" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, bundleAllocationScenario, .{});
+}
+
+test "failed bundle cannot replay into a valid command recording" {
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{});
+    const encoder = bundle.make_bundle_encoder(failing.allocator(), 0, 0, 1, false, false).?;
+    defer doeNativeRenderBundleEncoderRelease(toOpaque(encoder));
+    failing.fail_index = failing.alloc_index;
+    doeNativeRenderBundleEncoderDraw(toOpaque(encoder), 3, 1, 0, 0);
+    try std.testing.expectEqual(error.OutOfMemory, encoder.state.failed);
+    failing.fail_index = std.math.maxInt(usize);
+    const result = doeNativeRenderBundleEncoderFinish(toOpaque(encoder), null).?;
+    defer doeNativeRenderBundleRelease(result);
+    try std.testing.expect(bundle.cast_bundle(result).?.error_object);
+    var device = DoeDevice{};
+    var commands = native_types.DoeCommandEncoder{ .dev = &device };
+    var pass = DoeRenderPass{ .enc = &commands };
+    const bundles = [_]?*anyopaque{result};
+    doeNativeRenderPassExecuteBundles(toOpaque(&pass), bundles.len, &bundles);
+    try std.testing.expectEqual(error.InvalidArgument, commands.state.failed);
+    try std.testing.expectEqual(@as(usize, 0), commands.cmds.items.len);
 }
 
 // ============================================================
@@ -461,19 +569,23 @@ pub export fn doeNativeRenderPassExecuteBundles(
     bundles: [*]const ?*anyopaque,
 ) callconv(.c) void {
     const pass = cast(DoeRenderPass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     const is_vulkan = pass.enc.dev.backend == .vulkan;
 
     for (bundles[0..bundle_count]) |raw| {
-        const b = bundle.cast_bundle(raw) orelse continue;
+        const b = bundle.cast_bundle(raw) orelse return recording.fail(pass.enc, error.InvalidArgument);
         bundle.check_compatibility(b, pass.target_format, pass.sample_count) catch |err| {
+            _ = pass.enc.state.fail(error.InvalidArgument);
             pass.enc.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, @errorName(err));
             return;
         };
         if (b.depth_stencil_format != pass.depth_stencil_format) {
+            _ = pass.enc.state.fail(error.InvalidArgument);
             pass.enc.dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "render bundle depth/stencil format differs from the render pass");
             return;
         }
-        references.retainRenderBundle(alloc, &pass.enc.references, b);
+        if (!recording.reserve(pass.enc, 0, 1)) return;
+        references.retainRenderBundleAssumeCapacity(&pass.enc.references, b);
         const saved_vulkan_state: ?SavedVulkanBundlePassState = if (is_vulkan)
             SavedVulkanBundlePassState.capture(pass)
         else
@@ -534,8 +646,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
                     rc.render_pass.instance_count = d.instance_count;
                     rc.render_pass.first_vertex = d.first_vertex;
                     rc.render_pass.first_instance = d.first_instance;
-                    pass.enc.cmds.append(alloc, rc) catch
-                        std.debug.panic("doe: executeBundles OOM", .{});
+                    if (!recording.append(pass.enc, rc)) return;
                 },
                 .draw_indexed => |d| {
                     if (!require_index_buffer_for_bundle_draw(&state, "draw_indexed")) {
@@ -561,8 +672,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
                     // first_index converts to a byte offset into the index buffer.
                     const bytes_per_index: u64 = if (state.index_format == 0x1) 2 else 4;
                     rc.render_pass.index_offset = state.index_offset + @as(u64, d.first_index) * bytes_per_index;
-                    pass.enc.cmds.append(alloc, rc) catch
-                        std.debug.panic("doe: executeBundles OOM", .{});
+                    if (!recording.append(pass.enc, rc)) return;
                 },
                 .draw_indirect => |d| {
                     if (pass.recorded_draw_count >= pass.max_draw_count) continue;
@@ -578,8 +688,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
                     rc.render_pass.indirect = true;
                     rc.render_pass.indirect_buffer = d.indirect_buffer;
                     rc.render_pass.indirect_offset = d.indirect_offset;
-                    pass.enc.cmds.append(alloc, rc) catch
-                        std.debug.panic("doe: executeBundles OOM", .{});
+                    if (!recording.append(pass.enc, rc)) return;
                 },
                 .draw_indexed_indirect => |d| {
                     if (!require_index_buffer_for_bundle_draw(&state, "draw_indexed_indirect")) {
@@ -602,8 +711,7 @@ pub export fn doeNativeRenderPassExecuteBundles(
                     rc.render_pass.index_format = state.index_format;
                     rc.render_pass.indirect_buffer = d.indirect_buffer;
                     rc.render_pass.indirect_offset = d.indirect_offset;
-                    pass.enc.cmds.append(alloc, rc) catch
-                        std.debug.panic("doe: executeBundles OOM", .{});
+                    if (!recording.append(pass.enc, rc)) return;
                 },
             }
         }

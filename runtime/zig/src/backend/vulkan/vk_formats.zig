@@ -406,6 +406,27 @@ pub fn bytes_per_pixel(format: model_gpu_types.WGPUTextureFormat) !u32 {
     };
 }
 
+pub fn copy_block_extent(format: model_gpu_types.WGPUTextureFormat) [2]u32 {
+    return switch (format) {
+        model_gpu_types.WGPUTextureFormat_BC1RGBAUnorm...model_gpu_types.WGPUTextureFormat_EACRG11Snorm => .{ 4, 4 },
+        model_gpu_types.WGPUTextureFormat_ASTC4x4Unorm, model_gpu_types.WGPUTextureFormat_ASTC4x4UnormSrgb => .{ 4, 4 },
+        model_gpu_types.WGPUTextureFormat_ASTC5x4Unorm, model_gpu_types.WGPUTextureFormat_ASTC5x4UnormSrgb => .{ 5, 4 },
+        model_gpu_types.WGPUTextureFormat_ASTC5x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC5x5UnormSrgb => .{ 5, 5 },
+        model_gpu_types.WGPUTextureFormat_ASTC6x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC6x5UnormSrgb => .{ 6, 5 },
+        model_gpu_types.WGPUTextureFormat_ASTC6x6Unorm, model_gpu_types.WGPUTextureFormat_ASTC6x6UnormSrgb => .{ 6, 6 },
+        model_gpu_types.WGPUTextureFormat_ASTC8x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC8x5UnormSrgb => .{ 8, 5 },
+        model_gpu_types.WGPUTextureFormat_ASTC8x6Unorm, model_gpu_types.WGPUTextureFormat_ASTC8x6UnormSrgb => .{ 8, 6 },
+        model_gpu_types.WGPUTextureFormat_ASTC8x8Unorm, model_gpu_types.WGPUTextureFormat_ASTC8x8UnormSrgb => .{ 8, 8 },
+        model_gpu_types.WGPUTextureFormat_ASTC10x5Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x5UnormSrgb => .{ 10, 5 },
+        model_gpu_types.WGPUTextureFormat_ASTC10x6Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x6UnormSrgb => .{ 10, 6 },
+        model_gpu_types.WGPUTextureFormat_ASTC10x8Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x8UnormSrgb => .{ 10, 8 },
+        model_gpu_types.WGPUTextureFormat_ASTC10x10Unorm, model_gpu_types.WGPUTextureFormat_ASTC10x10UnormSrgb => .{ 10, 10 },
+        model_gpu_types.WGPUTextureFormat_ASTC12x10Unorm, model_gpu_types.WGPUTextureFormat_ASTC12x10UnormSrgb => .{ 12, 10 },
+        model_gpu_types.WGPUTextureFormat_ASTC12x12Unorm, model_gpu_types.WGPUTextureFormat_ASTC12x12UnormSrgb => .{ 12, 12 },
+        else => .{ 1, 1 },
+    };
+}
+
 /// Returns the Vulkan image aspect mask for a WebGPU texture format.
 /// Color formats use COLOR_BIT; depth and depth-stencil formats use the
 /// appropriate depth/stencil combination.

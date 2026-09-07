@@ -8,7 +8,11 @@ pub const alloc = gpa.allocator();
 pub const label_store = @import("doe_label_store.zig");
 
 pub fn make(comptime T: type) ?*T {
-    const object = alloc.create(T) catch return null;
+    return create(T, alloc) catch null;
+}
+
+pub fn create(comptime T: type, allocator: std.mem.Allocator) std.mem.Allocator.Error!*T {
+    const object = try allocator.create(T);
     program_identity_trace.recordNativeObjectCreate(T, object);
     return object;
 }

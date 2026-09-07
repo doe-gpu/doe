@@ -3,6 +3,26 @@
 This is the live status front door for the non-TSIR WGSL compiler and WebGPU
 runtime path. Artifacts and executable tests own pass/fail state.
 
+## Recording failures and submission ordering
+
+Ordinary encoders, render bundles, and query recording now retain explicit
+failure state. Allocation failures report through existing device error scopes;
+finish produces an error command object when allocation permits, and queue
+submission rejects it before executing the submitted list. Commands, passes,
+bundles, and retained dependencies keep their owning allocator through cleanup.
+Fault-injection tests cover recording growth, abandoned state, failed finish,
+rejected replay/submission, and subsequent valid recording.
+
+Vulkan buffer-to-texture copies execute at their recorded queue position using
+the source GPU buffer. An abandoned recording cannot change its destination.
+Copy layout validation checks mip-relative extents, block geometry, layers,
+strides, and the last accessed source byte. The physical regression retains the
+pre-fix failure and verifies dispatch/copy/readback after caller reference release.
+Source, canonical tests, and exact Node/Bun/Electron main-process packages are
+indexed at `bench/out/compute-program/20260906-ordinary-recording/README.md`.
+This does not establish complete pass-state validation, texture-copy conformance,
+concurrent queue safety, physical Metal/D3D12 behavior, or a performance advantage.
+
 ## Transactional fused command construction
 
 The native fused compute entrypoints now use a typed recording builder that
@@ -20,9 +40,8 @@ It uses the same library bytes as retained-package qualification; the addon's
 similarly named helper uses ordinary encoding and is separate evidence.
 The implementation, canonical tests, and retained-package regressions are indexed at
 `bench/out/compute-program/20260906-recorded-allocation/README.md`.
-Ordinary encoder, render bundle, and query recording still contain allocation
-failure paths requiring repair; this checkpoint does not qualify those paths or
-physical non-Vulkan execution.
+That earlier checkpoint covers the fused constructors. Ordinary recording and
+its distinct native entrypoints are covered by the checkpoint above.
 
 ## Depth attachment ownership
 

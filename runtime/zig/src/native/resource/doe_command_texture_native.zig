@@ -1,3 +1,4 @@
+const recording = @import("../command/doe_command_recording.zig");
 // doe_command_texture_native.zig — clearBuffer, copyTextureToTexture, writeTexture C-ABI exports.
 // Sharded from doe_wgpu_native.zig to keep texture command concerns cohesive.
 
@@ -29,6 +30,7 @@ pub export fn doeNativeCommandEncoderClearBuffer(
     size: u64,
 ) callconv(.c) void {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
+    if (!recording.requireOpen(enc)) return;
     const buf = cast(DoeBuffer, buffer_raw) orelse return;
     if (buf.error_object or buf.destroyed) return;
     // Resolve WGPU_WHOLE_SIZE sentinel: if size is u64 max, fill to end of buffer.
@@ -37,12 +39,13 @@ pub export fn doeNativeCommandEncoderClearBuffer(
     else
         size;
     if (fill_size == 0) return;
-    references.retainBuffer(alloc, &enc.references, buf);
-    enc.cmds.append(alloc, .{ .clear_buffer = .{
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, buf);
+    if (!recording.append(enc, .{ .clear_buffer = .{
         .buffer = if (enc.dev.backend == .vulkan) toOpaque(buf) else buf.mtl,
         .offset = offset,
         .size = fill_size,
-    } }) catch std.debug.panic("doe_command_texture_native: OOM recording clearBuffer command", .{});
+    } })) return;
 }
 
 // ============================================================
@@ -69,12 +72,15 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
     depth_or_layers: u32,
 ) callconv(.c) void {
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return;
+    if (!recording.requireOpen(enc)) return;
     const src = cast(DoeTexture, src_texture_raw) orelse return;
     const dst = cast(DoeTexture, dst_texture_raw) orelse return;
     if (src.error_object or dst.error_object) return;
-    references.retainTexture(alloc, &enc.references, src);
-    references.retainTexture(alloc, &enc.references, dst);
-    enc.cmds.append(alloc, .{ .copy_texture_to_texture = .{
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainTextureAssumeCapacity(&enc.references, src);
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainTextureAssumeCapacity(&enc.references, dst);
+    if (!recording.append(enc, .{ .copy_texture_to_texture = .{
         .src_texture = if (enc.dev.backend == .vulkan) toOpaque(src) else src.mtl,
         .src_mip = src_mip,
         .src_slice = src_slice,
@@ -90,7 +96,7 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
         .width = width,
         .height = height,
         .depth_or_layers = depth_or_layers,
-    } }) catch std.debug.panic("doe_command_texture_native: OOM recording copyTextureToTexture command", .{});
+    } })) return;
 }
 
 // ============================================================

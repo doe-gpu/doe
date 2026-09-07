@@ -18,6 +18,7 @@
 // actionable error rather than a silent misfire.
 
 const std = @import("std");
+const recording = @import("../../contracts/command_recording.zig");
 const leases = @import("../../contracts/resource_lease.zig");
 const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
 const backend_contract = @import("../../contracts/backend.zig");
@@ -121,6 +122,8 @@ pub const BundleCmd = union(BundleCmdTag) {
 
 pub const DoeBundleEncoder = struct {
     pub const TYPE_MAGIC = MAGIC_BUNDLE_ENCODER;
+    state: recording.State = .open,
+    device_lease: ?leases.ResourceLease = null,
     magic: u32 = TYPE_MAGIC,
     allocator: std.mem.Allocator,
     ref_count: u32 = 1,
@@ -142,6 +145,8 @@ pub const DoeBundleEncoder = struct {
 
 pub const DoeRenderBundle = struct {
     pub const TYPE_MAGIC = MAGIC_BUNDLE;
+    error_object: bool = false,
+    device_lease: ?leases.ResourceLease = null,
     magic: u32 = TYPE_MAGIC,
     allocator: std.mem.Allocator,
     ref_count: u32 = 1,
@@ -210,6 +215,7 @@ extern fn metal_bridge_render_encoder_draw_indexed_indirect(
 // ============================================================
 
 pub const ReplayError = error{
+    InvalidBundle,
     FormatMismatch,
     SampleCountMismatch,
 };
@@ -220,6 +226,7 @@ pub fn check_compatibility(
     pass_color_format: abi_texture.WGPUTextureFormat,
     pass_sample_count: u32,
 ) ReplayError!void {
+    if (b.error_object) return error.InvalidBundle;
     if (b.color_format != 0 and b.color_format != pass_color_format) {
         return ReplayError.FormatMismatch;
     }
@@ -545,19 +552,28 @@ pub fn make_bundle_encoder(
     return enc;
 }
 
-pub fn bundle_encoder_push(enc: *DoeBundleEncoder, cmd: BundleCmd) void {
-    enc.cmds.append(enc.allocator, cmd) catch
-        std.debug.panic("render_bundle: OOM recording bundle command", .{});
+pub fn bundle_encoder_push(enc: *DoeBundleEncoder, cmd: BundleCmd) recording.Failure!void {
+    if (enc.state != .open) return error.InvalidState;
+    enc.cmds.append(enc.allocator, cmd) catch |err| {
+        _ = enc.state.fail(err);
+        return err;
+    };
 }
 
 pub fn bundle_encoder_finish(enc: *DoeBundleEncoder) ?*DoeRenderBundle {
     const a = enc.allocator;
-    const bundle = a.create(DoeRenderBundle) catch return null;
-    const cmds_slice = enc.cmds.toOwnedSlice(a) catch {
+    const valid = enc.state == .open;
+    const bundle = a.create(DoeRenderBundle) catch |err| {
+        _ = enc.state.fail(err);
+        return null;
+    };
+    const cmds_slice = enc.cmds.toOwnedSlice(a) catch |err| {
+        _ = enc.state.fail(err);
         a.destroy(bundle);
         return null;
     };
     bundle.* = .{
+        .error_object = !valid,
         .allocator = a,
         .backend = enc.backend,
         .color_format = enc.color_format,
@@ -567,6 +583,7 @@ pub fn bundle_encoder_finish(enc: *DoeBundleEncoder) ?*DoeRenderBundle {
         .references = enc.references,
     };
     enc.references = .{};
+    enc.state = .finished;
     return bundle;
 }
 
@@ -576,6 +593,7 @@ pub fn bundle_destroy(b: *DoeRenderBundle) void {
 }
 
 pub fn destroyReleasedBundle(b: *DoeRenderBundle) void {
+    if (b.device_lease) |lease| lease.release(lease.handle);
     leases.releaseAll(b.allocator, &b.references);
     const a = b.allocator;
     a.free(b.cmds);

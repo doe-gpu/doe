@@ -1,3 +1,4 @@
+const recording = @import("../command/doe_command_recording.zig");
 // doe_query_native.zig — QuerySet (GPU timestamp query) support for Doe Metal and Vulkan backends.
 //
 // Metal: Uses MTLCounterSampleBuffer for GPU timeline timestamps.
@@ -123,29 +124,31 @@ pub fn doeNativeCommandEncoderWriteTimestampWithPosition(
     position: native_cmds.TimestampWritePosition,
 ) void {
     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
+    if (!recording.requireOpen(enc)) return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     if (qs.destroyed or query_index >= qs.count) return;
+    if (!recording.reserve(enc, 1, 1)) return;
     native_helpers.object_add_ref(DoeQuerySet, qs_raw);
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
-            enc.cmds.append(native_helpers.alloc, .{ .write_timestamp = .{
+            if (!recording.append(enc, .{ .write_timestamp = .{
                 .counter_buffer = null,
                 .query_set = qs_raw,
                 .query_index = query_index,
                 .position = position,
-            } }) catch std.debug.panic("doe_query_native: OOM recording vulkan write_timestamp", .{});
+            } })) return;
             return;
         }
     }
 
     // Metal: record for deferred execution at submit.
-    enc.cmds.append(native_helpers.alloc, .{ .write_timestamp = .{
+    if (!recording.append(enc, .{ .write_timestamp = .{
         .counter_buffer = qs.counter_sample_buffer,
         .query_set = qs_raw,
         .query_index = query_index,
         .position = position,
-    } }) catch std.debug.panic("doe_query_native: OOM recording write_timestamp", .{});
+    } })) return;
 }
 
 // ============================================================
@@ -161,6 +164,7 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
     dst_offset: u64,
 ) callconv(.c) void {
     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
+    if (!recording.requireOpen(enc)) return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     const dst = native_helpers.cast(native_types.DoeBuffer, dst_raw) orelse return;
     if (qs.destroyed or dst.error_object or dst.destroyed) return;
@@ -170,13 +174,15 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
     const copy_bytes = @as(usize, query_count) * TIMESTAMP_BYTES;
     const d_off: usize = @intCast(dst_offset);
     if (d_off + copy_bytes > @as(usize, @intCast(dst.size))) return;
+    if (!recording.reserve(enc, 1, 1)) return;
     native_helpers.object_add_ref(DoeQuerySet, qs_raw);
 
-    references.retainBuffer(native_helpers.alloc, &enc.references, dst);
+    if (!recording.reserve(enc, 0, 1)) return;
+    references.retainBufferAssumeCapacity(&enc.references, dst);
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
-            enc.cmds.append(native_helpers.alloc, .{ .resolve_query_set = .{
+            if (!recording.append(enc, .{ .resolve_query_set = .{
                 .counter_buffer = null,
                 .query_set = qs_raw,
                 .first_query = first_query,
@@ -184,13 +190,13 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
                 .dst_mtl = null,
                 .dst_buffer = dst_raw,
                 .dst_offset = dst_offset,
-            } }) catch std.debug.panic("doe_query_native: OOM recording vulkan resolve_query_set", .{});
+            } })) return;
             return;
         }
     }
 
     // Metal: record for deferred execution at submit.
-    enc.cmds.append(native_helpers.alloc, .{ .resolve_query_set = .{
+    if (!recording.append(enc, .{ .resolve_query_set = .{
         .counter_buffer = qs.counter_sample_buffer,
         .query_set = qs_raw,
         .first_query = first_query,
@@ -198,7 +204,7 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
         .dst_mtl = dst.mtl,
         .dst_buffer = dst_raw,
         .dst_offset = dst_offset,
-    } }) catch std.debug.panic("doe_query_native: OOM recording resolve_query_set", .{});
+    } })) return;
 }
 
 pub fn vulkanRecordWriteTimestamp(
@@ -442,6 +448,7 @@ pub export fn doeNativeRenderPassBeginOcclusionQuery(
     query_index: u32,
 ) callconv(.c) void {
     const pass = native_helpers.cast(native_types.DoeRenderPass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     const qs_raw = pass.occlusion_query_set orelse return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     if (qs.query_type != WGPU_QUERY_TYPE_OCCLUSION) return;
@@ -452,8 +459,8 @@ pub export fn doeNativeRenderPassBeginOcclusionQuery(
 
 pub fn retainRecordedReference(enc: *native_types.DoeCommandEncoder, raw: ?*anyopaque) void {
     _ = native_helpers.cast(DoeQuerySet, raw) orelse return;
-    enc.references.append(native_helpers.alloc, .{ .handle = raw, .release = doeNativeQuerySetRelease }) catch
-        std.debug.panic("doe_query_native: OOM retaining recorded query set", .{});
+    if (!recording.reserve(enc, 0, 1)) return;
+    enc.references.appendAssumeCapacity(.{ .handle = raw, .release = doeNativeQuerySetRelease });
     native_helpers.object_add_ref(DoeQuerySet, raw);
 }
 
@@ -461,6 +468,7 @@ pub export fn doeNativeRenderPassEndOcclusionQuery(
     pass_raw: ?*anyopaque,
 ) callconv(.c) void {
     const pass = native_helpers.cast(native_types.DoeRenderPass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     pass.occlusion_query_active = false;
 }
 const log = std.log.scoped(.doe_query_native);

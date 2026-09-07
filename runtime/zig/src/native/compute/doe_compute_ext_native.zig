@@ -1,3 +1,4 @@
+const recording = @import("../command/doe_command_recording.zig");
 // doe_compute_ext_native.zig — Compute pass and pipeline extensions for Doe native Metal backend.
 // Sharded from doe_wgpu_native.zig: compute pass operations, getBindGroupLayout, dispatchIndirect.
 
@@ -133,7 +134,10 @@ fn bumpPassState(pass: *DoeComputePass) void {
 
 fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
     if (pass.pipeline == pip) return;
-    if (pip) |pipeline| references.retainPipeline(alloc, &pass.enc.references, pipeline);
+    if (pip) |pipeline| {
+        if (!recording.reserve(pass.enc, 0, 1)) return;
+        references.retainPipelineAssumeCapacity(&pass.enc.references, pipeline);
+    }
     pass.pipeline = pip;
     bumpPassState(pass);
 }
@@ -141,7 +145,10 @@ fn setPassPipeline(pass: *DoeComputePass, pip: ?*DoeComputePipeline) void {
 fn setPassBindGroup(pass: *DoeComputePass, index: usize, bg: ?*DoeBindGroup) void {
     if (index >= pass.bind_groups.len) return;
     if (pass.bind_groups[index] == bg) return;
-    if (bg) |group| references.retainBindGroup(alloc, &pass.enc.references, group);
+    if (bg) |group| {
+        if (!recording.reserve(pass.enc, 0, 1)) return;
+        references.retainBindGroupAssumeCapacity(&pass.enc.references, group);
+    }
     pass.bind_groups[index] = bg;
     bumpPassState(pass);
 }
@@ -180,6 +187,7 @@ fn tryRepeatLastRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline
 
 pub export fn doeNativeComputePassSetPipeline(pass_raw: ?*anyopaque, pip_raw: ?*anyopaque) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     setPassPipeline(pass, cast(DoeComputePipeline, pip_raw));
 }
 
@@ -187,10 +195,12 @@ pub export fn doeNativeComputePassSetBindGroup(pass_raw: ?*anyopaque, index: u32
     _ = dyn_count;
     _ = dyn_offsets;
     const pass = cast(DoeComputePass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     if (index < MAX_COMPUTE_BIND_GROUPS) setPassBindGroup(pass, @intCast(index), cast(DoeBindGroup, bg_raw));
 }
 
 fn appendRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline, x: u32, y: u32, z: u32) void {
+    if (!recording.requireOpen(pass.enc)) return;
     if (tryRepeatLastRecordedDispatch(pass, pip, x, y, z)) return;
     if (!validate_dispatch_preconditions(pass, pip, .{ x, y, z })) return;
     var cmd = RecordedCmd{ .dispatch = .{
@@ -227,13 +237,13 @@ fn appendRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline, x: u3
         rememberLastRecordedDispatch(pass, pip, x, y, z);
         return;
     }
-    pass.enc.cmds.append(alloc, cmd) catch
-        std.debug.panic("doe_compute_ext_native: OOM recording dispatch command", .{});
+    if (!recording.append(pass.enc, cmd)) return;
     rememberLastRecordedDispatch(pass, pip, x, y, z);
 }
 
 pub export fn doeNativeComputePassDispatch(pass_raw: ?*anyopaque, x: u32, y: u32, z: u32) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     const pip = pass.pipeline orelse return;
     appendRecordedDispatch(pass, pip, x, y, z);
 }
@@ -247,6 +257,7 @@ pub export fn doeNativeComputePassDispatchBound(
     z: u32,
 ) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     const pip = cast(DoeComputePipeline, pip_raw) orelse return;
     setPassPipeline(pass, pip);
     setPassBindGroup(pass, 0, cast(DoeBindGroup, bg0_raw));
@@ -255,6 +266,7 @@ pub export fn doeNativeComputePassDispatchBound(
 
 pub export fn doeNativeComputePassEnd(raw: ?*anyopaque) callconv(.c) void {
     const pass = cast(DoeComputePass, raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     const query_set = pass.timestamp_end_query_set orelse return;
     const write_index = pass.timestamp_end_write_index;
     pass.timestamp_end_query_set = null;
@@ -293,8 +305,9 @@ pub export fn doeNativeComputePassRelease(raw: ?*anyopaque) callconv(.c) void {
             query_native.doeNativeQuerySetRelease(query_set);
         }
         native_helpers.label_store.remove(raw);
+        const allocator = p.enc.allocator;
         if (p.owns_encoder) native_exports.doeNativeCommandEncoderRelease(toOpaque(p.enc));
-        alloc.destroy(p);
+        allocator.destroy(p);
     }
 }
 
@@ -345,6 +358,7 @@ pub export fn doeNativeComputePipelineGetBindGroupLayout(pip_raw: ?*anyopaque, g
 
 pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_raw: ?*anyopaque, offset: u64) callconv(.c) void {
     const pass = cast(DoeComputePass, pass_raw) orelse return;
+    if (!recording.requireOpen(pass.enc)) return;
     const pip = pass.pipeline orelse return;
     const indirect_buf = cast(DoeBuffer, buf_raw) orelse return;
     if (indirect_buf.error_object or indirect_buf.destroyed) return;
@@ -384,7 +398,7 @@ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_ra
             pass.bind_groups[0..],
         );
     }
-    references.retainBuffer(alloc, &pass.enc.references, indirect_buf);
-    pass.enc.cmds.append(alloc, cmd) catch
-        std.debug.panic("doe_compute_ext_native: OOM recording indirect dispatch command", .{});
+    if (!recording.reserve(pass.enc, 0, 1)) return;
+    references.retainBufferAssumeCapacity(&pass.enc.references, indirect_buf);
+    if (!recording.append(pass.enc, cmd)) return;
 }

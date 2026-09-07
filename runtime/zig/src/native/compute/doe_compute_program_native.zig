@@ -190,6 +190,7 @@ pub export fn doeNativeComputeProgramPrepare(queue_raw: ?*anyopaque, commands_ra
     if (comptime builtin.os.tag != .linux) return null;
     const queue = helpers.cast(objects.DoeQueue, queue_raw) orelse return null;
     const commands = helpers.cast(objects.DoeCommandBuffer, commands_raw) orelse return null;
+    if (commands.error_object) return null;
     if (commands.dev != queue.dev or queue.dev.backend != .vulkan) {
         errors.deliverInternalError(queue.dev, "compute program: expected Vulkan commands from the selected device", .{});
         return null;
